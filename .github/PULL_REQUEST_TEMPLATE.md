@@ -15,4 +15,5 @@
 
 ## CLA
 
+- [ ] Owner or Claude PR (CLA not required)
 - [ ] I have read the [CLA](https://github.com/GameTech-Systems/Chess9s/blob/main/CLA.md) and agree to it. I wrote the agreement sentence from CONTRIBUTING in this description.

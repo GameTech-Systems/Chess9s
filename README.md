@@ -17,7 +17,7 @@ The name, logos, art, story, characters, books, video, and merchandise are **All
 
 ## Rules are variables
 
-Every piece behavior is a **parameter** with a default and a list of options. For example, the King moves 2 squares by default, with 1, 3, or 4 as options. A **ruleset** is a named bundle of choices, and every game records which ruleset it used.
+Every piece behavior is a **parameter** with a default and a list of options. For example, in the current draft the King's range is 2 squares, with 1, 3, or 4 as options. Draft values are unverified until the default rules are fairness-checked. A **ruleset** is a named bundle of choices, and every game records which ruleset it used.
 
 Players can pick from published rulesets and propose new ones. For 2-player games, fair play is required: the default rules are built and checked for fairness before they are released, and **official tournament rules** are established only after public discussion. 3-player rules are experimental and will be tested for balance later.
 

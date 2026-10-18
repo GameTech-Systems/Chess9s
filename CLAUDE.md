@@ -1,36 +1,45 @@
 # Chess Nines (Chess9s repo): project memory for Claude Code
 
-## What this is
-Chess Nines is a 9×9 chess variant (custom pieces and special squares). 2-player ships first; 3-player Dragon mode comes later. Rules are published as data so players can pick rulesets and propose new ones. Gameplay lives at chess9s.com. This repo is public.
+@docs/HANDOFF.md
 
-## Current focus
-Phase 0 (foundation) is done once Commit 1 lands. Next: Phase 1, scaffold the pnpm workspace (packages/engine, apps/web), the rules loader, and the board render. See docs/ROADMAP.md.
-(Update this section at the end of every session.)
+## What this is
+Chess Nines is a 9×9 chess variant (custom pieces and special squares). 2-player ships first; 3-player Dragon mode comes later. Rules are published as data so players can pick rulesets and propose new ones. Gameplay lives at chess9s.com. This repo is public and source-available (PolyForm Shield 1.0.0), never "open source".
+
+## Session protocol
+1. **Start** with `/start-session S<n>`. One build-plan step per session, one pull request per step. The step list is `docs/BUILD-PLAN.md`; read only your step's section.
+2. **Model and effort** come from the step (or the owner's pasted ledger brief). If the session runs on something else, give the owner the exact commands (`/model sonnet`, `/effort medium`) at the top of your first reply. Don't switch models mid-session yourself: it drops the prompt cache.
+3. **Plan mode** before any change that touches several files. **Write the failing test first.** Commit after every green task.
+4. **End** with `/end-session`: checks, handoff, log, PR, CI, merge, and the next-session recommendation with a `ledger-sync` block. If usage is running low, run it early; unfinished work stays on its branch.
+
+## Decisions and defaults
+- Owner decisions are made in a private ledger. Public ones reach you through the owner's brief, the "Decision defaults" table in `docs/BUILD-PLAN.md`, and `docs/decisions/`.
+- **Defaults, not stalls.** When a step needs an open decision, apply its default, mark it provisional (in the data's `source` or `notes`, or a code comment), list it in the handoff, and keep going.
+- **Never invent rules.** You may only choose among options already listed in `rules/parameters.json` or in a decision. New pieces, movement, squares, parameters, or options come from the owner. If none exists, record the question in the handoff and work on the rest of the step.
+
+## Pull requests and merging
+- Claude opens and merges its own PRs; the owner does not approve them. Use `scripts/claude/ship.sh` (it uses the GitHub REST API, because `gh pr` and `gh issue` fail in cloud sessions).
+- Merge only when CI is green. Never push to `main`, never force-push `main`, never merge a partial step with failing tests.
+- Merge method: rebase (decision D8). It keeps per-task commits and their authorship.
+- Sign off every commit (`git commit -s`). A DCO check runs on every PR and fails without it (decision D22).
 
 ## Non-negotiables
-- **Rules are data.** Never hardcode a piece rule. Read it from rules/parameters.json and the selected ruleset.
-- **Do not invent game rules.** If a rule is unclear or open (default null, `needsDecision`), stop and ask the owner. All seed values in parameters.json are unverified.
-- **Engine is pure TypeScript.** No DOM or UI imports, deterministic, N-player-ready turn order, check and checkmate computed from attack maps.
-- **Test every parameter** at its default and at each option. Write the failing test first.
-- **Official rulesets are immutable.** Never edit one. Create a new version.
-- **2-player defaults must be fairness-checked** before they are published as a Candidate ruleset. Do not change a default without the owner's approval.
-- **Public repo hygiene.** No secrets, no personal info, no unreleased art or lore. Never read .env or private paths. Do not create or commit art, lore, or characters.
-- **Licensing.** Code is PolyForm Shield 1.0.0. Ask before adding any dependency, and never add GPL or AGPL ones. List third-party components in NOTICE.
+- **Rules are data.** Never hardcode a piece rule. Read it from `rules/` and the selected ruleset.
+- **Test every parameter** at its default and at each option.
+- **Official rulesets are immutable.** Changes ship as a new version.
+- **2-player defaults must be fairness-checked** before they are published as a Candidate. Don't change a default without the owner's decision.
+- **Public repo hygiene.** No secrets, no personal information (names, emails, addresses), no unreleased art or lore. Never read `.env` or private paths. Don't create art, lore, or characters.
+- **Dependencies.** Only permissive licenses (MIT, BSD, Apache-2.0, ISC). Never GPL, LGPL, or AGPL. Use the pre-approved list in the step; anything else, note it in the PR and the handoff. List third-party components in NOTICE.
 - **Naming.** Product text says "Chess Nines". Chess9s.com is the web address.
 
-## Planned stack
-TypeScript, pnpm workspaces, Vite + React (static SPA), Vitest. Details in docs/decisions/0002-stack.md. Hosting: Cloudflare (provisional, docs/decisions/0003-hosting.md).
+## Stack
+TypeScript, pnpm workspaces (`packages/engine`, `packages/sim`, `apps/web`), Vite + React static SPA, Vitest. See `docs/decisions/0002-stack.md`. Hosting: Cloudflare, provisional (`docs/decisions/0003-hosting.md`).
 
 ## Commands
-Filled in after scaffolding (install, dev, test, lint, typecheck).
-
-## Working style
-- Plan mode before any change touching several files.
-- One task per session. Commit after each green task with a clear message.
-- Keep pull requests small. Ask before adding dependencies or changing structure.
-- End each session with /end-session.
+Filled in by S7 (install, dev, test, lint, typecheck, validate:rules).
 
 ## Where things live
-- rules/parameters.json: the variable registry. rules/rulesets/: named bundles. rules/schema/: JSON Schemas.
-- docs/RULES-FRAMEWORK.md, docs/GOVERNANCE.md: how rules and ratification work.
-- docs/decisions/: short decision records.
+- `docs/HANDOFF.md`: current state and the next session (rewritten every session). `docs/sessions/LOG.md`: one line per session.
+- `docs/BUILD-PLAN.md`: every step, its model and effort, done-when checks, and decision defaults.
+- `rules/parameters.json`: the variable registry. `rules/rulesets/`: named bundles. `rules/schema/`: JSON Schemas.
+- `.claude/rules/`: extra instructions that load only when you touch matching paths (engine, rules data).
+- `docs/RULES-FRAMEWORK.md`, `docs/GOVERNANCE.md`, `docs/decisions/`.
