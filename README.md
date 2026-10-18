@@ -1,0 +1,45 @@
+# Chess Nines
+
+**A 9×9 chess variant with custom pieces, special squares, and rules the community helps decide.**
+
+- Play (coming soon): [chess9s.com](https://chess9s.com)
+- Story and lore (coming soon): [chessnines.com](https://chessnines.com)
+
+> **Status: foundation stage.** There is no playable build yet. This repository currently holds the rules framework, governance, and legal groundwork. See the [roadmap](docs/ROADMAP.md).
+
+## Core-source, not open source
+
+The game's code, rules text, and rule data are published here so anyone can **verify the game is fair** and **test their own variants**. You can read, run, and modify everything locally.
+
+This repository is **source-available**, not open source. It is licensed under the [PolyForm Shield License 1.0.0](LICENSE): you may use, modify, and share the software for any purpose except providing a product that competes with it, or with any product the project owner provides using it. The license text says goods and services can compete even when they are free or built for other platforms or programming languages, and that a product marketed as a practical substitute definitely competes. In plain terms: study it, test it, build on it, but don't ship a substitute for the game. The license text controls; this summary is not legal advice.
+
+The name, logos, art, story, characters, books, video, and merchandise are **All Rights Reserved** and are not covered by that license. They are protected by those reserved rights and by trademark. See [NOTICE](NOTICE) and [TRADEMARKS](TRADEMARKS.md).
+
+## Rules are variables
+
+Every piece behavior is a **parameter** with a default and a list of options. For example, the King moves 2 squares by default, with 1, 3, or 4 as options. A **ruleset** is a named bundle of choices, and every game records which ruleset it used.
+
+Players can pick from published rulesets and propose new ones. For 2-player games, fair play is required: the default rules are built and checked for fairness before they are released, and **official tournament rules** are established only after public discussion. 3-player rules are experimental and will be tested for balance later.
+
+Learn more: [Rules framework](docs/RULES-FRAMEWORK.md) · [Governance](docs/GOVERNANCE.md) · [Parameter registry](rules/parameters.json)
+
+## Take part
+
+- **Discuss and propose rules:** [GitHub Discussions](https://github.com/GameTech-Systems/Chess9s/discussions)
+- **Structured proposals and reports:** [open an issue](https://github.com/GameTech-Systems/Chess9s/issues/new/choose) (rule proposal, movement proposal, balance report, bug)
+- **Contribute:** read [CONTRIBUTING](CONTRIBUTING.md) first. A [CLA](CLA.md) is required, and art, lore, and character contributions are not accepted.
+- **Conduct:** [Code of Conduct](CODE_OF_CONDUCT.md)
+
+## Repository map
+
+```
+docs/     roadmap, rules framework, governance, workflow, decision records
+rules/    parameter registry, schemas, rulesets
+assets/   reserved materials (see assets/README.md)
+```
+
+Code (`packages/engine`, `apps/web`) arrives in Phase 1.
+
+## Legal
+
+Copyright 2026 Duke Johnson and successors and assigns. Chess Nines™ is claimed as a trademark; see [TRADEMARKS](TRADEMARKS.md).

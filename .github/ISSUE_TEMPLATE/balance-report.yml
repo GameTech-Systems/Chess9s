@@ -1,0 +1,49 @@
+name: Balance report
+description: Share playtest or simulation results for a ruleset.
+title: "[Balance] "
+labels: ["balance-report"]
+body:
+  - type: input
+    id: ruleset
+    attributes:
+      label: Ruleset id and version
+      placeholder: draft-2p 0.0.1
+    validations:
+      required: true
+  - type: dropdown
+    id: players
+    attributes:
+      label: Player count
+      options:
+        - 2-player
+        - 3-player (experimental)
+    validations:
+      required: true
+  - type: dropdown
+    id: method
+    attributes:
+      label: Method
+      options:
+        - Human games
+        - Bot self-play
+        - Mixed
+    validations:
+      required: true
+  - type: textarea
+    id: results
+    attributes:
+      label: Results
+      description: Number of games and outcomes by side or seat. Include draw rate and average length if you have them.
+    validations:
+      required: true
+  - type: textarea
+    id: observations
+    attributes:
+      label: Observations
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Contribution terms
+      options:
+        - label: I agree this report is a Contribution under the Chess Nines CLA, and the results are honest.
+          required: true

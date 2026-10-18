@@ -1,0 +1,10 @@
+{
+  "$schema": "../schema/ruleset.schema.json",
+  "id": "draft-2p",
+  "name": "Draft 2-Player (unratified)",
+  "version": "0.0.1",
+  "status": "proposed",
+  "players": 2,
+  "description": "Working ruleset that plays every parameter at its default. Seed values are unverified and this ruleset is not official.",
+  "overrides": {}
+}

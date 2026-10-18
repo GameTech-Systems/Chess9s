@@ -1,0 +1,25 @@
+Chess Nines
+Required Notice: Copyright 2026 Duke Johnson and successors and assigns (https://chess9s.com)
+Licensor Line of Business: Chess Nines, a 9x9 chess variant game with selectable rule variants (https://chess9s.com)
+
+LICENSED MATERIAL
+The source code, tests, tooling, rules text, rule data (rules/), and documentation
+(docs/) in this repository are licensed under the PolyForm Shield License 1.0.0.
+See the LICENSE file.
+
+NOT LICENSED -- ALL RIGHTS RESERVED
+The following are not covered by the LICENSE file. No license to them is granted,
+expressly or by implication:
+
+  - The names "Chess Nines" and "Chess9s", logos, and trade dress. See TRADEMARKS.md.
+  - Art, piece and board designs, illustrations, sound, animation, and any media,
+    including anything in the assets/ directory.
+  - Story, lore, characters, world-building, books, video, and merchandise, and any
+    derivative works of them.
+
+Anything in this repository that is not clearly code, rules text, rule data, or
+documentation should be treated as reserved unless the Owner states otherwise in writing.
+
+THIRD-PARTY COMPONENTS
+Third-party dependencies keep their own licenses. They will be listed here as they
+are added.
