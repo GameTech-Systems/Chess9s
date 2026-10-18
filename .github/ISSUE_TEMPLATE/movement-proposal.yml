@@ -1,0 +1,37 @@
+name: Movement proposal
+description: Propose a new way for a piece to move.
+title: "[Movement] "
+labels: ["movement-proposal"]
+body:
+  - type: input
+    id: piece
+    attributes:
+      label: Piece
+      placeholder: king
+    validations:
+      required: true
+  - type: textarea
+    id: movement
+    attributes:
+      label: Movement description
+      description: Directions, range, whether it can jump, how it captures, and any restricted squares. Betza notation is welcome but optional.
+    validations:
+      required: true
+  - type: textarea
+    id: examples
+    attributes:
+      label: Example positions
+      description: Show a few positions and the legal moves you expect.
+  - type: textarea
+    id: fairness
+    attributes:
+      label: Fairness reasoning
+    validations:
+      required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Contribution terms
+      options:
+        - label: I agree this proposal is a Contribution under the Chess Nines CLA.
+          required: true

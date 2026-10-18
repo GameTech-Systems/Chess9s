@@ -1,0 +1,53 @@
+name: Rule proposal
+description: Propose a new parameter, a new option, or a change to a default.
+title: "[Rule] "
+labels: ["rule-proposal"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Rules are variables. Each has a default and options. See the [rules framework](https://github.com/GameTech-Systems/Chess9s/blob/main/docs/RULES-FRAMEWORK.md).
+  - type: input
+    id: parameter
+    attributes:
+      label: Parameter id
+      description: An existing id from rules/parameters.json, or a new one in the form piece.aspect.
+      placeholder: king.range
+    validations:
+      required: true
+  - type: dropdown
+    id: players
+    attributes:
+      label: Player count
+      options:
+        - 2-player
+        - 3-player (experimental)
+        - Both
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed default and options
+      description: What should the default be, and which options should players be able to choose?
+    validations:
+      required: true
+  - type: textarea
+    id: fairness
+    attributes:
+      label: Fairness reasoning
+      description: Why is this fair to both sides? For 3-player, how might it affect seat balance?
+    validations:
+      required: true
+  - type: textarea
+    id: interactions
+    attributes:
+      label: Interactions with other parameters
+      description: Anything this changes indirectly, such as check detection, safe squares, or promotion.
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Contribution terms
+      options:
+        - label: I agree this proposal is a Contribution under the Chess Nines CLA.
+          required: true

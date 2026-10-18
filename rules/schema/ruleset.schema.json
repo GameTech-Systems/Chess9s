@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Chess Nines ruleset",
+  "type": "object",
+  "required": ["id", "name", "version", "status", "players", "overrides"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+    "name": { "type": "string" },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "status": { "enum": ["proposed", "experimental", "candidate", "official", "deprecated"] },
+    "players": { "enum": [2, 3] },
+    "description": { "type": "string" },
+    "extends": { "type": "string" },
+    "overrides": { "type": "object" },
+    "ratification": {
+      "type": "object",
+      "required": ["decisionRecord", "date"],
+      "properties": {
+        "decisionRecord": { "type": "string" },
+        "date": { "type": "string", "format": "date" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "if": { "properties": { "status": { "const": "official" } } },
+  "then": { "required": ["ratification"] },
+  "additionalProperties": false
+}
