@@ -58,7 +58,7 @@ In `packages/engine`: load `parameters.json` and a ruleset, validate both agains
 Done when: loader tests pass and the draft ruleset resolves with no null values for 2-player.
 Decisions: D2, D3, D5, D6.
 
-### S9 — Board and piece data formats · Opus 5.5 · high · `todo`
+### S9 — Board and piece data formats · Opus 5.5 · high · `done`
 Design `rules/schema/board.schema.json` (coordinates a–i and 1–9, square types such as void and gateway, start position by side) and `rules/schema/piece.schema.json` (movement as data: directions, range, jumping, capture mode, restricted squares; Betza shorthand optional later). Add a neutral test layout in `packages/engine/test/fixtures/` that is clearly not the real board. Write a decision record for the formats.
 Done when: schemas validate the fixture and the formats are documented in `docs/RULES-FRAMEWORK.md`.
 Decisions: D1.
