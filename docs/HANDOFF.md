@@ -19,7 +19,8 @@ S10 (real board and pieces) is still an owner step in chat; its data must pass `
 
 ## Open questions for the owner
 - Settled 2026-10-19 (`docs/decisions/rules-decisions-2026-10-19.md`): the four S11 questions. Code now makes jumping moves ignore `pass: false`.
-- Not yet built: promotion-zone validation error (no zone field exists), `promote_to_captured_only`, stone capturability mode setting.
+- Promotion: a piece that defines `promotion` with an empty `to` list already fails the schema (tested). A parameter-driven empty list means no promotion.
+- Needs owner via `/new-parameter` (not built): `promote_to_captured_only` mode and the stone-capturability mode setting.
 - Still open from S8: an override set to null is rejected; an `extends` parent must have the same player count. Dependencies beyond D21: `ajv`, `ajv-formats` (MIT), `@types/*`, TypeScript ~6.0.
 - None blocking S12.
 

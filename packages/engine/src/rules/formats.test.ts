@@ -253,6 +253,12 @@ describe('piece format: square rules and promotion', () => {
     expect(pieceIssues(p).length).toBeGreaterThan(0);
   });
 
+  it('rejects a promotion with an empty list (decision 2026-10-19)', () => {
+    const p = clone(stepper) as Json;
+    p.promotion = { to: [] };
+    expect(() => validatePiece(p, validBoard(), registry())).toThrow(/fails its schema/);
+  });
+
   it('accepts a fixed promotion list with a condition', () => {
     const p = clone(stepper) as Json;
     p.promotion = { to: ['slider'], when: { players: [2] } };
