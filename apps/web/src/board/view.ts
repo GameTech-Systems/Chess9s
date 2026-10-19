@@ -14,6 +14,20 @@ export const PHI = (1 + Math.sqrt(5)) / 2;
 const BLACK = '#000000';
 const WHITE = '#ffffff';
 
+/** What the board shows besides the pieces in a game. */
+export interface Highlights {
+  /** The selected piece's square. */
+  selected?: string;
+  /** Squares the selected piece may move to; `capture` marks those holding a piece to take. */
+  targets: { at: string; capture: boolean }[];
+  /** The squares of the last move, from and to. */
+  lastMove?: [string, string];
+  /** Squares of the Kings in check. */
+  check: string[];
+  /** Squares of the pieces that have a legal move. */
+  movable: string[];
+}
+
 /** File index 0 to 8 and rank 1 to 9 from a square name such as "e5". */
 export function parseSquare(at: string): { file: number; rank: number } {
   const m = /^([a-i])([1-9])$/.exec(at);

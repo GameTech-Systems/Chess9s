@@ -1,6 +1,15 @@
 import { useId } from 'react';
-import type { Board as BoardData, Square } from '@chess9s/engine';
-import { FILES, SIZE, edgeLabels, squareFill, tetrahedron, toScreen, viewRotation } from './view';
+import type { Board as BoardData, Position, Square } from '@chess9s/engine';
+import {
+  FILES,
+  SIZE,
+  edgeLabels,
+  squareFill,
+  tetrahedron,
+  toScreen,
+  viewRotation,
+  type Highlights,
+} from './view';
 
 // Setup key for pieces that belong to no side (engine's NEUTRAL; importing it would pull Ajv into the bundle).
 const NEUTRAL = 'neutral';
@@ -25,11 +34,27 @@ export interface BoardProps {
   /** Whose seat the board is drawn from; a seat without a view is drawn upright. */
   seat?: string;
   players?: 2 | 3;
+  /** The pieces to draw; without it, the board's start position for `players`. */
+  position?: Position;
+  /** Marks drawn under the pieces: selection, move targets, last move, check. */
+  highlights?: Highlights;
+  /** Makes the board playable: called with the square clicked (or chosen by keyboard). */
+  onSquareClick?: (at: string) => void;
 }
 
 const unique = <T,>(xs: T[]): T[] => [...new Set(xs)];
 
-export function Board({ board, pieceLetters, seat = 'light', players = 2 }: BoardProps) {
+const EMPTY: Highlights = { targets: [], check: [], movable: [] };
+
+export function Board({
+  board,
+  pieceLetters,
+  seat = 'light',
+  players = 2,
+  position,
+  highlights = EMPTY,
+  onSquareClick,
+}: BoardProps) {
   const uid = useId();
   const rotate = viewRotation(board.sides.find((s) => s.id === seat));
   const typeLabel = new Map(board.squareTypes.map((t) => [t.id, t.label]));
@@ -42,6 +67,13 @@ export function Board({ board, pieceLetters, seat = 'light', players = 2 }: Boar
     ),
   );
   const setup = board.setups.find((s) => s.players === players);
+  const placed: { at: string; id: string; side: string }[] = position
+    ? Object.entries(position).map(([at, p]) => ({ at, id: p.piece, side: p.side }))
+    : Object.entries(setup?.pieces ?? {}).flatMap(([side, byAt]) =>
+        Object.entries(byAt).map(([at, id]) => ({ at, id, side })),
+      );
+  const bySquare = new Map(placed.map((p) => [p.at, p]));
+  const reachable = new Set([...highlights.movable, ...highlights.targets.map((t) => t.at)]);
   const centerOf = (at: string) => {
     const { col, row } = toScreen(at, rotate);
     return { col, row, x: MARGIN + col * CELL + CELL / 2, y: MARGIN + row * CELL + CELL / 2 };
@@ -56,7 +88,7 @@ export function Board({ board, pieceLetters, seat = 'light', players = 2 }: Boar
     <svg
       className="board"
       viewBox={`0 0 ${TOTAL} ${TOTAL}`}
-      role="img"
+      role={onSquareClick ? 'group' : 'img'}
       aria-label={`Chess Nines board, ${seat} seat`}
     >
       <defs>
@@ -171,51 +203,175 @@ export function Board({ board, pieceLetters, seat = 'light', players = 2 }: Boar
         <path d="M0 -26L-8 -39H8Z" fill="#1d1b18" />
       </g>
 
-      {setup &&
-        Object.entries(setup.pieces).flatMap(([side, placed]) =>
-          Object.entries(placed).map(([at, id]) => {
+      <Marks highlights={highlights} centerOf={centerOf} />
+
+      {placed.map(({ at, id, side }) => {
+        const { x, y } = centerOf(at);
+        const tone = TOKENS[side] ?? TOKENS[NEUTRAL]!;
+        const letter = pieceLetters[id] ?? id.charAt(0).toUpperCase();
+        return (
+          <g
+            key={`${side}-${at}`}
+            data-piece={id}
+            data-at={at}
+            data-side={side}
+            transform={`translate(${x} ${y})`}
+            pointerEvents="none"
+          >
+            <title>{`${at} · ${id.replace(/-/g, ' ')}`}</title>
+            <circle
+              r="37"
+              fill={tone.fill}
+              stroke={tone.stroke}
+              strokeWidth="3"
+              filter={`url(#${uid}-shadow)`}
+            />
+            <circle
+              r="30"
+              fill="none"
+              stroke={tone.stroke}
+              strokeOpacity="0.45"
+              strokeWidth="1.5"
+            />
+            <text
+              textAnchor="middle"
+              dominantBaseline="central"
+              y="2"
+              fontSize={letter.length > 1 ? 28 : 36}
+              fontWeight="600"
+              fill={tone.ink}
+              fontFamily="Georgia, 'Times New Roman', serif"
+            >
+              {letter}
+            </text>
+          </g>
+        );
+      })}
+
+      {onSquareClick && (
+        <g>
+          {squares.map(({ at }) => {
             const { x, y } = centerOf(at);
-            const tone = TOKENS[side] ?? TOKENS[NEUTRAL]!;
-            const letter = pieceLetters[id] ?? id.charAt(0).toUpperCase();
+            const piece = bySquare.get(at);
+            const name = piece ? `${at}, ${piece.id.replace(/-/g, ' ')}, ${piece.side}` : at;
             return (
-              <g
-                key={`${side}-${at}`}
-                data-piece={id}
-                data-at={at}
-                data-side={side}
-                transform={`translate(${x} ${y})`}
-              >
-                <title>{`${at} · ${id.replace(/-/g, ' ')}`}</title>
-                <circle
-                  r="37"
-                  fill={tone.fill}
-                  stroke={tone.stroke}
-                  strokeWidth="3"
-                  filter={`url(#${uid}-shadow)`}
-                />
-                <circle
-                  r="30"
-                  fill="none"
-                  stroke={tone.stroke}
-                  strokeOpacity="0.45"
-                  strokeWidth="1.5"
-                />
-                <text
-                  textAnchor="middle"
-                  dominantBaseline="central"
-                  y="2"
-                  fontSize={letter.length > 1 ? 28 : 36}
-                  fontWeight="600"
-                  fill={tone.ink}
-                  fontFamily="Georgia, 'Times New Roman', serif"
-                >
-                  {letter}
-                </text>
-              </g>
+              <rect
+                key={at}
+                data-hit={at}
+                x={x - CELL / 2}
+                y={y - CELL / 2}
+                width={CELL}
+                height={CELL}
+                fill="transparent"
+                role="button"
+                aria-label={name}
+                tabIndex={reachable.has(at) ? 0 : -1}
+                style={{ cursor: reachable.has(at) ? 'pointer' : 'default' }}
+                onClick={() => onSquareClick(at)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onSquareClick(at);
+                  }
+                }}
+              />
             );
-          }),
-        )}
+          })}
+        </g>
+      )}
     </svg>
+  );
+}
+
+const MARK = {
+  last: '#e0b84c',
+  selected: '#f4d675',
+  target: '#e0b84c',
+  capture: '#e0574b',
+  check: '#e0574b',
+};
+
+/** Selection, move targets, the last move and check, drawn between the squares and the pieces. */
+function Marks({
+  highlights,
+  centerOf,
+}: {
+  highlights: Highlights;
+  centerOf: (at: string) => { x: number; y: number };
+}) {
+  const box = (at: string) => {
+    const { x, y } = centerOf(at);
+    return { x: x - CELL / 2, y: y - CELL / 2, width: CELL, height: CELL };
+  };
+  return (
+    <g pointerEvents="none">
+      {highlights.lastMove?.map((at) => (
+        <rect
+          key={`last-${at}`}
+          data-last-move={at}
+          {...box(at)}
+          fill={MARK.last}
+          fillOpacity="0.32"
+        />
+      ))}
+      {highlights.check.map((at) => {
+        const { x, y } = centerOf(at);
+        return (
+          <circle
+            key={`check-${at}`}
+            data-check={at}
+            cx={x}
+            cy={y}
+            r="48"
+            fill={MARK.check}
+            fillOpacity="0.55"
+            stroke={MARK.check}
+            strokeWidth="3"
+          />
+        );
+      })}
+      {highlights.selected && (
+        <rect
+          data-selected={highlights.selected}
+          {...box(highlights.selected)}
+          fill={MARK.selected}
+          fillOpacity="0.3"
+          stroke={MARK.selected}
+          strokeWidth="5"
+          strokeOpacity="0.95"
+        />
+      )}
+      {highlights.targets.map(({ at, capture }) => {
+        const { x, y } = centerOf(at);
+        return capture ? (
+          <circle
+            key={`target-${at}`}
+            data-target={at}
+            data-capture=""
+            cx={x}
+            cy={y}
+            r="44"
+            fill="none"
+            stroke={MARK.capture}
+            strokeWidth="7"
+            strokeOpacity="0.95"
+          />
+        ) : (
+          <circle
+            key={`target-${at}`}
+            data-target={at}
+            cx={x}
+            cy={y}
+            r="15"
+            fill={MARK.target}
+            fillOpacity="0.9"
+            stroke="#14161c"
+            strokeOpacity="0.5"
+            strokeWidth="2"
+          />
+        );
+      })}
+    </g>
   );
 }
 
