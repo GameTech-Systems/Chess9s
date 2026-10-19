@@ -61,6 +61,9 @@ const played = (model: Model, move: GeneratedMove): Model => ({
   history: [...model.history, model.game],
 });
 
+/** A move chosen outside the board (the computer's), recorded like a click-made one. */
+export const playFor = played;
+
 export const canUndo = (model: Model): boolean => model.history.length > 0;
 
 /** Take back the last move (hot-seat only; online play will not offer it). */

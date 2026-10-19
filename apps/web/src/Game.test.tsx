@@ -6,6 +6,7 @@ import { Game } from './Game';
 import { App } from './App';
 import { createRules, ruleset } from './game/rules';
 import { fromGame, newModel } from './game/session';
+import { saveGuest } from './game/guest';
 
 const render = (initial = newModel()) => renderToStaticMarkup(<Game initial={initial} />);
 
@@ -114,5 +115,29 @@ describe('play aids, part 2', () => {
     expect(html).toContain(`${ruleset.id} v${ruleset.version}`);
     expect(html).toContain('En passant');
     expect(html).toContain('>Close<');
+  });
+});
+
+describe('computer opponent and guest play', () => {
+  it('offers a mode choice, hot-seat by default', () => {
+    const html = render();
+    expect(html).toContain('aria-label="Opponent"');
+    expect(html).toMatch(/aria-pressed="true"[^>]*>Hot-seat</);
+    expect(html).toMatch(/aria-pressed="false"[^>]*>Computer</);
+  });
+
+  it('restores a saved computer game', () => {
+    let game = newGame(createRules(), ruleset);
+    game = playMove(game, game.legal[0]!);
+    const data = new Map<string, string>();
+    const store = {
+      getItem: (k: string) => data.get(k) ?? null,
+      setItem: (k: string, v: string) => void data.set(k, v),
+      removeItem: (k: string) => void data.delete(k),
+    };
+    saveGuest(store, { game, mode: 'computer' });
+    const html = renderToStaticMarkup(<Game store={store} />);
+    expect(html).toMatch(/aria-pressed="true"[^>]*>Computer</);
+    expect(html).toContain(game.moves[0]!.notation);
   });
 });

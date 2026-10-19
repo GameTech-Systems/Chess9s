@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { unbuiltFeatures } from '@chess9s/engine';
 import { RulesScreen } from './Rules';
 import { formatElapsed, play, soundsFor } from './game/aids';
+import { randomMove } from './game/bot';
+import { clearGuest, loadGuest, saveGuest, type Mode, type Store } from './game/guest';
 import { Board } from './board/Board';
 import { boardData, pieceLetters } from './board/data';
 import { DEFAULT_RULESET_ID, createRules, listRulesets, type RulesetInfo } from './game/rules';
@@ -11,6 +13,8 @@ import {
   click,
   highlights,
   newModel,
+  playFor,
+  fromGame,
   promote,
   rounds,
   statusLine,
@@ -37,6 +41,17 @@ function lostLine(pieces: string[]): string {
   return [...counts].map(([id, n]) => (n > 1 ? `${pretty(id)} ×${n}` : pretty(id))).join(', ');
 }
 
+function browserStore(): Store | null {
+  try {
+    return typeof window === 'undefined' ? null : window.localStorage;
+  } catch {
+    return null;
+  }
+}
+
+/** Pause before the computer moves, so the player sees their own move land. */
+const BOT_DELAY_MS = 500;
+
 /**
  * `ruleset` is the one being played (default draft-2p). `initial` starts the screen from a given
  * game (tests); otherwise a new game. `onChangeRuleset` returns to the picker.
@@ -45,13 +60,24 @@ export function Game({
   initial,
   ruleset = listRulesets().find((r) => r.id === DEFAULT_RULESET_ID)!,
   onChangeRuleset,
+  store = browserStore(),
 }: {
   initial?: Model;
+  /** Where guest play is kept; the browser's localStorage by default. */
+  store?: Store | null;
   ruleset?: RulesetInfo;
   onChangeRuleset?: () => void;
 }) {
   const rules = useMemo(() => createRules(ruleset.id), [ruleset.id]);
-  const [model, setModel] = useState(() => initial ?? newModel(rules, ruleset));
+  const saved = useMemo(
+    () => (initial || !store ? null : loadGuest(store, rules, ruleset)),
+    // Read once, when the screen opens.
+    [],
+  );
+  const [model, setModel] = useState(
+    () => initial ?? (saved ? fromGame(saved.game) : newModel(rules, ruleset)),
+  );
+  const [mode, setMode] = useState<Mode>(saved?.mode ?? 'hot-seat');
   const [view, setView] = useState<View>('light');
   const { game, promoting } = model;
   const over = game.result.status !== 'ongoing';
@@ -64,6 +90,33 @@ export function Game({
   const [elapsed, setElapsed] = useState(0);
   const started = useRef(Date.now());
   const moveCount = useRef(game.moves.length);
+  // Against the computer, the player has the side that moves first.
+  const botSide = mode === 'computer' ? game.order[1] : undefined;
+  const botTurn = botSide !== undefined && game.turn === botSide && !over;
+  useEffect(() => {
+    if (!botTurn) return;
+    const id = setTimeout(() => {
+      setModel((m) => {
+        const move = m.game.turn === botSide ? randomMove(m.game) : undefined;
+        return move ? playFor(m, move) : m;
+      });
+    }, BOT_DELAY_MS);
+    return () => clearTimeout(id);
+  }, [botTurn, game.moves.length]);
+  // Keep the game in the browser.
+  useEffect(() => {
+    if (store) saveGuest(store, { game, mode });
+  }, [game.moves.length, mode]);
+  const restart = () => {
+    if (store) clearGuest(store);
+    setModel(newModel(rules, ruleset));
+  };
+  // Undo takes back the computer's reply too, so it is the player's turn again.
+  const undoMove = () =>
+    setModel((m) => {
+      const back = undo(m);
+      return botSide !== undefined && back.game.turn === botSide ? undo(back) : back;
+    });
   // Sound on each new move.
   useEffect(() => {
     const before = moveCount.current;
@@ -96,7 +149,7 @@ export function Game({
           seat={seat}
           position={game.position}
           highlights={highlights(model)}
-          onSquareClick={(at) => setModel((m) => click(m, at))}
+          onSquareClick={(at) => !botTurn && setModel((m) => click(m, at))}
         />
       </div>
 
@@ -147,6 +200,14 @@ export function Game({
           </p>
         ))}
 
+        <div className="segmented" role="group" aria-label="Opponent">
+          {(['hot-seat', 'computer'] as const).map((id) => (
+            <button key={id} type="button" aria-pressed={mode === id} onClick={() => setMode(id)}>
+              {id === 'computer' ? 'Computer' : 'Hot-seat'}
+            </button>
+          ))}
+        </div>
+
         <div className="segmented" role="group" aria-label="Board view">
           {VIEWS.map((v) => (
             <button
@@ -178,7 +239,7 @@ export function Game({
           <button type="button" aria-pressed={sound} onClick={() => setSound((v) => !v)}>
             Sound
           </button>
-          <button type="button" disabled={!canUndo(model)} onClick={() => setModel(undo)}>
+          <button type="button" disabled={!canUndo(model) || botTurn} onClick={undoMove}>
             Undo
           </button>
         </div>
@@ -192,12 +253,7 @@ export function Game({
           ))}
         </ol>
 
-        <button
-          type="button"
-          className="again"
-          onClick={() => setModel(newModel(rules, ruleset))}
-          data-over={over ? '' : undefined}
-        >
+        <button type="button" className="again" onClick={restart} data-over={over ? '' : undefined}>
           New game
         </button>
 
