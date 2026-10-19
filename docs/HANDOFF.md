@@ -20,8 +20,8 @@ Start with: `/start-session S18`
 
 ## Open questions for the owner
 - Answered 19 Oct 2026 (decisions record, section 7): `tail.2p.canCapture` stays as an option, off by default; the closed Coast is closed to Kings and Queens too. No code change needed.
-- Confirm the opener's exception (a5-e5, then e5-i5 on the very next turn only). Default: as written.
-- 3-player: Coast pieces give check only from A5 until they have emerged (needs an `emerged` marker per piece when 3-player is built). Did "emerge at E5" mean A5 (RULES.md)? And does this replace "Dragon pieces don't give check to Kings"? Default: A5; not built.
+- Answered: the opener's exception is as written; Coast pieces emerge through A5; 3-player Dragon pieces give no check while both Kings are in play (they may capture a King, then must checkmate the other); 2-player Dragon Heads, Sun and Moon must give check.
+- Open: how the `emerged` marker (check from A5 only) fits with "no Dragon check while both Kings are in play". Default: no check; marker matters only after a King is captured. Not built.
 - Sun and Moon promotion targets, Tetrahedron size, Ting Yang art, and whether the 3-player Tail passes an empty e5 (default: yes) are still open.
 
 ## Notes for Claude
