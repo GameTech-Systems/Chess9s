@@ -18,9 +18,7 @@ Start with: `/start-session S16`
 - D3, D6: decided; applied in rule set v0.2. D1: pieces are unverified seeds in `rules/pieces/`.
 
 ## Open questions for the owner
-- Promoting to a lost piece: you said it does not cancel the loss "because the pawn traded for it". I read it as: the pawn is spent and the piece comes back, nothing else changes. Can a second pawn then promote to the same lost type (the loss stays on the list), or does the restored piece remove it? Default until you answer: the game state (S16/S17) removes it from the list once the piece is back on the board. Not blocking S16.
-- Sun and Moon promotion (`sunMoon.canPromote`): no targets given, so it does nothing. Tell me the targets when you want it built.
-- Tetrahedron size, Ting Yang art, and whether the 3-player Tail passes an empty e5 (default: yes), still open.
+- Answered 19 Oct (see rules-decisions section 5 and 6): promoting to a lost piece removes it from the list; Sun/Moon promotion targets given (not built); tetrahedron size and 3-player Tail over e5 confirmed. Still open: Ting Yang art (no content given).
 
 ## Notes for Claude
 - Use `scripts/claude/ship.sh` (`gh pr` and `gh issue` fail in cloud sessions). `/end-session` may be invoked by Claude directly.
