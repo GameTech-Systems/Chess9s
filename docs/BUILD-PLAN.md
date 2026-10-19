@@ -76,7 +76,7 @@ Done when: fixture positions produce exactly the expected move lists.
 In `apps/web`: render the 9×9 board from board data with every special square type, coordinates, and placeholder piece shapes (letters or simple shapes, no art). Responsive square sizing.
 Done when: the real board (or the fixture, if S10 isn't done) renders on desktop and phone widths.
 
-### S13 — Pieces, batch 1: King and the standard-movement pieces · Sonnet 5.5 · high · `todo`
+### S13 — Pieces, batch 1: King and the standard-movement pieces · Sonnet 5.5 · high · `done`
 Implement through data and parameters: `king.range`, `king.canJump`, and the pieces from S10 whose movement needs no special squares. Tests at every option.
 Decisions: D1.
 
