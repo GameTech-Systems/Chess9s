@@ -1,6 +1,6 @@
 # 0007: Board and piece data formats
 
-**Status:** Accepted (provisional: built against a neutral fixture under decision D1's default; S10 confirms it on the real board)
+**Status:** Accepted. S10 entered the real board and pieces in this format (see "S10 additions").
 
 ## Context
 The engine must not hardcode piece rules (CLAUDE.md, [Rules framework](../RULES-FRAMEWORK.md)). S10 enters the real board and pieces, and S11 builds a move generator with no piece-specific code. Both need a format for boards and movement first.
@@ -23,3 +23,8 @@ Special rules are engine features switched by parameters and are added in the st
 ## Consequences
 - S10 converts the owner's board and pieces into this format; anything that doesn't fit becomes a question for the owner, not a new field invented on the spot.
 - Leapers cross no squares in this format, so a "pass over" rule never applies to them. The owner confirmed this matches the rules: Knights are never stopped from passing the center, so `knight` in `center.passThrough` has no effect.
+
+## S10 additions
+- Squares may carry a display `color` (`#rrggbb`); the colored squares go into board data per ledger decision D25. Sides may carry a display `view` (`rotate`: 0, 90, 180 or 270, clockwise from the standard diagram), from the owner's images of the light and Dragon seats. The engine ignores both.
+- The forward-direction check now skips moves and promotions whose `when` rules them out for the setup's player count, so the Dragon side (no forward direction) can hold the Sun and Moon, whose first-move double step is 2-player only.
+- Rules that need game state or location-dependent flags remain engine features, listed in each piece's `notes`: opening the Coast and leaving it, the Tail repeat limit, capture on the Coast, castling, en passant, the Queen-pawn swap, pawn-safe zones, 3-player check and stone, and `givesCheck` that differs by player count.
