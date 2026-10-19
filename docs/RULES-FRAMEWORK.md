@@ -107,6 +107,20 @@ The engine checks what a schema can't: unique ids, declared square types and sid
 
 Special rules such as en passant, castling and opening the Coast are engine features switched by parameters; the format grows to describe them as they are built. Betza notation, which the fairy-chess community already uses, may later be accepted as a shorthand that converts into this format.
 
+## Move generation
+
+`packages/engine/src/moves/generate.ts` turns this data into pseudo-legal moves (check is handled later). It has no piece-specific code. Where the format is silent, the choices below are provisional (S11) until the owner confirms them.
+
+- **Steps**: named directions and vectors are turned around for a side whose forward is `down`. A side without a forward direction may only use moves that read the same either way.
+- **Range**: a move repeats its step up to `range` times along a line, or to the edge when unlimited. Each square reached is a possible destination; the earlier ones are stepped through.
+- **Blocking**: without `jump`, the line ends at the first occupied square (a capture there if allowed). With `jump`, it continues past occupied squares, and each one on the way may still be captured.
+- **Captures**: never your own side's pieces. Any other piece, `neutral` ones included, may be captured if the move allows captures and the piece is `capturable`. `move-only` moves need an empty square; `capture-only` moves need a piece to capture.
+- **Square rules** *(provisional)*: the piece's own rules and the move's rules both apply when their `when` holds. Any applicable `stop: false` forbids ending on that square type. Any applicable `pass: false` ends the line on that square: the piece may still stop there if stopping is allowed, but not continue.
+- **Targets**: every square of the listed types except the one the piece stands on. Stop rules and the capture mode still apply.
+- **Conditions** are checked against the resolved ruleset. A parameter that is missing, still null or of the wrong type stops generation with an error rather than a guess.
+- **Promotion**: a move that ends on the side's last rank produces one move per target. *(Provisional)*: an empty target list means the piece does not promote.
+- Results are sorted by notation (`e2-e4`, `e5xd6`, `d8-d9=slider`) with duplicates removed, so the same position always gives the same list.
+
 ## Engine requirements
 
 - Pure TypeScript with no UI dependencies, and deterministic.
