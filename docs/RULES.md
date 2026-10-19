@@ -109,6 +109,7 @@ All Coast pieces move in straight lines and stop when blocked; none may turn a c
 3. The Sun and Moon move along the Coast one square at a time. Once the way is clear, a Dragon Head may move to A5 and then leave the Coast.
 4. From A5 a piece moves out along rank 5 toward E5, or diagonally to B4 or B6.
 5. Coast pieces can't be captured while they stand on the Coast.
+6. A Coast piece is **unemerged** until it has first left the Coast through A5, and **emerged** after (the game keeps this marker per piece). Until it has emerged it can give check only from A5. Once emerged it can return to the Coast and check and capture from there (owner, 19 Oct 2026; open: Dragon pieces also "don't give check" below, and the exit may be E5, not A5).
 
 ## Center square and general rules
 

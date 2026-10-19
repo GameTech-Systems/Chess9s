@@ -19,9 +19,9 @@ Start with: `/start-session S18`
 - D3, D6: applied in rule set v0.2. D1: pieces are unverified seeds. D34: dark's view is turned 180°. D36: tetrahedron on e5.
 
 ## Open questions for the owner
-- Keep the option `tail.2p.canCapture`? Default: kept; when on, the Tail takes only the other side's pieces.
-- Is a closed Coast closed to Kings and Queens too (nothing moves onto a Coast square before it opens)? Default: yes. Also confirm the opener's exception (a5-e5, then e5-i5 on the very next turn only). Default: as written.
-- 3-player: "the Dragon could use a Coast piece to check from A5 only". RULES.md says Dragon pieces don't check. What does this mean? Default: not built, no change.
+- Answered 19 Oct 2026 (decisions record, section 7): `tail.2p.canCapture` stays as an option, off by default; the closed Coast is closed to Kings and Queens too. No code change needed.
+- Confirm the opener's exception (a5-e5, then e5-i5 on the very next turn only). Default: as written.
+- 3-player: Coast pieces give check only from A5 until they have emerged (needs an `emerged` marker per piece when 3-player is built). Did "emerge at E5" mean A5 (RULES.md)? And does this replace "Dragon pieces don't give check to Kings"? Default: A5; not built.
 - Sun and Moon promotion targets, Tetrahedron size, Ting Yang art, and whether the 3-player Tail passes an empty e5 (default: yes) are still open.
 
 ## Notes for Claude
