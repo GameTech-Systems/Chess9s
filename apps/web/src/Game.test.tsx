@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { newGame, playMove, toNotation, type Position } from '@chess9s/engine';
 import hotSeatMate from '../../../packages/engine/test/fixtures/games/hot-seat-mate.json';
 import { Game } from './Game';
+import { App } from './App';
 import { createRules, ruleset } from './game/rules';
 import { fromGame, newModel } from './game/session';
 
@@ -66,5 +67,22 @@ describe('Game screen', () => {
       expect(html).toContain(`>${piece}</button>`);
     }
     expect(html).toContain('Promote to');
+  });
+});
+
+describe('Rule picker', () => {
+  it('opens on the picker: every ruleset with its status badge, 3-player not playable yet', () => {
+    const html = renderToStaticMarkup(<App />);
+    expect(html).toContain('Choose a ruleset');
+    expect(html).toContain('Draft 2-Player');
+    expect(html).toContain('data-status="proposed"');
+    expect(html).toContain('data-status="experimental"');
+    expect(html).toMatch(/Not playable yet/);
+    expect(html).toMatch(/<button[^>]*>Play<\/button>/);
+    expect(html).not.toContain('aria-label="Moves"');
+  });
+
+  it('the game screen offers a way back to the picker', () => {
+    expect(render()).toContain('Change ruleset');
   });
 });

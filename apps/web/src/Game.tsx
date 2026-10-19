@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { unbuiltFeatures } from '@chess9s/engine';
 import { Board } from './board/Board';
 import { boardData, pieceLetters } from './board/data';
-import { createRules, ruleset } from './game/rules';
+import { DEFAULT_RULESET_ID, createRules, listRulesets, type RulesetInfo } from './game/rules';
 import {
   cancelPromotion,
   click,
@@ -31,10 +31,21 @@ function lostLine(pieces: string[]): string {
   return [...counts].map(([id, n]) => (n > 1 ? `${pretty(id)} ×${n}` : pretty(id))).join(', ');
 }
 
-/** `initial` starts the screen from a given game (tests); otherwise a new game. */
-export function Game({ initial }: { initial?: Model }) {
-  const rules = useMemo(createRules, []);
-  const [model, setModel] = useState(() => initial ?? newModel(rules));
+/**
+ * `ruleset` is the one being played (default draft-2p). `initial` starts the screen from a given
+ * game (tests); otherwise a new game. `onChangeRuleset` returns to the picker.
+ */
+export function Game({
+  initial,
+  ruleset = listRulesets().find((r) => r.id === DEFAULT_RULESET_ID)!,
+  onChangeRuleset,
+}: {
+  initial?: Model;
+  ruleset?: RulesetInfo;
+  onChangeRuleset?: () => void;
+}) {
+  const rules = useMemo(() => createRules(ruleset.id), [ruleset.id]);
+  const [model, setModel] = useState(() => initial ?? newModel(rules, ruleset));
   const [view, setView] = useState<View>('light');
   const { game, promoting } = model;
   const over = game.result.status !== 'ongoing';
@@ -120,10 +131,14 @@ export function Game({ initial }: { initial?: Model }) {
         <button
           type="button"
           className="again"
-          onClick={() => setModel(newModel(rules))}
+          onClick={() => setModel(newModel(rules, ruleset))}
           data-over={over ? '' : undefined}
         >
           New game
+        </button>
+
+        <button type="button" className="again" onClick={onChangeRuleset}>
+          Change ruleset
         </button>
 
         <p className="facts small">

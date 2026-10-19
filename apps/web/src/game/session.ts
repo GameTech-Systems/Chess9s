@@ -10,7 +10,7 @@ import {
   type MoveRules,
 } from '@chess9s/engine';
 import type { Highlights } from '../board/view';
-import { createRules, ruleset } from './rules';
+import { createRules, ruleset, type RulesetInfo } from './rules';
 
 export interface Promoting {
   from: string;
@@ -29,8 +29,11 @@ export interface Model {
 
 export const fromGame = (game: GameState): Model => ({ game, selected: null, promoting: null });
 
-export function newModel(rules: MoveRules = createRules()): Model {
-  return fromGame(newGame(rules, { id: ruleset.id, version: ruleset.version }));
+export function newModel(
+  rules: MoveRules = createRules(),
+  info: Pick<RulesetInfo, 'id' | 'version'> = ruleset,
+): Model {
+  return fromGame(newGame(rules, { id: info.id, version: info.version }));
 }
 
 const movesFrom = (game: GameState, from: string): GeneratedMove[] =>
