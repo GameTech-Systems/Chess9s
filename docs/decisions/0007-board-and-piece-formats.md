@@ -32,3 +32,6 @@ Special rules are engine features switched by parameters and are added in the st
 ## S12 additions
 - D34: Dark's seat view is turned 180 degrees (rank 9 at the bottom, the Coast on the right, as in regular chess). It is now `view: {rotate: 180}` on the dark side in `standard-9x9` (version 0.1.1).
 - D36: the symbol on e5 is a tetrahedron, not an arrow, and carries no rule. Its base is three corners of a cube (equilateral from above), one base side parallel to the Coast column, the opposite vertex pointing at the Ting Yang symbol, apex centered. Size is "phi significant"; the renderer uses a base side of phi/2 of the square (provisional). The home-play board will carry it too, and the three Dragon pieces will have hollow pyramidal bases that fit over it like a cap. These are display and product notes only: no board field was added.
+
+## S16 additions
+- Setups gain `turnOrder`, the seats in order of play (every side with pieces once, never `neutral`), so turn order works for any number of players. `standard-9x9` (version 0.2.0) seats dark, light for 2 players and dark, light, Dragon for 3, as docs/RULES.md says; `turn.firstMove` picks who starts where a ruleset resolves it. The field is optional in the schema; the engine refuses to give a turn order for a setup without one.

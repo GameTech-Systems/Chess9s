@@ -1,0 +1,5179 @@
+{
+  "description": "S16: check, checkmate, stalemate and attack maps on the real board (rules/boards/standard-9x9.json, rules/pieces/) under the draft 2-player ruleset. Every position runs at each king.range option. Expected results come from plain geometry worked out independently of the engine (docs/RULES.md). The Coast is treated as open.",
+  "cases": [
+    {
+      "name": "Kings five apart on the e-file: neither may step within the other's range, king.range=1",
+      "overrides": {
+        "king.range": 1
+      },
+      "side": "light",
+      "pieces": {
+        "e1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e6": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": ["e1-d1", "e1-d2", "e1-e2", "e1-f1", "e1-f2"],
+      "status": "ongoing"
+    },
+    {
+      "name": "Kings five apart on the e-file: neither may step within the other's range, king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "side": "light",
+      "pieces": {
+        "e1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e6": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "e1-c1",
+        "e1-c3",
+        "e1-d1",
+        "e1-d2",
+        "e1-e2",
+        "e1-e3",
+        "e1-f1",
+        "e1-f2",
+        "e1-g1",
+        "e1-g3"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "Kings five apart on the e-file: neither may step within the other's range, king.range=3",
+      "overrides": {
+        "king.range": 3
+      },
+      "side": "light",
+      "pieces": {
+        "e1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e6": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "e1-b1",
+        "e1-b4",
+        "e1-c1",
+        "e1-c3",
+        "e1-d1",
+        "e1-d2",
+        "e1-e2",
+        "e1-f1",
+        "e1-f2",
+        "e1-g1",
+        "e1-g3",
+        "e1-h1",
+        "e1-h4"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "Kings five apart on the e-file: neither may step within the other's range, king.range=4",
+      "overrides": {
+        "king.range": 4
+      },
+      "side": "light",
+      "pieces": {
+        "e1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e6": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "e1-a1",
+        "e1-a5",
+        "e1-b1",
+        "e1-b4",
+        "e1-c1",
+        "e1-c3",
+        "e1-d1",
+        "e1-d2",
+        "e1-f1",
+        "e1-f2",
+        "e1-g1",
+        "e1-g3",
+        "e1-h1",
+        "e1-h4",
+        "e1-i1",
+        "e1-i5"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "back-rank rook check on f9, pawns e8 f8 g8; an unprotected rook four squares away, king.range=1",
+      "overrides": {
+        "king.range": 1
+      },
+      "side": "dark",
+      "pieces": {
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "e8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "f8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "g8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "b9": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "f1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["b9"],
+      "legal": [],
+      "status": "checkmate"
+    },
+    {
+      "name": "back-rank rook check on f9, pawns e8 f8 g8; an unprotected rook four squares away, king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "side": "dark",
+      "pieces": {
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "e8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "f8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "g8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "b9": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "f1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["b9"],
+      "legal": [],
+      "status": "checkmate"
+    },
+    {
+      "name": "back-rank rook check on f9, pawns e8 f8 g8; an unprotected rook four squares away, king.range=3",
+      "overrides": {
+        "king.range": 3
+      },
+      "side": "dark",
+      "pieces": {
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "e8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "f8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "g8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "b9": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "f1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["b9"],
+      "legal": [],
+      "status": "checkmate"
+    },
+    {
+      "name": "back-rank rook check on f9, pawns e8 f8 g8; an unprotected rook four squares away, king.range=4",
+      "overrides": {
+        "king.range": 4
+      },
+      "side": "dark",
+      "pieces": {
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "e8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "f8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "g8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "b9": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "f1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["b9"],
+      "legal": ["f9xb9"],
+      "status": "ongoing"
+    },
+    {
+      "name": "back-rank rook check on f9 with the rook protected by a knight, king.range=1",
+      "overrides": {
+        "king.range": 1
+      },
+      "side": "dark",
+      "pieces": {
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "e8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "f8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "g8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "b9": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "c7": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        },
+        "f1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["b9"],
+      "legal": [],
+      "status": "checkmate"
+    },
+    {
+      "name": "back-rank rook check on f9 with the rook protected by a knight, king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "side": "dark",
+      "pieces": {
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "e8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "f8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "g8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "b9": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "c7": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        },
+        "f1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["b9"],
+      "legal": [],
+      "status": "checkmate"
+    },
+    {
+      "name": "back-rank rook check on f9 with the rook protected by a knight, king.range=3",
+      "overrides": {
+        "king.range": 3
+      },
+      "side": "dark",
+      "pieces": {
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "e8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "f8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "g8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "b9": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "c7": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        },
+        "f1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["b9"],
+      "legal": [],
+      "status": "checkmate"
+    },
+    {
+      "name": "back-rank rook check on f9 with the rook protected by a knight, king.range=4",
+      "overrides": {
+        "king.range": 4
+      },
+      "side": "dark",
+      "pieces": {
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "e8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "f8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "g8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "b9": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "c7": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        },
+        "f1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["b9"],
+      "legal": [],
+      "status": "checkmate"
+    },
+    {
+      "name": "king on h1 behind its own pawns, rook check along rank 1, king.range=1",
+      "overrides": {
+        "king.range": 1
+      },
+      "side": "light",
+      "pieces": {
+        "h1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "g2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "h2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "i2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "c1": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "c2": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": ["c1"],
+      "legal": [],
+      "status": "checkmate"
+    },
+    {
+      "name": "king on h1 behind its own pawns, rook check along rank 1, king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "side": "light",
+      "pieces": {
+        "h1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "g2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "h2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "i2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "c1": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "c2": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": ["c1"],
+      "legal": [],
+      "status": "checkmate"
+    },
+    {
+      "name": "king on h1 behind its own pawns, rook check along rank 1, king.range=3",
+      "overrides": {
+        "king.range": 3
+      },
+      "side": "light",
+      "pieces": {
+        "h1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "g2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "h2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "i2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "c1": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "c2": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": ["c1"],
+      "legal": [],
+      "status": "checkmate"
+    },
+    {
+      "name": "king on h1 behind its own pawns, rook check along rank 1, king.range=4",
+      "overrides": {
+        "king.range": 4
+      },
+      "side": "light",
+      "pieces": {
+        "h1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "g2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "h2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "i2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "c1": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "c2": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": ["c1"],
+      "legal": [],
+      "status": "checkmate"
+    },
+    {
+      "name": "king on h1 behind its own pawns, rook check along rank 1, king.range=1, king.canJump=true",
+      "overrides": {
+        "king.range": 1,
+        "king.canJump": true
+      },
+      "side": "light",
+      "pieces": {
+        "h1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "g2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "h2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "i2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "c1": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "c2": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": ["c1"],
+      "legal": [],
+      "status": "checkmate"
+    },
+    {
+      "name": "king on h1 behind its own pawns, rook check along rank 1, king.range=2, king.canJump=true",
+      "overrides": {
+        "king.range": 2,
+        "king.canJump": true
+      },
+      "side": "light",
+      "pieces": {
+        "h1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "g2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "h2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "i2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "c1": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "c2": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": ["c1"],
+      "legal": ["h1-f3", "h1-h3"],
+      "status": "ongoing"
+    },
+    {
+      "name": "king on h1 behind its own pawns, rook check along rank 1, king.range=3, king.canJump=true",
+      "overrides": {
+        "king.range": 3,
+        "king.canJump": true
+      },
+      "side": "light",
+      "pieces": {
+        "h1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "g2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "h2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "i2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "c1": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "c2": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": ["c1"],
+      "legal": ["h1-e4", "h1-f3", "h1-h3", "h1-h4"],
+      "status": "ongoing"
+    },
+    {
+      "name": "king on h1 behind its own pawns, rook check along rank 1, king.range=4, king.canJump=true",
+      "overrides": {
+        "king.range": 4,
+        "king.canJump": true
+      },
+      "side": "light",
+      "pieces": {
+        "h1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "g2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "h2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "i2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "c1": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "c2": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": ["c1"],
+      "legal": ["h1-d5", "h1-e4", "h1-f3", "h1-h3", "h1-h4", "h1-h5"],
+      "status": "ongoing"
+    },
+    {
+      "name": "king on i9 boxed by rooks on h7 and b8, not in check, king.range=1",
+      "overrides": {
+        "king.range": 1
+      },
+      "side": "dark",
+      "pieces": {
+        "i9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "h7": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "b8": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [],
+      "status": "stalemate",
+      "stalemate": "draw"
+    },
+    {
+      "name": "king on i9 boxed by rooks on h7 and b8, not in check, king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "side": "dark",
+      "pieces": {
+        "i9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "h7": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "b8": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": ["i9-g9"],
+      "status": "ongoing"
+    },
+    {
+      "name": "king on i9 boxed by rooks on h7 and b8, not in check, king.range=3",
+      "overrides": {
+        "king.range": 3
+      },
+      "side": "dark",
+      "pieces": {
+        "i9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "h7": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "b8": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": ["i9-f6", "i9-f9", "i9-g9", "i9-i6"],
+      "status": "ongoing"
+    },
+    {
+      "name": "king on i9 boxed by rooks on h7 and b8, not in check, king.range=4",
+      "overrides": {
+        "king.range": 4
+      },
+      "side": "dark",
+      "pieces": {
+        "i9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "h7": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "b8": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": ["i9-e9", "i9-f6", "i9-f9", "i9-g9", "i9-i5", "i9-i6"],
+      "status": "ongoing"
+    },
+    {
+      "name": "king on i9 boxed by rooks on h7 and b8, not in check, king.range=1, draw.stalemate=\"loss-for-stalemated\"",
+      "overrides": {
+        "king.range": 1,
+        "draw.stalemate": "loss-for-stalemated"
+      },
+      "side": "dark",
+      "pieces": {
+        "i9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "h7": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "b8": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [],
+      "status": "stalemate",
+      "stalemate": "loss-for-stalemated"
+    },
+    {
+      "name": "king on i9 boxed by rooks on h7 and b8, not in check, king.range=2, draw.stalemate=\"loss-for-stalemated\"",
+      "overrides": {
+        "king.range": 2,
+        "draw.stalemate": "loss-for-stalemated"
+      },
+      "side": "dark",
+      "pieces": {
+        "i9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "h7": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "b8": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": ["i9-g9"],
+      "status": "ongoing"
+    },
+    {
+      "name": "king on i9 boxed by rooks on h7 and b8, not in check, king.range=3, draw.stalemate=\"loss-for-stalemated\"",
+      "overrides": {
+        "king.range": 3,
+        "draw.stalemate": "loss-for-stalemated"
+      },
+      "side": "dark",
+      "pieces": {
+        "i9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "h7": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "b8": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": ["i9-f6", "i9-f9", "i9-g9", "i9-i6"],
+      "status": "ongoing"
+    },
+    {
+      "name": "king on i9 boxed by rooks on h7 and b8, not in check, king.range=4, draw.stalemate=\"loss-for-stalemated\"",
+      "overrides": {
+        "king.range": 4,
+        "draw.stalemate": "loss-for-stalemated"
+      },
+      "side": "dark",
+      "pieces": {
+        "i9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "h7": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "b8": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": ["i9-e9", "i9-f6", "i9-f9", "i9-g9", "i9-i5", "i9-i6"],
+      "status": "ongoing"
+    },
+    {
+      "name": "king on i9 boxed by rooks on h7 and b8, not in check, king.range=1, draw.stalemate=\"win-for-stalemated\"",
+      "overrides": {
+        "king.range": 1,
+        "draw.stalemate": "win-for-stalemated"
+      },
+      "side": "dark",
+      "pieces": {
+        "i9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "h7": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "b8": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [],
+      "status": "stalemate",
+      "stalemate": "win-for-stalemated"
+    },
+    {
+      "name": "king on i9 boxed by rooks on h7 and b8, not in check, king.range=2, draw.stalemate=\"win-for-stalemated\"",
+      "overrides": {
+        "king.range": 2,
+        "draw.stalemate": "win-for-stalemated"
+      },
+      "side": "dark",
+      "pieces": {
+        "i9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "h7": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "b8": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": ["i9-g9"],
+      "status": "ongoing"
+    },
+    {
+      "name": "king on i9 boxed by rooks on h7 and b8, not in check, king.range=3, draw.stalemate=\"win-for-stalemated\"",
+      "overrides": {
+        "king.range": 3,
+        "draw.stalemate": "win-for-stalemated"
+      },
+      "side": "dark",
+      "pieces": {
+        "i9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "h7": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "b8": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": ["i9-f6", "i9-f9", "i9-g9", "i9-i6"],
+      "status": "ongoing"
+    },
+    {
+      "name": "king on i9 boxed by rooks on h7 and b8, not in check, king.range=4, draw.stalemate=\"win-for-stalemated\"",
+      "overrides": {
+        "king.range": 4,
+        "draw.stalemate": "win-for-stalemated"
+      },
+      "side": "dark",
+      "pieces": {
+        "i9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "h7": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "b8": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": ["i9-e9", "i9-f6", "i9-f9", "i9-g9", "i9-i5", "i9-i6"],
+      "status": "ongoing"
+    },
+    {
+      "name": "queen on e1 checks e9 across an empty e5; rooks d9 f9, pawns d8 f8, king.range=1",
+      "overrides": {
+        "king.range": 1
+      },
+      "side": "dark",
+      "pieces": {
+        "e9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "d9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "f9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "d8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "f8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "e1": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        },
+        "i1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        }
+      },
+      "checkers": ["e1"],
+      "legal": [],
+      "status": "checkmate"
+    },
+    {
+      "name": "queen on e1 checks e9 across an empty e5; rooks d9 f9, pawns d8 f8, king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "side": "dark",
+      "pieces": {
+        "e9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "d9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "f9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "d8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "f8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "e1": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        },
+        "i1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        }
+      },
+      "checkers": ["e1"],
+      "legal": [],
+      "status": "checkmate"
+    },
+    {
+      "name": "queen on e1 checks e9 across an empty e5; rooks d9 f9, pawns d8 f8, king.range=3",
+      "overrides": {
+        "king.range": 3
+      },
+      "side": "dark",
+      "pieces": {
+        "e9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "d9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "f9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "d8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "f8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "e1": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        },
+        "i1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        }
+      },
+      "checkers": ["e1"],
+      "legal": [],
+      "status": "checkmate"
+    },
+    {
+      "name": "queen on e1 checks e9 across an empty e5; rooks d9 f9, pawns d8 f8, king.range=4",
+      "overrides": {
+        "king.range": 4
+      },
+      "side": "dark",
+      "pieces": {
+        "e9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "d9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "f9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "d8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "f8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "e1": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        },
+        "i1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        }
+      },
+      "checkers": ["e1"],
+      "legal": [],
+      "status": "checkmate"
+    },
+    {
+      "name": "queen on e1 checks e9 across an empty e5; rooks d9 f9, pawns d8 f8, king.range=1, king.canJump=true",
+      "overrides": {
+        "king.range": 1,
+        "king.canJump": true
+      },
+      "side": "dark",
+      "pieces": {
+        "e9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "d9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "f9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "d8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "f8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "e1": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        },
+        "i1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        }
+      },
+      "checkers": ["e1"],
+      "legal": [],
+      "status": "checkmate"
+    },
+    {
+      "name": "queen on e1 checks e9 across an empty e5; rooks d9 f9, pawns d8 f8, king.range=2, king.canJump=true",
+      "overrides": {
+        "king.range": 2,
+        "king.canJump": true
+      },
+      "side": "dark",
+      "pieces": {
+        "e9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "d9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "f9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "d8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "f8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "e1": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        },
+        "i1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        }
+      },
+      "checkers": ["e1"],
+      "legal": ["e9-c7", "e9-c9", "e9-g7", "e9-g9"],
+      "status": "ongoing"
+    },
+    {
+      "name": "queen on e1 checks e9 across an empty e5; rooks d9 f9, pawns d8 f8, king.range=3, king.canJump=true",
+      "overrides": {
+        "king.range": 3,
+        "king.canJump": true
+      },
+      "side": "dark",
+      "pieces": {
+        "e9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "d9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "f9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "d8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "f8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "e1": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        },
+        "i1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        }
+      },
+      "checkers": ["e1"],
+      "legal": ["e9-b6", "e9-b9", "e9-c7", "e9-c9", "e9-g7", "e9-g9", "e9-h6", "e9-h9"],
+      "status": "ongoing"
+    },
+    {
+      "name": "queen on e1 checks e9 across an empty e5; rooks d9 f9, pawns d8 f8, king.range=4, king.canJump=true",
+      "overrides": {
+        "king.range": 4,
+        "king.canJump": true
+      },
+      "side": "dark",
+      "pieces": {
+        "e9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "d9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "f9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "d8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "f8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "e1": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        },
+        "i1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        }
+      },
+      "checkers": ["e1"],
+      "legal": [
+        "e9-a9",
+        "e9-b6",
+        "e9-b9",
+        "e9-c7",
+        "e9-c9",
+        "e9-g7",
+        "e9-g9",
+        "e9-h6",
+        "e9-h9",
+        "e9-i9"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "the same queen check, when the side may also move the Tail, king.range=1",
+      "overrides": {
+        "king.range": 1
+      },
+      "side": "dark",
+      "alsoMove": ["neutral"],
+      "pieces": {
+        "e9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "d9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "f9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "d8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "f8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "e1": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        },
+        "i1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        }
+      },
+      "checkers": ["e1"],
+      "legal": ["a5-e5"],
+      "status": "ongoing"
+    },
+    {
+      "name": "the same queen check, when the side may also move the Tail, king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "side": "dark",
+      "alsoMove": ["neutral"],
+      "pieces": {
+        "e9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "d9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "f9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "d8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "f8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "e1": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        },
+        "i1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        }
+      },
+      "checkers": ["e1"],
+      "legal": ["a5-e5"],
+      "status": "ongoing"
+    },
+    {
+      "name": "the same queen check, when the side may also move the Tail, king.range=3",
+      "overrides": {
+        "king.range": 3
+      },
+      "side": "dark",
+      "alsoMove": ["neutral"],
+      "pieces": {
+        "e9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "d9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "f9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "d8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "f8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "e1": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        },
+        "i1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        }
+      },
+      "checkers": ["e1"],
+      "legal": ["a5-e5"],
+      "status": "ongoing"
+    },
+    {
+      "name": "the same queen check, when the side may also move the Tail, king.range=4",
+      "overrides": {
+        "king.range": 4
+      },
+      "side": "dark",
+      "alsoMove": ["neutral"],
+      "pieces": {
+        "e9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "d9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "f9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "d8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "f8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "e1": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        },
+        "i1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        }
+      },
+      "checkers": ["e1"],
+      "legal": ["a5-e5"],
+      "status": "ongoing"
+    },
+    {
+      "name": "a bishop pinned to its King on e1 by a queen on e9 across e5, king.range=1",
+      "overrides": {
+        "king.range": 1
+      },
+      "side": "light",
+      "pieces": {
+        "e1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e3": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        },
+        "e9": {
+          "piece": "queen",
+          "side": "dark",
+          "moved": true
+        },
+        "a9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": ["e1-d1", "e1-d2", "e1-e2", "e1-f1", "e1-f2"],
+      "status": "ongoing"
+    },
+    {
+      "name": "a bishop pinned to its King on e1 by a queen on e9 across e5, king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "side": "light",
+      "pieces": {
+        "e1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e3": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        },
+        "e9": {
+          "piece": "queen",
+          "side": "dark",
+          "moved": true
+        },
+        "a9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": ["e1-c1", "e1-c3", "e1-d1", "e1-d2", "e1-e2", "e1-f1", "e1-f2", "e1-g1", "e1-g3"],
+      "status": "ongoing"
+    },
+    {
+      "name": "a bishop pinned to its King on e1 by a queen on e9 across e5, king.range=3",
+      "overrides": {
+        "king.range": 3
+      },
+      "side": "light",
+      "pieces": {
+        "e1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e3": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        },
+        "e9": {
+          "piece": "queen",
+          "side": "dark",
+          "moved": true
+        },
+        "a9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "e1-b1",
+        "e1-b4",
+        "e1-c1",
+        "e1-c3",
+        "e1-d1",
+        "e1-d2",
+        "e1-e2",
+        "e1-f1",
+        "e1-f2",
+        "e1-g1",
+        "e1-g3",
+        "e1-h1",
+        "e1-h4"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "a bishop pinned to its King on e1 by a queen on e9 across e5, king.range=4",
+      "overrides": {
+        "king.range": 4
+      },
+      "side": "light",
+      "pieces": {
+        "e1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e3": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        },
+        "e9": {
+          "piece": "queen",
+          "side": "dark",
+          "moved": true
+        },
+        "a9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "e1-a1",
+        "e1-b1",
+        "e1-b4",
+        "e1-c1",
+        "e1-c3",
+        "e1-d1",
+        "e1-d2",
+        "e1-e2",
+        "e1-f1",
+        "e1-f2",
+        "e1-g1",
+        "e1-g3",
+        "e1-h1",
+        "e1-h4",
+        "e1-i1"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "a rook on e9 does not check e1: rooks never slide through e5, king.range=1",
+      "overrides": {
+        "king.range": 1
+      },
+      "side": "light",
+      "pieces": {
+        "e1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "a9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": ["e1-d1", "e1-d2", "e1-e2", "e1-f1", "e1-f2"],
+      "status": "ongoing"
+    },
+    {
+      "name": "a rook on e9 does not check e1: rooks never slide through e5, king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "side": "light",
+      "pieces": {
+        "e1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "a9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "e1-c1",
+        "e1-c3",
+        "e1-d1",
+        "e1-d2",
+        "e1-e2",
+        "e1-e3",
+        "e1-f1",
+        "e1-f2",
+        "e1-g1",
+        "e1-g3"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "a rook on e9 does not check e1: rooks never slide through e5, king.range=3",
+      "overrides": {
+        "king.range": 3
+      },
+      "side": "light",
+      "pieces": {
+        "e1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "a9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "e1-b1",
+        "e1-b4",
+        "e1-c1",
+        "e1-c3",
+        "e1-d1",
+        "e1-d2",
+        "e1-e2",
+        "e1-e3",
+        "e1-e4",
+        "e1-f1",
+        "e1-f2",
+        "e1-g1",
+        "e1-g3",
+        "e1-h1",
+        "e1-h4"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "a rook on e9 does not check e1: rooks never slide through e5, king.range=4",
+      "overrides": {
+        "king.range": 4
+      },
+      "side": "light",
+      "pieces": {
+        "e1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "a9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "e1-a1",
+        "e1-b1",
+        "e1-b4",
+        "e1-c1",
+        "e1-c3",
+        "e1-d1",
+        "e1-d2",
+        "e1-e2",
+        "e1-e3",
+        "e1-e4",
+        "e1-f1",
+        "e1-f2",
+        "e1-g1",
+        "e1-g3",
+        "e1-h1",
+        "e1-h4",
+        "e1-i1",
+        "e1-i5"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "light Dragon Head on a1 checks f6 along the diagonal over an empty e5, king.range=1",
+      "overrides": {
+        "king.range": 1
+      },
+      "side": "dark",
+      "pieces": {
+        "f6": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a1": {
+          "piece": "light-dragon-head",
+          "side": "light",
+          "moved": true
+        },
+        "i1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["a1"],
+      "legal": ["f6-e6", "f6-e7", "f6-f5", "f6-f7", "f6-g5", "f6-g6"],
+      "status": "ongoing"
+    },
+    {
+      "name": "light Dragon Head on a1 checks f6 along the diagonal over an empty e5, king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "side": "dark",
+      "pieces": {
+        "f6": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a1": {
+          "piece": "light-dragon-head",
+          "side": "light",
+          "moved": true
+        },
+        "i1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["a1"],
+      "legal": [
+        "f6-d6",
+        "f6-d8",
+        "f6-e6",
+        "f6-e7",
+        "f6-f4",
+        "f6-f5",
+        "f6-f7",
+        "f6-f8",
+        "f6-g5",
+        "f6-g6",
+        "f6-h4",
+        "f6-h6"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "light Dragon Head on a1 checks f6 along the diagonal over an empty e5, king.range=3",
+      "overrides": {
+        "king.range": 3
+      },
+      "side": "dark",
+      "pieces": {
+        "f6": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a1": {
+          "piece": "light-dragon-head",
+          "side": "light",
+          "moved": true
+        },
+        "i1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["a1"],
+      "legal": [
+        "f6-c6",
+        "f6-c9",
+        "f6-d6",
+        "f6-d8",
+        "f6-e6",
+        "f6-e7",
+        "f6-f3",
+        "f6-f5",
+        "f6-f7",
+        "f6-f8",
+        "f6-f9",
+        "f6-g5",
+        "f6-g6",
+        "f6-h4",
+        "f6-h6",
+        "f6-i6"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "light Dragon Head on a1 checks f6 along the diagonal over an empty e5, king.range=4",
+      "overrides": {
+        "king.range": 4
+      },
+      "side": "dark",
+      "pieces": {
+        "f6": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a1": {
+          "piece": "light-dragon-head",
+          "side": "light",
+          "moved": true
+        },
+        "i1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["a1"],
+      "legal": [
+        "f6-b6",
+        "f6-c6",
+        "f6-c9",
+        "f6-d6",
+        "f6-d8",
+        "f6-e6",
+        "f6-e7",
+        "f6-f2",
+        "f6-f3",
+        "f6-f5",
+        "f6-f7",
+        "f6-f8",
+        "f6-f9",
+        "f6-g5",
+        "f6-g6",
+        "f6-h4",
+        "f6-h6",
+        "f6-i6"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "light Dragon Head on a1 checks f6 along the diagonal over an empty e5, king.range=1, coastPieces.2p.giveCheck=false",
+      "overrides": {
+        "king.range": 1,
+        "coastPieces.2p.giveCheck": false
+      },
+      "side": "dark",
+      "pieces": {
+        "f6": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a1": {
+          "piece": "light-dragon-head",
+          "side": "light",
+          "moved": true
+        },
+        "i1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": ["f6-e6", "f6-e7", "f6-f5", "f6-f7", "f6-g5", "f6-g6", "f6-g7"],
+      "status": "ongoing"
+    },
+    {
+      "name": "light Dragon Head on a1 checks f6 along the diagonal over an empty e5, king.range=2, coastPieces.2p.giveCheck=false",
+      "overrides": {
+        "king.range": 2,
+        "coastPieces.2p.giveCheck": false
+      },
+      "side": "dark",
+      "pieces": {
+        "f6": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a1": {
+          "piece": "light-dragon-head",
+          "side": "light",
+          "moved": true
+        },
+        "i1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "f6-d4",
+        "f6-d6",
+        "f6-d8",
+        "f6-e6",
+        "f6-e7",
+        "f6-f4",
+        "f6-f5",
+        "f6-f7",
+        "f6-f8",
+        "f6-g5",
+        "f6-g6",
+        "f6-g7",
+        "f6-h4",
+        "f6-h6",
+        "f6-h8"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "light Dragon Head on a1 checks f6 along the diagonal over an empty e5, king.range=3, coastPieces.2p.giveCheck=false",
+      "overrides": {
+        "king.range": 3,
+        "coastPieces.2p.giveCheck": false
+      },
+      "side": "dark",
+      "pieces": {
+        "f6": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a1": {
+          "piece": "light-dragon-head",
+          "side": "light",
+          "moved": true
+        },
+        "i1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "f6-c3",
+        "f6-c6",
+        "f6-c9",
+        "f6-d4",
+        "f6-d6",
+        "f6-d8",
+        "f6-e6",
+        "f6-e7",
+        "f6-f3",
+        "f6-f5",
+        "f6-f7",
+        "f6-f8",
+        "f6-f9",
+        "f6-g5",
+        "f6-g6",
+        "f6-g7",
+        "f6-h4",
+        "f6-h6",
+        "f6-h8",
+        "f6-i6",
+        "f6-i9"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "light Dragon Head on a1 checks f6 along the diagonal over an empty e5, king.range=4, coastPieces.2p.giveCheck=false",
+      "overrides": {
+        "king.range": 4,
+        "coastPieces.2p.giveCheck": false
+      },
+      "side": "dark",
+      "pieces": {
+        "f6": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a1": {
+          "piece": "light-dragon-head",
+          "side": "light",
+          "moved": true
+        },
+        "i1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "f6-b2",
+        "f6-b6",
+        "f6-c3",
+        "f6-c6",
+        "f6-c9",
+        "f6-d4",
+        "f6-d6",
+        "f6-d8",
+        "f6-e6",
+        "f6-e7",
+        "f6-f2",
+        "f6-f3",
+        "f6-f5",
+        "f6-f7",
+        "f6-f8",
+        "f6-f9",
+        "f6-g5",
+        "f6-g6",
+        "f6-g7",
+        "f6-h4",
+        "f6-h6",
+        "f6-h8",
+        "f6-i6",
+        "f6-i9"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "Sun on e6 next to the dark King on f7, king.range=1",
+      "overrides": {
+        "king.range": 1
+      },
+      "side": "dark",
+      "pieces": {
+        "f7": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "e6": {
+          "piece": "sun",
+          "side": "light",
+          "moved": true
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["e6"],
+      "legal": ["f7-e8", "f7-f8", "f7-g6", "f7-g7", "f7-g8", "f7xe6"],
+      "status": "ongoing"
+    },
+    {
+      "name": "Sun on e6 next to the dark King on f7, king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "side": "dark",
+      "pieces": {
+        "f7": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "e6": {
+          "piece": "sun",
+          "side": "light",
+          "moved": true
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["e6"],
+      "legal": [
+        "f7-d9",
+        "f7-e8",
+        "f7-f8",
+        "f7-f9",
+        "f7-g6",
+        "f7-g7",
+        "f7-g8",
+        "f7-h5",
+        "f7-h7",
+        "f7-h9",
+        "f7xe6"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "Sun on e6 next to the dark King on f7, king.range=3",
+      "overrides": {
+        "king.range": 3
+      },
+      "side": "dark",
+      "pieces": {
+        "f7": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "e6": {
+          "piece": "sun",
+          "side": "light",
+          "moved": true
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["e6"],
+      "legal": [
+        "f7-c7",
+        "f7-d9",
+        "f7-e8",
+        "f7-f4",
+        "f7-f8",
+        "f7-f9",
+        "f7-g6",
+        "f7-g7",
+        "f7-g8",
+        "f7-h5",
+        "f7-h7",
+        "f7-h9",
+        "f7-i4",
+        "f7-i7",
+        "f7xe6"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "Sun on e6 next to the dark King on f7, king.range=4",
+      "overrides": {
+        "king.range": 4
+      },
+      "side": "dark",
+      "pieces": {
+        "f7": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "e6": {
+          "piece": "sun",
+          "side": "light",
+          "moved": true
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["e6"],
+      "legal": [
+        "f7-b7",
+        "f7-c7",
+        "f7-d9",
+        "f7-e8",
+        "f7-f3",
+        "f7-f4",
+        "f7-f8",
+        "f7-f9",
+        "f7-g6",
+        "f7-g7",
+        "f7-g8",
+        "f7-h5",
+        "f7-h7",
+        "f7-h9",
+        "f7-i4",
+        "f7-i7",
+        "f7xe6"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "Sun on e6 next to the dark King on f7, king.range=1, coastPieces.2p.giveCheck=false",
+      "overrides": {
+        "king.range": 1,
+        "coastPieces.2p.giveCheck": false
+      },
+      "side": "dark",
+      "pieces": {
+        "f7": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "e6": {
+          "piece": "sun",
+          "side": "light",
+          "moved": true
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": ["f7-e7", "f7-e8", "f7-f6", "f7-f8", "f7-g6", "f7-g7", "f7-g8", "f7xe6"],
+      "status": "ongoing"
+    },
+    {
+      "name": "Sun on e6 next to the dark King on f7, king.range=2, coastPieces.2p.giveCheck=false",
+      "overrides": {
+        "king.range": 2,
+        "coastPieces.2p.giveCheck": false
+      },
+      "side": "dark",
+      "pieces": {
+        "f7": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "e6": {
+          "piece": "sun",
+          "side": "light",
+          "moved": true
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "f7-d7",
+        "f7-d9",
+        "f7-e7",
+        "f7-e8",
+        "f7-f5",
+        "f7-f6",
+        "f7-f8",
+        "f7-f9",
+        "f7-g6",
+        "f7-g7",
+        "f7-g8",
+        "f7-h5",
+        "f7-h7",
+        "f7-h9",
+        "f7xe6"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "Sun on e6 next to the dark King on f7, king.range=3, coastPieces.2p.giveCheck=false",
+      "overrides": {
+        "king.range": 3,
+        "coastPieces.2p.giveCheck": false
+      },
+      "side": "dark",
+      "pieces": {
+        "f7": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "e6": {
+          "piece": "sun",
+          "side": "light",
+          "moved": true
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "f7-c7",
+        "f7-d7",
+        "f7-d9",
+        "f7-e7",
+        "f7-e8",
+        "f7-f4",
+        "f7-f5",
+        "f7-f6",
+        "f7-f8",
+        "f7-f9",
+        "f7-g6",
+        "f7-g7",
+        "f7-g8",
+        "f7-h5",
+        "f7-h7",
+        "f7-h9",
+        "f7-i4",
+        "f7-i7",
+        "f7xe6"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "Sun on e6 next to the dark King on f7, king.range=4, coastPieces.2p.giveCheck=false",
+      "overrides": {
+        "king.range": 4,
+        "coastPieces.2p.giveCheck": false
+      },
+      "side": "dark",
+      "pieces": {
+        "f7": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "e6": {
+          "piece": "sun",
+          "side": "light",
+          "moved": true
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "f7-b7",
+        "f7-c7",
+        "f7-d7",
+        "f7-d9",
+        "f7-e7",
+        "f7-e8",
+        "f7-f3",
+        "f7-f4",
+        "f7-f6",
+        "f7-f8",
+        "f7-f9",
+        "f7-g6",
+        "f7-g7",
+        "f7-g8",
+        "f7-h5",
+        "f7-h7",
+        "f7-h9",
+        "f7-i4",
+        "f7-i7",
+        "f7xe6"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "Moon on e4 next to the light King on d3, king.range=1",
+      "overrides": {
+        "king.range": 1
+      },
+      "side": "light",
+      "pieces": {
+        "d3": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e4": {
+          "piece": "moon",
+          "side": "dark",
+          "moved": true
+        },
+        "b9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": ["e4"],
+      "legal": ["d3-c2", "d3-c3", "d3-c4", "d3-d2", "d3-e2", "d3xe4"],
+      "status": "ongoing"
+    },
+    {
+      "name": "Moon on e4 next to the light King on d3, king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "side": "light",
+      "pieces": {
+        "d3": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e4": {
+          "piece": "moon",
+          "side": "dark",
+          "moved": true
+        },
+        "b9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": ["e4"],
+      "legal": [
+        "d3-b1",
+        "d3-b3",
+        "d3-b5",
+        "d3-c2",
+        "d3-c3",
+        "d3-c4",
+        "d3-d1",
+        "d3-d2",
+        "d3-e2",
+        "d3-f1",
+        "d3xe4"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "Moon on e4 next to the light King on d3, king.range=3",
+      "overrides": {
+        "king.range": 3
+      },
+      "side": "light",
+      "pieces": {
+        "d3": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e4": {
+          "piece": "moon",
+          "side": "dark",
+          "moved": true
+        },
+        "b9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": ["e4"],
+      "legal": [
+        "d3-a3",
+        "d3-a6",
+        "d3-b1",
+        "d3-b3",
+        "d3-b5",
+        "d3-c2",
+        "d3-c3",
+        "d3-c4",
+        "d3-d1",
+        "d3-d2",
+        "d3-d6",
+        "d3-e2",
+        "d3-f1",
+        "d3-g3",
+        "d3xe4"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "Moon on e4 next to the light King on d3, king.range=4",
+      "overrides": {
+        "king.range": 4
+      },
+      "side": "light",
+      "pieces": {
+        "d3": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e4": {
+          "piece": "moon",
+          "side": "dark",
+          "moved": true
+        },
+        "b9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": ["e4"],
+      "legal": [
+        "d3-a3",
+        "d3-a6",
+        "d3-b1",
+        "d3-b3",
+        "d3-c2",
+        "d3-c3",
+        "d3-c4",
+        "d3-d1",
+        "d3-d2",
+        "d3-d6",
+        "d3-e2",
+        "d3-f1",
+        "d3-g3",
+        "d3-h3",
+        "d3xe4"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "Moon on e4 next to the light King on d3, king.range=1, coastPieces.2p.giveCheck=false",
+      "overrides": {
+        "king.range": 1,
+        "coastPieces.2p.giveCheck": false
+      },
+      "side": "light",
+      "pieces": {
+        "d3": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e4": {
+          "piece": "moon",
+          "side": "dark",
+          "moved": true
+        },
+        "b9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": ["d3-c2", "d3-c3", "d3-c4", "d3-d2", "d3-d4", "d3-e2", "d3-e3", "d3xe4"],
+      "status": "ongoing"
+    },
+    {
+      "name": "Moon on e4 next to the light King on d3, king.range=2, coastPieces.2p.giveCheck=false",
+      "overrides": {
+        "king.range": 2,
+        "coastPieces.2p.giveCheck": false
+      },
+      "side": "light",
+      "pieces": {
+        "d3": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e4": {
+          "piece": "moon",
+          "side": "dark",
+          "moved": true
+        },
+        "b9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "d3-b1",
+        "d3-b3",
+        "d3-b5",
+        "d3-c2",
+        "d3-c3",
+        "d3-c4",
+        "d3-d1",
+        "d3-d2",
+        "d3-d4",
+        "d3-d5",
+        "d3-e2",
+        "d3-e3",
+        "d3-f1",
+        "d3-f3",
+        "d3xe4"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "Moon on e4 next to the light King on d3, king.range=3, coastPieces.2p.giveCheck=false",
+      "overrides": {
+        "king.range": 3,
+        "coastPieces.2p.giveCheck": false
+      },
+      "side": "light",
+      "pieces": {
+        "d3": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e4": {
+          "piece": "moon",
+          "side": "dark",
+          "moved": true
+        },
+        "b9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "d3-a3",
+        "d3-a6",
+        "d3-b1",
+        "d3-b3",
+        "d3-b5",
+        "d3-c2",
+        "d3-c3",
+        "d3-c4",
+        "d3-d1",
+        "d3-d2",
+        "d3-d4",
+        "d3-d5",
+        "d3-d6",
+        "d3-e2",
+        "d3-e3",
+        "d3-f1",
+        "d3-f3",
+        "d3-g3",
+        "d3xe4"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "Moon on e4 next to the light King on d3, king.range=4, coastPieces.2p.giveCheck=false",
+      "overrides": {
+        "king.range": 4,
+        "coastPieces.2p.giveCheck": false
+      },
+      "side": "light",
+      "pieces": {
+        "d3": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e4": {
+          "piece": "moon",
+          "side": "dark",
+          "moved": true
+        },
+        "b9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "d3-a3",
+        "d3-a6",
+        "d3-b1",
+        "d3-b3",
+        "d3-c2",
+        "d3-c3",
+        "d3-c4",
+        "d3-d1",
+        "d3-d2",
+        "d3-d4",
+        "d3-d5",
+        "d3-d6",
+        "d3-e2",
+        "d3-e3",
+        "d3-f1",
+        "d3-f3",
+        "d3-g3",
+        "d3-h3",
+        "d3xe4"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "dark King on the Ting Yang square i5, Tail on a5, king.range=1",
+      "overrides": {
+        "king.range": 1
+      },
+      "side": "dark",
+      "pieces": {
+        "i5": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": ["i5-h4", "i5-h5", "i5-h6", "i5-i4", "i5-i6"],
+      "status": "ongoing"
+    },
+    {
+      "name": "dark King on the Ting Yang square i5, Tail on a5, king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "side": "dark",
+      "pieces": {
+        "i5": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "i5-g3",
+        "i5-g5",
+        "i5-g7",
+        "i5-h4",
+        "i5-h5",
+        "i5-h6",
+        "i5-i3",
+        "i5-i4",
+        "i5-i6",
+        "i5-i7"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "dark King on the Ting Yang square i5, Tail on a5, king.range=3",
+      "overrides": {
+        "king.range": 3
+      },
+      "side": "dark",
+      "pieces": {
+        "i5": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "i5-f2",
+        "i5-f5",
+        "i5-f8",
+        "i5-g3",
+        "i5-g5",
+        "i5-g7",
+        "i5-h4",
+        "i5-h5",
+        "i5-h6",
+        "i5-i2",
+        "i5-i3",
+        "i5-i4",
+        "i5-i6",
+        "i5-i7",
+        "i5-i8"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "dark King on the Ting Yang square i5, Tail on a5, king.range=4",
+      "overrides": {
+        "king.range": 4
+      },
+      "side": "dark",
+      "pieces": {
+        "i5": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "i5-e9",
+        "i5-f2",
+        "i5-f8",
+        "i5-g3",
+        "i5-g5",
+        "i5-g7",
+        "i5-h4",
+        "i5-h5",
+        "i5-h6",
+        "i5-i1",
+        "i5-i2",
+        "i5-i3",
+        "i5-i4",
+        "i5-i6",
+        "i5-i7",
+        "i5-i8",
+        "i5-i9"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "dark King on the Ting Yang square i5, Tail on a5, king.range=1, tail.canCheck=true",
+      "overrides": {
+        "king.range": 1,
+        "tail.canCheck": true
+      },
+      "side": "dark",
+      "pieces": {
+        "i5": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": ["i5-h4", "i5-h5", "i5-h6", "i5-i4", "i5-i6"],
+      "status": "ongoing"
+    },
+    {
+      "name": "dark King on the Ting Yang square i5, Tail on a5, king.range=2, tail.canCheck=true",
+      "overrides": {
+        "king.range": 2,
+        "tail.canCheck": true
+      },
+      "side": "dark",
+      "pieces": {
+        "i5": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "i5-g3",
+        "i5-g5",
+        "i5-g7",
+        "i5-h4",
+        "i5-h5",
+        "i5-h6",
+        "i5-i3",
+        "i5-i4",
+        "i5-i6",
+        "i5-i7"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "dark King on the Ting Yang square i5, Tail on a5, king.range=3, tail.canCheck=true",
+      "overrides": {
+        "king.range": 3,
+        "tail.canCheck": true
+      },
+      "side": "dark",
+      "pieces": {
+        "i5": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "i5-f2",
+        "i5-f5",
+        "i5-f8",
+        "i5-g3",
+        "i5-g5",
+        "i5-g7",
+        "i5-h4",
+        "i5-h5",
+        "i5-h6",
+        "i5-i2",
+        "i5-i3",
+        "i5-i4",
+        "i5-i6",
+        "i5-i7",
+        "i5-i8"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "dark King on the Ting Yang square i5, Tail on a5, king.range=4, tail.canCheck=true",
+      "overrides": {
+        "king.range": 4,
+        "tail.canCheck": true
+      },
+      "side": "dark",
+      "pieces": {
+        "i5": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "i5-e9",
+        "i5-f2",
+        "i5-f8",
+        "i5-g3",
+        "i5-g5",
+        "i5-g7",
+        "i5-h4",
+        "i5-h5",
+        "i5-h6",
+        "i5-i1",
+        "i5-i2",
+        "i5-i3",
+        "i5-i4",
+        "i5-i6",
+        "i5-i7",
+        "i5-i8",
+        "i5-i9"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "dark King on the Ting Yang square i5, Tail on a5, king.range=1, tail.2p.canCapture=true",
+      "overrides": {
+        "king.range": 1,
+        "tail.2p.canCapture": true
+      },
+      "side": "dark",
+      "pieces": {
+        "i5": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": ["i5-h4", "i5-h5", "i5-h6", "i5-i4", "i5-i6"],
+      "status": "ongoing"
+    },
+    {
+      "name": "dark King on the Ting Yang square i5, Tail on a5, king.range=2, tail.2p.canCapture=true",
+      "overrides": {
+        "king.range": 2,
+        "tail.2p.canCapture": true
+      },
+      "side": "dark",
+      "pieces": {
+        "i5": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "i5-g3",
+        "i5-g5",
+        "i5-g7",
+        "i5-h4",
+        "i5-h5",
+        "i5-h6",
+        "i5-i3",
+        "i5-i4",
+        "i5-i6",
+        "i5-i7"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "dark King on the Ting Yang square i5, Tail on a5, king.range=3, tail.2p.canCapture=true",
+      "overrides": {
+        "king.range": 3,
+        "tail.2p.canCapture": true
+      },
+      "side": "dark",
+      "pieces": {
+        "i5": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "i5-f2",
+        "i5-f5",
+        "i5-f8",
+        "i5-g3",
+        "i5-g5",
+        "i5-g7",
+        "i5-h4",
+        "i5-h5",
+        "i5-h6",
+        "i5-i2",
+        "i5-i3",
+        "i5-i4",
+        "i5-i6",
+        "i5-i7",
+        "i5-i8"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "dark King on the Ting Yang square i5, Tail on a5, king.range=4, tail.2p.canCapture=true",
+      "overrides": {
+        "king.range": 4,
+        "tail.2p.canCapture": true
+      },
+      "side": "dark",
+      "pieces": {
+        "i5": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": [],
+      "legal": [
+        "i5-e9",
+        "i5-f2",
+        "i5-f8",
+        "i5-g3",
+        "i5-g5",
+        "i5-g7",
+        "i5-h4",
+        "i5-h5",
+        "i5-h6",
+        "i5-i1",
+        "i5-i2",
+        "i5-i3",
+        "i5-i4",
+        "i5-i6",
+        "i5-i7",
+        "i5-i8",
+        "i5-i9"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "dark King on the Ting Yang square i5, Tail on a5, king.range=1, tail.canCheck=true, tail.2p.canCapture=true",
+      "overrides": {
+        "king.range": 1,
+        "tail.canCheck": true,
+        "tail.2p.canCapture": true
+      },
+      "side": "dark",
+      "pieces": {
+        "i5": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["a5"],
+      "legal": ["i5-h4", "i5-h5", "i5-h6", "i5-i4", "i5-i6"],
+      "status": "ongoing"
+    },
+    {
+      "name": "dark King on the Ting Yang square i5, Tail on a5, king.range=2, tail.canCheck=true, tail.2p.canCapture=true",
+      "overrides": {
+        "king.range": 2,
+        "tail.canCheck": true,
+        "tail.2p.canCapture": true
+      },
+      "side": "dark",
+      "pieces": {
+        "i5": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["a5"],
+      "legal": [
+        "i5-g3",
+        "i5-g5",
+        "i5-g7",
+        "i5-h4",
+        "i5-h5",
+        "i5-h6",
+        "i5-i3",
+        "i5-i4",
+        "i5-i6",
+        "i5-i7"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "dark King on the Ting Yang square i5, Tail on a5, king.range=3, tail.canCheck=true, tail.2p.canCapture=true",
+      "overrides": {
+        "king.range": 3,
+        "tail.canCheck": true,
+        "tail.2p.canCapture": true
+      },
+      "side": "dark",
+      "pieces": {
+        "i5": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["a5"],
+      "legal": [
+        "i5-f2",
+        "i5-f5",
+        "i5-f8",
+        "i5-g3",
+        "i5-g5",
+        "i5-g7",
+        "i5-h4",
+        "i5-h5",
+        "i5-h6",
+        "i5-i2",
+        "i5-i3",
+        "i5-i4",
+        "i5-i6",
+        "i5-i7",
+        "i5-i8"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "dark King on the Ting Yang square i5, Tail on a5, king.range=4, tail.canCheck=true, tail.2p.canCapture=true",
+      "overrides": {
+        "king.range": 4,
+        "tail.canCheck": true,
+        "tail.2p.canCapture": true
+      },
+      "side": "dark",
+      "pieces": {
+        "i5": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["a5"],
+      "legal": [
+        "i5-e9",
+        "i5-f2",
+        "i5-f8",
+        "i5-g3",
+        "i5-g5",
+        "i5-g7",
+        "i5-h4",
+        "i5-h5",
+        "i5-h6",
+        "i5-i1",
+        "i5-i2",
+        "i5-i3",
+        "i5-i4",
+        "i5-i6",
+        "i5-i7",
+        "i5-i8",
+        "i5-i9"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "dark pawn on e3 checks the light King on f2, king.range=1",
+      "overrides": {
+        "king.range": 1
+      },
+      "side": "light",
+      "pieces": {
+        "f2": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e3": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "b9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": ["e3"],
+      "legal": ["f2-e1", "f2-e2", "f2-f1", "f2-f3", "f2-g1", "f2-g2", "f2-g3", "f2xe3"],
+      "status": "ongoing"
+    },
+    {
+      "name": "dark pawn on e3 checks the light King on f2, king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "side": "light",
+      "pieces": {
+        "f2": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e3": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "b9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": ["e3"],
+      "legal": [
+        "f2-e1",
+        "f2-e2",
+        "f2-f1",
+        "f2-f3",
+        "f2-f4",
+        "f2-g1",
+        "f2-g2",
+        "f2-g3",
+        "f2-h2",
+        "f2-h4",
+        "f2xe3"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "dark pawn on e3 checks the light King on f2, king.range=3",
+      "overrides": {
+        "king.range": 3
+      },
+      "side": "light",
+      "pieces": {
+        "f2": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e3": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "b9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": ["e3"],
+      "legal": [
+        "f2-c2",
+        "f2-e1",
+        "f2-e2",
+        "f2-f1",
+        "f2-f3",
+        "f2-f4",
+        "f2-f5",
+        "f2-g1",
+        "f2-g2",
+        "f2-g3",
+        "f2-h2",
+        "f2-h4",
+        "f2-i2",
+        "f2-i5",
+        "f2xe3"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "dark pawn on e3 checks the light King on f2, king.range=4",
+      "overrides": {
+        "king.range": 4
+      },
+      "side": "light",
+      "pieces": {
+        "f2": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e3": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "b9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": ["e3"],
+      "legal": [
+        "f2-b2",
+        "f2-c2",
+        "f2-e1",
+        "f2-e2",
+        "f2-f1",
+        "f2-f3",
+        "f2-f4",
+        "f2-f6",
+        "f2-g1",
+        "f2-g2",
+        "f2-g3",
+        "f2-h2",
+        "f2-h4",
+        "f2-i2",
+        "f2-i5",
+        "f2xe3"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "knight check from g7 onto f9: only a pawn capture answers it, king.range=1",
+      "overrides": {
+        "king.range": 1
+      },
+      "side": "dark",
+      "pieces": {
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "e9": {
+          "piece": "queen",
+          "side": "dark",
+          "moved": true
+        },
+        "g9": {
+          "piece": "bishop",
+          "side": "dark",
+          "moved": true
+        },
+        "e8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "f8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "g8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "h5": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        },
+        "g7": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["g7"],
+      "legal": ["f8xg7"],
+      "status": "ongoing"
+    },
+    {
+      "name": "knight check from g7 onto f9: only a pawn capture answers it, king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "side": "dark",
+      "pieces": {
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "e9": {
+          "piece": "queen",
+          "side": "dark",
+          "moved": true
+        },
+        "g9": {
+          "piece": "bishop",
+          "side": "dark",
+          "moved": true
+        },
+        "e8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "f8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "g8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "h5": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        },
+        "g7": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["g7"],
+      "legal": ["f8xg7"],
+      "status": "ongoing"
+    },
+    {
+      "name": "knight check from g7 onto f9: only a pawn capture answers it, king.range=3",
+      "overrides": {
+        "king.range": 3
+      },
+      "side": "dark",
+      "pieces": {
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "e9": {
+          "piece": "queen",
+          "side": "dark",
+          "moved": true
+        },
+        "g9": {
+          "piece": "bishop",
+          "side": "dark",
+          "moved": true
+        },
+        "e8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "f8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "g8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "h5": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        },
+        "g7": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["g7"],
+      "legal": ["f8xg7"],
+      "status": "ongoing"
+    },
+    {
+      "name": "knight check from g7 onto f9: only a pawn capture answers it, king.range=4",
+      "overrides": {
+        "king.range": 4
+      },
+      "side": "dark",
+      "pieces": {
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "e9": {
+          "piece": "queen",
+          "side": "dark",
+          "moved": true
+        },
+        "g9": {
+          "piece": "bishop",
+          "side": "dark",
+          "moved": true
+        },
+        "e8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "f8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "g8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "h5": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        },
+        "g7": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        },
+        "b1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["g7"],
+      "legal": ["f8xg7"],
+      "status": "ongoing"
+    },
+    {
+      "name": "King on a1 in check from a Queen on c3, king.range=1",
+      "overrides": {
+        "king.range": 1
+      },
+      "side": "light",
+      "pieces": {
+        "a1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "c3": {
+          "piece": "queen",
+          "side": "dark",
+          "moved": true
+        },
+        "e3": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": ["c3"],
+      "legal": ["a1-a2", "a1-b1"],
+      "status": "ongoing"
+    },
+    {
+      "name": "King on a1 in check from a Queen on c3, king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "side": "light",
+      "pieces": {
+        "a1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "c3": {
+          "piece": "queen",
+          "side": "dark",
+          "moved": true
+        },
+        "e3": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": ["c3"],
+      "legal": ["a1-a2", "a1-b1"],
+      "status": "ongoing"
+    },
+    {
+      "name": "King on a1 in check from a Queen on c3, king.range=3",
+      "overrides": {
+        "king.range": 3
+      },
+      "side": "light",
+      "pieces": {
+        "a1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "c3": {
+          "piece": "queen",
+          "side": "dark",
+          "moved": true
+        },
+        "e3": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": ["c3"],
+      "legal": ["a1-a2", "a1-a4", "a1-b1", "a1-d1"],
+      "status": "ongoing"
+    },
+    {
+      "name": "King on a1 in check from a Queen on c3, king.range=4",
+      "overrides": {
+        "king.range": 4
+      },
+      "side": "light",
+      "pieces": {
+        "a1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "c3": {
+          "piece": "queen",
+          "side": "dark",
+          "moved": true
+        },
+        "e3": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": ["c3"],
+      "legal": ["a1-a2", "a1-a4", "a1-b1", "a1-d1"],
+      "status": "ongoing"
+    },
+    {
+      "name": "Queen on b2 protected by the King on c3 against the King on a1, king.range=1",
+      "overrides": {
+        "king.range": 1
+      },
+      "side": "light",
+      "pieces": {
+        "a1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "b2": {
+          "piece": "queen",
+          "side": "dark",
+          "moved": true
+        },
+        "c3": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": ["b2"],
+      "legal": [],
+      "status": "checkmate"
+    },
+    {
+      "name": "Queen on b2 protected by the King on c3 against the King on a1, king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "side": "light",
+      "pieces": {
+        "a1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "b2": {
+          "piece": "queen",
+          "side": "dark",
+          "moved": true
+        },
+        "c3": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": ["b2"],
+      "legal": [],
+      "status": "checkmate"
+    },
+    {
+      "name": "Queen on b2 protected by the King on c3 against the King on a1, king.range=3",
+      "overrides": {
+        "king.range": 3
+      },
+      "side": "light",
+      "pieces": {
+        "a1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "b2": {
+          "piece": "queen",
+          "side": "dark",
+          "moved": true
+        },
+        "c3": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": ["b2"],
+      "legal": ["a1-a4", "a1-d1"],
+      "status": "ongoing"
+    },
+    {
+      "name": "Queen on b2 protected by the King on c3 against the King on a1, king.range=4",
+      "overrides": {
+        "king.range": 4
+      },
+      "side": "light",
+      "pieces": {
+        "a1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "b2": {
+          "piece": "queen",
+          "side": "dark",
+          "moved": true
+        },
+        "c3": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "checkers": ["b2"],
+      "legal": ["a1-a4", "a1-d1"],
+      "status": "ongoing"
+    },
+    {
+      "name": "light pawn on d8 checks the King on e9 (its capture there would promote), king.range=1",
+      "overrides": {
+        "king.range": 1
+      },
+      "side": "dark",
+      "pieces": {
+        "e9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "d8": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "i1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["d8"],
+      "legal": ["e9-d9", "e9-e8", "e9-f8", "e9-f9", "e9xd8"],
+      "status": "ongoing"
+    },
+    {
+      "name": "light pawn on d8 checks the King on e9 (its capture there would promote), king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "side": "dark",
+      "pieces": {
+        "e9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "d8": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "i1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["d8"],
+      "legal": ["e9-d9", "e9-e7", "e9-e8", "e9-f8", "e9-f9", "e9-g7", "e9-g9", "e9xd8"],
+      "status": "ongoing"
+    },
+    {
+      "name": "light pawn on d8 checks the King on e9 (its capture there would promote), king.range=3",
+      "overrides": {
+        "king.range": 3
+      },
+      "side": "dark",
+      "pieces": {
+        "e9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "d8": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "i1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["d8"],
+      "legal": [
+        "e9-b9",
+        "e9-d9",
+        "e9-e6",
+        "e9-e7",
+        "e9-e8",
+        "e9-f8",
+        "e9-f9",
+        "e9-g7",
+        "e9-g9",
+        "e9-h6",
+        "e9-h9",
+        "e9xd8"
+      ],
+      "status": "ongoing"
+    },
+    {
+      "name": "light pawn on d8 checks the King on e9 (its capture there would promote), king.range=4",
+      "overrides": {
+        "king.range": 4
+      },
+      "side": "dark",
+      "pieces": {
+        "e9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "d8": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "i1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "checkers": ["d8"],
+      "legal": [
+        "e9-a9",
+        "e9-b9",
+        "e9-d9",
+        "e9-e6",
+        "e9-e7",
+        "e9-e8",
+        "e9-f8",
+        "e9-f9",
+        "e9-g7",
+        "e9-g9",
+        "e9-h6",
+        "e9-h9",
+        "e9-i9",
+        "e9xd8"
+      ],
+      "status": "ongoing"
+    }
+  ],
+  "attackMaps": [
+    {
+      "name": "lone King on e3, king.range=1",
+      "overrides": {
+        "king.range": 1
+      },
+      "side": "light",
+      "pieces": {
+        "e3": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": ["d2", "d3", "d4", "e2", "e4", "f2", "f3", "f4"]
+    },
+    {
+      "name": "lone King on e3, king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "side": "light",
+      "pieces": {
+        "e3": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "c1",
+        "c3",
+        "c5",
+        "d2",
+        "d3",
+        "d4",
+        "e1",
+        "e2",
+        "e4",
+        "f2",
+        "f3",
+        "f4",
+        "g1",
+        "g3",
+        "g5"
+      ]
+    },
+    {
+      "name": "lone King on e3, king.range=3",
+      "overrides": {
+        "king.range": 3
+      },
+      "side": "light",
+      "pieces": {
+        "e3": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "b3",
+        "b6",
+        "c1",
+        "c3",
+        "c5",
+        "d2",
+        "d3",
+        "d4",
+        "e1",
+        "e2",
+        "e4",
+        "e6",
+        "f2",
+        "f3",
+        "f4",
+        "g1",
+        "g3",
+        "g5",
+        "h3",
+        "h6"
+      ]
+    },
+    {
+      "name": "lone King on e3, king.range=4",
+      "overrides": {
+        "king.range": 4
+      },
+      "side": "light",
+      "pieces": {
+        "e3": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "a3",
+        "a7",
+        "b3",
+        "b6",
+        "c1",
+        "c3",
+        "c5",
+        "d2",
+        "d3",
+        "d4",
+        "e1",
+        "e2",
+        "e4",
+        "e6",
+        "e7",
+        "f2",
+        "f3",
+        "f4",
+        "g1",
+        "g3",
+        "g5",
+        "h3",
+        "h6",
+        "i3",
+        "i7"
+      ]
+    },
+    {
+      "name": "King on e3 with a pawn on e4 and a knight on f2, king.range=1",
+      "overrides": {
+        "king.range": 1
+      },
+      "side": "light",
+      "pieces": {
+        "e3": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e4": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "f2": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "d1",
+        "d2",
+        "d3",
+        "d4",
+        "d5",
+        "e2",
+        "e4",
+        "f2",
+        "f3",
+        "f4",
+        "f5",
+        "g4",
+        "h1",
+        "h3"
+      ]
+    },
+    {
+      "name": "King on e3 with a pawn on e4 and a knight on f2, king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "side": "light",
+      "pieces": {
+        "e3": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e4": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "f2": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "c1",
+        "c3",
+        "c5",
+        "d1",
+        "d2",
+        "d3",
+        "d4",
+        "d5",
+        "e1",
+        "e2",
+        "e4",
+        "f2",
+        "f3",
+        "f4",
+        "f5",
+        "g3",
+        "g4",
+        "g5",
+        "h1",
+        "h3"
+      ]
+    },
+    {
+      "name": "King on e3 with a pawn on e4 and a knight on f2, king.range=3",
+      "overrides": {
+        "king.range": 3
+      },
+      "side": "light",
+      "pieces": {
+        "e3": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e4": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "f2": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "b3",
+        "b6",
+        "c1",
+        "c3",
+        "c5",
+        "d1",
+        "d2",
+        "d3",
+        "d4",
+        "d5",
+        "e1",
+        "e2",
+        "e4",
+        "f2",
+        "f3",
+        "f4",
+        "f5",
+        "g3",
+        "g4",
+        "g5",
+        "h1",
+        "h3",
+        "h6"
+      ]
+    },
+    {
+      "name": "King on e3 with a pawn on e4 and a knight on f2, king.range=4",
+      "overrides": {
+        "king.range": 4
+      },
+      "side": "light",
+      "pieces": {
+        "e3": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e4": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "f2": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "a3",
+        "a7",
+        "b3",
+        "b6",
+        "c1",
+        "c3",
+        "c5",
+        "d1",
+        "d2",
+        "d3",
+        "d4",
+        "d5",
+        "e1",
+        "e2",
+        "e4",
+        "f2",
+        "f3",
+        "f4",
+        "f5",
+        "g3",
+        "g4",
+        "g5",
+        "h1",
+        "h3",
+        "h6",
+        "i3",
+        "i7"
+      ]
+    },
+    {
+      "name": "King on e3 with a pawn on e4 and a knight on f2, king.range=1, king.canJump=true",
+      "overrides": {
+        "king.range": 1,
+        "king.canJump": true
+      },
+      "side": "light",
+      "pieces": {
+        "e3": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e4": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "f2": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "d1",
+        "d2",
+        "d3",
+        "d4",
+        "d5",
+        "e2",
+        "e4",
+        "f2",
+        "f3",
+        "f4",
+        "f5",
+        "g4",
+        "h1",
+        "h3"
+      ]
+    },
+    {
+      "name": "King on e3 with a pawn on e4 and a knight on f2, king.range=2, king.canJump=true",
+      "overrides": {
+        "king.range": 2,
+        "king.canJump": true
+      },
+      "side": "light",
+      "pieces": {
+        "e3": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e4": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "f2": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "c1",
+        "c3",
+        "c5",
+        "d1",
+        "d2",
+        "d3",
+        "d4",
+        "d5",
+        "e1",
+        "e2",
+        "e4",
+        "f2",
+        "f3",
+        "f4",
+        "f5",
+        "g1",
+        "g3",
+        "g4",
+        "g5",
+        "h1",
+        "h3"
+      ]
+    },
+    {
+      "name": "King on e3 with a pawn on e4 and a knight on f2, king.range=3, king.canJump=true",
+      "overrides": {
+        "king.range": 3,
+        "king.canJump": true
+      },
+      "side": "light",
+      "pieces": {
+        "e3": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e4": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "f2": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "b3",
+        "b6",
+        "c1",
+        "c3",
+        "c5",
+        "d1",
+        "d2",
+        "d3",
+        "d4",
+        "d5",
+        "e1",
+        "e2",
+        "e4",
+        "e6",
+        "f2",
+        "f3",
+        "f4",
+        "f5",
+        "g1",
+        "g3",
+        "g4",
+        "g5",
+        "h1",
+        "h3",
+        "h6"
+      ]
+    },
+    {
+      "name": "King on e3 with a pawn on e4 and a knight on f2, king.range=4, king.canJump=true",
+      "overrides": {
+        "king.range": 4,
+        "king.canJump": true
+      },
+      "side": "light",
+      "pieces": {
+        "e3": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e4": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "f2": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "a3",
+        "a7",
+        "b3",
+        "b6",
+        "c1",
+        "c3",
+        "c5",
+        "d1",
+        "d2",
+        "d3",
+        "d4",
+        "d5",
+        "e1",
+        "e2",
+        "e4",
+        "e6",
+        "e7",
+        "f2",
+        "f3",
+        "f4",
+        "f5",
+        "g1",
+        "g3",
+        "g4",
+        "g5",
+        "h1",
+        "h3",
+        "h6",
+        "i3",
+        "i7"
+      ]
+    },
+    {
+      "name": "Queen on e1 and Rook on b4: the void and e5, king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "side": "light",
+      "pieces": {
+        "e1": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        },
+        "b4": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "a1",
+        "b1",
+        "b2",
+        "b3",
+        "b4",
+        "b5",
+        "b6",
+        "b7",
+        "b8",
+        "b9",
+        "c1",
+        "c3",
+        "c4",
+        "d1",
+        "d2",
+        "d4",
+        "e2",
+        "e3",
+        "e4",
+        "e6",
+        "e7",
+        "e8",
+        "e9",
+        "f1",
+        "f2",
+        "f4",
+        "g1",
+        "g3",
+        "g4",
+        "h1",
+        "h4",
+        "i1",
+        "i4",
+        "i5"
+      ]
+    },
+    {
+      "name": "unmoved Sun on a2 attacks two squares straight ahead, king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "side": "light",
+      "pieces": {
+        "a2": {
+          "piece": "sun",
+          "side": "light",
+          "moved": false
+        }
+      },
+      "expected": ["a1", "a3", "a4", "b1", "b2", "b3"]
+    },
+    {
+      "name": "dark pawns on e7 and b7 attack forward diagonals, never the Coast, king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "side": "dark",
+      "pieces": {
+        "e7": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "b7": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": ["c6", "d6", "f6"]
+    },
+    {
+      "name": "Tail on e5 with light pieces on a5 and i5, king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "side": "neutral",
+      "pieces": {
+        "e5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        },
+        "a5": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "i5": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": []
+    },
+    {
+      "name": "Tail on e5 with light pieces on a5 and i5, king.range=2, tail.2p.canCapture=true",
+      "overrides": {
+        "king.range": 2,
+        "tail.2p.canCapture": true
+      },
+      "side": "neutral",
+      "pieces": {
+        "e5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        },
+        "a5": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "i5": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": ["a5", "i5"]
+    }
+  ]
+}

@@ -126,8 +126,8 @@ describe('fixture coverage', () => {
   ];
   // Read by these pieces, but not about movement the fixtures can show.
   const later = [
-    'coastPieces.2p.giveCheck', // check: S16 (attack maps)
-    'tail.canCheck', // check: S16
+    'coastPieces.2p.giveCheck', // check: moves/check.test.ts (S16)
+    'tail.canCheck', // check: moves/check.test.ts (S16)
     'sunMoon.3p.range', // 3-player Coast play
     'tail.3p.movement',
     'tail.3p.captures',

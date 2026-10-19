@@ -50,7 +50,7 @@ Boards live in `rules/boards/` (the Chess Nines board is `standard-9x9.json`) an
 | `squareTypes` | The kinds of special square, each with an `id` and `label` |
 | `squares` | The special squares: `at` (such as `e5`), one or more `types`, an optional owning `side`, a display `label` and a display `color` (`#rrggbb`). Unlisted squares are plain |
 | `sides` | Each side's `id`, its `forward` direction (`up`, toward rank 9, or `down`) and an optional `view`: how the board is drawn for that seat, as a clockwise `rotate` of the standard diagram (0, 90, 180 or 270). A side may have no forward direction if none of its moves in that player count is forward-relative |
-| `setups` | One start position per player count: side id, or `neutral` for unowned pieces, to square to piece id |
+| `setups` | One start position per player count: side id, or `neutral` for unowned pieces, to square to piece id, and a `turnOrder`: the seats in order of play, every side with pieces once and never `neutral` |
 
 Coordinates are lowercase: files `a` to `i` from the left, ranks `1` to `9` from the light side.
 
@@ -109,7 +109,7 @@ Special rules such as en passant, castling and opening the Coast are engine feat
 
 ## Move generation
 
-`packages/engine/src/moves/generate.ts` turns this data into pseudo-legal moves (check is handled later). It has no piece-specific code. The square-rule, neutral-piece and promotion choices below are settled by `docs/decisions/rules-decisions-2026-10-19.md`.
+`packages/engine/src/moves/generate.ts` turns this data into pseudo-legal moves; `check.ts` adds check and legality (next section). It has no piece-specific code. The square-rule, neutral-piece and promotion choices below are settled by `docs/decisions/rules-decisions-2026-10-19.md`.
 
 - **Steps**: named directions and vectors are turned around for a side whose forward is `down`. A side without a forward direction may only use moves that read the same either way.
 - **Range**: a move repeats its step up to `range` times along a line, or to the edge when unlimited. Each square reached is a possible destination; the earlier ones are stepped through.
@@ -120,6 +120,17 @@ Special rules such as en passant, castling and opening the Coast are engine feat
 - **Conditions** are checked against the resolved ruleset. A parameter that is missing, still null or of the wrong type stops generation with an error rather than a guess.
 - **Promotion**: a move that ends on the side's last rank produces one move per target. Promotion is mandatory and matches standard chess by default (queen, rook, bishop, knight, independent of captures). An empty target list means the piece does not promote. A piece with a promotion zone but an empty list is a configuration error (to be enforced when zones become data; today the zone is the last rank). The option `captured-piece` of `pawn.promotion.targets` (off by default) adds every piece type the side has lost, other than Kings and pawns; the caller passes the lost pieces (`Lost`, side id to piece ids) to `movesFrom` and `generateMoves`. A side that has lost none has no target, so the pawn stays a pawn. The generator refuses (`RulesError`) when such a promotion comes up and no lost list was given, or the list names an unknown piece.
 - Results are sorted by notation (`e2-e4`, `e5xd6`, `d8-d9=slider`) with duplicates removed, so the same position always gives the same list.
+
+## Check and legal moves
+
+`packages/engine/src/moves/check.ts` builds on the generator; nothing in it names a piece.
+
+- **Attack maps** come from the same walk as moves (`attacksFrom`, `attackMap`): a square is attacked when one of a piece's moves could capture an enemy piece standing there. Move-only steps never attack; lines, ranges, jumps, stop and pass rules apply exactly as for moves, so `king.range` and `king.canJump` change what a King attacks. Squares of the attacker's own pieces count (defended); whether the piece on a square may be captured does not. Attacks never need the lost-piece list.
+- **Check**: a side is in check when a piece of any other side, `neutral` included, attacks one of its `royal` pieces and that piece's `givesCheck` holds (`coastPieces.2p.giveCheck` for Dragon Heads, Sun and Moon; `tail.canCheck` for the Tail, which also needs `tail.2p.canCapture` to attack at all). A side without a royal piece is never in check. The flag is read only for a piece that attacks.
+- **Legal moves** are the pseudo-legal moves after which none of the side's royal pieces is in check. A caller may let the side also move another side's pieces (`alsoMove`, such as `neutral` for the Tail in 2-player games); whether it may on this turn is game state.
+- **Game status**: no legal move is checkmate when in check and stalemate otherwise; stalemate reads `draw.stalemate` (draw, loss for the stalemated side, or win for it). 3-player check and game end are not built yet: a Coast piece's flag names a 2-player parameter and is refused in a 3-player game rather than guessed.
+- **Turn order** (`packages/engine/src/game/turns.ts`): the setup's `turnOrder`, rotated so that `turn.firstMove` starts where the ruleset resolves it, for any number of seats; `nextSide` skips seats that are out.
+- **Interactions** (`packages/engine/src/rules/interactions.ts`): every pair of parameters that can vary in a game of that player count and share an `affects` system, for the simulation harness.
 
 ## Engine requirements
 

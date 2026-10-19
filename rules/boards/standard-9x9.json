@@ -2,7 +2,7 @@
   "$schema": "../schema/board.schema.json",
   "id": "standard-9x9",
   "name": "Chess Nines board",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "The 9x9 Chess Nines board: the Coast (file a), an 8-column checkered board (files b to i) split by the void (rank 5), and the start positions for 2 and 3 players.",
   "squareTypes": [
     {
@@ -345,7 +345,11 @@
           "a5": "dragon-tail"
         }
       },
-      "notes": "Mirror image across rank 5. The Dragon Tail belongs to neither side; either player may move it."
+      "turnOrder": [
+        "dark",
+        "light"
+      ],
+      "notes": "Mirror image across rank 5. The Dragon Tail belongs to neither side; either player may move it. Dark moves first by default; turn.firstMove may let light start."
     },
     {
       "players": 3,
@@ -394,7 +398,12 @@
           "a1": "light-dragon-head"
         }
       },
-      "notes": "As 2 players, except the Sun and Moon switch (Sun a8, Moon a2) and all 5 Coast pieces belong to the Dragon player."
+      "turnOrder": [
+        "dark",
+        "light",
+        "dragon"
+      ],
+      "notes": "As 2 players, except the Sun and Moon switch (Sun a8, Moon a2) and all 5 Coast pieces belong to the Dragon player. Turn order: dark, light, Dragon (docs/RULES.md)."
     }
   ],
   "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026.",

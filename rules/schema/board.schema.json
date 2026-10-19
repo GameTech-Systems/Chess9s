@@ -112,6 +112,12 @@
             "additionalProperties": { "$ref": "#/$defs/id" }
           }
         },
+        "turnOrder": {
+          "description": "Seats in order of play: every side with pieces in this setup, once, never neutral. turn.firstMove, where a ruleset resolves it, picks the seat that starts.",
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/id" }
+        },
         "notes": { "type": "string" }
       },
       "additionalProperties": false
