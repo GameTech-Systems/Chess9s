@@ -1,0 +1,84 @@
+{
+  "$schema": "../schema/piece.schema.json",
+  "id": "pawn",
+  "name": "Pawn",
+  "letter": "P",
+  "promotion": {
+    "to": {
+      "param": "pawn.promotion.targets"
+    }
+  },
+  "moves": [
+    {
+      "directions": [
+        "forward"
+      ],
+      "range": 1,
+      "capture": "move-only"
+    },
+    {
+      "vectors": [
+        [
+          0,
+          1
+        ]
+      ],
+      "range": 2,
+      "capture": "move-only",
+      "when": {
+        "all": [
+          {
+            "firstMove": true
+          },
+          {
+            "param": "pawn.initialDoubleStep",
+            "is": true
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "forward-diagonal"
+      ],
+      "range": 1,
+      "capture": "capture-only"
+    }
+  ],
+  "squares": [
+    {
+      "type": "coast",
+      "stop": false,
+      "pass": false
+    },
+    {
+      "type": "center",
+      "stop": {
+        "param": "pawn.canEnterCenter"
+      }
+    },
+    {
+      "type": "center",
+      "stop": false,
+      "when": {
+        "param": "center.occupants",
+        "in": [
+          "dragons",
+          "dragons-and-sun-moon"
+        ]
+      }
+    },
+    {
+      "type": "center",
+      "pass": false,
+      "when": {
+        "not": {
+          "param": "center.passThrough",
+          "has": "pawn"
+        }
+      }
+    }
+  ],
+  "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026.",
+  "notes": "Not expressed yet (engine features): en passant and pawn-safe zones (pawn.safeZones; the colored squares are in the board data). Each pawn is named by its starting file's color (docs/RULES.md); the engine keeps track of the starting file, so there is one pawn piece."
+}

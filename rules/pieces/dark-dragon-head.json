@@ -1,0 +1,55 @@
+{
+  "$schema": "../schema/piece.schema.json",
+  "id": "dark-dragon-head",
+  "name": "Dark Dragon Head",
+  "letter": "DH",
+  "givesCheck": {
+    "param": "coastPieces.2p.giveCheck"
+  },
+  "moves": [
+    {
+      "directions": [
+        "orthogonal",
+        "diagonal"
+      ],
+      "range": {
+        "param": "dragonHead.range"
+      },
+      "jump": {
+        "param": "dragon.canJump"
+      }
+    }
+  ],
+  "squares": [
+    {
+      "type": "center",
+      "pass": false,
+      "when": {
+        "not": {
+          "param": "center.passThrough",
+          "has": "dragon-head"
+        }
+      }
+    },
+    {
+      "type": "coast",
+      "stop": false,
+      "notes": "coast.returnAllowed off: a Coast piece that has left the Coast may not come back.",
+      "when": {
+        "all": [
+          {
+            "param": "coast.returnAllowed",
+            "is": false
+          },
+          {
+            "not": {
+              "from": "coast"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026.",
+  "notes": "Not expressed yet (engine features): no Coast piece moves until the Coast opens (coast.2p.initiation); ways off the Coast (coast.2p.exit, coast.3p.exit); capture on the Coast (coast.2p.capturable, coast.3p.capturable). givesCheck follows the 2-player setting; in 3-player games dragon.3p.givesCheck applies instead, which a single flag can't express yet."
+}

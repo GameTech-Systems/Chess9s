@@ -1,0 +1,409 @@
+{
+  "$schema": "../schema/piece.schema.json",
+  "id": "moon",
+  "name": "Moon",
+  "letter": "M",
+  "givesCheck": {
+    "param": "coastPieces.2p.giveCheck"
+  },
+  "moves": [
+    {
+      "directions": [
+        "orthogonal",
+        "diagonal"
+      ],
+      "range": {
+        "param": "sunMoon.range"
+      },
+      "when": {
+        "all": [
+          {
+            "players": [
+              2
+            ]
+          },
+          {
+            "param": "sunMoon.capture",
+            "is": "any-move-square"
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "orthogonal"
+      ],
+      "range": {
+        "param": "sunMoon.range"
+      },
+      "capture": "move-only",
+      "when": {
+        "all": [
+          {
+            "players": [
+              2
+            ]
+          },
+          {
+            "param": "sunMoon.capture",
+            "in": [
+              "diagonal-only",
+              "none"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "diagonal"
+      ],
+      "range": {
+        "param": "sunMoon.range"
+      },
+      "when": {
+        "all": [
+          {
+            "players": [
+              2
+            ]
+          },
+          {
+            "param": "sunMoon.capture",
+            "is": "diagonal-only"
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "diagonal"
+      ],
+      "range": {
+        "param": "sunMoon.range"
+      },
+      "capture": "move-only",
+      "when": {
+        "all": [
+          {
+            "players": [
+              2
+            ]
+          },
+          {
+            "param": "sunMoon.capture",
+            "is": "none"
+          }
+        ]
+      }
+    },
+    {
+      "vectors": [
+        [
+          0,
+          1
+        ]
+      ],
+      "range": 2,
+      "when": {
+        "all": [
+          {
+            "players": [
+              2
+            ]
+          },
+          {
+            "firstMove": true
+          },
+          {
+            "param": "sunMoon.firstMoveDouble",
+            "is": true
+          },
+          {
+            "param": "sunMoon.capture",
+            "is": "any-move-square"
+          }
+        ]
+      },
+      "notes": "2 straight forward on its first move."
+    },
+    {
+      "vectors": [
+        [
+          0,
+          1
+        ]
+      ],
+      "range": 2,
+      "capture": "move-only",
+      "when": {
+        "all": [
+          {
+            "players": [
+              2
+            ]
+          },
+          {
+            "firstMove": true
+          },
+          {
+            "param": "sunMoon.firstMoveDouble",
+            "is": true
+          },
+          {
+            "param": "sunMoon.capture",
+            "in": [
+              "diagonal-only",
+              "none"
+            ]
+          }
+        ]
+      },
+      "notes": "2 straight forward on its first move."
+    },
+    {
+      "directions": [
+        "orthogonal",
+        "diagonal"
+      ],
+      "range": 1,
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "from": "coast"
+          },
+          {
+            "param": "sunMoon.capture",
+            "is": "any-move-square"
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "orthogonal"
+      ],
+      "range": 1,
+      "capture": "move-only",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "from": "coast"
+          },
+          {
+            "param": "sunMoon.capture",
+            "in": [
+              "diagonal-only",
+              "none"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "diagonal"
+      ],
+      "range": 1,
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "from": "coast"
+          },
+          {
+            "param": "sunMoon.capture",
+            "is": "diagonal-only"
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "diagonal"
+      ],
+      "range": 1,
+      "capture": "move-only",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "from": "coast"
+          },
+          {
+            "param": "sunMoon.capture",
+            "is": "none"
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "orthogonal",
+        "diagonal"
+      ],
+      "range": {
+        "param": "sunMoon.3p.range"
+      },
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "not": {
+              "from": "coast"
+            }
+          },
+          {
+            "param": "sunMoon.capture",
+            "is": "any-move-square"
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "orthogonal"
+      ],
+      "range": {
+        "param": "sunMoon.3p.range"
+      },
+      "capture": "move-only",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "not": {
+              "from": "coast"
+            }
+          },
+          {
+            "param": "sunMoon.capture",
+            "in": [
+              "diagonal-only",
+              "none"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "diagonal"
+      ],
+      "range": {
+        "param": "sunMoon.3p.range"
+      },
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "not": {
+              "from": "coast"
+            }
+          },
+          {
+            "param": "sunMoon.capture",
+            "is": "diagonal-only"
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "diagonal"
+      ],
+      "range": {
+        "param": "sunMoon.3p.range"
+      },
+      "capture": "move-only",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "not": {
+              "from": "coast"
+            }
+          },
+          {
+            "param": "sunMoon.capture",
+            "is": "none"
+          }
+        ]
+      }
+    }
+  ],
+  "squares": [
+    {
+      "type": "center",
+      "stop": false,
+      "when": {
+        "param": "center.occupants",
+        "is": "dragons"
+      }
+    },
+    {
+      "type": "center",
+      "pass": false,
+      "when": {
+        "not": {
+          "param": "center.passThrough",
+          "has": "sun-moon-pawn"
+        }
+      }
+    },
+    {
+      "type": "coast",
+      "stop": false,
+      "notes": "coast.returnAllowed off: a Coast piece that has left the Coast may not come back.",
+      "when": {
+        "all": [
+          {
+            "param": "coast.returnAllowed",
+            "is": false
+          },
+          {
+            "not": {
+              "from": "coast"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026.",
+  "notes": "Each capture option of sunMoon.capture is its own group of moves. Reading of diagonal-only: it moves as usual but captures only on diagonal moves. Not expressed yet (engine features): Coast opening and exits, capture on the Coast, promotion (sunMoon.canPromote: no promotion targets have been given), and 3-player check (dragon.3p.givesCheck). givesCheck follows the 2-player setting."
+}

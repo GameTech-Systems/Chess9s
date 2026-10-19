@@ -1,0 +1,83 @@
+{
+  "$schema": "../schema/piece.schema.json",
+  "id": "queen",
+  "name": "Queen",
+  "letter": "Q",
+  "moves": [
+    {
+      "directions": [
+        "orthogonal",
+        "diagonal"
+      ]
+    }
+  ],
+  "squares": [
+    {
+      "type": "void",
+      "stop": {
+        "param": "queen.canEnterVoid"
+      },
+      "pass": {
+        "param": "queen.canEnterVoid"
+      }
+    },
+    {
+      "type": "coast",
+      "stop": {
+        "param": "queen.canEnterCoast"
+      },
+      "pass": {
+        "param": "queen.canEnterCoast"
+      }
+    },
+    {
+      "type": "center",
+      "stop": false,
+      "notes": "queen.voidCrossings: she passes over e5 only and never stops there."
+    },
+    {
+      "type": "center",
+      "pass": false,
+      "when": {
+        "not": {
+          "param": "center.passThrough",
+          "has": "queen"
+        }
+      }
+    },
+    {
+      "type": "center",
+      "pass": false,
+      "when": {
+        "param": "queen.voidCrossings",
+        "is": "none"
+      }
+    },
+    {
+      "type": "coast-gate",
+      "stop": false,
+      "pass": false,
+      "when": {
+        "param": "queen.voidCrossings",
+        "in": [
+          "e5-only",
+          "none"
+        ]
+      }
+    },
+    {
+      "type": "ting-yang",
+      "stop": false,
+      "pass": false,
+      "when": {
+        "param": "queen.voidCrossings",
+        "in": [
+          "e5-only",
+          "none"
+        ]
+      }
+    }
+  ],
+  "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026.",
+  "notes": "Not expressed yet (engine features): the swap with her green pawn (queen.pawnSwap). Reading of queen.voidCrossings e5-only and none: a5 and i5 are closed to her, for stopping and crossing."
+}

@@ -1,0 +1,216 @@
+{
+  "$schema": "../schema/piece.schema.json",
+  "id": "dragon-tail",
+  "name": "Dragon Tail",
+  "letter": "T",
+  "capturable": {
+    "param": "tail.capturable"
+  },
+  "givesCheck": {
+    "param": "tail.canCheck"
+  },
+  "moves": [
+    {
+      "targets": [
+        "tail-square"
+      ],
+      "capture": "move-only",
+      "when": {
+        "all": [
+          {
+            "players": [
+              2
+            ]
+          },
+          {
+            "param": "tail.2p.path",
+            "is": "a5-e5-i5"
+          },
+          {
+            "param": "tail.2p.canCapture",
+            "is": false
+          }
+        ]
+      }
+    },
+    {
+      "targets": [
+        "tail-square"
+      ],
+      "capture": "move-or-capture",
+      "when": {
+        "all": [
+          {
+            "players": [
+              2
+            ]
+          },
+          {
+            "param": "tail.2p.path",
+            "is": "a5-e5-i5"
+          },
+          {
+            "param": "tail.2p.canCapture",
+            "is": true
+          }
+        ]
+      }
+    },
+    {
+      "targets": [
+        "center",
+        "ting-yang"
+      ],
+      "capture": "move-only",
+      "when": {
+        "all": [
+          {
+            "players": [
+              2
+            ]
+          },
+          {
+            "param": "tail.2p.path",
+            "is": "e5-i5-only"
+          },
+          {
+            "param": "tail.2p.canCapture",
+            "is": false
+          }
+        ]
+      }
+    },
+    {
+      "targets": [
+        "center",
+        "ting-yang"
+      ],
+      "capture": "move-or-capture",
+      "when": {
+        "all": [
+          {
+            "players": [
+              2
+            ]
+          },
+          {
+            "param": "tail.2p.path",
+            "is": "e5-i5-only"
+          },
+          {
+            "param": "tail.2p.canCapture",
+            "is": true
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "orthogonal",
+        "diagonal"
+      ],
+      "range": {
+        "param": "dragonHead.range"
+      },
+      "jump": {
+        "param": "dragon.canJump"
+      },
+      "capture": "move-or-capture",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "param": "tail.3p.movement",
+            "is": "like-dragon-head"
+          },
+          {
+            "param": "tail.3p.captures",
+            "is": "non-coast-pieces"
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "orthogonal",
+        "diagonal"
+      ],
+      "range": {
+        "param": "dragonHead.range"
+      },
+      "jump": {
+        "param": "dragon.canJump"
+      },
+      "capture": "move-only",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "param": "tail.3p.movement",
+            "is": "like-dragon-head"
+          },
+          {
+            "param": "tail.3p.captures",
+            "is": "none"
+          }
+        ]
+      }
+    },
+    {
+      "targets": [
+        "tail-square"
+      ],
+      "capture": "move-or-capture",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "param": "tail.3p.movement",
+            "is": "two-player-path"
+          },
+          {
+            "param": "tail.3p.captures",
+            "is": "non-coast-pieces"
+          }
+        ]
+      }
+    },
+    {
+      "targets": [
+        "tail-square"
+      ],
+      "capture": "move-only",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "param": "tail.3p.movement",
+            "is": "two-player-path"
+          },
+          {
+            "param": "tail.3p.captures",
+            "is": "none"
+          }
+        ]
+      }
+    }
+  ],
+  "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026.",
+  "notes": "Not expressed yet (engine features): its first move is a5 to e5, which opens the Coast (coast.2p.initiation); the repeat limit (tail.repeatLimit); either player may move it in 2-player games; in 3-player games it is the Dragon's royal piece (checkmated, never captured) and turns to stone. In 3-player games all other Coast pieces are the Dragon's own, so non-coast-pieces captures any enemy piece."
+}

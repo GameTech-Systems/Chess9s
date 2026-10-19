@@ -1,0 +1,38 @@
+{
+  "$schema": "../schema/piece.schema.json",
+  "id": "knight",
+  "name": "Knight",
+  "letter": "N",
+  "moves": [
+    {
+      "vectors": [
+        [
+          1,
+          2
+        ]
+      ],
+      "symmetry": "all",
+      "range": 1
+    }
+  ],
+  "squares": [
+    {
+      "type": "coast",
+      "stop": false,
+      "pass": false
+    },
+    {
+      "type": "center",
+      "stop": false,
+      "when": {
+        "param": "center.occupants",
+        "in": [
+          "dragons",
+          "dragons-and-sun-moon"
+        ]
+      }
+    }
+  ],
+  "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026.",
+  "notes": "A Knight's jump crosses no squares, so center.passThrough has no effect on it (decision 0007)."
+}
