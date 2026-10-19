@@ -96,7 +96,7 @@ Done when: the check and mate fixture suite passes at every king.range option.
 Select a piece, show legal moves, move, alternate turns, detect game end, and record the ruleset id and version with the game. Phase 1 exit.
 Done when: a full 2-player hot-seat game runs in the browser with legal-move highlighting.
 
-### S18 — Phase 1 review · Opus 5.5 · medium · `todo`
+### S18 — Phase 1 review · Opus 5.5 · medium · `done`
 Run everything, fix rough edges, remove dead code, update docs, and propose any changes to Phase 2 steps in the handoff. The owner reviews the master plan.
 
 ## Phase 2: Playable product

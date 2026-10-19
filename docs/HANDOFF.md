@@ -1,32 +1,36 @@
 # Handoff
 
-Updated 2026-10-19 by S17 (Sonnet 5.5). `/end-session` rewrites this file; keep it under 40 lines.
+Updated 2026-10-19 by S18 (Sonnet 5.5 · medium; the step asked for Opus 5.5). `/end-session` rewrites this file; keep it under 40 lines.
 
 ## State
-- Phase 1 is built. `apps/web` plays a 2-player hot-seat game on draft-2p: click a piece to see its legal moves, click a target to move, pick a promotion piece, check/checkmate/stalemate end the game. 970 tests pass. An 80-move game to checkmate was also clicked through in Chromium with no console errors (Playwright script is not in the repo).
-- `packages/engine/src/game/game.ts` is the game state: `newGame`, `playMove`, `findMove`, `gameRecord` (ruleset id and version, moves, result), `unbuiltFeatures`. It supplies `alsoMove`, `lost`, `allow`, `inert` and `lifts` to `legalMoves`/`gameStatus`. See RULES-FRAMEWORK, "Game state".
-- Owner answers applied (decisions record, section 6): the Tail never captures a piece of the side moving it; Coast pieces give no check while the Coast is closed (they still block).
-- The Coast is closed to every piece until the Tail lands on e5; the Tail follows `tail.repeatLimit`, with the opener's e5-to-i5 exception. A promotion removes one matching piece from the lost list.
-- Fixture `packages/engine/test/fixtures/games/hot-seat-mate.json`: a full game to checkmate found by self-play (regression only, not independent geometry).
-- The screen lists the rules it does not play yet ("Not in this build yet"): en passant, pawn-safe zones, and the three other draws at their defaults.
+- Phase 1 is done and reviewed. `apps/web` plays a 2-player hot-seat game on draft-2p. Lint, typecheck, `validate:rules`, build and 969 tests pass. The 80-move fixture game was replayed by clicking in Chromium: it ends in "Checkmate · Light wins" with no console errors (script run from outside the repo).
+- S18 changes: removed the placeholder `ENGINE_NAME` export and its test, added a blank favicon (the page logged a 404), updated the README status and repository map. No rules or engine behavior changed.
+- Dead-code scan found nothing else to cut. Engine exports used only by tests (`attackMap`, `assertPlayable`, `gameRecord`, `parameterInteractions`) are kept for Phase 2 (danger indicator, sim, rule picker).
+- Not engine features yet: castling, en passant, pawn safe zones, queen pawn swap, leaving the Coast by A5 only, no capture on the Coast, swapped King and Queen, threefold repetition, the 50-move rule, insufficient material, 3-player check and game end. The screen lists them under "Not in this build yet".
 
 ## Next session
-**S18 — Phase 1 review** · Opus 5.5 · effort medium
-Why: Phase 1 exit. Run everything, remove dead code, update docs, and propose Phase 2 changes.
-Start with: `/start-session S18`
+**S19 — Rule picker** · Sonnet 5.5 · medium
+Why: first Phase 2 step; the owner's plan changes below do not block it.
+Start with: `/start-session S19`
+
+## Proposed Phase 2 changes (for the owner's plan review)
+- **Insert an engine step before S23: the missing 2-player rules** (threefold repetition, 50-move, insufficient material, castling, en passant, pawn safe zones, and the owner-listed Coast rules). Without draw rules, bot self-play (S24) may never end, and a fairness report on incomplete rules says little. Suggested: Opus 5.5 · high.
+- **S19:** only `draft-2p` plays (`newGame` refuses 3 players). List `draft-3p` as "not playable yet". `apps/web/src/game/rules.ts` resolves draft-2p at import time; make it a function of the chosen ruleset.
+- **S20:** last-move highlight already exists in the board; drop it from the step. Undo is cheap: `playMove` returns a new immutable state, so keep a stack of states (no engine change). The danger indicator can use the exported `attackMap`.
+- **S23 / S22:** `playMove` takes about 6.5 ms (a full legal scan). Start S23 with a speed task (incremental attack maps); S22's random mover is fine as is.
+- **E2E test:** a Playwright dependency would let CI click a full game. It is not on the D21 list (Apache-2.0). Suggest adding it in S25 once the layout settles.
+- **S27:** the web bundle includes Ajv (130 kB gzip), which uses `new Function`; a strict CSP needs a pre-resolved ruleset.
 
 ## Decisions in effect for the next step
 - D3, D6: applied in rule set v0.2. D1: pieces are unverified seeds. D34: dark's view is turned 180°. D36: tetrahedron on e5.
 
 ## Open questions for the owner
+- Approve Playwright as a dev dependency (for the e2e test above)? Default: no; none added.
 - Keep the option `tail.2p.canCapture`? Default: kept; when on, the Tail takes only the other side's pieces.
-- Is a closed Coast closed to Kings and Queens too (nothing moves onto a Coast square before it opens)? Default: yes. Also confirm the opener's exception (a5-e5, then e5-i5 on the very next turn only). Default: as written.
-- 3-player: "the Dragon could use a Coast piece to check from A5 only". RULES.md says Dragon pieces don't check. What does this mean? Default: not built, no change.
+- Is a closed Coast closed to Kings and Queens too? Default: yes. Confirm the opener's exception (a5-e5, then e5-i5 on the very next turn only). Default: as written.
+- 3-player: "the Dragon could use a Coast piece to check from A5 only" vs RULES.md "Dragon pieces don't check". Default: not built, no change.
 - Sun and Moon promotion targets, Tetrahedron size, Ting Yang art, and whether the 3-player Tail passes an empty e5 (default: yes) are still open.
 
 ## Notes for Claude
 - `scripts/claude/ship.sh` opens and merges PRs (`gh pr` fails in cloud sessions).
-- The web now imports engine runtime values (resolve and validate rules at start), so Ajv is in the bundle (130 kB gzip). Ajv builds code with `new Function`; a strict CSP would need a pre-resolved ruleset.
-- `playMove` takes about 6.5 ms (a full legal scan). Fine for hot-seat; the search AI needs faster attack maps.
-- Not engine features yet: castling, en passant, pawn safe zones, queen pawn swap, leaving the Coast by A5 only, no capture on the Coast, swapped King and Queen, threefold repetition, the 50-move rule, insufficient material, and 3-player check and game end (`newGame` refuses 3 players).
-- No component tests click the board (no DOM library). S18 could add an e2e test if a Playwright dependency is approved.
+- The hot-seat fixture `packages/engine/test/fixtures/games/hot-seat-mate.json` uses `x` for captures in its notation (`c5xb3`).
