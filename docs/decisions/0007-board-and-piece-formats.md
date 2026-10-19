@@ -22,4 +22,4 @@ Special rules are engine features switched by parameters and are added in the st
 
 ## Consequences
 - S10 converts the owner's board and pieces into this format; anything that doesn't fit becomes a question for the owner, not a new field invented on the spot.
-- Leapers cross no squares in this format, so a "pass over" rule never applies to them. If `center.passThrough` should mean something for Knights, the owner needs to say which squares a Knight move passes.
+- Leapers cross no squares in this format, so a "pass over" rule never applies to them. The owner confirmed this matches the rules: Knights are never stopped from passing the center, so `knight` in `center.passThrough` has no effect.

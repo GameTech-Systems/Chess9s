@@ -1,7 +1,6 @@
 ---
 name: end-session
 description: Finish a Chess Nines build session. Runs the checks, rewrites the handoff, logs the session, ships the pull request (open, wait for CI, merge), and recommends the next session's step, model, and effort. Use at the end of every session, or early when usage is running low.
-disable-model-invocation: true
 ---
 
 Finish the current step.
