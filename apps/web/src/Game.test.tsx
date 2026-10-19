@@ -54,15 +54,14 @@ describe('Game screen', () => {
     const game = newGame(createRules(), ruleset, {
       position,
       turn: 'light',
-      lost: { light: ['knight'] },
+      lost: { light: ['knight', 'pawn', 'pawn'] },
     });
     const html = render({
       game,
       selected: 'b8',
       promoting: { from: 'b8', to: 'b9', choices: ['bishop', 'knight', 'queen', 'rook'] },
     });
-    expect(html).toContain('Lost:');
-    expect(html).toContain('Light knight');
+    expect(html).toContain('Light lost: knight, pawn ×2');
     for (const piece of ['Bishop', 'Knight', 'Queen', 'Rook', 'Cancel']) {
       expect(html).toContain(`>${piece}</button>`);
     }

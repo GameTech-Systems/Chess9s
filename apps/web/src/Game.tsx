@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { unbuiltFeatures } from '@chess9s/engine';
 import { Board } from './board/Board';
 import { boardData, pieceLetters } from './board/data';
@@ -24,6 +24,13 @@ const VIEWS: { id: View; label: string }[] = [
 const pretty = (id: string) => id.replace(/-/g, ' ');
 const title = (id: string) => id.charAt(0).toUpperCase() + id.slice(1);
 
+/** Lost piece types with counts: "pawn ×3, rook". */
+function lostLine(pieces: string[]): string {
+  const counts = new Map<string, number>();
+  for (const id of pieces) counts.set(id, (counts.get(id) ?? 0) + 1);
+  return [...counts].map(([id, n]) => (n > 1 ? `${pretty(id)} ×${n}` : pretty(id))).join(', ');
+}
+
 /** `initial` starts the screen from a given game (tests); otherwise a new game. */
 export function Game({ initial }: { initial?: Model }) {
   const rules = useMemo(createRules, []);
@@ -34,6 +41,11 @@ export function Game({ initial }: { initial?: Model }) {
   const seat = view === 'follow' ? game.turn : view;
   const missing = unbuiltFeatures(rules);
   const lost = Object.entries(game.lost);
+  const list = useRef<HTMLOListElement>(null);
+  // Keep the latest move in view.
+  useEffect(() => {
+    list.current?.scrollTo({ top: list.current.scrollHeight });
+  }, [game.moves.length]);
 
   return (
     <div className="table">
@@ -77,14 +89,11 @@ export function Game({ initial }: { initial?: Model }) {
           {!game.coastOpen && !over && ' · move the Dragon Tail from a5 to e5 to open it'}
         </p>
 
-        {lost.length > 0 && (
-          <p className="facts">
-            Lost:{' '}
-            {lost
-              .map(([side, pieces]) => `${title(side)} ${pieces.map(pretty).join(', ')}`)
-              .join(' · ')}
+        {lost.map(([side, pieces]) => (
+          <p key={side} className="facts">
+            {title(side)} lost: {lostLine(pieces)}
           </p>
-        )}
+        ))}
 
         <div className="segmented" role="group" aria-label="Board view">
           {VIEWS.map((v) => (
@@ -99,7 +108,7 @@ export function Game({ initial }: { initial?: Model }) {
           ))}
         </div>
 
-        <ol className="moves" aria-label="Moves">
+        <ol className="moves" aria-label="Moves" ref={list}>
           {rounds(game).map((r) => (
             <li key={r.number} value={r.number}>
               <span>{r.first}</span>

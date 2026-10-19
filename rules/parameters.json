@@ -551,7 +551,8 @@
         "capture",
         "check-detection"
       ],
-      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)",
+      "notes": "Even when on, the Tail never captures a piece of the side moving it (owner, 19 Oct 2026, S17)."
     },
     {
       "id": "tail.3p.captures",
