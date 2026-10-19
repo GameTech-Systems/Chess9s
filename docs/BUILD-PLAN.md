@@ -80,7 +80,7 @@ Done when: the real board (or the fixture, if S10 isn't done) renders on desktop
 Implement through data and parameters: `king.range`, `king.canJump`, and the pieces from S10 whose movement needs no special squares. Tests at every option.
 Decisions: D1.
 
-### S14 — Pieces, batch 2: Queen and Pawn · Sonnet 5.5 · high · `todo`
+### S14 — Pieces, batch 2: Queen and Pawn · Sonnet 5.5 · high · `done`
 `queen.canEnterVoid`, `queen.enemyTerritoryEntry` (gateways), `pawn.initialDoubleStep`, `pawn.promotion.targets`. Tests at every option.
 Decisions: D2.
 
