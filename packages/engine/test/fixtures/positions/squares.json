@@ -135,6 +135,27 @@
       "side": "light",
       "pieces": { "e5": { "piece": "leaper", "side": "light" } },
       "expected": ["e5-b4", "e5-d2", "e5-d8", "e5-f2", "e5-f8", "e5-h6"]
+    },
+    {
+      "name": "a jumping move is not stopped by a no-passing rule (decision 2026-10-19)",
+      "players": 2,
+      "overrides": { "guard.range": 2, "guard.canJump": true },
+      "side": "light",
+      "pieces": { "h3": { "piece": "guard", "side": "light" } },
+      "expected": [
+        "h3-f1",
+        "h3-f3",
+        "h3-f5",
+        "h3-g2",
+        "h3-g3",
+        "h3-g4",
+        "h3-h1",
+        "h3-h2",
+        "h3-h5",
+        "h3-i2",
+        "h3-i3",
+        "h3-i4"
+      ]
     }
   ]
 }

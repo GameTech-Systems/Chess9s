@@ -84,7 +84,7 @@ A **move** is exactly one of:
 
 It may also set `range` (most steps; omitted means unlimited), `jump` (may pass occupied squares; default false), `capture` (`move-or-capture`, the default, `move-only` or `capture-only`), its own `squares` rules and a `when` condition.
 
-A **square rule** names a square type and says whether the piece may `stop` there (end a move on it, including a capture) or `pass` over it (cross it on the way). Both default to true. Square rules apply to the squares a move steps through, even when it jumps. A leaper's single step crosses no squares.
+A **square rule** names a square type and says whether the piece may `stop` there (end a move on it, including a capture) or `pass` over it (cross it on the way). Both default to true. `pass` rules apply to the squares a sliding move steps through; a jumping move ignores them, and a leaper's single step crosses no squares.
 
 **Parameters** plug in two ways:
 
@@ -109,16 +109,16 @@ Special rules such as en passant, castling and opening the Coast are engine feat
 
 ## Move generation
 
-`packages/engine/src/moves/generate.ts` turns this data into pseudo-legal moves (check is handled later). It has no piece-specific code. Where the format is silent, the choices below are provisional (S11) until the owner confirms them.
+`packages/engine/src/moves/generate.ts` turns this data into pseudo-legal moves (check is handled later). It has no piece-specific code. The square-rule, neutral-piece and promotion choices below are settled by `docs/decisions/rules-decisions-2026-10-19.md`.
 
 - **Steps**: named directions and vectors are turned around for a side whose forward is `down`. A side without a forward direction may only use moves that read the same either way.
 - **Range**: a move repeats its step up to `range` times along a line, or to the edge when unlimited. Each square reached is a possible destination; the earlier ones are stepped through.
 - **Blocking**: without `jump`, the line ends at the first occupied square (a capture there if allowed). With `jump`, it continues past occupied squares, and each one on the way may still be captured.
-- **Captures**: never your own side's pieces. Any other piece, `neutral` ones included, may be captured if the move allows captures and the piece is `capturable`. `move-only` moves need an empty square; `capture-only` moves need a piece to capture.
-- **Square rules** *(provisional)*: the piece's own rules and the move's rules both apply when their `when` holds. Any applicable `stop: false` forbids ending on that square type. Any applicable `pass: false` ends the line on that square: the piece may still stop there if stopping is allowed, but not continue.
+- **Captures**: never your own side's pieces. Any other piece, `neutral` ones included, may be captured if the move allows captures and the piece's `capturable` flag is true (no special-casing by piece name). Dragon Tail (2-player) and stones (3-player, from an eliminated king's pieces) are ownerless and not capturable by default; stone capturability is to become a game-mode setting. `move-only` moves need an empty square; `capture-only` moves need a piece to capture.
+- **Square rules**: the piece's own rules and the move's rules both apply when their `when` holds. Deny wins: any applicable `stop: false` forbids ending on that square type, and a move's own rule cannot override the piece's. The result does not depend on the order rules are evaluated. Any applicable `pass: false` ends a **sliding** line on that square: the piece may still stop there if stopping is allowed, but not continue. **Jumping moves (`jump: true`) are not affected by `pass: false`**; their `stop` rules still apply.
 - **Targets**: every square of the listed types except the one the piece stands on. Stop rules and the capture mode still apply.
 - **Conditions** are checked against the resolved ruleset. A parameter that is missing, still null or of the wrong type stops generation with an error rather than a guess.
-- **Promotion**: a move that ends on the side's last rank produces one move per target. *(Provisional)*: an empty target list means the piece does not promote.
+- **Promotion**: a move that ends on the side's last rank produces one move per target. Promotion is mandatory and matches standard chess by default (queen, rook, bishop, knight, independent of captures). An empty target list means the piece does not promote. A piece with a promotion zone but an empty list is a configuration error (to be enforced when zones become data; today the zone is the last rank). `promote_to_captured_only` is a possible later mode, off by default.
 - Results are sorted by notation (`e2-e4`, `e5xd6`, `d8-d9=slider`) with duplicates removed, so the same position always gives the same list.
 
 ## Engine requirements
