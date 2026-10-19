@@ -18,11 +18,8 @@ S10 (real board and pieces) is still an owner step in chat; its data must pass `
 - Owner instruction (S11): Claude writes its plan in the reply and goes ahead without waiting for approval (CLAUDE.md, start-session skill).
 
 ## Open questions for the owner
-- Provisional move-generator choices (S11). Say if any should change:
-  1. When several square rules apply, any `false` wins (a move-level `stop: true` can't override a piece-level `stop: false`).
-  2. `pass: false` ends the line on that square, but the piece may still stop there if stopping is allowed.
-  3. Neutral pieces can be captured by any side when `capturable`.
-  4. An empty promotion target list means no promotion.
+- Settled 2026-10-19 (`docs/decisions/rules-decisions-2026-10-19.md`): the four S11 questions. Code now makes jumping moves ignore `pass: false`.
+- Not yet built: promotion-zone validation error (no zone field exists), `promote_to_captured_only`, stone capturability mode setting.
 - Still open from S8: an override set to null is rejected; an `extends` parent must have the same player count. Dependencies beyond D21: `ajv`, `ajv-formats` (MIT), `@types/*`, TypeScript ~6.0.
 - None blocking S12.
 

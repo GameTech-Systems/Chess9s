@@ -222,14 +222,14 @@ export function movesFrom(rules: MoveRules, position: Position, from: string): G
     const ids = value(rules, target.param);
     if (!Array.isArray(ids))
       throw new RulesError(`Parameter ${target.param} must be a list of pieces`);
-    // Provisional (S11): an empty target list means the piece does not promote.
+    // An empty target list means the piece does not promote (decision 2026-10-19).
     return ids.length > 0 ? ids.map(String).sort() : [undefined];
   };
 
   for (const move of piece.moves) {
     if (move.when && !holds(move.when, env)) continue;
 
-    // Square rules of the piece and of this move; any applicable `false` forbids (provisional, S11).
+    // Square rules of the piece and of this move; any applicable `false` forbids (decision 2026-10-19: deny wins).
     const noStop = new Set<string>();
     const noPass = new Set<string>();
     for (const rule of [...(piece.squares ?? []), ...(move.squares ?? [])]) {
@@ -291,7 +291,8 @@ export function movesFrom(rules: MoveRules, position: Position, from: string): G
         if (!onBoard(f, r)) break;
         const at = coord(f, r);
         land(at);
-        if ((position[at] && !jump) || !mayPass(at)) break;
+        // A no-passing rule ends sliding moves only; jumping moves ignore it (decision 2026-10-19).
+        if (!jump && (position[at] || !mayPass(at))) break;
       }
     }
   }
