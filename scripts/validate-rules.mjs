@@ -1,26 +1,50 @@
 // Validate rules/ data against its JSON Schemas (Ajv, draft 2020-12).
-// Usage: node scripts/validate-rules.mjs [--registry <file>]
-import { readFileSync, readdirSync } from 'node:fs';
+// Usage: node scripts/validate-rules.mjs [--registry <file>] [--boards <dir>] [--pieces <dir>]
+// Boards and pieces default to rules/boards/ and rules/pieces/, skipped while absent.
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 
 const read = (p) => JSON.parse(readFileSync(p, 'utf8'));
 const args = process.argv.slice(2);
-const flag = args.indexOf('--registry');
-const registryPath = flag >= 0 ? args[flag + 1] : 'rules/parameters.json';
+const option = (name, fallback) => {
+  const i = args.indexOf(name);
+  return i >= 0 ? args[i + 1] : fallback;
+};
+const registryPath = option('--registry', 'rules/parameters.json');
+const boardsDir = option('--boards', 'rules/boards');
+const piecesDir = option('--pieces', 'rules/pieces');
 
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 addFormats(ajv);
 const validateRegistry = ajv.compile(read('rules/schema/parameters.schema.json'));
 const validateRuleset = ajv.compile(read('rules/schema/ruleset.schema.json'));
+const validateBoard = ajv.compile(read('rules/schema/board.schema.json'));
+const validatePiece = ajv.compile(read('rules/schema/piece.schema.json'));
 
-const targets = [[registryPath, validateRegistry]];
-for (const f of readdirSync('rules/rulesets')
-  .filter((n) => n.endsWith('.json'))
-  .sort()) {
-  targets.push([join('rules/rulesets', f), validateRuleset]);
+for (const name of ['--boards', '--pieces']) {
+  const dir = option(name);
+  if (dir !== undefined && !existsSync(dir)) {
+    console.error(`FAIL ${name} ${dir}: no such directory`);
+    process.exit(1);
+  }
 }
+
+const jsonFiles = (dir) =>
+  existsSync(dir)
+    ? readdirSync(dir)
+        .filter((n) => n.endsWith('.json'))
+        .sort()
+        .map((n) => join(dir, n))
+    : [];
+
+const targets = [
+  [registryPath, validateRegistry],
+  ...jsonFiles('rules/rulesets').map((f) => [f, validateRuleset]),
+  ...jsonFiles(boardsDir).map((f) => [f, validateBoard]),
+  ...jsonFiles(piecesDir).map((f) => [f, validatePiece]),
+];
 
 let failed = false;
 for (const [path, validate] of targets) {

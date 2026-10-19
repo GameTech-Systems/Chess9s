@@ -1,0 +1,12 @@
+{
+  "id": "off-board",
+  "name": "Invalid: a square off the 9x9 board",
+  "version": "0.0.1",
+  "squareTypes": [{ "id": "void", "label": "Void" }],
+  "squares": [{ "at": "j1", "types": ["void"] }],
+  "sides": [
+    { "id": "light", "forward": "up" },
+    { "id": "dark", "forward": "down" }
+  ],
+  "setups": [{ "players": 2, "pieces": {} }]
+}
