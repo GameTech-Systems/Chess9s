@@ -95,3 +95,24 @@ describe('play aids on the screen', () => {
     expect(html).toMatch(/<button[^>]*disabled=""[^>]*>Undo/);
   });
 });
+
+describe('play aids, part 2', () => {
+  it('has a sound toggle (on), an elapsed display and a "?" rules button', () => {
+    const html = render();
+    expect(html).toMatch(/aria-pressed="true"[^>]*>Sound/);
+    expect(html).toMatch(/aria-label="Elapsed time"[^>]*>0:00</);
+    expect(html).toMatch(/<button[^>]*aria-label="Rules"[^>]*>\?<\/button>/);
+    expect(html).not.toContain('role="dialog"');
+  });
+
+  it('the rules screen names the ruleset and what is not built', async () => {
+    const { RulesScreen } = await import('./Rules');
+    const html = renderToStaticMarkup(
+      <RulesScreen ruleset={ruleset} missing={['En passant']} onClose={() => {}} />,
+    );
+    expect(html).toContain('role="dialog"');
+    expect(html).toContain(`${ruleset.id} v${ruleset.version}`);
+    expect(html).toContain('En passant');
+    expect(html).toContain('>Close<');
+  });
+});

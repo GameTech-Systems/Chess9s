@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { unbuiltFeatures } from '@chess9s/engine';
+import { RulesScreen } from './Rules';
+import { formatElapsed, play, soundsFor } from './game/aids';
 import { Board } from './board/Board';
 import { boardData, pieceLetters } from './board/data';
 import { DEFAULT_RULESET_ID, createRules, listRulesets, type RulesetInfo } from './game/rules';
@@ -57,6 +59,29 @@ export function Game({
   const missing = unbuiltFeatures(rules);
   const lost = Object.entries(game.lost);
   const list = useRef<HTMLOListElement>(null);
+  const [sound, setSound] = useState(true);
+  const [showRules, setShowRules] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
+  const started = useRef(Date.now());
+  const moveCount = useRef(game.moves.length);
+  // Sound on each new move.
+  useEffect(() => {
+    const before = moveCount.current;
+    moveCount.current = game.moves.length;
+    if (sound) play(soundsFor(before, game.moves.length, over));
+  }, [game.moves.length]);
+  // Elapsed time since the game began; it stops at the end and restarts with a new game.
+  useEffect(() => {
+    if (game.moves.length === 0) {
+      started.current = Date.now();
+      setElapsed(0);
+    }
+  }, [game.moves.length]);
+  useEffect(() => {
+    if (over) return;
+    const id = setInterval(() => setElapsed(Date.now() - started.current), 1000);
+    return () => clearInterval(id);
+  }, [over]);
   // Keep the latest move in view.
   useEffect(() => {
     list.current?.scrollTo({ top: list.current.scrollHeight });
@@ -83,6 +108,18 @@ export function Game({
           data-check={game.inCheck ? '' : undefined}
         >
           {statusLine(game)}
+        </p>
+
+        <p className="facts">
+          Time <strong aria-label="Elapsed time">{formatElapsed(elapsed)}</strong>
+          <button
+            type="button"
+            className="help"
+            aria-label="Rules"
+            onClick={() => setShowRules(true)}
+          >
+            ?
+          </button>
         </p>
 
         {promoting && (
@@ -138,6 +175,9 @@ export function Game({
           >
             Show danger
           </button>
+          <button type="button" aria-pressed={sound} onClick={() => setSound((v) => !v)}>
+            Sound
+          </button>
           <button type="button" disabled={!canUndo(model)} onClick={() => setModel(undo)}>
             Undo
           </button>
@@ -180,6 +220,13 @@ export function Game({
           </details>
         )}
       </aside>
+      {showRules && (
+        <RulesScreen
+          ruleset={ruleset}
+          missing={missing.map((f) => f.label)}
+          onClose={() => setShowRules(false)}
+        />
+      )}
     </div>
   );
 }
