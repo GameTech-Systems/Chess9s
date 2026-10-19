@@ -11,7 +11,7 @@ import {
   statusLine,
   type Model,
 } from './session';
-import { createRules, ruleset } from './rules';
+import { createRules, listRulesets, ruleset } from './rules';
 
 const clicks = (m: Model, ...squares: string[]) => squares.reduce(click, m);
 const king = (side: string) => ({ piece: 'king', side });
@@ -23,6 +23,35 @@ describe('the rules the game plays', () => {
     expect(ruleset.id).toBe('draft-2p');
     expect(ruleset.version).toMatch(/^\d+\.\d+\.\d+$/);
     expect(Object.values(rules.values)).not.toContain(null);
+  });
+});
+
+describe('the ruleset list', () => {
+  it('has every ruleset in rules/rulesets/, with a status and a player count', () => {
+    const list = listRulesets();
+    expect(list.map((r) => r.id)).toEqual(['draft-2p', 'draft-3p']);
+    for (const r of list) {
+      expect(['proposed', 'experimental', 'candidate', 'official']).toContain(r.status);
+      expect(r.name).not.toBe('');
+    }
+  });
+
+  it('marks only the rulesets the engine can play as playable', () => {
+    const byId = Object.fromEntries(listRulesets().map((r) => [r.id, r]));
+    expect(byId['draft-2p']!.playable).toBe(true);
+    expect(byId['draft-3p']!.playable).toBe(false);
+    expect(byId['draft-3p']!.players).toBe(3);
+  });
+
+  it('builds the rules and the game record for the chosen ruleset', () => {
+    expect(createRules('draft-2p').players).toBe(2);
+    const m = newModel(createRules('draft-2p'), listRulesets()[0]);
+    expect(m.game.ruleset).toEqual({ id: 'draft-2p', version: ruleset.version });
+  });
+
+  it('refuses a ruleset that is unknown or not playable yet', () => {
+    expect(() => createRules('nope')).toThrow(/unknown ruleset/i);
+    expect(() => createRules('draft-3p')).toThrow(/not playable/i);
   });
 });
 
