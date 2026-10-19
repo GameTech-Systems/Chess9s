@@ -1,30 +1,32 @@
 # Handoff
 
-Updated 2026-10-19 by S16 (Opus 5.5 · high). `/end-session` rewrites this file; keep it under 40 lines.
+Updated 2026-10-19 by S17 (Sonnet 5.5). `/end-session` rewrites this file; keep it under 40 lines.
 
 ## State
-- Phase 1. Every piece type moves from data (S13 to S15). The engine now has attack maps, check, legal moves, checkmate and stalemate (`packages/engine/src/moves/check.ts`), plus turn order for any number of seats (`src/game/turns.ts`). 895 tests pass.
-- Attacks use the same walk as moves (`attacksFrom` in `generate.ts`), so `king.range`, `king.canJump` and square rules shape them. A side is in check from any other side, the neutral Tail included, when the attacker's `givesCheck` holds. `gameStatus` reads `draw.stalemate` only when a stalemate happens.
-- Fixtures: `test/fixtures/positions/check-mate.json` has 112 cases (each of the 18 positions at every `king.range` option, with `king.canJump`, `coastPieces.2p.giveCheck`, `tail.canCheck`, `tail.2p.canCapture` and `draw.stalemate` at every option) and 17 attack maps. The expected results come from an independent geometry script (not in the repo); the engine matched them on the first run.
-- Board setups gain `turnOrder` (schema, `standard-9x9` 0.2.0): dark, light for 2 players; dark, light, Dragon for 3 players. `turn.firstMove` picks who starts. `nextSide` skips seats that are out.
-- `parameterInteractions(registry, players)` lists pairs of parameters whose `affects` overlap, for the simulation harness.
+- Phase 1 is built. `apps/web` plays a 2-player hot-seat game on draft-2p: click a piece to see its legal moves, click a target to move, pick a promotion piece, check/checkmate/stalemate end the game. 970 tests pass. An 80-move game to checkmate was also clicked through in Chromium with no console errors (Playwright script is not in the repo).
+- `packages/engine/src/game/game.ts` is the game state: `newGame`, `playMove`, `findMove`, `gameRecord` (ruleset id and version, moves, result), `unbuiltFeatures`. It supplies `alsoMove`, `lost`, `allow`, `inert` and `lifts` to `legalMoves`/`gameStatus`. See RULES-FRAMEWORK, "Game state".
+- Owner answers applied (decisions record, section 6): the Tail never captures a piece of the side moving it; Coast pieces give no check while the Coast is closed (they still block).
+- The Coast is closed to every piece until the Tail lands on e5; the Tail follows `tail.repeatLimit`, with the opener's e5-to-i5 exception. A promotion removes one matching piece from the lost list.
+- Fixture `packages/engine/test/fixtures/games/hot-seat-mate.json`: a full game to checkmate found by self-play (regression only, not independent geometry).
+- The screen lists the rules it does not play yet ("Not in this build yet"): en passant, pawn-safe zones, and the three other draws at their defaults.
 
 ## Next session
-**S17 — Hot-seat game** · Sonnet 5.5 · effort high
-Why: last Phase 1 step. It must build game state (opening the Coast, moving the Tail, the lost-piece list), which is about correctness, not just UI.
-Start with: `/start-session S17`
+**S18 — Phase 1 review** · Opus 5.5 · effort medium
+Why: Phase 1 exit. Run everything, remove dead code, update docs, and propose Phase 2 changes.
+Start with: `/start-session S18`
 
 ## Decisions in effect for the next step
-- D3, D6: decided; applied in rule set v0.2. D1: pieces are unverified seeds in `rules/pieces/`. D34: dark's seat view is turned 180°.
+- D3, D6: applied in rule set v0.2. D1: pieces are unverified seeds. D34: dark's view is turned 180°. D36: tetrahedron on e5.
 
 ## Open questions for the owner
-- Can a side use the Tail (when `tail.2p.canCapture` is on) to capture one of its own pieces? The engine lets the Tail capture any non-neutral piece. Default: allowed until you say otherwise. Not blocking S17, which keeps the default (no Tail captures).
-- Promoting to a lost piece: if the restored piece leaves the lost list, can a second pawn promote to it again? Default: the game state removes it from the list once the piece is back on the board.
+- Keep the option `tail.2p.canCapture`? Default: kept; when on, the Tail takes only the other side's pieces.
+- Is a closed Coast closed to Kings and Queens too (nothing moves onto a Coast square before it opens)? Default: yes. Also confirm the opener's exception (a5-e5, then e5-i5 on the very next turn only). Default: as written.
+- 3-player: "the Dragon could use a Coast piece to check from A5 only". RULES.md says Dragon pieces don't check. What does this mean? Default: not built, no change.
 - Sun and Moon promotion targets, Tetrahedron size, Ting Yang art, and whether the 3-player Tail passes an empty e5 (default: yes) are still open.
 
 ## Notes for Claude
-- Use `scripts/claude/ship.sh` (`gh pr` and `gh issue` fail in cloud sessions).
-- S17 must supply what `legalMoves` and `gameStatus` take as inputs: `alsoMove: ['neutral']` only on turns when the Tail may move (the Coast is open and `tail.repeatLimit` allows it), and the `Lost` list. Coast pieces can't move until the Coast opens. Attacks treat the Coast as open, so decide whether a closed-Coast piece gives check: the rules say no Coast piece moves, which suggests no check.
-- Not yet engine features: castling, en passant, pawn safe zones, queen pawn swap, Coast opening and exits, capture on the Coast, `tail.repeatLimit`, threefold repetition, the 50-move rule, insufficient material, and 3-player check and game end (a Coast piece's `givesCheck` names a 2-player parameter and is refused in 3-player games).
-- `legalMoves` runs a full attack scan per move. That is fine for hot-seat play; the search AI step will want something faster.
-- Web imports engine types only; no runtime values from `@chess9s/engine` in `apps/web`. Notation: `e2-e4`, `e5xd6`, `d8-d9=queen`.
+- `scripts/claude/ship.sh` opens and merges PRs (`gh pr` fails in cloud sessions).
+- The web now imports engine runtime values (resolve and validate rules at start), so Ajv is in the bundle (130 kB gzip). Ajv builds code with `new Function`; a strict CSP would need a pre-resolved ruleset.
+- `playMove` takes about 6.5 ms (a full legal scan). Fine for hot-seat; the search AI needs faster attack maps.
+- Not engine features yet: castling, en passant, pawn safe zones, queen pawn swap, leaving the Coast by A5 only, no capture on the Coast, swapped King and Queen, threefold repetition, the 50-move rule, insufficient material, and 3-player check and game end (`newGame` refuses 3 players).
+- No component tests click the board (no DOM library). S18 could add an e2e test if a Playwright dependency is approved.

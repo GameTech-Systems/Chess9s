@@ -92,7 +92,7 @@ Decisions: D3, D6.
 Attack maps computed from the same movement data (never hardcoded), check detection, legal-move filtering, checkmate, and `draw.stalemate`. Flag parameter combinations whose `affects` overlap so the simulation harness can test them later. N-player-ready turn order.
 Done when: the check and mate fixture suite passes at every king.range option.
 
-### S17 — Hot-seat game · Sonnet 5.5 · medium · `todo`
+### S17 — Hot-seat game · Sonnet 5.5 · medium · `done`
 Select a piece, show legal moves, move, alternate turns, detect game end, and record the ruleset id and version with the game. Phase 1 exit.
 Done when: a full 2-player hot-seat game runs in the browser with legal-move highlighting.
 
