@@ -21,7 +21,7 @@ Every piece behavior is a **parameter** with a default and a list of options. Fo
 
 Players can pick from published rulesets and propose new ones. For 2-player games, fair play is required: the default rules are built and checked for fairness before they are released, and **official tournament rules** are established only after public discussion. 3-player rules are experimental and will be tested for balance later.
 
-Learn more: [Rules framework](docs/RULES-FRAMEWORK.md) · [Governance](docs/GOVERNANCE.md) · [Parameter registry](rules/parameters.json)
+Learn more: [Draft rules](docs/RULES.md) · [Rules framework](docs/RULES-FRAMEWORK.md) · [Governance](docs/GOVERNANCE.md) · [Parameter registry](rules/parameters.json)
 
 ## Take part
 

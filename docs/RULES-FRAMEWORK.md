@@ -1,6 +1,6 @@
 # Rules framework
 
-Chess Nines rules are **data**. The engine reads them; it never hardcodes a piece rule.
+Chess Nines rules are **data**. The engine reads them; it never hardcodes a piece rule. The current draft rules are explained in plain words in [RULES.md](RULES.md).
 
 ## Concepts
 
