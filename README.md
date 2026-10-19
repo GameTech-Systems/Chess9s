@@ -5,7 +5,7 @@
 - Play (coming soon): [chess9s.com](https://chess9s.com)
 - Story and lore (coming soon): [chessnines.com](https://chessnines.com)
 
-> **Status: foundation stage.** There is no playable build yet. This repository currently holds the rules framework, governance, and legal groundwork. See the [roadmap](docs/ROADMAP.md).
+> **Status: Phase 1 built.** The engine and a 2-player hot-seat game run locally (`pnpm dev`): click a piece to see its legal moves, and check, checkmate and stalemate end the game. Several rules are not built yet (en passant, castling, pawn-safe zones, three of the four draws), and there is no 3-player play, computer opponent or hosted build. The draft rules are unverified until they are fairness-checked. See the [roadmap](docs/ROADMAP.md).
 
 ## Core-source, not open source
 
@@ -33,12 +33,14 @@ Learn more: [Draft rules](docs/RULES.md) · [Rules framework](docs/RULES-FRAMEWO
 ## Repository map
 
 ```
-docs/     roadmap, rules framework, governance, workflow, decision records
-rules/    parameter registry, schemas, rulesets
-assets/   reserved materials (see assets/README.md)
+docs/              roadmap, rules framework, governance, workflow, decision records
+rules/             parameter registry, schemas, boards, pieces, rulesets
+packages/engine/   rules loader, move generator, check and game state (TypeScript)
+apps/web/          the browser game (Vite and React)
+assets/            reserved materials (see assets/README.md)
 ```
 
-Code (`packages/engine`, `apps/web`) arrives in Phase 1.
+Run it: Node 22 and pnpm 10, then `pnpm install` and `pnpm dev`. `pnpm test` runs the whole suite.
 
 ## Legal
 
