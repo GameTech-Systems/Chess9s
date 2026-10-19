@@ -26,3 +26,8 @@ Owner-approved answers to the four open rules questions. These supersede the pro
 - An empty promotion list means the piece does not promote (correct for knight, queen, etc.).
 - **Validation:** if a piece has a promotion zone defined but an empty options list, raise a config validation error. Do not silently skip promotion.
 - Optional later mode: `promote_to_captured_only`, **off by default**.
+
+## 5. Promotion to a captured piece
+- `pawn.promotion.targets` option `captured-piece` (off by default): a pawn that reaches the promotion zone may promote to any piece type its own side has lost: queen, rook, bishop, knight or Coast piece.
+- If the side has lost none of those, there is nothing to promote to and the pawn stays a pawn.
+- Provisional readings, to confirm: with other targets in the list, the lost pieces are added to them; a restored piece does not remove the loss unless the game state says so (the engine takes the lost list as given); Kings and pawns are never targets.

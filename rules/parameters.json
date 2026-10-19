@@ -209,7 +209,7 @@
     {
       "id": "pawn.promotion.targets",
       "label": "Pawn promotion targets",
-      "description": "Which pieces an eligible pawn may promote to.",
+      "description": "Which pieces an eligible pawn may promote to. The option captured-piece adds any piece type its side has lost (queen, rook, bishop, knight or Coast piece); if the side has lost none, the pawn stays a pawn.",
       "piece": "pawn",
       "players": [
         2,
@@ -235,7 +235,7 @@
         "balance"
       ],
       "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)",
-      "notes": "Default from decision D2. Light pawns promote on rank 9, dark pawns on rank 1."
+      "notes": "Default from decision D2. Light pawns promote on rank 9, dark pawns on rank 1. captured-piece is off by default; meaning given by the owner on 19 Oct 2026 (S14). Provisional readings: combined with other options it adds the lost pieces to them, and Kings and pawns are never targets."
     },
     {
       "id": "pawn.safeZones",

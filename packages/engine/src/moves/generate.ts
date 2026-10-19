@@ -25,6 +25,12 @@ export interface PlacedPiece {
 /** Coordinate (such as "e5") to the piece standing there. */
 export type Position = Record<string, PlacedPiece>;
 
+/** Side id to the ids of the pieces that side has lost (captured) so far. */
+export type Lost = Record<string, string[]>;
+
+/** The option of a promotion-target list that stands for the side's lost pieces. */
+export const CAPTURED_PIECE = 'captured-piece';
+
 /** Everything moves depend on: the board, its pieces by id and the resolved ruleset. */
 export interface MoveRules {
   board: Board;
@@ -195,8 +201,34 @@ function sortUnique(moves: GeneratedMove[]): GeneratedMove[] {
   return [...byKey.keys()].sort().map((k) => byKey.get(k)!);
 }
 
-/** Pseudo-legal moves of the piece on `from`, or none if the square is empty. */
-export function movesFrom(rules: MoveRules, position: Position, from: string): GeneratedMove[] {
+/**
+ * The piece types a side may promote to under the `captured-piece` option: those it has lost.
+ * Royal pieces and pieces that promote themselves (pawns) are never targets. Refused when the
+ * game does not say what was lost, because a promotion would then be a guess.
+ */
+function lostTargets(rules: MoveRules, side: string, lost: Lost | undefined): string[] {
+  if (!lost) {
+    throw new RulesError(
+      `A promotion under ${CAPTURED_PIECE} needs the pieces each side has lost; none were given`,
+    );
+  }
+  const ids = lost[side] ?? [];
+  for (const id of ids) {
+    if (!rules.pieces[id]) throw new RulesError(`${side} has lost unknown piece ${id}`);
+  }
+  return ids.filter((id) => !rules.pieces[id]!.royal && !rules.pieces[id]!.promotion);
+}
+
+/**
+ * Pseudo-legal moves of the piece on `from`, or none if the square is empty. `lost` lists the
+ * pieces each side has lost; it is read only by a promotion under `captured-piece`.
+ */
+export function movesFrom(
+  rules: MoveRules,
+  position: Position,
+  from: string,
+  lost?: Lost,
+): GeneratedMove[] {
   const placed = position[from];
   if (!placed) return [];
   const piece = pieceOf(rules, from, placed);
@@ -218,12 +250,23 @@ export function movesFrom(rules: MoveRules, position: Position, from: string): G
     }
     if (parse(to)[1] !== (forward === 'up' ? SIZE - 1 : 0)) return [undefined];
     const target = promo.to;
-    if (Array.isArray(target)) return [...target].sort();
-    const ids = value(rules, target.param);
-    if (!Array.isArray(ids))
-      throw new RulesError(`Parameter ${target.param} must be a list of pieces`);
-    // An empty target list means the piece does not promote (decision 2026-10-19).
-    return ids.length > 0 ? ids.map(String).sort() : [undefined];
+    let ids: string[];
+    if (Array.isArray(target)) ids = target;
+    else {
+      const v = value(rules, target.param);
+      if (!Array.isArray(v))
+        throw new RulesError(`Parameter ${target.param} must be a list of pieces`);
+      ids = v.map(String);
+    }
+    if (ids.includes(CAPTURED_PIECE)) {
+      ids = [
+        ...ids.filter((id) => id !== CAPTURED_PIECE),
+        ...lostTargets(rules, placed.side, lost),
+      ];
+    }
+    // No targets means the piece does not promote: an empty list (decision 2026-10-19), or no
+    // lost piece to take back (decision 2026-10-19, section 5). The pawn stays a pawn.
+    return ids.length > 0 ? [...new Set(ids)].sort() : [undefined];
   };
 
   for (const move of piece.moves) {
@@ -300,11 +343,16 @@ export function movesFrom(rules: MoveRules, position: Position, from: string): G
 }
 
 /** Pseudo-legal moves of every piece of `side` (a side id, or NEUTRAL). */
-export function generateMoves(rules: MoveRules, position: Position, side: string): GeneratedMove[] {
+export function generateMoves(
+  rules: MoveRules,
+  position: Position,
+  side: string,
+  lost?: Lost,
+): GeneratedMove[] {
   const own = Object.keys(position)
     .filter((at) => position[at]!.side === side)
     .sort();
-  return sortUnique(own.flatMap((at) => movesFrom(rules, position, at)));
+  return sortUnique(own.flatMap((at) => movesFrom(rules, position, at, lost)));
 }
 
 /** The board's start position for a player count. */

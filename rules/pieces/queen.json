@@ -6,9 +6,23 @@
   "moves": [
     {
       "directions": [
-        "orthogonal",
-        "diagonal"
+        "forward",
+        "backward",
+        "forward-diagonal",
+        "backward-diagonal"
       ]
+    },
+    {
+      "directions": [
+        "sideways"
+      ],
+      "squares": [
+        {
+          "type": "center",
+          "pass": false
+        }
+      ],
+      "notes": "Along rank 5 she never crosses e5: it is crossed only on the E file and the diagonals d4-f6 and f4-d6 (docs/RULES.md)."
     }
   ],
   "squares": [
@@ -78,6 +92,6 @@
       }
     }
   ],
-  "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026.",
+  "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026. S14 (19 Oct 2026): split the moves so that rank 5 does not cross e5, as docs/RULES.md says.",
   "notes": "Not expressed yet (engine features): the swap with her green pawn (queen.pawnSwap). Reading of queen.voidCrossings e5-only and none: a5 and i5 are closed to her, for stopping and crossing."
 }
