@@ -321,3 +321,73 @@ describe('stalemate ruling', () => {
     expect(gameStatus(rules, boxed, 'dark').stalemate).toBeUndefined();
   });
 });
+
+// Owner answers of 19 Oct 2026 (S17): the Tail never captures a piece of the side moving it,
+// and a closed Coast gives no check (its pieces are inert until the Coast opens).
+describe('the Tail and the side that moves it', () => {
+  const duel: Position = {
+    f1: { piece: 'king', side: 'light' },
+    f9: { piece: 'king', side: 'dark' },
+    a5: { piece: 'dragon-tail', side: NEUTRAL },
+    i5: { piece: 'rook', side: 'light' },
+  };
+  const tailMoves = (side: string, canCapture: boolean) =>
+    legalMoves(rulesFor(2, { 'tail.2p.canCapture': canCapture }), duel, side, {
+      alsoMove: [NEUTRAL],
+    })
+      .map(toNotation)
+      .filter((m) => m.startsWith('a5'));
+
+  it('may take the opponent’s piece when tail.2p.canCapture is on', () => {
+    expect(tailMoves('dark', true)).toEqual(['a5-e5', 'a5xi5']);
+  });
+
+  it('may not take, or stop on, a piece of the side moving it', () => {
+    expect(tailMoves('light', true)).toEqual(['a5-e5']);
+  });
+
+  it('cannot capture at all when tail.2p.canCapture is off', () => {
+    expect(tailMoves('dark', false)).toEqual(['a5-e5']);
+    expect(tailMoves('light', false)).toEqual(['a5-e5']);
+  });
+});
+
+describe('inert pieces (a closed Coast)', () => {
+  const rules = rulesFor(2, { 'king.range': 1 });
+  // A Dragon Head on a9 attacks along rank 9 to the dark King on f9 (b9 to e9 are empty).
+  const hit: Position = {
+    f9: { piece: 'king', side: 'dark' },
+    f1: { piece: 'king', side: 'light' },
+    a9: { piece: 'light-dragon-head', side: 'light' },
+  };
+  const inert = (at: string) => at.startsWith('a');
+
+  it('give no check while inert, and give it again once active', () => {
+    expect(checkers(rules, hit, 'dark')).toEqual(['a9']);
+    expect(checkers(rules, hit, 'dark', inert)).toEqual([]);
+    expect(inCheck(rules, hit, 'dark', inert)).toBe(false);
+  });
+
+  it('still stand in the way: a blocker between them and the King stays a blocker', () => {
+    const blocked: Position = { ...hit, c9: { piece: 'sun', side: 'dark' } };
+    expect(checkers(rules, blocked, 'dark')).toEqual([]);
+    expect(checkers(rules, blocked, 'dark', inert)).toEqual([]);
+  });
+
+  it('gameStatus and legalMoves take the predicate, and the moves that lift it', () => {
+    const open = gameStatus(rules, hit, 'dark');
+    expect(open.inCheck).toBe(true);
+    const closed = gameStatus(rules, hit, 'dark', { inert });
+    expect(closed.inCheck).toBe(false);
+    expect(closed.legal.length).toBeGreaterThan(open.legal.length);
+    const lifting = legalMoves(rules, hit, 'dark', { inert, lifts: () => true });
+    expect(lifting.map(toNotation)).toEqual(open.legal.map(toNotation));
+  });
+
+  it('allow removes moves before the check test', () => {
+    const start = startPosition(set.board, 2);
+    const noPawns = legalMoves(rulesFor(2), start, 'light', { allow: (m) => m.piece !== 'pawn' });
+    expect(noPawns.length).toBeGreaterThan(0);
+    expect(noPawns.some((m) => m.piece === 'pawn')).toBe(false);
+  });
+});

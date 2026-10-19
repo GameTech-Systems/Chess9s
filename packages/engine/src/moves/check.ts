@@ -12,6 +12,7 @@ import {
   type GeneratedMove,
   type Lost,
   type MoveRules,
+  type PlacedPiece,
   type Position,
 } from './generate';
 
@@ -24,6 +25,21 @@ export interface TurnOptions {
    * the caller decides.
    */
   alsoMove?: string[];
+  /**
+   * Which of the pseudo-legal moves may be played this turn at all (before the check test), such
+   * as the repeat limit on the Tail. `mover` is the side whose piece moves.
+   */
+  allow?: (move: GeneratedMove, mover: string) => boolean;
+  /**
+   * Pieces whose attacks give no check while this holds, such as a closed Coast's pieces. They
+   * still occupy their squares and block lines.
+   */
+  inert?: (at: string, placed: PlacedPiece) => boolean;
+  /**
+   * Moves after which `inert` no longer applies, such as the one that opens the Coast: the
+   * position after such a move is judged with every piece active.
+   */
+  lifts?: (move: GeneratedMove, mover: string) => boolean;
 }
 
 /** The position after a move: the piece moves (as its promotion, if any) and is marked moved. */
@@ -50,8 +66,14 @@ export function attackMap(rules: MoveRules, position: Position, side: string): s
 /**
  * Squares of the pieces giving check to `side`: pieces of any other side whose `givesCheck`
  * holds and that attack one of its royal pieces. Sorted; none for a side without a royal piece.
+ * Pieces that are `inert` give no check.
  */
-export function checkers(rules: MoveRules, position: Position, side: string): string[] {
+export function checkers(
+  rules: MoveRules,
+  position: Position,
+  side: string,
+  inert?: TurnOptions['inert'],
+): string[] {
   const royal = new Set(
     Object.keys(position).filter((at) => {
       const placed = position[at]!;
@@ -62,7 +84,7 @@ export function checkers(rules: MoveRules, position: Position, side: string): st
   return Object.keys(position)
     .filter((at) => {
       const placed = position[at]!;
-      if (placed.side === side) return false;
+      if (placed.side === side || inert?.(at, placed)) return false;
       if (!attacksFrom(rules, position, at).some((to) => royal.has(to))) return false;
       // Read the flag only for a piece that attacks, so an unrelated piece's flag is never needed.
       return givesCheck(rules, at, placed);
@@ -70,23 +92,37 @@ export function checkers(rules: MoveRules, position: Position, side: string): st
     .sort();
 }
 
-export const inCheck = (rules: MoveRules, position: Position, side: string): boolean =>
-  checkers(rules, position, side).length > 0;
+export const inCheck = (
+  rules: MoveRules,
+  position: Position,
+  side: string,
+  inert?: TurnOptions['inert'],
+): boolean => checkers(rules, position, side, inert).length > 0;
 
 /**
  * Legal moves for `side`: its pseudo-legal moves, and those of the `alsoMove` sides, that leave
- * none of its royal pieces in check. Sorted by notation.
+ * none of its royal pieces in check. A borrowed piece (the Tail) never captures a piece of the
+ * side moving it (owner, 19 Oct 2026). Sorted by notation.
  */
 export function legalMoves(
   rules: MoveRules,
   position: Position,
   side: string,
-  { lost, alsoMove = [] }: TurnOptions = {},
+  { lost, alsoMove = [], allow, inert, lifts }: TurnOptions = {},
 ): GeneratedMove[] {
   const movers = [...new Set([side, ...alsoMove])];
-  const moves = movers.flatMap((mover) => generateMoves(rules, position, mover, lost));
+  const moves = movers.flatMap((mover) =>
+    generateMoves(rules, position, mover, lost)
+      .filter((m) => mover === side || position[m.to]?.side !== side)
+      .filter((m) => allow?.(m, mover) !== false)
+      .map((m) => [m, mover] as const),
+  );
   return moves
-    .filter((m) => !inCheck(rules, applyMove(position, m), side))
+    .filter(
+      ([m, mover]) =>
+        !inCheck(rules, applyMove(position, m), side, lifts?.(m, mover) ? undefined : inert),
+    )
+    .map(([m]) => m)
     .map((m) => [toNotation(m), m] as const)
     .sort(([x], [y]) => (x < y ? -1 : x > y ? 1 : 0))
     .map(([, m]) => m);
@@ -111,7 +147,7 @@ export function gameStatus(
   side: string,
   options: TurnOptions = {},
 ): GameStatus {
-  const found = checkers(rules, position, side);
+  const found = checkers(rules, position, side, options.inert);
   const legal = legalMoves(rules, position, side, options);
   const status: GameStatus = {
     side,
