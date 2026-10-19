@@ -22,7 +22,7 @@ export function parseSquare(at: string): { file: number; rank: number } {
 }
 
 /** A seat's clockwise turn of the standard diagram; no view means the standard diagram. */
-export function viewRotation(side: Pick<Side, 'view'> | undefined): Rotation {
+export function viewRotation(side: Side | undefined): Rotation {
   return side?.view?.rotate ?? 0;
 }
 
@@ -63,7 +63,8 @@ export function edgeLabels(rotate: Rotation): { bottom: string[]; left: string[]
     throw new Error('unreachable');
   };
   const filesOnBottom = rotate === 0 || rotate === 180;
-  const pick = (cell: { file: string; rank: string }, wantFile: boolean) => (wantFile ? cell.file : cell.rank);
+  const pick = (cell: { file: string; rank: string }, wantFile: boolean) =>
+    wantFile ? cell.file : cell.rank;
   return {
     bottom: Array.from({ length: SIZE }, (_, c) => pick(at(c, SIZE - 1), filesOnBottom)),
     left: Array.from({ length: SIZE }, (_, r) => pick(at(0, r), !filesOnBottom)),
@@ -71,7 +72,7 @@ export function edgeLabels(rotate: Rotation): { bottom: string[]; left: string[]
 }
 
 /** The square's own color if the board data gives one, else the chessboard checker (b1 black). */
-export function squareFill(square: Pick<Square, 'at' | 'color'>): string {
+export function squareFill(square: Square): string {
   if (square.color) return square.color;
   const { file, rank } = parseSquare(square.at);
   return (file + rank) % 2 === 0 ? BLACK : WHITE;

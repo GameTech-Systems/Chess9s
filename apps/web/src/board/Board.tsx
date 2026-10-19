@@ -1,7 +1,9 @@
 import { useId } from 'react';
 import type { Board as BoardData, Square } from '@chess9s/engine';
-import { NEUTRAL } from '@chess9s/engine';
 import { FILES, SIZE, edgeLabels, squareFill, tetrahedron, toScreen, viewRotation } from './view';
+
+// Setup key for pieces that belong to no side (engine's NEUTRAL; importing it would pull Ajv into the bundle).
+const NEUTRAL = 'neutral';
 
 const CELL = 100;
 const MARGIN = 64;
@@ -35,7 +37,9 @@ export function Board({ board, pieceLetters, seat = 'light', players = 2 }: Boar
   // The data lists only the special squares; every other square is plain checkered.
   const listed = new Map(board.squares.map((sq) => [sq.at, sq]));
   const squares: Square[] = [...FILES].flatMap((f) =>
-    Array.from({ length: SIZE }, (_, i) => `${f}${i + 1}`).map((at) => listed.get(at) ?? { at, types: [] }),
+    Array.from({ length: SIZE }, (_, i) => `${f}${i + 1}`).map(
+      (at) => listed.get(at) ?? { at, types: [] },
+    ),
   );
   const setup = board.setups.find((s) => s.players === players);
   const centerOf = (at: string) => {
@@ -74,15 +78,43 @@ export function Board({ board, pieceLetters, seat = 'light', players = 2 }: Boar
       </defs>
 
       <rect width={TOTAL} height={TOTAL} rx="28" fill={`url(#${uid}-frame)`} />
-      <rect x="6" y="6" width={TOTAL - 12} height={TOTAL - 12} rx="23" fill="none" stroke="#c8a45d" strokeOpacity="0.55" strokeWidth="2" />
-      <rect x={MARGIN - 7} y={MARGIN - 7} width={BOARD + 14} height={BOARD + 14} rx="10" fill="none" stroke="#c8a45d" strokeOpacity="0.8" strokeWidth="2" />
+      <rect
+        x="6"
+        y="6"
+        width={TOTAL - 12}
+        height={TOTAL - 12}
+        rx="23"
+        fill="none"
+        stroke="#c8a45d"
+        strokeOpacity="0.55"
+        strokeWidth="2"
+      />
+      <rect
+        x={MARGIN - 7}
+        y={MARGIN - 7}
+        width={BOARD + 14}
+        height={BOARD + 14}
+        rx="10"
+        fill="none"
+        stroke="#c8a45d"
+        strokeOpacity="0.8"
+        strokeWidth="2"
+      />
 
       <g clipPath={`url(#${uid}-clip)`} shapeRendering="crispEdges">
         {squares.map((sq) => (
           <SquareCell key={sq.at} sq={sq} typeLabel={typeLabel} {...centerOf(sq.at)} />
         ))}
       </g>
-      <rect x={MARGIN} y={MARGIN} width={BOARD} height={BOARD} rx="6" fill={`url(#${uid}-gloss)`} pointerEvents="none" />
+      <rect
+        x={MARGIN}
+        y={MARGIN}
+        width={BOARD}
+        height={BOARD}
+        rx="6"
+        fill={`url(#${uid}-gloss)`}
+        pointerEvents="none"
+      />
 
       <g className="coords" fontSize="28" textAnchor="middle" fill="#c9b98c">
         {labels.bottom.map((t, i) => (
@@ -107,8 +139,20 @@ export function Board({ board, pieceLetters, seat = 'light', players = 2 }: Boar
         <polygon points={pts(tetra.apex, a, b)} fill="#0d3a14" fillOpacity="0.55" />
         <polygon points={pts(tetra.apex, b, c)} fill="#0d3a14" fillOpacity="0.28" />
         <polygon points={pts(tetra.apex, c, a)} fill="#d8f5d0" fillOpacity="0.38" />
-        <polygon points={pts(a, b, c)} fill="none" stroke="#e8f7e0" strokeOpacity="0.9" strokeWidth="2.5" />
-        <path d={`M${tetra.apex.x} ${tetra.apex.y}L${a.x} ${a.y}M${tetra.apex.x} ${tetra.apex.y}L${b.x} ${b.y}M${tetra.apex.x} ${tetra.apex.y}L${c.x} ${c.y}`} stroke="#e8f7e0" strokeOpacity="0.8" strokeWidth="2" fill="none" />
+        <polygon
+          points={pts(a, b, c)}
+          fill="none"
+          stroke="#e8f7e0"
+          strokeOpacity="0.9"
+          strokeWidth="2.5"
+        />
+        <path
+          d={`M${tetra.apex.x} ${tetra.apex.y}L${a.x} ${a.y}M${tetra.apex.x} ${tetra.apex.y}L${b.x} ${b.y}M${tetra.apex.x} ${tetra.apex.y}L${c.x} ${c.y}`}
+          stroke="#e8f7e0"
+          strokeOpacity="0.8"
+          strokeWidth="2"
+          fill="none"
+        />
       </g>
 
       {/* Ting Yang: placeholder symbol, no art. Turns 90 degrees clockwise in 3-player games. */}
@@ -122,9 +166,9 @@ export function Board({ board, pieceLetters, seat = 'light', players = 2 }: Boar
         strokeLinejoin="round"
         pointerEvents="none"
       >
-        <circle r="30" />
+        <circle r="26" />
         <circle r="5" fill="#1d1b18" stroke="none" />
-        <path d="M0 -30L-9 -44H9Z" fill="#1d1b18" />
+        <path d="M0 -26L-8 -39H8Z" fill="#1d1b18" />
       </g>
 
       {setup &&
@@ -134,10 +178,28 @@ export function Board({ board, pieceLetters, seat = 'light', players = 2 }: Boar
             const tone = TOKENS[side] ?? TOKENS[NEUTRAL]!;
             const letter = pieceLetters[id] ?? id.charAt(0).toUpperCase();
             return (
-              <g key={`${side}-${at}`} data-piece={id} data-at={at} data-side={side} transform={`translate(${x} ${y})`}>
+              <g
+                key={`${side}-${at}`}
+                data-piece={id}
+                data-at={at}
+                data-side={side}
+                transform={`translate(${x} ${y})`}
+              >
                 <title>{`${at} · ${id.replace(/-/g, ' ')}`}</title>
-                <circle r="37" fill={tone.fill} stroke={tone.stroke} strokeWidth="3" filter={`url(#${uid}-shadow)`} />
-                <circle r="30" fill="none" stroke={tone.stroke} strokeOpacity="0.45" strokeWidth="1.5" />
+                <circle
+                  r="37"
+                  fill={tone.fill}
+                  stroke={tone.stroke}
+                  strokeWidth="3"
+                  filter={`url(#${uid}-shadow)`}
+                />
+                <circle
+                  r="30"
+                  fill="none"
+                  stroke={tone.stroke}
+                  strokeOpacity="0.45"
+                  strokeWidth="1.5"
+                />
                 <text
                   textAnchor="middle"
                   dominantBaseline="central"
@@ -172,7 +234,9 @@ function SquareCell({
   x: number;
   y: number;
 }) {
-  const name = unique([sq.label, ...sq.types.map((t) => typeLabel.get(t))].filter((t): t is string => !!t));
+  const name = unique(
+    [sq.label, ...sq.types.map((t) => typeLabel.get(t))].filter((t): t is string => !!t),
+  );
   const typeAttrs = Object.fromEntries(sq.types.map((t) => [`data-type-${t}`, '']));
   const left = x - CELL / 2;
   const top = y - CELL / 2;
@@ -182,17 +246,43 @@ function SquareCell({
       <title>{[sq.at, ...name].join(' · ')}</title>
       <rect x={left} y={top} width={CELL} height={CELL} fill={squareFill(sq)} />
       {has('safe-zone') && (
-        <rect x={left + 7} y={top + 7} width={CELL - 14} height={CELL - 14} fill="none" stroke="#fff" strokeOpacity="0.4" strokeWidth="2" />
+        <rect
+          x={left + 7}
+          y={top + 7}
+          width={CELL - 14}
+          height={CELL - 14}
+          fill="none"
+          stroke="#fff"
+          strokeOpacity="0.4"
+          strokeWidth="2"
+        />
       )}
       {has('coast-gate') && (
-        <rect x={left + 10} y={top + 10} width={CELL - 20} height={CELL - 20} fill="none" stroke="#fff" strokeOpacity="0.75" strokeWidth="3" strokeDasharray="10 8" />
+        <rect
+          x={left + 10}
+          y={top + 10}
+          width={CELL - 20}
+          height={CELL - 20}
+          fill="none"
+          stroke="#fff"
+          strokeOpacity="0.75"
+          strokeWidth="3"
+          strokeDasharray="10 8"
+        />
       )}
       {has('tail-square') && (
         <path
           d={[
             [left + 6, top + 22, left + 6, top + 6, left + 22, top + 6],
             [left + CELL - 22, top + 6, left + CELL - 6, top + 6, left + CELL - 6, top + 22],
-            [left + CELL - 6, top + CELL - 22, left + CELL - 6, top + CELL - 6, left + CELL - 22, top + CELL - 6],
+            [
+              left + CELL - 6,
+              top + CELL - 22,
+              left + CELL - 6,
+              top + CELL - 6,
+              left + CELL - 22,
+              top + CELL - 6,
+            ],
             [left + 22, top + CELL - 6, left + 6, top + CELL - 6, left + 6, top + CELL - 22],
           ]
             .map(([x1, y1, x2, y2, x3, y3]) => `M${x1} ${y1}L${x2} ${y2}L${x3} ${y3}`)

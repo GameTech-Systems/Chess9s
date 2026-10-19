@@ -72,7 +72,7 @@ Decisions: D1.
 Generic pseudo-legal move generation from piece movement data and board data: directions, range, jumping, capture modes, restricted squares, gateways. Deterministic. No piece-specific code paths.
 Done when: fixture positions produce exactly the expected move lists.
 
-### S12 — Board renderer · Sonnet 5.5 · medium · `todo`
+### S12 — Board renderer · Sonnet 5.5 · medium · `done`
 In `apps/web`: render the 9×9 board from board data with every special square type, coordinates, and placeholder piece shapes (letters or simple shapes, no art). Responsive square sizing.
 Done when: the real board (or the fixture, if S10 isn't done) renders on desktop and phone widths.
 
