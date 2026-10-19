@@ -115,6 +115,10 @@ function turnOptions(rules: MoveRules, s: Dynamic, turn: string): TurnOptions {
   };
 }
 
+/** The options legalMoves takes for the side to move in this game (the Coast, the Tail). */
+export const turnOptionsOf = (state: GameState): TurnOptions =>
+  turnOptions(state.rules, state, state.turn);
+
 function resultOf(status: GameStatus, order: readonly string[]): GameResult {
   if (status.result === 'ongoing') return { status: 'ongoing' };
   const loser = status.side;

@@ -5,6 +5,7 @@
 // Semantics: docs/RULES-FRAMEWORK.md, "Check and legal moves".
 import { RulesError, type ParamValue } from '../rules/loader';
 import {
+  attackReach,
   attacksFrom,
   generateMoves,
   givesCheck,
@@ -100,6 +101,69 @@ export const inCheck = (
 ): boolean => checkers(rules, position, side, inert).length > 0;
 
 /**
+ * A test of whether a move leaves `side` out of check, as `inCheck` on the position after it
+ * would say, without rescanning every piece per move. Each piece of the other sides is walked
+ * once on the position and once alone on the board. A move changes only its from-square (now
+ * empty, so lines through it reach further) and its to-square (now filled, so lines through it
+ * stop sooner), so a piece is walked again only when it moved, read the from-square, or read a
+ * newly filled to-square while attacking a king; and never when even alone it reaches no king.
+ */
+function staysOutOfCheck(
+  rules: MoveRules,
+  position: Position,
+  side: string,
+  inert: TurnOptions['inert'],
+  lifts: TurnOptions['lifts'],
+): (move: GeneratedMove, mover: string) => boolean {
+  const royal = Object.keys(position).filter((at) => {
+    const placed = position[at]!;
+    return placed.side === side && rules.pieces[placed.piece]?.royal === true;
+  });
+  const others = Object.keys(position)
+    .filter((at) => position[at]!.side !== side)
+    .map((at) => ({
+      at,
+      placed: position[at]!,
+      ...attackReach(rules, position, at),
+      alone: new Set(attacksFrom(rules, { [at]: position[at]! }, at)),
+    }));
+
+  return (move, mover) => {
+    const placed = position[move.from]!;
+    const kings = royal.filter((at) => at !== move.from);
+    if (placed.side === side && rules.pieces[move.promotion ?? placed.piece]?.royal === true) {
+      kings.push(move.to);
+    }
+    if (kings.length === 0) return true;
+    const hits = (attacks: Set<string>) => kings.some((k) => attacks.has(k));
+    const filled = position[move.to] === undefined;
+    const inertNow = lifts?.(move, mover) ? undefined : inert;
+    let after: Position | undefined;
+    for (const other of others) {
+      if (other.at === move.to) continue; // Captured.
+      const moved = other.at === move.from;
+      if (!moved && !hits(other.alone)) continue;
+      let { at, placed: piece, attacks } = other;
+      if (
+        moved ||
+        other.reads.has(move.from) ||
+        (filled && other.reads.has(move.to) && hits(attacks))
+      ) {
+        after ??= applyMove(position, move);
+        if (moved) at = move.to;
+        piece = after[at]!;
+        attacks = new Set(attacksFrom(rules, after, at));
+      }
+      if (inertNow?.(at, piece)) continue;
+      if (!hits(attacks)) continue;
+      // Read the flag only for a piece that attacks, so an unrelated piece's flag is never needed.
+      if (givesCheck(rules, at, piece)) return false;
+    }
+    return true;
+  };
+}
+
+/**
  * Legal moves for `side`: its pseudo-legal moves, and those of the `alsoMove` sides, that leave
  * none of its royal pieces in check. A borrowed piece (the Tail) never captures a piece of the
  * side moving it (owner, 19 Oct 2026). Sorted by notation.
@@ -117,13 +181,10 @@ export function legalMoves(
       .filter((m) => allow?.(m, mover) !== false)
       .map((m) => [m, mover] as const),
   );
+  const safe = staysOutOfCheck(rules, position, side, inert, lifts);
   return moves
-    .filter(
-      ([m, mover]) =>
-        !inCheck(rules, applyMove(position, m), side, lifts?.(m, mover) ? undefined : inert),
-    )
-    .map(([m]) => m)
-    .map((m) => [toNotation(m), m] as const)
+    .filter(([m, mover]) => safe(m, mover))
+    .map(([m]) => [toNotation(m), m] as const)
     .sort(([x], [y]) => (x < y ? -1 : x > y ? 1 : 0))
     .map(([, m]) => m);
 }

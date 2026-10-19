@@ -113,13 +113,18 @@ const images = ([f, r]: Step, symmetry: Move['symmetry']): Step[] => {
 
 const stepKey = ([f, r]: Step) => `${f},${r}`;
 
-/** The move's distinct steps, relative to the side's forward. */
+/** The move's distinct steps, relative to the side's forward, worked out once per move. */
+const stepCache = new WeakMap<Move, Step[]>();
 function relativeSteps(move: Move): Step[] {
-  const all = move.directions
-    ? move.directions.flatMap((d) => DIRECTION_STEPS[d])
-    : (move.vectors ?? []).flatMap((v) => images(v, move.symmetry));
-  const seen = new Map(all.map((s) => [stepKey(s), s]));
-  return [...seen.values()];
+  let steps = stepCache.get(move);
+  if (!steps) {
+    const all = move.directions
+      ? move.directions.flatMap((d) => DIRECTION_STEPS[d])
+      : (move.vectors ?? []).flatMap((v) => images(v, move.symmetry));
+    steps = [...new Map(all.map((s) => [stepKey(s), s])).values()];
+    stepCache.set(move, steps);
+  }
+  return steps;
 }
 
 /** Square types by coordinate (squares the board data does not list have none), built once per board. */
@@ -245,6 +250,7 @@ type CaptureMode = NonNullable<Move['capture']>;
  * Walk every move of the piece on `from` and report each square it may end on (stop rules
  * applied) with that move's capture mode. Lines end at the first occupied square, which is
  * reported too, unless the move jumps. Who stands on a reported square is the caller's concern.
+ * `look` hears every square whose occupant the walk reads: only those can change the result.
  */
 function walk(
   rules: MoveRules,
@@ -252,6 +258,7 @@ function walk(
   from: string,
   { piece, placed, forward, env }: Context,
   visit: (to: string, mode: CaptureMode) => void,
+  look?: (at: string) => void,
 ): void {
   const types = squareTypes(rules.board);
   const typesAt = (at: string) => types.get(at) ?? [];
@@ -303,6 +310,7 @@ function walk(
         r += dr;
         if (!onBoard(f, r)) break;
         const at = coord(f, r);
+        look?.(at);
         land(at);
         // A no-passing rule ends sliding moves only; jumping moves ignore it (decision 2026-10-19).
         if (!jump && (position[at] || !mayPass(at))) break;
@@ -393,6 +401,33 @@ export function attacksFrom(rules: MoveRules, position: Position, from: string):
     if (mode !== 'move-only') squares.add(to);
   });
   return [...squares].sort();
+}
+
+/**
+ * The squares the piece on `from` attacks, and every square whose occupant its walk reads. Its
+ * attacks stay the same after a move that leaves all of those squares as they were (and leaves
+ * the piece where it is), because nothing else in the walk depends on the position.
+ */
+export function attackReach(
+  rules: MoveRules,
+  position: Position,
+  from: string,
+): { attacks: Set<string>; reads: Set<string> } {
+  const attacks = new Set<string>();
+  const reads = new Set<string>();
+  const placed = position[from];
+  if (!placed) return { attacks, reads };
+  walk(
+    rules,
+    position,
+    from,
+    context(rules, from, placed),
+    (to, mode) => {
+      if (mode !== 'move-only') attacks.add(to);
+    },
+    (at) => reads.add(at),
+  );
+  return { attacks, reads };
 }
 
 /** Whether a piece's attacks count as check (`givesCheck`, true unless its data says otherwise). */
