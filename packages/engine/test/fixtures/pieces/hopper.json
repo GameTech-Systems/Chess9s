@@ -1,0 +1,19 @@
+{
+  "$schema": "../../../../../rules/schema/piece.schema.json",
+  "id": "hopper",
+  "name": "Hopper",
+  "letter": "H",
+  "capturable": { "param": "hopper.capturable" },
+  "givesCheck": false,
+  "moves": [
+    { "targets": ["gateway"], "capture": "move-only" },
+    {
+      "directions": ["orthogonal"],
+      "range": 1,
+      "capture": "move-or-capture",
+      "when": { "any": [{ "players": [3] }, { "param": "gate.occupants", "is": "any" }] },
+      "squares": [{ "type": "home", "stop": false }]
+    }
+  ],
+  "source": "Test fixture (S9). Not a Chess Nines piece."
+}

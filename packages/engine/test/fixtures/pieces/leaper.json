@@ -1,0 +1,12 @@
+{
+  "$schema": "../../../../../rules/schema/piece.schema.json",
+  "id": "leaper",
+  "name": "Leaper",
+  "letter": "L",
+  "moves": [{ "vectors": [[1, 3]], "symmetry": "all", "range": 1 }],
+  "squares": [
+    { "type": "void", "stop": false },
+    { "type": "gateway", "stop": false, "when": { "param": "gate.occupants", "is": "hopper-only" } }
+  ],
+  "source": "Test fixture (S9). Not a Chess Nines piece."
+}

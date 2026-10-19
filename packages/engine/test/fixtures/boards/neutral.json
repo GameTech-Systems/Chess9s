@@ -1,0 +1,66 @@
+{
+  "$schema": "../../../../../rules/schema/board.schema.json",
+  "id": "neutral-fixture",
+  "name": "Neutral test board",
+  "version": "0.1.0",
+  "description": "Exercises every part of the board format. Deliberately unlike the Chess Nines board: no Coast, no void row, no center square.",
+  "squareTypes": [
+    { "id": "void", "label": "Void", "description": "Test squares some pieces may not enter." },
+    {
+      "id": "gateway",
+      "label": "Gateway",
+      "description": "Test squares the hopper moves between."
+    },
+    { "id": "home", "label": "Home", "description": "One side-owned test square per side." }
+  ],
+  "squares": [
+    { "at": "c4", "types": ["void"] },
+    { "at": "d4", "types": ["void"] },
+    { "at": "f6", "types": ["void"] },
+    { "at": "g6", "types": ["void"] },
+    { "at": "b6", "types": ["gateway"], "label": "West gate" },
+    { "at": "h4", "types": ["gateway"], "label": "East gate" },
+    { "at": "e2", "types": ["home"], "side": "light" },
+    { "at": "e8", "types": ["home"], "side": "dark" }
+  ],
+  "sides": [
+    { "id": "light", "forward": "up" },
+    { "id": "dark", "forward": "down" },
+    { "id": "third" }
+  ],
+  "setups": [
+    {
+      "players": 2,
+      "pieces": {
+        "light": {
+          "e1": "guard",
+          "a1": "slider",
+          "i1": "slider",
+          "c1": "leaper",
+          "g1": "leaper",
+          "d2": "stepper",
+          "f2": "stepper"
+        },
+        "dark": {
+          "e9": "guard",
+          "a9": "slider",
+          "i9": "slider",
+          "c9": "leaper",
+          "g9": "leaper",
+          "d8": "stepper",
+          "f8": "stepper"
+        },
+        "neutral": { "b6": "hopper" }
+      }
+    },
+    {
+      "players": 3,
+      "pieces": {
+        "light": { "e1": "guard", "a1": "slider", "d2": "stepper" },
+        "dark": { "e9": "guard", "i9": "slider", "f8": "stepper" },
+        "third": { "b6": "hopper", "h4": "hopper" }
+      }
+    }
+  ],
+  "source": "Test fixture (S9, decision D1 default). Not the Chess Nines board; the real board arrives in S10."
+}

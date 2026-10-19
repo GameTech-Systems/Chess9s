@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Chess Nines board",
+  "description": "A 9x9 board: special squares, sides and start positions. Format: docs/decisions/0007-board-and-piece-formats.md.",
+  "type": "object",
+  "required": ["id", "name", "version", "squareTypes", "squares", "sides", "setups"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": { "$ref": "#/$defs/id" },
+    "name": { "type": "string" },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "description": { "type": "string" },
+    "squareTypes": {
+      "description": "Kinds of special square. Unlisted squares are plain.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/squareType" }
+    },
+    "squares": {
+      "description": "Special squares, one entry per square.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/square" }
+    },
+    "sides": {
+      "type": "array",
+      "minItems": 2,
+      "items": { "$ref": "#/$defs/side" }
+    },
+    "setups": {
+      "description": "Start positions, one per player count.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/setup" }
+    },
+    "source": { "type": "string" },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+    "coordinate": {
+      "description": "File a to i (from the left), rank 1 to 9 (from the light side).",
+      "type": "string",
+      "pattern": "^[a-i][1-9]$"
+    },
+    "squareType": {
+      "type": "object",
+      "required": ["id", "label"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string" },
+        "description": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "square": {
+      "type": "object",
+      "required": ["at", "types"],
+      "properties": {
+        "at": { "$ref": "#/$defs/coordinate" },
+        "types": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "side": { "description": "The side this square belongs to, for side-specific rules.", "$ref": "#/$defs/id" },
+        "label": { "description": "Display name, such as a named square.", "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "side": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id", "not": { "const": "neutral" } },
+        "forward": {
+          "description": "Direction of the side's forward moves: up toward rank 9, down toward rank 1.",
+          "enum": ["up", "down"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "setup": {
+      "type": "object",
+      "required": ["players", "pieces"],
+      "properties": {
+        "players": { "enum": [2, 3] },
+        "pieces": {
+          "description": "Start position by side: side id (or \"neutral\" for unowned pieces) to square to piece id.",
+          "type": "object",
+          "propertyNames": { "$ref": "#/$defs/id" },
+          "additionalProperties": {
+            "type": "object",
+            "propertyNames": { "$ref": "#/$defs/coordinate" },
+            "additionalProperties": { "$ref": "#/$defs/id" }
+          }
+        },
+        "notes": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  }
+}
