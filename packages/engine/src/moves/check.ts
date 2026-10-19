@@ -7,12 +7,14 @@ import { RulesError, type ParamValue } from '../rules/loader';
 import {
   attackReach,
   attacksFrom,
+  castlePath,
   generateMoves,
   givesCheck,
   toNotation,
   type GeneratedMove,
   type Lost,
   type MoveRules,
+  type Passing,
   type PlacedPiece,
   type Position,
 } from './generate';
@@ -20,6 +22,8 @@ import {
 export interface TurnOptions {
   /** The pieces each side has lost; read only by a promotion under `captured-piece`. */
   lost?: Lost;
+  /** What the last move left open to capture in passing (en passant), if anything. */
+  passing?: Passing;
   /**
    * Other sides whose pieces this side may move on this turn, such as NEUTRAL for the Dragon
    * Tail in 2-player games. Whether it may (the Coast opened, the repeat limit) is game state;
@@ -43,7 +47,10 @@ export interface TurnOptions {
   lifts?: (move: GeneratedMove, mover: string) => boolean;
 }
 
-/** The position after a move: the piece moves (as its promotion, if any) and is marked moved. */
+/**
+ * The position after a move: the piece moves (as its promotion, if any) and is marked moved; a
+ * capture in passing removes the piece it takes; castling moves the partner too.
+ */
 export function applyMove(position: Position, move: GeneratedMove): Position {
   const placed = position[move.from];
   if (!placed || placed.piece !== move.piece) {
@@ -51,7 +58,14 @@ export function applyMove(position: Position, move: GeneratedMove): Position {
   }
   const next: Position = { ...position };
   delete next[move.from];
-  next[move.to] = { piece: move.promotion ?? placed.piece, side: placed.side, moved: true };
+  if (move.captureAt !== undefined) delete next[move.captureAt];
+  if (move.castle) {
+    const partner = position[move.castle.from];
+    if (!partner) throw new RulesError(`${move.castle.from} holds no castling partner`);
+    delete next[move.castle.from];
+    next[move.castle.to] = { ...partner, moved: true };
+  }
+  next[move.to] = { ...placed, piece: move.promotion ?? placed.piece, moved: true };
   return next;
 }
 
@@ -129,6 +143,11 @@ function staysOutOfCheck(
     }));
 
   return (move, mover) => {
+    // Castling and captures in passing change more than two squares: judge them in full.
+    if (move.castle || move.captureAt !== undefined) {
+      const after = applyMove(position, move);
+      return !inCheck(rules, after, side, lifts?.(move, mover) ? undefined : inert);
+    }
     const placed = position[move.from]!;
     const kings = royal.filter((at) => at !== move.from);
     if (placed.side === side && rules.pieces[move.promotion ?? placed.piece]?.royal === true) {
@@ -164,6 +183,29 @@ function staysOutOfCheck(
 }
 
 /**
+ * Castling's conditions besides the position after it: the side is not in check, and the piece
+ * would not be in check on any square it crosses (docs/RULES.md, "as in chess").
+ */
+function castleAllowed(
+  rules: MoveRules,
+  position: Position,
+  side: string,
+  move: GeneratedMove,
+  inert: TurnOptions['inert'],
+): boolean {
+  if (inCheck(rules, position, side, inert)) return false;
+  return castlePath(move).every(
+    (at) =>
+      !inCheck(
+        rules,
+        applyMove(position, { from: move.from, to: at, piece: move.piece }),
+        side,
+        inert,
+      ),
+  );
+}
+
+/**
  * Legal moves for `side`: its pseudo-legal moves, and those of the `alsoMove` sides, that leave
  * none of its royal pieces in check. A borrowed piece (the Tail) never captures a piece of the
  * side moving it (owner, 19 Oct 2026). Sorted by notation.
@@ -172,13 +214,14 @@ export function legalMoves(
   rules: MoveRules,
   position: Position,
   side: string,
-  { lost, alsoMove = [], allow, inert, lifts }: TurnOptions = {},
+  { lost, passing, alsoMove = [], allow, inert, lifts }: TurnOptions = {},
 ): GeneratedMove[] {
   const movers = [...new Set([side, ...alsoMove])];
   const moves = movers.flatMap((mover) =>
-    generateMoves(rules, position, mover, lost)
-      .filter((m) => mover === side || position[m.to]?.side !== side)
+    generateMoves(rules, position, mover, lost, passing)
+      .filter((m) => mover === side || position[m.captureAt ?? m.to]?.side !== side)
       .filter((m) => allow?.(m, mover) !== false)
+      .filter((m) => !m.castle || castleAllowed(rules, position, side, m, inert))
       .map((m) => [m, mover] as const),
   );
   const safe = staysOutOfCheck(rules, position, side, inert, lifts);

@@ -12,6 +12,7 @@ import {
   type Move,
   type Piece,
   type Scalar,
+  type SquareRule,
 } from '../rules/formats';
 import { RulesError, type ParamValue } from '../rules/loader';
 
@@ -21,6 +22,8 @@ export interface PlacedPiece {
   side: string;
   /** Has moved at least once; `firstMove` conditions hold until it has. */
   moved?: boolean;
+  /** The square it started the game on, read by `homeFile` square rules (pawn-safe zones). */
+  home?: string;
 }
 
 /** Coordinate (such as "e5") to the piece standing there. */
@@ -49,6 +52,18 @@ export interface GeneratedMove {
   capture?: string;
   /** Id of the piece promoted to. */
   promotion?: string;
+  /** Where the captured piece stood, when not on `to` (a capture in passing). */
+  captureAt?: string;
+  /** Squares this move passed over that an enemy may capture on, in passing, on the next turn. */
+  passes?: string[];
+  /** Castling: the partner piece's move, made together with this one. */
+  castle?: { from: string; to: string };
+}
+
+/** What the last move left open to capture in passing: the squares it passed and where it landed. */
+export interface Passing {
+  squares: string[];
+  at: string;
 }
 
 type Step = [number, number];
@@ -138,6 +153,17 @@ export function squareTypes(board: Board): Map<string, string[]> {
   return types;
 }
 
+/** The side each square belongs to (`Square.side`), built once per board. */
+const sideCache = new WeakMap<Board, Map<string, string>>();
+function squareSides(board: Board): Map<string, string> {
+  let sides = sideCache.get(board);
+  if (!sides) {
+    sides = new Map(board.squares.flatMap((s) => (s.side ? [[s.at, s.side] as const] : [])));
+    sideCache.set(board, sides);
+  }
+  return sides;
+}
+
 /** A parameter's resolved value; missing and undecided values are refused, never guessed. */
 function value(rules: MoveRules, id: string): Exclude<ParamValue, null> {
   if (!Object.hasOwn(rules.values, id))
@@ -189,7 +215,7 @@ function holds(c: Condition, env: Env): boolean {
 }
 
 export const toNotation = (m: GeneratedMove): string =>
-  `${m.from}${m.capture !== undefined ? 'x' : '-'}${m.to}${m.promotion !== undefined ? `=${m.promotion}` : ''}`;
+  `${m.from}${m.capture !== undefined ? 'x' : '-'}${m.to}${m.promotion !== undefined ? `=${m.promotion}` : ''}${m.castle ? `/${m.castle.from}-${m.castle.to}` : ''}`;
 
 function pieceOf(rules: MoveRules, at: string, placed: PlacedPiece): Piece {
   const piece = rules.pieces[placed.piece];
@@ -244,48 +270,89 @@ function context(rules: MoveRules, from: string, placed: PlacedPiece): Context {
   };
 }
 
-type CaptureMode = NonNullable<Move['capture']>;
+/** Whether a square rule covers the square `at` for this piece: its type, owner and file. */
+function covers(rules: MoveRules, rule: SquareRule, at: string, placed: PlacedPiece): boolean {
+  const typed = (squareTypes(rules.board).get(at) ?? []).includes(rule.type);
+  if (typed === (rule.outside === true)) return false;
+  if (rule.owner !== undefined) {
+    const side = squareSides(rules.board).get(at);
+    if (side === undefined || (side === placed.side) !== (rule.owner === 'own')) return false;
+  }
+  return rule.homeFile !== true || (placed.home !== undefined && placed.home[0] === at[0]);
+}
+
+/**
+ * Where the piece may stop and pass under its own square rules and those of `move`; any
+ * applicable `false` forbids (decision 2026-10-19: deny wins).
+ */
+function access(
+  rules: MoveRules,
+  { piece, placed, env }: Context,
+  move?: Move,
+): { mayStop: (at: string) => boolean; mayPass: (at: string) => boolean } {
+  const noStop: SquareRule[] = [];
+  const noPass: SquareRule[] = [];
+  for (const rule of [...(piece.squares ?? []), ...(move?.squares ?? [])]) {
+    if (rule.stop === undefined && rule.pass === undefined) continue;
+    if (rule.when && !holds(rule.when, env)) continue;
+    if (!flag(rules, rule.stop, true)) noStop.push(rule);
+    if (!flag(rules, rule.pass, true)) noPass.push(rule);
+  }
+  return {
+    mayStop: (at) => !noStop.some((r) => covers(rules, r, at, placed)),
+    mayPass: (at) => !noPass.some((r) => covers(rules, r, at, placed)),
+  };
+}
+
+/**
+ * Whether the piece standing on `at` may be captured: its `capturable` flag, then its square
+ * rules' `capturable` for the square it stands on (pawn-safe zones, capture on the Coast).
+ */
+export function capturable(rules: MoveRules, at: string, placed: PlacedPiece): boolean {
+  const piece = pieceOf(rules, at, placed);
+  if (!flag(rules, piece.capturable, true)) return false;
+  const env: Env = {
+    rules,
+    fromTypes: squareTypes(rules.board).get(at) ?? [],
+    moved: placed.moved === true,
+  };
+  return !(piece.squares ?? []).some(
+    (r) =>
+      r.capturable !== undefined &&
+      covers(rules, r, at, placed) &&
+      (!r.when || holds(r.when, env)) &&
+      !flag(rules, r.capturable, true),
+  );
+}
 
 /**
  * Walk every move of the piece on `from` and report each square it may end on (stop rules
- * applied) with that move's capture mode. Lines end at the first occupied square, which is
- * reported too, unless the move jumps. Who stands on a reported square is the caller's concern.
- * `look` hears every square whose occupant the walk reads: only those can change the result.
+ * applied) with that move and how many steps along `step` it took (none for a targets move).
+ * Lines end at the first occupied square, which is reported too, unless the move jumps. Who
+ * stands on a reported square is the caller's concern. `look` hears every square whose
+ * occupant the walk reads: only those can change the result.
  */
 function walk(
   rules: MoveRules,
   position: Position,
   from: string,
-  { piece, placed, forward, env }: Context,
-  visit: (to: string, mode: CaptureMode) => void,
+  ctx: Context,
+  visit: (to: string, move: Move, step?: Step, n?: number) => void,
   look?: (at: string) => void,
 ): void {
-  const types = squareTypes(rules.board);
-  const typesAt = (at: string) => types.get(at) ?? [];
+  const { piece, placed, forward, env } = ctx;
   const sign = forward === 'down' ? -1 : 1;
   const [f0, r0] = parse(from);
 
   for (const move of piece.moves) {
     if (move.when && !holds(move.when, env)) continue;
-
-    // Square rules of the piece and of this move; any applicable `false` forbids (decision 2026-10-19: deny wins).
-    const noStop = new Set<string>();
-    const noPass = new Set<string>();
-    for (const rule of [...(piece.squares ?? []), ...(move.squares ?? [])]) {
-      if (rule.when && !holds(rule.when, env)) continue;
-      if (!flag(rules, rule.stop, true)) noStop.add(rule.type);
-      if (!flag(rules, rule.pass, true)) noPass.add(rule.type);
-    }
-    const mayStop = (at: string) => !typesAt(at).some((t) => noStop.has(t));
-    const mayPass = (at: string) => !typesAt(at).some((t) => noPass.has(t));
-    const mode = move.capture ?? 'move-or-capture';
-    const land = (to: string) => {
-      if (mayStop(to)) visit(to, mode);
-    };
+    const { mayStop, mayPass } = access(rules, ctx, move);
 
     if (move.targets) {
       for (const sq of rules.board.squares) {
-        if (sq.at !== from && sq.types.some((t) => move.targets!.includes(t))) land(sq.at);
+        if (sq.at !== from && sq.types.some((t) => move.targets!.includes(t)) && mayStop(sq.at)) {
+          visit(sq.at, move);
+        }
       }
       continue;
     }
@@ -311,7 +378,7 @@ function walk(
         if (!onBoard(f, r)) break;
         const at = coord(f, r);
         look?.(at);
-        land(at);
+        if (mayStop(at)) visit(at, move, [df, dr], n);
         // A no-passing rule ends sliding moves only; jumping moves ignore it (decision 2026-10-19).
         if (!jump && (position[at] || !mayPass(at))) break;
       }
@@ -321,18 +388,21 @@ function walk(
 
 /**
  * Pseudo-legal moves of the piece on `from`, or none if the square is empty. `lost` lists the
- * pieces each side has lost; it is read only by a promotion under `captured-piece`.
+ * pieces each side has lost; it is read only by a promotion under `captured-piece`. `passing`
+ * is what the last move left open to capture in passing, if anything.
  */
 export function movesFrom(
   rules: MoveRules,
   position: Position,
   from: string,
   lost?: Lost,
+  passing?: Passing,
 ): GeneratedMove[] {
   const placed = position[from];
   if (!placed) return [];
   const ctx = context(rules, from, placed);
   const { piece, forward, env } = ctx;
+  const [f0, r0] = parse(from);
   const moves: GeneratedMove[] = [];
 
   const promotions = (to: string): (string | undefined)[] => {
@@ -364,27 +434,96 @@ export function movesFrom(
     return ids.length > 0 ? [...new Set(ids)].sort() : [undefined];
   };
 
-  walk(rules, position, from, ctx, (to, mode) => {
+  walk(rules, position, from, ctx, (to, move, step, n = 0) => {
+    const mode = move.capture ?? 'move-or-capture';
     const occupant = position[to];
     let capture: string | undefined;
+    let captureAt: string | undefined;
     if (!occupant) {
-      if (mode === 'capture-only') return;
+      if (mode === 'capture-only') {
+        // A capture in passing: onto a square the last move passed, taking the piece that made it.
+        const victim = passing && position[passing.at];
+        if (!move.inPassing || !victim || !passing.squares.includes(to)) return;
+        if (victim.side === placed.side || !capturable(rules, passing.at, victim)) return;
+        capture = victim.piece;
+        captureAt = passing.at;
+      }
     } else {
       if (occupant.side === placed.side || mode === 'move-only') return;
-      if (!flag(rules, pieceOf(rules, to, occupant).capturable, true)) return;
+      if (!capturable(rules, to, occupant)) return;
       capture = occupant.piece;
     }
+    const passes =
+      move.passable && step && n > 1
+        ? Array.from({ length: n - 1 }, (_, i) =>
+            coord(f0 + step[0] * (i + 1), r0 + step[1] * (i + 1)),
+          )
+        : [];
     for (const promotion of promotions(to)) {
       moves.push({
         from,
         to,
         piece: piece.id,
         ...(capture !== undefined && { capture }),
+        ...(captureAt !== undefined && { captureAt }),
         ...(promotion !== undefined && { promotion }),
+        ...(passes.length > 0 && { passes }),
       });
     }
   });
+  moves.push(...castlings(rules, position, from, ctx));
   return sortUnique(moves);
+}
+
+/**
+ * Castling moves of the piece on `from` (pseudo-legal: whether it is in check, or crosses or
+ * lands on an attacked square, is for legalMoves). Along its rank, toward an unmoved own partner
+ * with only empty squares between; the piece moves `steps` and the partner lands on the last
+ * square it crossed. Both must be allowed to stand there, and the piece to cross what it crosses.
+ */
+function castlings(
+  rules: MoveRules,
+  position: Position,
+  from: string,
+  ctx: Context,
+): GeneratedMove[] {
+  const { piece, placed, env } = ctx;
+  const castle = piece.castle;
+  if (!castle || placed.moved === true || (castle.when && !holds(castle.when, env))) return [];
+  const [f0, r0] = parse(from);
+  const out: GeneratedMove[] = [];
+  for (const df of [1, -1]) {
+    let f = f0 + df;
+    while (onBoard(f, r0) && !position[coord(f, r0)]) f += df;
+    if (!onBoard(f, r0) || Math.abs(f - f0) <= castle.steps) continue;
+    const partnerAt = coord(f, r0);
+    const partner = position[partnerAt]!;
+    if (
+      partner.side !== placed.side ||
+      partner.piece !== castle.partner ||
+      partner.moved === true
+    ) {
+      continue;
+    }
+    const to = coord(f0 + df * castle.steps, r0);
+    const rookTo = coord(f0 + df * (castle.steps - 1), r0);
+    const own = access(rules, ctx);
+    const crossed = castlePath({ from, to });
+    if (!own.mayStop(to) || !crossed.every(own.mayPass)) continue;
+    if (!access(rules, context(rules, partnerAt, partner)).mayStop(rookTo)) continue;
+    out.push({ from, to, piece: piece.id, castle: { from: partnerAt, to: rookTo } });
+  }
+  return out;
+}
+
+/** The squares a castling piece crosses between its from- and to-square (same rank). */
+export function castlePath({ from, to }: { from: string; to: string }): string[] {
+  const [f0, r0] = parse(from);
+  const [f1] = parse(to);
+  const df = Math.sign(f1 - f0);
+  const out: string[] = [];
+  for (let f = f0 + df; f !== f1; f += df) out.push(coord(f, r0));
+  return out;
 }
 
 /**
@@ -397,8 +536,8 @@ export function attacksFrom(rules: MoveRules, position: Position, from: string):
   const placed = position[from];
   if (!placed) return [];
   const squares = new Set<string>();
-  walk(rules, position, from, context(rules, from, placed), (to, mode) => {
-    if (mode !== 'move-only') squares.add(to);
+  walk(rules, position, from, context(rules, from, placed), (to, move) => {
+    if (move.capture !== 'move-only') squares.add(to);
   });
   return [...squares].sort();
 }
@@ -422,8 +561,8 @@ export function attackReach(
     position,
     from,
     context(rules, from, placed),
-    (to, mode) => {
-      if (mode !== 'move-only') attacks.add(to);
+    (to, move) => {
+      if (move.capture !== 'move-only') attacks.add(to);
     },
     (at) => reads.add(at),
   );
@@ -441,11 +580,53 @@ export function generateMoves(
   position: Position,
   side: string,
   lost?: Lost,
+  passing?: Passing,
 ): GeneratedMove[] {
   const own = Object.keys(position)
     .filter((at) => position[at]!.side === side)
     .sort();
-  return sortUnique(own.flatMap((at) => movesFrom(rules, position, at, lost)));
+  return sortUnique(own.flatMap((at) => movesFrom(rules, position, at, lost, passing)));
+}
+
+const readsFirstMove = (c: Condition | undefined): boolean =>
+  c !== undefined &&
+  ('firstMove' in c ||
+    ('not' in c && readsFirstMove(c.not)) ||
+    ('all' in c && c.all.some(readsFirstMove)) ||
+    ('any' in c && c.any.some(readsFirstMove)));
+
+/** Per piece id: whether its moved flag and its home square can change what it may do. */
+const keyCache = new WeakMap<MoveRules, Map<string, { moved: boolean; home: boolean }>>();
+function keyFacts(rules: MoveRules, id: string): { moved: boolean; home: boolean } {
+  let facts = keyCache.get(rules);
+  if (!facts) {
+    facts = new Map();
+    const env: Env = { rules, fromTypes: [], moved: false };
+    const castles = Object.values(rules.pieces).filter(
+      (p) => p.castle && (!p.castle.when || holds(p.castle.when, env)),
+    );
+    for (const p of Object.values(rules.pieces)) {
+      const rulesOf = [...(p.squares ?? []), ...p.moves.flatMap((m) => m.squares ?? [])];
+      const moved =
+        castles.some((c) => c === p || c.castle!.partner === p.id) ||
+        readsFirstMove(p.promotion?.when) ||
+        p.moves.some((m) => readsFirstMove(m.when)) ||
+        rulesOf.some((r) => readsFirstMove(r.when));
+      facts.set(p.id, { moved, home: rulesOf.some((r) => r.homeFile === true) });
+    }
+    keyCache.set(rules, facts);
+  }
+  return facts.get(id) ?? { moved: false, home: false };
+}
+
+/**
+ * A placed piece as the repetition rule compares it: its type and side, and its moved flag and
+ * starting file only where they can change what it may do (first moves, castling, pawn-safe
+ * zones), so a piece that moved away and came back is the same piece unless its rights changed.
+ */
+export function placedKey(rules: MoveRules, placed: PlacedPiece): string {
+  const facts = keyFacts(rules, placed.piece);
+  return `${placed.side}:${placed.piece}${facts.moved && placed.moved ? '*' : ''}${facts.home ? `@${placed.home?.[0] ?? ''}` : ''}`;
 }
 
 /** The board's start position for a player count. */
@@ -454,7 +635,7 @@ export function startPosition(board: Board, players: 2 | 3): Position {
   if (!setup) throw new RulesError(`Board ${board.id} has no setup for ${players} players`);
   const position: Position = {};
   for (const [side, placed] of Object.entries(setup.pieces)) {
-    for (const [at, piece] of Object.entries(placed)) position[at] = { piece, side };
+    for (const [at, piece] of Object.entries(placed)) position[at] = { piece, side, home: at };
   }
   return position;
 }

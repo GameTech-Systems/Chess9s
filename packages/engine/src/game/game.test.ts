@@ -376,19 +376,15 @@ describe('finding and recording moves', () => {
 });
 
 describe('features the game does not play yet', () => {
-  it('lists the rules that are in effect but not built, so the screen can say so', () => {
-    const listed = unbuiltFeatures(rulesFor(2)).map((f) => f.id);
-    expect(listed).toEqual(
-      expect.arrayContaining(['en-passant', 'pawn.safeZones', 'draw.threefoldRepetition']),
-    );
-    expect(listed).not.toContain('castling.enabled');
+  it('lists none at the draft-2p defaults: every rule they switch on is built (S22a)', () => {
+    expect(unbuiltFeatures(rulesFor(2))).toEqual([]);
   });
 
   it('lists an option only while it is on', () => {
-    const on = unbuiltFeatures(rulesFor(2, { 'castling.enabled': true })).map((f) => f.id);
-    expect(on).toContain('castling.enabled');
-    const off = unbuiltFeatures(rulesFor(2, { 'pawn.safeZones': 'off' })).map((f) => f.id);
-    expect(off).not.toContain('pawn.safeZones');
+    const on = unbuiltFeatures(rulesFor(2, { 'queen.pawnSwap': true })).map((f) => f.id);
+    expect(on).toEqual(['queen.pawnSwap']);
+    const swap = unbuiltFeatures(rulesFor(2, { 'setup.swapKingQueen': true })).map((f) => f.id);
+    expect(swap).toEqual(['setup.swapKingQueen']);
   });
 });
 

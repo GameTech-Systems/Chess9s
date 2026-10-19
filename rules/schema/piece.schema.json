@@ -24,6 +24,11 @@
       "items": { "$ref": "#/$defs/squareRule" }
     },
     "promotion": { "$ref": "#/$defs/promotion" },
+    "castle": { "$ref": "#/$defs/castle" },
+    "irreversible": {
+      "description": "Its moves can't be taken back (it never moves backward). Like a capture, a move by it starts the fifty-move count and the repetition record again. Default false.",
+      "type": "boolean"
+    },
     "source": { "type": "string" },
     "notes": { "type": "string" }
   },
@@ -77,6 +82,14 @@
           "enum": ["move-or-capture", "move-only", "capture-only"]
         },
         "squares": { "type": "array", "items": { "$ref": "#/$defs/squareRule" } },
+        "passable": {
+          "description": "A move of more than one step that an enemy move with inPassing may answer, on the very next turn only, by capturing on a square it passed over. Default false.",
+          "type": "boolean"
+        },
+        "inPassing": {
+          "description": "A capture-only move that may also land on a square a passable move passed over on the turn before, taking the piece that made it. Default false.",
+          "type": "boolean"
+        },
         "when": { "$ref": "#/$defs/condition" },
         "notes": { "type": "string" }
       },
@@ -99,17 +112,41 @@
       "additionalProperties": false
     },
     "squareRule": {
-      "description": "Whether the piece may stop on, or pass over, squares of a type. Both default to true.",
+      "description": "Whether the piece may stop on, or pass over, squares of a type, and (piece-level rules only) whether it may be captured while it stands on one. All default to true.",
       "type": "object",
       "required": ["type"],
       "properties": {
         "type": { "$ref": "#/$defs/id" },
+        "outside": {
+          "description": "The rule covers every square that is not of this type instead. Default false.",
+          "type": "boolean"
+        },
+        "owner": {
+          "description": "The rule covers only squares whose side is the piece's own, or another side's.",
+          "enum": ["own", "other"]
+        },
+        "homeFile": {
+          "description": "The rule covers only squares in the file the piece started the game on. Default false.",
+          "type": "boolean"
+        },
         "stop": { "$ref": "#/$defs/flag" },
         "pass": { "$ref": "#/$defs/flag" },
+        "capturable": { "$ref": "#/$defs/flag" },
         "when": { "$ref": "#/$defs/condition" },
         "notes": { "type": "string" }
       },
-      "anyOf": [{ "required": ["stop"] }, { "required": ["pass"] }],
+      "anyOf": [{ "required": ["stop"] }, { "required": ["pass"] }, { "required": ["capturable"] }],
+      "additionalProperties": false
+    },
+    "castle": {
+      "description": "Castling: the unmoved piece moves `steps` squares along its rank toward an unmoved own `partner` piece with only empty squares between them, and the partner jumps to the square next to its new square, on the side it came from (the last square it crossed). Not out of check, and not across or onto an attacked square.",
+      "type": "object",
+      "required": ["partner", "steps"],
+      "properties": {
+        "partner": { "$ref": "#/$defs/id" },
+        "steps": { "type": "integer", "minimum": 2, "maximum": 7 },
+        "when": { "$ref": "#/$defs/condition" }
+      },
       "additionalProperties": false
     },
     "promotion": {

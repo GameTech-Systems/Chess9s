@@ -131,6 +131,9 @@ describe('fixture coverage', () => {
     'sunMoon.3p.range', // 3-player Coast play
     'tail.3p.movement',
     'tail.3p.captures',
+    'coast.2p.exit', // rules/special-rules.test.ts (S22a)
+    'coast.2p.capturable', // rules/special-rules.test.ts (S22a)
+    'coast.3p.capturable', // 3-player Coast play
   ];
 
   it('the pieces of this batch read only the parameters covered here or set aside above', () => {

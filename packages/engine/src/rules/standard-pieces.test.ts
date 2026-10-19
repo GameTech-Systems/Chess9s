@@ -54,6 +54,8 @@ describe('fixture positions: King, Rook, Bishop, Knight', () => {
 
 describe('fixture coverage', () => {
   const read = ['king.range', 'king.canJump', 'king.canEnterCoast', 'center.occupants', 'center.passThrough'];
+  // Read by these pieces and covered at every option elsewhere.
+  const elsewhere = ['castling.enabled']; // special-rules.test.ts (S22a)
 
   it('the pieces of this batch read only the parameters the fixtures cover', () => {
     const found = new Set<string>();
@@ -66,7 +68,7 @@ describe('fixture coverage', () => {
       }
     };
     walk(batch.map((id) => set.pieces[id] as Piece));
-    expect([...found].sort()).toEqual([...read].sort());
+    expect([...found].sort()).toEqual([...read, ...elsewhere].sort());
   });
 
   it.each(read)('%s is set to every option, or left at its default, somewhere', (id) => {

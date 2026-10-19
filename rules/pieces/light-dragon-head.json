@@ -48,8 +48,57 @@
           }
         ]
       }
+    },
+    {
+      "type": "coast",
+      "outside": true,
+      "stop": false,
+      "notes": "coast.2p.exit = a5-only: a Coast piece leaves the Coast only from A5.",
+      "when": {
+        "all": [
+          {
+            "players": [
+              2
+            ]
+          },
+          {
+            "param": "coast.2p.exit",
+            "is": "a5-only"
+          },
+          {
+            "from": "coast"
+          },
+          {
+            "not": {
+              "from": "coast-gate"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "coast",
+      "capturable": {
+        "param": "coast.2p.capturable"
+      },
+      "when": {
+        "players": [
+          2
+        ]
+      }
+    },
+    {
+      "type": "coast",
+      "capturable": {
+        "param": "coast.3p.capturable"
+      },
+      "when": {
+        "players": [
+          3
+        ]
+      }
     }
   ],
   "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026.",
-  "notes": "The closed Coast (no Coast piece moves, and none gives check, until the Tail opens it: coast.2p.initiation) is game state, not piece data (S17, src/game/game.ts). Not expressed yet (engine features): ways off the Coast (coast.2p.exit, coast.3p.exit); capture on the Coast (coast.2p.capturable, coast.3p.capturable). givesCheck follows the 2-player setting; in 3-player games dragon.3p.givesCheck applies instead, which a single flag can't express yet."
+  "notes": "The closed Coast (no Coast piece moves, and none gives check, until the Tail opens it: coast.2p.initiation) is game state, not piece data (S17, src/game/game.ts). Ways off the Coast (coast.2p.exit) and capture on the Coast (coast.2p.capturable, coast.3p.capturable) are square rules (S22a). Not expressed yet (engine features): the 3-player first emergence through A5 (coast.3p.exit). givesCheck follows the 2-player setting; in 3-player games dragon.3p.givesCheck applies instead, which a single flag can't express yet."
 }

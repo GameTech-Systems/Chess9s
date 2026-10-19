@@ -1,14 +1,18 @@
 // Game state: whose turn it is, the position, the pieces each side has lost, whether the Coast
-// is open, the Tail's repeat limit, the moves played, and how the game ended. It supplies what
+// is open, the Tail's repeat limit, what may be captured in passing, the counts behind the
+// fifty-move and repetition draws, the moves played, and how the game ended. It supplies what
 // legalMoves/gameStatus take as inputs (docs/RULES-FRAMEWORK.md, "Game state"). Immutable and
 // deterministic: playMove returns a new state. Two players only; 3-player game end is not built.
 import { applyMove, gameStatus, type GameStatus, type TurnOptions } from '../moves/check';
 import {
+  givesCheck,
+  placedKey,
   squareTypes,
   toNotation,
   type GeneratedMove,
   type Lost,
   type MoveRules,
+  type Passing,
   type Position,
   startPosition,
 } from '../moves/generate';
@@ -21,10 +25,21 @@ const COAST = 'coast';
 const CENTER = 'center';
 const TING_YANG = 'ting-yang';
 
+export type DrawReason = 'stalemate' | 'insufficient-material' | 'repetition' | 'fifty-move';
+
 export type GameResult =
   | { status: 'ongoing' }
   | { status: 'win'; winner: string; loser: string; reason: 'checkmate' | 'stalemate' }
-  | { status: 'draw'; reason: 'stalemate' };
+  | { status: 'draw'; reason: DrawReason };
+
+/**
+ * The positions since the last capture or irreversible move, newest first, as a chain each
+ * state shares with the one before. Earlier positions can't come back, so the chain restarts.
+ */
+export interface Seen {
+  key: string;
+  prev: Seen | null;
+}
 
 /** A move as played: the side whose turn it was and the move's notation. */
 export interface PlayedMove extends GeneratedMove {
@@ -48,12 +63,18 @@ export interface GameState {
   tailRun: Record<string, number>;
   /** The side that opened the Coast and has not yet had its next turn (the repeat-limit exception). */
   tailBonus: string | null;
+  /** What the last move left open to capture in passing (en passant), if anything. */
+  passing: Passing | null;
+  /** Moves (plies) since the last capture or irreversible (pawn) move, for the fifty-move rule. */
+  quiet: number;
+  /** This position and the earlier ones that could repeat, for threefold repetition. */
+  seen: Seen | null;
   moves: PlayedMove[];
   /** The side to move is in check. */
   inCheck: boolean;
   /** Squares of the pieces giving check. */
   checkers: string[];
-  /** Legal moves of the side to move, including the Tail's when it may move. */
+  /** Legal moves of the side to move, including the Tail's when it may move; none once it is over. */
   legal: GeneratedMove[];
   result: GameResult;
 }
@@ -88,7 +109,10 @@ function opensCoast(rules: MoveRules, coastOpen: boolean, move: GeneratedMove, m
   return (squareTypes(rules.board).get(move.to) ?? []).includes(CENTER);
 }
 
-type Dynamic = Pick<GameState, 'position' | 'lost' | 'coastOpen' | 'tailRun' | 'tailBonus'>;
+type Dynamic = Pick<
+  GameState,
+  'position' | 'lost' | 'coastOpen' | 'tailRun' | 'tailBonus' | 'passing'
+>;
 
 /** What the engine's legalMoves needs to know about this game on `turn`. */
 function turnOptions(rules: MoveRules, s: Dynamic, turn: string): TurnOptions {
@@ -99,6 +123,7 @@ function turnOptions(rules: MoveRules, s: Dynamic, turn: string): TurnOptions {
   const run = s.tailRun[turn] ?? 0;
   return {
     lost: s.lost,
+    ...(s.passing && { passing: s.passing }),
     alsoMove: hasTail ? [NEUTRAL] : [],
     allow: (m, mover) => {
       if (mover !== NEUTRAL) return s.coastOpen || (!has(m.from, COAST) && !has(m.to, COAST));
@@ -138,18 +163,73 @@ function resultOf(status: GameStatus, order: readonly string[]): GameResult {
   }
 }
 
-/** Fill in what follows from the position and whose turn it is: check, legal moves, result. */
-function settle(
-  rules: MoveRules,
-  base: Omit<GameState, 'inCheck' | 'checkers' | 'legal' | 'result'>,
-): GameState {
+/**
+ * Neither side can ever checkmate: no piece but a royal one could give check (the neutral Tail
+ * never does by default). Provisional reading of "insufficient material, as in chess" (S22a):
+ * chess's lone minor piece is not counted, because nobody has shown it can't mate on this board.
+ */
+function insufficientMaterial(rules: MoveRules, position: Position): boolean {
+  return !Object.entries(position).some(
+    ([at, p]) => rules.pieces[p.piece]?.royal !== true && givesCheck(rules, at, p),
+  );
+}
+
+/**
+ * What makes two positions the same for repetition: the pieces on their squares (with the
+ * rights they carry), the side to move, the Coast, and the moves that side has, so a lost
+ * capture in passing or a Tail that may no longer move makes a different position.
+ */
+function positionKey(rules: MoveRules, s: Dynamic & { turn: string }, legal: GeneratedMove[]) {
+  const pieces = Object.keys(s.position)
+    .sort()
+    .map((at) => `${at}=${placedKey(rules, s.position[at]!)}`);
+  return `${s.turn}|${s.coastOpen ? 'open' : 'closed'}|${pieces.join(',')}|${legal.map(toNotation).join(',')}`;
+}
+
+function occurrences(seen: Seen): number {
+  let n = 0;
+  for (let s: Seen | null = seen; s; s = s.prev) if (s.key === seen.key) n++;
+  return n;
+}
+
+/** The draw rules, in order: insufficient material, threefold repetition, the fifty-move rule. */
+function drawnBy(rules: MoveRules, base: Settled, seen: Seen | null): DrawReason | null {
+  if (
+    param(rules, 'draw.insufficientMaterial') === true &&
+    insufficientMaterial(rules, base.position)
+  ) {
+    return 'insufficient-material';
+  }
+  if (seen && occurrences(seen) >= 3) return 'repetition';
+  // "50 moves by each side": 50 turns of every seat (docs/RULES.md). Draws are automatic (S22a).
+  if (param(rules, 'draw.fiftyMove') === true && base.quiet >= 50 * base.order.length) {
+    return 'fifty-move';
+  }
+  return null;
+}
+
+type Settled = Omit<GameState, 'inCheck' | 'checkers' | 'legal' | 'result' | 'seen'>;
+
+/**
+ * Fill in what follows from the position and whose turn it is: check, legal moves, the
+ * repetition record (continuing `prev`) and the result. Checkmate and stalemate come first.
+ */
+function settle(rules: MoveRules, base: Settled, prev: Seen | null): GameState {
   const status = gameStatus(rules, base.position, base.turn, turnOptions(rules, base, base.turn));
+  const seen =
+    param(rules, 'draw.threefoldRepetition') === true
+      ? { key: positionKey(rules, base, status.legal), prev }
+      : null;
+  let result = resultOf(status, base.order);
+  const drawn = result.status === 'ongoing' ? drawnBy(rules, base, seen) : null;
+  if (drawn) result = { status: 'draw', reason: drawn };
   return {
     ...base,
+    seen,
     inCheck: status.inCheck,
     checkers: status.checkers,
-    legal: status.legal,
-    result: resultOf(status, base.order),
+    legal: result.status === 'ongoing' ? status.legal : [],
+    result,
   };
 }
 
@@ -173,31 +253,42 @@ export function newGame(
   const turn = init.turn ?? order[0]!;
   if (!order.includes(turn)) throw new RulesError(`${turn} has no seat in this game`);
   const coastOpen = init.coastOpen ?? param(rules, 'coast.2p.initiation') === 'open-at-start';
-  return settle(rules, {
-    ruleset: { ...ruleset },
+  return settle(
     rules,
-    order,
-    turn,
-    position: init.position ?? startPosition(rules.board, 2),
-    lost: init.lost ?? {},
-    coastOpen,
-    tailRun: {},
-    tailBonus: null,
-    moves: [],
-  });
+    {
+      ruleset: { ...ruleset },
+      rules,
+      order,
+      turn,
+      position: init.position ?? startPosition(rules.board, 2),
+      lost: init.lost ?? {},
+      coastOpen,
+      tailRun: {},
+      tailBonus: null,
+      passing: null,
+      quiet: 0,
+      moves: [],
+    },
+    null,
+  );
 }
 
 const same = (a: GeneratedMove, b: GeneratedMove) =>
-  a.from === b.from && a.to === b.to && a.piece === b.piece && a.promotion === b.promotion;
+  a.piece === b.piece && toNotation(a) === toNotation(b);
 
-/** The legal move between two squares (with its promotion, if it has one), or none. */
+/**
+ * The legal move between two squares (with its promotion, if it has one), or none. Castling is
+ * found by the partner's square instead of `to`, so it never hides the plain move to `to`.
+ */
 export function findMove(
   state: GameState,
   from: string,
   to: string,
   promotion?: string,
 ): GeneratedMove | undefined {
-  return state.legal.find((m) => m.from === from && m.to === to && m.promotion === promotion);
+  return state.legal.find(
+    (m) => m.from === from && (m.castle ? m.castle.from : m.to) === to && m.promotion === promotion,
+  );
 }
 
 /** The state after a legal move. Refuses an illegal move and any move once the game is over. */
@@ -208,7 +299,7 @@ export function playMove(state: GameState, move: GeneratedMove): GameState {
 
   const { rules, turn } = state;
   const placed = state.position[legal.from]!;
-  const target = state.position[legal.to];
+  const target = state.position[legal.captureAt ?? legal.to];
   const lost: Lost = Object.fromEntries(Object.entries(state.lost).map(([s, l]) => [s, [...l]]));
   if (target) (lost[target.side] ??= []).push(target.piece);
   if (legal.promotion !== undefined) {
@@ -225,18 +316,26 @@ export function playMove(state: GameState, move: GeneratedMove): GameState {
     [turn]: placed.side === NEUTRAL ? (state.tailRun[turn] ?? 0) + 1 : 0,
   };
   const played: PlayedMove = { ...legal, side: turn, notation: toNotation(legal) };
-  return settle(rules, {
-    ruleset: state.ruleset,
+  // A capture or a move that can't be taken back: no earlier position can come back.
+  const fresh = target !== undefined || rules.pieces[legal.piece]?.irreversible === true;
+  return settle(
     rules,
-    order: state.order,
-    turn: nextSide(state.order, turn),
-    position: applyMove(state.position, legal),
-    lost,
-    coastOpen: state.coastOpen || opens,
-    tailRun,
-    tailBonus: opens ? turn : state.tailBonus === turn ? null : state.tailBonus,
-    moves: [...state.moves, played],
-  });
+    {
+      ruleset: state.ruleset,
+      rules,
+      order: state.order,
+      turn: nextSide(state.order, turn),
+      position: applyMove(state.position, legal),
+      lost,
+      coastOpen: state.coastOpen || opens,
+      tailRun,
+      tailBonus: opens ? turn : state.tailBonus === turn ? null : state.tailBonus,
+      passing: legal.passes ? { squares: legal.passes, at: legal.to } : null,
+      quiet: fresh ? 0 : state.quiet + 1,
+      moves: [...state.moves, played],
+    },
+    fresh ? null : state.seen,
+  );
 }
 
 /** What is kept with a game: the ruleset id and version, the moves and the result. */
@@ -262,33 +361,10 @@ export interface UnbuiltFeature {
 export function unbuiltFeatures(rules: MoveRules): UnbuiltFeature[] {
   const v = rules.values;
   const all: [UnbuiltFeature, boolean][] = [
-    [{ id: 'en-passant', label: 'En passant' }, true],
-    [{ id: 'castling.enabled', label: 'Castling' }, v['castling.enabled'] === true],
     [{ id: 'queen.pawnSwap', label: 'Queen and pawn swap' }, v['queen.pawnSwap'] === true],
-    [
-      { id: 'pawn.safeZones', label: 'Pawn-safe zones' },
-      v['pawn.safeZones'] !== undefined && v['pawn.safeZones'] !== 'off',
-    ],
-    [
-      { id: 'coast.2p.exit', label: 'Leaving the Coast by A5 only' },
-      v['coast.2p.exit'] === 'a5-only',
-    ],
-    [
-      { id: 'coast.2p.capturable', label: 'No capture on the Coast' },
-      v['coast.2p.capturable'] === false,
-    ],
     [
       { id: 'setup.swapKingQueen', label: 'King and Queen swapped at the start' },
       v['setup.swapKingQueen'] === true,
-    ],
-    [
-      { id: 'draw.threefoldRepetition', label: 'Draw by threefold repetition' },
-      v['draw.threefoldRepetition'] === true,
-    ],
-    [{ id: 'draw.fiftyMove', label: 'Draw by the fifty-move rule' }, v['draw.fiftyMove'] === true],
-    [
-      { id: 'draw.insufficientMaterial', label: 'Draw by insufficient material' },
-      v['draw.insufficientMaterial'] === true,
     ],
   ];
   return all.filter(([, on]) => on).map(([f]) => f);

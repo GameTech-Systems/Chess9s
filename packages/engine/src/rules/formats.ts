@@ -88,8 +88,16 @@ export type Condition =
 
 export interface SquareRule {
   type: string;
+  /** The rule covers every square that is not of `type` instead. */
+  outside?: boolean;
+  /** The rule covers only squares whose `side` is the piece's own, or another side's. */
+  owner?: 'own' | 'other';
+  /** The rule covers only squares in the file the piece started on (`PlacedPiece.home`). */
+  homeFile?: boolean;
   stop?: Flag;
   pass?: Flag;
+  /** Whether the piece may be captured while it stands on such a square (piece-level rules only). */
+  capturable?: Flag;
   when?: Condition;
   notes?: string;
 }
@@ -105,8 +113,19 @@ export interface Move {
   jump?: Flag;
   capture?: 'move-or-capture' | 'move-only' | 'capture-only';
   squares?: SquareRule[];
+  /** A multi-step move an enemy `inPassing` move may answer by capturing on a square it passed. */
+  passable?: boolean;
+  /** A capture-only move that may also take, in passing, a piece whose passable move just passed its square. */
+  inPassing?: boolean;
   when?: Condition;
   notes?: string;
+}
+
+/** Castling: move `steps` along the rank toward an unmoved `partner`, which lands on the last square crossed. */
+export interface Castle {
+  partner: string;
+  steps: number;
+  when?: Condition;
 }
 
 export interface Piece {
@@ -121,6 +140,9 @@ export interface Piece {
   moves: Move[];
   squares?: SquareRule[];
   promotion?: { to: string[] | ParamRef; when?: Condition };
+  castle?: Castle;
+  /** Its moves can't be taken back: a move by it restarts the fifty-move count and the repetition record. */
+  irreversible?: boolean;
   source?: string;
   notes?: string;
 }
@@ -253,11 +275,14 @@ export function validatePiece(piece: unknown, board: Board, registry: Registry):
       }
     }
   };
-  const squareRules = (path: string, rules: SquareRule[] = []) =>
+  const squareRules = (path: string, rules: SquareRule[] = [], pieceLevel = false) =>
     rules.forEach((r, i) => {
       squareType(`${path}[${i}]`, r.type);
       ref(`${path}[${i}].stop`, r.stop, 'boolean');
       ref(`${path}[${i}].pass`, r.pass, 'boolean');
+      ref(`${path}[${i}].capturable`, r.capturable, 'boolean');
+      // Whether a standing piece may be captured has nothing to do with how it moves.
+      if (!pieceLevel && r.capturable !== undefined) issue(`${path}[${i}].capturable belongs on a piece-level square rule`);
       if (r.when) condition(`${path}[${i}].when`, r.when);
     });
 
@@ -269,9 +294,11 @@ export function validatePiece(piece: unknown, board: Board, registry: Registry):
     ref(`${path}.range`, m.range, 'integer');
     ref(`${path}.jump`, m.jump, 'boolean');
     squareRules(`${path}.squares`, m.squares);
+    if (m.inPassing && m.capture !== 'capture-only') issue(`${path}.inPassing needs a capture-only move`);
     if (m.when) condition(`${path}.when`, m.when);
   });
-  squareRules('squares', p.squares);
+  squareRules('squares', p.squares, true);
+  if (p.castle?.when) condition('castle.when', p.castle.when);
   if (p.promotion) {
     ref('promotion.to', p.promotion.to, 'enumSet');
     if (p.promotion.when) condition('promotion.when', p.promotion.when);
@@ -326,6 +353,7 @@ export function validateBoardAndPieces(board: unknown, pieces: unknown[], regist
     if (Array.isArray(to)) {
       for (const id of to) if (!byId[id]) issues.push(`${p.id}: promotion.to names unknown piece ${id}`);
     }
+    if (p.castle && !byId[p.castle.partner]) issues.push(`${p.id}: castle.partner names unknown piece ${p.castle.partner}`);
   }
   const facing = new Map(board.sides.map((s) => [s.id, s.forward]));
   for (const setup of board.setups) {

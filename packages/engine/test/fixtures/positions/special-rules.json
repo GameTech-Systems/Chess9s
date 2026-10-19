@@ -1,0 +1,353 @@
+{
+  "description": "S22a: en passant, castling, pawn-safe zones, the Coast's exit and capture rules, and the 2-player draws, on the real board (rules/boards/standard-9x9.json, rules/pieces/) under draft-2p. `home` is the square a piece started on; the engine reads it for pawn-safe zones. Expected results come from docs/RULES.md and plain geometry, worked out independently of the engine.",
+  "positions": {
+    "en-passant": {
+      "description": "Light to move. c2-c4 passes c3 beside the dark pawn on b4, which may then take it in passing.",
+      "turn": "light",
+      "pieces": {
+        "f1": {
+          "piece": "king",
+          "side": "light"
+        },
+        "f9": {
+          "piece": "king",
+          "side": "dark"
+        },
+        "c2": {
+          "piece": "pawn",
+          "side": "light",
+          "home": "c2"
+        },
+        "b4": {
+          "piece": "pawn",
+          "side": "dark",
+          "home": "b8",
+          "moved": true
+        }
+      }
+    },
+    "en-passant-pinned": {
+      "description": "Light to move. After c2-c4, d4xc3 in passing would empty c4 and d4 and open the light rook's line along rank 4 to the dark King on h4, so it is illegal.",
+      "turn": "light",
+      "pieces": {
+        "f1": {
+          "piece": "king",
+          "side": "light"
+        },
+        "h4": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "b4": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "c2": {
+          "piece": "pawn",
+          "side": "light",
+          "home": "c2"
+        },
+        "d4": {
+          "piece": "pawn",
+          "side": "dark",
+          "home": "d8",
+          "moved": true
+        }
+      }
+    },
+    "castling": {
+      "description": "Light to move with an unmoved King on f1 and unmoved Rooks on b1 and i1: short castling f1-h1 with i1-g1, long castling f1-d1 with b1-e1.",
+      "turn": "light",
+      "pieces": {
+        "f1": {
+          "piece": "king",
+          "side": "light"
+        },
+        "b1": {
+          "piece": "rook",
+          "side": "light"
+        },
+        "i1": {
+          "piece": "rook",
+          "side": "light"
+        },
+        "f9": {
+          "piece": "king",
+          "side": "dark"
+        },
+        "b9": {
+          "piece": "rook",
+          "side": "dark"
+        },
+        "i9": {
+          "piece": "rook",
+          "side": "dark"
+        }
+      }
+    },
+    "safe-zones": {
+      "description": "Dark to move. Light pawns that crossed the void: b8 (from b2) stands on dark's colored square in its own starting file; c7 (from b2; it captured onto the c-file) stands on dark's colored square of another file; d4 (from d2) stands on light's own colored square. Dark Rooks on b9, c9 and d9 attack all three.",
+      "turn": "dark",
+      "pieces": {
+        "f1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "h9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "b8": {
+          "piece": "pawn",
+          "side": "light",
+          "home": "b2",
+          "moved": true
+        },
+        "c7": {
+          "piece": "pawn",
+          "side": "light",
+          "home": "b2",
+          "moved": true
+        },
+        "d4": {
+          "piece": "pawn",
+          "side": "light",
+          "home": "d2",
+          "moved": true
+        },
+        "b9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "c9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "d9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        }
+      }
+    },
+    "coast-capture": {
+      "description": "Light to move, Coast open, the Tail on i5. The dark Moon stands on the Coast at a4, attacked by the Light Dragon Head (a1, along the A-file) and the light Queen (c2, on the diagonal).",
+      "turn": "light",
+      "coastOpen": true,
+      "pieces": {
+        "f1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a1": {
+          "piece": "light-dragon-head",
+          "side": "light"
+        },
+        "c2": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        },
+        "a4": {
+          "piece": "moon",
+          "side": "dark",
+          "moved": true
+        },
+        "i5": {
+          "piece": "dragon-tail",
+          "side": "neutral",
+          "moved": true
+        }
+      }
+    },
+    "coast-capture-queen": {
+      "description": "Dark to move, Coast open. The light Queen stands on the Coast at a3; the Dark Dragon Head on a9 attacks her along the A-file.",
+      "turn": "dark",
+      "coastOpen": true,
+      "pieces": {
+        "f1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a3": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        },
+        "a9": {
+          "piece": "dark-dragon-head",
+          "side": "dark"
+        },
+        "i5": {
+          "piece": "dragon-tail",
+          "side": "neutral",
+          "moved": true
+        }
+      }
+    },
+    "coast-exit": {
+      "description": "Light to move, Coast open, the Tail on i5. The Sun on a2 (unmoved) and the Light Dragon Head on a5, the Coast gate; the light King on a7 is on the Coast but is not a Coast piece.",
+      "turn": "light",
+      "coastOpen": true,
+      "pieces": {
+        "a7": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a2": {
+          "piece": "sun",
+          "side": "light"
+        },
+        "a5": {
+          "piece": "light-dragon-head",
+          "side": "light",
+          "moved": true
+        },
+        "i5": {
+          "piece": "dragon-tail",
+          "side": "neutral",
+          "moved": true
+        }
+      }
+    },
+    "bare-kings": {
+      "description": "Only the two Kings and the neutral Tail, which never gives check: neither side can checkmate.",
+      "turn": "dark",
+      "pieces": {
+        "f1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a5": {
+          "piece": "dragon-tail",
+          "side": "neutral"
+        }
+      }
+    },
+    "kings-and-head": {
+      "description": "The two Kings and the Light Dragon Head: the Head may give check unless coastPieces.2p.giveCheck is off.",
+      "turn": "dark",
+      "coastOpen": true,
+      "pieces": {
+        "f1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "a1": {
+          "piece": "light-dragon-head",
+          "side": "light"
+        }
+      }
+    },
+    "last-capture": {
+      "description": "Light to move and in check from the undefended dark Rook on f2; f1xf2 takes the last piece but the Kings.",
+      "turn": "light",
+      "pieces": {
+        "f1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "f2": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        }
+      }
+    },
+    "rooks": {
+      "description": "Kings and one Rook each, far apart, for quiet shuffling moves: b1-b2-b1 and i9-i8-i9.",
+      "turn": "dark",
+      "pieces": {
+        "f1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "f9": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "b1": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "i9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "c2": {
+          "piece": "pawn",
+          "side": "light",
+          "home": "c2"
+        }
+      }
+    },
+    "safe-checker": {
+      "description": "Dark to move and in check from the light pawn on g7 (from g2), which stands on dark's colored square in its own starting file. The dark King on f8 could otherwise take it.",
+      "turn": "dark",
+      "pieces": {
+        "f1": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "f8": {
+          "piece": "king",
+          "side": "dark",
+          "moved": true
+        },
+        "g7": {
+          "piece": "pawn",
+          "side": "light",
+          "home": "g2",
+          "moved": true
+        }
+      }
+    }
+  }
+}

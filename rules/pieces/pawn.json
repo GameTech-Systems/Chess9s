@@ -8,6 +8,7 @@
       "param": "pawn.promotion.targets"
     }
   },
+  "irreversible": true,
   "moves": [
     {
       "directions": [
@@ -35,14 +36,16 @@
             "is": true
           }
         ]
-      }
+      },
+      "passable": true
     },
     {
       "directions": [
         "forward-diagonal"
       ],
       "range": 1,
-      "capture": "capture-only"
+      "capture": "capture-only",
+      "inPassing": true
     }
   ],
   "squares": [
@@ -77,8 +80,29 @@
           "has": "pawn"
         }
       }
+    },
+    {
+      "type": "safe-zone",
+      "owner": "other",
+      "homeFile": true,
+      "capturable": false,
+      "when": {
+        "param": "pawn.safeZones",
+        "is": "starting-file"
+      },
+      "notes": "Safe on the opponent's colored square in its own starting file. A pawn only moves forward, so standing on the opponent's half means it has crossed the void."
+    },
+    {
+      "type": "safe-zone",
+      "owner": "other",
+      "capturable": false,
+      "when": {
+        "param": "pawn.safeZones",
+        "is": "any-colored-square"
+      },
+      "notes": "Provisional (S22a): any colored square on the opponent's half, after crossing the void as in the default."
     }
   ],
   "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026.",
-  "notes": "Not expressed yet (engine features): en passant and pawn-safe zones (pawn.safeZones; the colored squares are in the board data). Each pawn is named by its starting file's color (docs/RULES.md); the engine keeps track of the starting file, so there is one pawn piece."
+  "notes": "Each pawn is named by its starting file's color (docs/RULES.md); the engine keeps the square each piece started on (home), so there is one pawn piece. En passant is always on, as in chess (no parameter yet: S22a question). irreversible: a pawn move restarts the fifty-move count, as in chess."
 }
