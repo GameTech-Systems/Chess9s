@@ -177,6 +177,8 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D20 | Discussion period before ratification | Default: 21 days | S30 |
 | D21 | Phase 1 dependencies | Default: the S7 pre-approved list | S7 |
 | D22 | DCO check alongside the CLA | Default: keep it; Claude signs off every commit with `git commit -s` | S7 |
+| D34 | Dark's seat view | Decided: turned 180° (rank 9 at the bottom, Coast on the right) | S12 |
+| D36 | e5 arrow | Decided: a tetrahedron symbol, not a rule (see decision 0007, S12 additions) | S12 |
 
 ## Ledger sync format
 
