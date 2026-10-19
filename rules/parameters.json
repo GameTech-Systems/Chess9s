@@ -1,183 +1,1074 @@
 {
   "$schema": "./schema/parameters.schema.json",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "parameters": [
     {
       "id": "king.range",
       "label": "King range",
-      "description": "How many squares the King may move in one move.",
+      "description": "How many squares the King may move in one straight direction.",
       "piece": "king",
-      "players": [2],
+      "players": [
+        2,
+        3
+      ],
       "type": "integer",
       "default": 2,
-      "options": [1, 2, 3, 4],
+      "options": [
+        1,
+        2,
+        3,
+        4
+      ],
       "status": "proposed",
-      "affects": ["movement", "check-detection", "safe-squares"],
-      "source": "owner example, October 2026",
-      "notes": "Higher values change what counts as an attack. Flag combinations for simulation."
+      "affects": [
+        "movement",
+        "check-detection",
+        "safe-squares"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)",
+      "notes": "Higher values change what counts as an attack. Fairness plan: test 1 if the draw rate is high."
     },
     {
       "id": "king.canJump",
       "label": "King can jump",
-      "description": "Whether the King may pass over occupied squares.",
+      "description": "Whether the King may pass over an occupied first square.",
       "piece": "king",
-      "players": [2],
+      "players": [
+        2,
+        3
+      ],
       "type": "boolean",
       "default": false,
-      "options": [false, true],
+      "options": [
+        false,
+        true
+      ],
       "status": "proposed",
-      "affects": ["movement", "check-detection"],
-      "source": "seed: v1 plan, unverified"
+      "affects": [
+        "movement",
+        "check-detection"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+    },
+    {
+      "id": "king.canEnterCoast",
+      "label": "King can enter the Coast",
+      "description": "Whether a King may move onto Coast squares (file A).",
+      "piece": "king",
+      "players": [
+        2,
+        3
+      ],
+      "type": "boolean",
+      "default": true,
+      "options": [
+        true,
+        false
+      ],
+      "status": "proposed",
+      "affects": [
+        "movement",
+        "board-state"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+    },
+    {
+      "id": "castling.enabled",
+      "label": "Castling",
+      "description": "Whether castling is allowed. When on, it works as in chess: the King moves 2 squares toward an unmoved Rook, which lands on the square the King crossed.",
+      "piece": "king",
+      "players": [
+        2,
+        3
+      ],
+      "type": "boolean",
+      "default": false,
+      "options": [
+        false,
+        true
+      ],
+      "status": "proposed",
+      "affects": [
+        "movement",
+        "check-detection"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
     },
     {
       "id": "queen.canEnterVoid",
       "label": "Queen can enter void squares",
-      "description": "Whether the Queen may cross or occupy void squares.",
+      "description": "Whether the Queen may land on or pass through the void squares B5, C5, D5, F5, G5 and H5.",
       "piece": "queen",
-      "players": [2],
+      "players": [
+        2,
+        3
+      ],
       "type": "boolean",
       "default": false,
-      "options": [false, true],
+      "options": [
+        false,
+        true
+      ],
       "status": "proposed",
-      "affects": ["movement", "check-detection"],
-      "source": "seed: v1 plan, unverified"
+      "affects": [
+        "movement",
+        "check-detection"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
     },
     {
-      "id": "queen.enemyTerritoryEntry",
-      "label": "Queen entry into enemy territory",
-      "description": "Whether the Queen may enter the opponent's half only through gateway squares or anywhere.",
+      "id": "queen.voidCrossings",
+      "label": "Queen void crossings",
+      "description": "Where the Queen may cross the void: A5 and I5 (may stop) and E5 (pass over only, when empty), only E5, or nowhere.",
       "piece": "queen",
-      "players": [2],
+      "players": [
+        2,
+        3
+      ],
       "type": "enum",
-      "default": "gateways-only",
-      "options": ["gateways-only", "unrestricted"],
+      "default": "a5-e5-i5",
+      "options": [
+        "a5-e5-i5",
+        "e5-only",
+        "none"
+      ],
       "status": "proposed",
-      "affects": ["movement", "check-detection"],
-      "source": "seed: v1 plan, unverified",
-      "notes": "Which squares are gateways must be defined in the board data."
+      "affects": [
+        "movement",
+        "check-detection"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)",
+      "notes": "Replaces queen.enemyTerritoryEntry. E5 is crossed only along the E-file and the diagonals D4-F6 and F4-D6."
+    },
+    {
+      "id": "queen.canEnterCoast",
+      "label": "Queen can enter the Coast",
+      "description": "Whether a Queen may move onto Coast squares (file A).",
+      "piece": "queen",
+      "players": [
+        2,
+        3
+      ],
+      "type": "boolean",
+      "default": true,
+      "options": [
+        true,
+        false
+      ],
+      "status": "proposed",
+      "affects": [
+        "movement",
+        "board-state"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+    },
+    {
+      "id": "queen.pawnSwap",
+      "label": "Queen and green pawn swap",
+      "description": "Once per game, as her move, a Queen may trade squares with her green pawn (starts on E2 or E8), when both pieces may legally stand on their new squares and her King is not left in check. A pawn swapped onto its promotion rank promotes at once.",
+      "piece": "queen",
+      "players": [
+        2,
+        3
+      ],
+      "type": "boolean",
+      "default": false,
+      "options": [
+        false,
+        true
+      ],
+      "status": "proposed",
+      "affects": [
+        "movement",
+        "promotion",
+        "check-detection"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
     },
     {
       "id": "pawn.initialDoubleStep",
       "label": "Pawn double step",
       "description": "Whether a standard pawn may advance two squares on its first move.",
       "piece": "pawn",
-      "players": [2],
+      "players": [
+        2,
+        3
+      ],
       "type": "boolean",
       "default": true,
-      "options": [true, false],
+      "options": [
+        true,
+        false
+      ],
       "status": "proposed",
-      "affects": ["movement"],
-      "source": "seed: v1 plan, unverified"
+      "affects": [
+        "movement"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
     },
     {
       "id": "pawn.promotion.targets",
       "label": "Pawn promotion targets",
       "description": "Which pieces an eligible pawn may promote to.",
       "piece": "pawn",
-      "players": [2],
+      "players": [
+        2,
+        3
+      ],
       "type": "enumSet",
-      "default": null,
-      "options": ["queen", "rook", "bishop", "knight", "captured-piece"],
+      "default": [
+        "queen",
+        "rook",
+        "bishop",
+        "knight"
+      ],
+      "options": [
+        "queen",
+        "rook",
+        "bishop",
+        "knight",
+        "captured-piece"
+      ],
       "status": "proposed",
-      "affects": ["promotion", "balance"],
-      "needsDecision": true,
-      "source": "seed: v1 plan, unverified",
-      "notes": "Open question in the v1 plan. No default chosen."
+      "affects": [
+        "promotion",
+        "balance"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)",
+      "notes": "Default from decision D2. Light pawns promote on rank 9, dark pawns on rank 1."
+    },
+    {
+      "id": "pawn.safeZones",
+      "label": "Pawn-safe zones",
+      "description": "A pawn that has crossed the void can't be captured on the opponent's colored square in its own starting file (B2/B8, C3/C7, D4/D6, F4/F6, G3/G7, H2/H8). It can still move, capture and give check.",
+      "piece": "pawn",
+      "players": [
+        2,
+        3
+      ],
+      "type": "enum",
+      "default": "starting-file",
+      "options": [
+        "starting-file",
+        "any-colored-square",
+        "off"
+      ],
+      "status": "proposed",
+      "affects": [
+        "capture",
+        "check-detection",
+        "balance"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)",
+      "notes": "Board data for the colored squares arrives with S10. E-file and I-file pawns have no safe zone."
+    },
+    {
+      "id": "pawn.canEnterCenter",
+      "label": "Pawns may enter E5",
+      "description": "Whether a pawn may move onto the center square E5.",
+      "piece": "pawn",
+      "players": [
+        2,
+        3
+      ],
+      "type": "boolean",
+      "default": false,
+      "options": [
+        false,
+        true
+      ],
+      "status": "proposed",
+      "affects": [
+        "movement"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+    },
+    {
+      "id": "center.occupants",
+      "label": "Who may stand on E5",
+      "description": "Which pieces may occupy the center square E5.",
+      "piece": null,
+      "players": [
+        2,
+        3
+      ],
+      "type": "enum",
+      "default": "dragons",
+      "options": [
+        "dragons",
+        "dragons-and-sun-moon",
+        "any"
+      ],
+      "status": "proposed",
+      "affects": [
+        "movement",
+        "board-state"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)",
+      "notes": "dragons = both Dragon Heads and the Dragon Tail."
+    },
+    {
+      "id": "center.passThrough",
+      "label": "Who may pass over E5",
+      "description": "Which pieces may pass over an empty E5 in a straight line or jump. No piece passes through an occupied E5.",
+      "piece": null,
+      "players": [
+        2,
+        3
+      ],
+      "type": "enumSet",
+      "default": [
+        "dragon-head",
+        "queen",
+        "king",
+        "sun-moon-pawn",
+        "knight"
+      ],
+      "options": [
+        "dragon-head",
+        "queen",
+        "king",
+        "sun-moon-pawn",
+        "knight",
+        "rook",
+        "bishop",
+        "pawn"
+      ],
+      "status": "proposed",
+      "affects": [
+        "movement",
+        "check-detection"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)",
+      "notes": "Rooks and Bishops can't slide through E5 by default."
+    },
+    {
+      "id": "coast.2p.initiation",
+      "label": "Opening the Coast (2-player)",
+      "description": "How the Coast opens in 2-player games: a player moves the Dragon Tail from A5 to E5, or the Coast is open from the start. Once open it stays open.",
+      "piece": null,
+      "players": [
+        2
+      ],
+      "type": "enum",
+      "default": "tail-to-center",
+      "options": [
+        "tail-to-center",
+        "open-at-start"
+      ],
+      "status": "proposed",
+      "affects": [
+        "movement",
+        "board-state",
+        "balance"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+    },
+    {
+      "id": "coast.2p.exit",
+      "label": "Leaving the Coast (2-player)",
+      "description": "How Coast pieces leave the Coast in 2-player games once it is open.",
+      "piece": null,
+      "players": [
+        2
+      ],
+      "type": "enum",
+      "default": "any-legal-move",
+      "options": [
+        "any-legal-move",
+        "a5-only"
+      ],
+      "status": "proposed",
+      "affects": [
+        "movement"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+    },
+    {
+      "id": "coast.3p.exit",
+      "label": "Leaving the Coast (3-player)",
+      "description": "How Coast pieces leave the Coast in 3-player games: first emergence through A5, then any legal move, or always through A5.",
+      "piece": null,
+      "players": [
+        3
+      ],
+      "type": "enum",
+      "default": "a5-first-then-any",
+      "options": [
+        "a5-first-then-any",
+        "a5-always"
+      ],
+      "status": "experimental",
+      "affects": [
+        "movement"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)",
+      "notes": "While on the Coast, the Sun and Moon move one square at a time."
+    },
+    {
+      "id": "coast.returnAllowed",
+      "label": "Coast pieces may return",
+      "description": "Whether Coast pieces may move back onto the Coast after leaving it.",
+      "piece": null,
+      "players": [
+        2,
+        3
+      ],
+      "type": "boolean",
+      "default": true,
+      "options": [
+        true,
+        false
+      ],
+      "status": "proposed",
+      "affects": [
+        "movement"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+    },
+    {
+      "id": "coast.2p.capturable",
+      "label": "Capture on the Coast (2-player)",
+      "description": "Whether Coast pieces standing on the Coast can be captured in 2-player games. The Tail is never captured.",
+      "piece": null,
+      "players": [
+        2
+      ],
+      "type": "boolean",
+      "default": true,
+      "options": [
+        true,
+        false
+      ],
+      "status": "proposed",
+      "affects": [
+        "capture",
+        "check-detection"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+    },
+    {
+      "id": "coast.3p.capturable",
+      "label": "Capture on the Coast (3-player)",
+      "description": "Whether Coast pieces standing on the Coast can be captured in 3-player games.",
+      "piece": null,
+      "players": [
+        3
+      ],
+      "type": "boolean",
+      "default": false,
+      "options": [
+        false,
+        true
+      ],
+      "status": "experimental",
+      "affects": [
+        "capture"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+    },
+    {
+      "id": "tail.2p.path",
+      "label": "Dragon Tail squares (2-player)",
+      "description": "Where the Tail may stand in 2-player games. It jumps, so pieces in between don't block it.",
+      "piece": "dragon-tail",
+      "players": [
+        2
+      ],
+      "type": "enum",
+      "default": "a5-e5-i5",
+      "options": [
+        "a5-e5-i5",
+        "e5-i5-only"
+      ],
+      "status": "proposed",
+      "affects": [
+        "movement",
+        "board-state"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)",
+      "notes": "First move is always A5 to E5, which opens the Coast."
+    },
+    {
+      "id": "tail.3p.movement",
+      "label": "Dragon Tail movement (3-player)",
+      "description": "How the Tail moves in 3-player games: any direction, any distance, like a Dragon Head, or the 2-player path.",
+      "piece": "dragon-tail",
+      "players": [
+        3
+      ],
+      "type": "enum",
+      "default": "like-dragon-head",
+      "options": [
+        "like-dragon-head",
+        "two-player-path"
+      ],
+      "status": "experimental",
+      "affects": [
+        "movement",
+        "check-detection"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+    },
+    {
+      "id": "tail.repeatLimit",
+      "label": "Tail repeat limit",
+      "description": "How many of a player's own turns in a row may be Tail moves (0 = no limit). The player who opens the Coast may move the Tail A5 to E5 and then E5 to I5 on consecutive turns, the first time.",
+      "piece": "dragon-tail",
+      "players": [
+        2
+      ],
+      "type": "integer",
+      "default": 1,
+      "options": [
+        1,
+        0
+      ],
+      "status": "proposed",
+      "affects": [
+        "movement",
+        "balance"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)",
+      "notes": "Stops the Tail being used as a free pass."
+    },
+    {
+      "id": "tail.2p.canCapture",
+      "label": "Dragon Tail captures (2-player)",
+      "description": "Whether the Tail may capture in 2-player games.",
+      "piece": "dragon-tail",
+      "players": [
+        2
+      ],
+      "type": "boolean",
+      "default": false,
+      "options": [
+        false,
+        true
+      ],
+      "status": "proposed",
+      "affects": [
+        "capture",
+        "check-detection"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+    },
+    {
+      "id": "tail.3p.captures",
+      "label": "Dragon Tail captures (3-player)",
+      "description": "What the Tail may capture in 3-player games.",
+      "piece": "dragon-tail",
+      "players": [
+        3
+      ],
+      "type": "enum",
+      "default": "non-coast-pieces",
+      "options": [
+        "non-coast-pieces",
+        "none"
+      ],
+      "status": "experimental",
+      "affects": [
+        "capture",
+        "check-detection"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+    },
+    {
+      "id": "tail.canCheck",
+      "label": "Dragon Tail gives check",
+      "description": "Whether the Tail can check a King.",
+      "piece": "dragon-tail",
+      "players": [
+        2,
+        3
+      ],
+      "type": "boolean",
+      "default": false,
+      "options": [
+        false,
+        true
+      ],
+      "status": "proposed",
+      "affects": [
+        "check-detection"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+    },
+    {
+      "id": "tail.capturable",
+      "label": "Dragon Tail can be captured",
+      "description": "Whether the Tail can be captured. In 3-player games it can be checkmated instead.",
+      "piece": "dragon-tail",
+      "players": [
+        2,
+        3
+      ],
+      "type": "boolean",
+      "default": false,
+      "options": [
+        false,
+        true
+      ],
+      "status": "proposed",
+      "affects": [
+        "capture",
+        "game-end"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+    },
+    {
+      "id": "dragonHead.range",
+      "label": "Dragon Head range",
+      "description": "How many squares a Dragon Head may slide in one straight direction. 8 is unlimited on a 9x9 board.",
+      "piece": "dragon-head",
+      "players": [
+        2,
+        3
+      ],
+      "type": "integer",
+      "default": 8,
+      "options": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "status": "proposed",
+      "affects": [
+        "movement",
+        "check-detection",
+        "balance"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)",
+      "notes": "Fairness plan: test 3 and 4 against unlimited."
+    },
+    {
+      "id": "dragon.rangeMode",
+      "label": "Coast piece range mode",
+      "description": "How range is counted for all 5 Coast pieces: squares in one straight line, stopping when blocked.",
+      "piece": "dragon",
+      "players": [
+        2,
+        3
+      ],
+      "type": "enum",
+      "default": "squares",
+      "options": [
+        "squares"
+      ],
+      "status": "proposed",
+      "affects": [
+        "movement"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)",
+      "notes": "Decision D4. The owner removed the turn-a-corner (moves) option."
+    },
+    {
+      "id": "dragon.canJump",
+      "label": "Dragon Heads can jump",
+      "description": "Whether a Dragon Head may pass over occupied squares.",
+      "piece": "dragon-head",
+      "players": [
+        2,
+        3
+      ],
+      "type": "boolean",
+      "default": false,
+      "options": [
+        false,
+        true
+      ],
+      "status": "proposed",
+      "affects": [
+        "movement",
+        "check-detection"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+    },
+    {
+      "id": "coastPieces.2p.giveCheck",
+      "label": "Coast pieces give check (2-player)",
+      "description": "Whether Dragon Heads and the Sun and Moon give check in 2-player games.",
+      "piece": null,
+      "players": [
+        2
+      ],
+      "type": "boolean",
+      "default": true,
+      "options": [
+        true,
+        false
+      ],
+      "status": "proposed",
+      "affects": [
+        "check-detection"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+    },
+    {
+      "id": "dragon.3p.givesCheck",
+      "label": "Dragon gives check (3-player)",
+      "description": "Whether the Dragon player's pieces give check to Kings. When off, the Dragon may instead capture an attacked King.",
+      "piece": null,
+      "players": [
+        3
+      ],
+      "type": "boolean",
+      "default": false,
+      "options": [
+        false,
+        true
+      ],
+      "status": "experimental",
+      "affects": [
+        "check-detection",
+        "game-end"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
     },
     {
       "id": "sunMoon.range",
-      "label": "Sun and Moon pawn range",
-      "description": "How many squares a Sun or Moon pawn may move, in any direction.",
+      "label": "Sun and Moon range (2-player)",
+      "description": "How many squares a Sun or Moon may move in one straight direction in 2-player games.",
       "piece": "sun-moon-pawn",
-      "players": [2],
+      "players": [
+        2
+      ],
+      "type": "integer",
+      "default": 1,
+      "options": [
+        1,
+        2
+      ],
+      "status": "proposed",
+      "affects": [
+        "movement",
+        "check-detection"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+    },
+    {
+      "id": "sunMoon.firstMoveDouble",
+      "label": "Sun and Moon first move (2-player)",
+      "description": "Whether a Sun or Moon may move 2 squares straight forward on its first move.",
+      "piece": "sun-moon-pawn",
+      "players": [
+        2
+      ],
+      "type": "boolean",
+      "default": true,
+      "options": [
+        true,
+        false
+      ],
+      "status": "proposed",
+      "affects": [
+        "movement"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+    },
+    {
+      "id": "sunMoon.3p.range",
+      "label": "Sun and Moon range off the Coast (3-player)",
+      "description": "How many squares a Sun or Moon may move in one straight direction once off the Coast in 3-player games. On the Coast it moves one square at a time.",
+      "piece": "sun-moon-pawn",
+      "players": [
+        3
+      ],
       "type": "integer",
       "default": 2,
-      "options": [1, 2, 3],
+      "options": [
+        1,
+        2
+      ],
+      "status": "experimental",
+      "affects": [
+        "movement",
+        "check-detection"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+    },
+    {
+      "id": "sunMoon.capture",
+      "label": "Sun and Moon capture",
+      "description": "How a Sun or Moon captures.",
+      "piece": "sun-moon-pawn",
+      "players": [
+        2,
+        3
+      ],
+      "type": "enum",
+      "default": "any-move-square",
+      "options": [
+        "any-move-square",
+        "diagonal-only",
+        "none"
+      ],
       "status": "proposed",
-      "affects": ["movement", "check-detection"],
-      "source": "seed: v1 plan, unverified"
+      "affects": [
+        "capture",
+        "check-detection"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)",
+      "notes": "Decision D6. any-move-square = it captures onto any square it can move to."
     },
     {
       "id": "sunMoon.canPromote",
-      "label": "Sun and Moon pawn promotion",
-      "description": "Whether Sun and Moon pawns may promote.",
+      "label": "Sun and Moon promotion",
+      "description": "Whether a Sun or Moon may promote.",
       "piece": "sun-moon-pawn",
-      "players": [2],
+      "players": [
+        2,
+        3
+      ],
       "type": "boolean",
       "default": false,
-      "options": [false, true],
+      "options": [
+        false,
+        true
+      ],
       "status": "proposed",
-      "affects": ["promotion", "balance"],
+      "affects": [
+        "promotion",
+        "balance"
+      ],
       "source": "seed: v1 plan, unverified"
+    },
+    {
+      "id": "turn.firstMove",
+      "label": "First move (2-player)",
+      "description": "Which side moves first in 2-player games. In 3-player games the order is dark, light, Dragon.",
+      "piece": null,
+      "players": [
+        2
+      ],
+      "type": "enum",
+      "default": "dark",
+      "options": [
+        "dark",
+        "light"
+      ],
+      "status": "proposed",
+      "affects": [
+        "balance"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)",
+      "notes": "Decision D26."
+    },
+    {
+      "id": "draw.stalemate",
+      "label": "Stalemate result (2-player)",
+      "description": "The result when the player to move has no legal move and is not in check.",
+      "piece": null,
+      "players": [
+        2
+      ],
+      "type": "enum",
+      "default": "draw",
+      "options": [
+        "draw",
+        "loss-for-stalemated",
+        "win-for-stalemated"
+      ],
+      "status": "proposed",
+      "affects": [
+        "game-end"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+    },
+    {
+      "id": "draw.3p.stalemate",
+      "label": "Stalemate result (3-player)",
+      "description": "A Kinged player who is not in check and has no legal move on their turn ends the game as a draw between the two Kinged players.",
+      "piece": null,
+      "players": [
+        3
+      ],
+      "type": "enum",
+      "default": "draw-between-kinged",
+      "options": [
+        "draw-between-kinged"
+      ],
+      "status": "experimental",
+      "affects": [
+        "game-end"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+    },
+    {
+      "id": "draw.threefoldRepetition",
+      "label": "Threefold repetition",
+      "description": "Whether threefold repetition is a draw. Tail moves count as moves.",
+      "piece": null,
+      "players": [
+        2
+      ],
+      "type": "boolean",
+      "default": true,
+      "options": [
+        true,
+        false
+      ],
+      "status": "proposed",
+      "affects": [
+        "game-end"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+    },
+    {
+      "id": "draw.fiftyMove",
+      "label": "Fifty-move rule",
+      "description": "Whether 50 moves by each side with no capture or pawn move is a draw. Tail moves count as moves.",
+      "piece": null,
+      "players": [
+        2
+      ],
+      "type": "boolean",
+      "default": true,
+      "options": [
+        true,
+        false
+      ],
+      "status": "proposed",
+      "affects": [
+        "game-end"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+    },
+    {
+      "id": "draw.insufficientMaterial",
+      "label": "Insufficient material",
+      "description": "Whether a position where neither side can checkmate is a draw.",
+      "piece": null,
+      "players": [
+        2
+      ],
+      "type": "boolean",
+      "default": true,
+      "options": [
+        true,
+        false
+      ],
+      "status": "proposed",
+      "affects": [
+        "game-end"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+    },
+    {
+      "id": "setup.swapKingQueen",
+      "label": "Swap King and Queen start",
+      "description": "Kings start on E1/E9 (white squares) and Queens on F1/F9 instead.",
+      "piece": null,
+      "players": [
+        2,
+        3
+      ],
+      "type": "boolean",
+      "default": false,
+      "options": [
+        false,
+        true
+      ],
+      "status": "experimental",
+      "affects": [
+        "board-state",
+        "balance"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)",
+      "notes": "Decision D30. Not for tournaments until tested and ratified."
+    },
+    {
+      "id": "extendedPlay.enabled",
+      "label": "Extended play (3-player)",
+      "description": "After a King checkmates the other, the Dragon may play on with captured pieces if both remaining players agree. Terms not yet settled.",
+      "piece": null,
+      "players": [
+        3
+      ],
+      "type": "boolean",
+      "default": false,
+      "options": [
+        false
+      ],
+      "status": "experimental",
+      "affects": [
+        "game-end"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)",
+      "notes": "Decision D31, set aside. Captured pieces re-enter through A5."
+    },
+    {
+      "id": "queen.enemyTerritoryEntry",
+      "label": "Queen entry into enemy territory",
+      "description": "Whether the Queen may enter the opponent's half only through gateway squares or anywhere.",
+      "piece": "queen",
+      "players": [
+        2
+      ],
+      "type": "enum",
+      "default": "gateways-only",
+      "options": [
+        "gateways-only",
+        "unrestricted"
+      ],
+      "status": "deprecated",
+      "affects": [
+        "movement",
+        "check-detection"
+      ],
+      "source": "seed: v1 plan, unverified",
+      "notes": "Replaced by queen.voidCrossings in rule set v0.2."
     },
     {
       "id": "dragon.range",
       "label": "Dragon range",
       "description": "How far a Dragon may move in one move.",
       "piece": "dragon",
-      "players": [2],
+      "players": [
+        3
+      ],
       "type": "integer",
       "default": 3,
-      "options": [2, 3, 4],
-      "status": "proposed",
-      "affects": ["movement", "check-detection"],
-      "source": "seed: v1 plan, unverified"
-    },
-    {
-      "id": "dragon.rangeMode",
-      "label": "Dragon range mode",
-      "description": "Whether the Dragon's range counts squares in one direction or separate moves.",
-      "piece": "dragon",
-      "players": [2],
-      "type": "enum",
-      "default": null,
-      "options": ["squares", "moves"],
-      "status": "proposed",
-      "affects": ["movement"],
-      "needsDecision": true,
+      "options": [
+        2,
+        3,
+        4
+      ],
+      "status": "deprecated",
+      "affects": [
+        "movement",
+        "check-detection"
+      ],
       "source": "seed: v1 plan, unverified",
-      "notes": "Open question in the v1 plan. No default chosen."
-    },
-    {
-      "id": "dragon.canJump",
-      "label": "Dragon can jump",
-      "description": "Whether a Dragon may pass over occupied squares.",
-      "piece": "dragon",
-      "players": [2],
-      "type": "boolean",
-      "default": false,
-      "options": [false, true],
-      "status": "proposed",
-      "affects": ["movement", "check-detection"],
-      "source": "seed: v1 plan, unverified"
+      "notes": "Replaced by dragonHead.range (Heads) and tail.3p.movement (Tail) in rule set v0.2."
     },
     {
       "id": "dragons.2p.mode",
       "label": "Dragons in 2-player games",
       "description": "Whether frozen Dragons block their starting squares or are removed from the board.",
       "piece": "dragon",
-      "players": [2],
+      "players": [
+        2
+      ],
       "type": "enum",
-      "default": null,
-      "options": ["blocking", "removed"],
-      "status": "proposed",
-      "affects": ["board-state", "movement"],
-      "needsDecision": true,
-      "source": "seed: v1 plan, unverified",
-      "notes": "Open question in the v1 plan. No default chosen."
-    },
-    {
-      "id": "draw.stalemate",
-      "label": "Stalemate result",
-      "description": "The result when the player to move has no legal move and is not in check.",
-      "piece": null,
-      "players": [2],
-      "type": "enum",
-      "default": "draw",
-      "options": ["draw", "loss-for-stalemated", "win-for-stalemated"],
-      "status": "proposed",
-      "affects": ["game-end"],
-      "source": "assumed standard chess; confirm"
+      "default": "blocking",
+      "options": [
+        "blocking",
+        "removed"
+      ],
+      "status": "deprecated",
+      "affects": [
+        "board-state",
+        "movement"
+      ],
+      "source": "decision D3, superseded",
+      "notes": "Superseded in rule set v0.2: Coast pieces play in 2-player games (see coast.2p.initiation)."
     }
   ]
 }

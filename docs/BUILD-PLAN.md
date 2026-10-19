@@ -54,7 +54,7 @@ Done when: CI passes on the PR, `pnpm dev` serves a blank app shell, and `valida
 Decisions: D7, D8, D10, D21.
 
 ### S8 — Rules loader and registry fixes · Sonnet 5.5 · medium · `todo`
-In `packages/engine`: load `parameters.json` and a ruleset, validate both against the schemas, check every default is one of its options, apply overrides, and refuse to start a game that depends on a parameter whose resolved value is still null. Apply registry fixes from D5 (Dragon parameters' player counts) and D6 (Sun and Moon capture). Set provisional values in `draft-2p.json` from D2 and D3, marked as provisional in its description. Tests: every parameter at its default and every option resolves correctly.
+In `packages/engine`: load `parameters.json` and a ruleset, validate both against the schemas, check every default is one of its options, apply overrides, and refuse to start a game that depends on a parameter whose resolved value is still null. The registry fixes from D2, D3, D5 and D6 already landed with rule set v0.2 (`docs/RULES.md`); deprecated parameters must load but never resolve into a new game. Tests: every parameter at its default and every option resolves correctly.
 Done when: loader tests pass and the draft ruleset resolves with no null values for 2-player.
 Decisions: D2, D3, D5, D6.
 
@@ -159,18 +159,18 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | ID | Topic | In effect | Needed by |
 |---|---|---|---|
 | D1 | Board and piece spec | Default: build formats against a neutral fixture (S9, S12); the real data arrives in S10; piece batches wait for S10 | S9 |
-| D2 | `pawn.promotion.targets` | Default: queen, rook, bishop, knight (provisional) | S8 |
-| D3 | `dragons.2p.mode` | Default: `blocking` (provisional) | S8 |
-| D4 | `dragon.rangeMode` | Default: decide in the Phase 6 planning session | S32 |
-| D5 | Dragon movement parameters' player count | Default: `players: [3]` for `dragon.range`, `dragon.rangeMode`, `dragon.canJump` | S8 |
-| D6 | Sun and Moon capture | Default: add `sunMoon.capture` with `default: null`, `needsDecision: true`; owner names the options before S15 | S8 |
+| D2 | `pawn.promotion.targets` | Decided: queen, rook, bishop, knight (rule set v0.2) | S8 |
+| D3 | `dragons.2p.mode` | Superseded by rule set v0.2: Coast pieces play in 2-player games (`coast.2p.initiation`) | S8 |
+| D4 | `dragon.rangeMode` | Decided: straight-line squares for all 5 Coast pieces, no corner option (rule set v0.2) | S32 |
+| D5 | Dragon movement parameters' player count | Superseded by rule set v0.2: Coast piece parameters are tagged per mode | S8 |
+| D6 | Sun and Moon capture | Decided: `sunMoon.capture` = any-move-square, options diagonal-only and none (rule set v0.2) | S8 |
 | D7 | Branch rules and merging | Default: ruleset on `main` requires a PR with 0 approvals and the `ci` check, blocks force-push and deletion; Claude merges after green CI | S7 |
 | D8 | Merge method | Default: rebase | S7 |
 | D10 | Default model | Default (applied): Sonnet 5.5 pinned in `.claude/settings.json`; Opus per step | S7 |
 | D11 | Discussions timing | Default: enable now | S5 |
 | D12 | Fairness measures | Default: first-player score between 47% and 53% over at least 2,000 bot games at two search depths; draw rate and game length reported | S24 |
 | D13 | "Chess9s" wording in TRADEMARKS | Default: describe Chess9s as the domain and repository name | S4 |
-| D14 | Public wording of 3-player features | Default: keep generic | S4 |
+| D14 | Public wording of 3-player features | Decided: the owner published the full 3-player rules in rule set v0.2 | S4 |
 | D15 | Hosting | Default: Cloudflare (Workers with Static Assets); confirm terms at signup | S27 |
 | D17 | ChessNines repo and site | Default: story, lore, and company information | S4 |
 | D18 | Multiplayer backend | Default: Cloudflare Durable Objects | S31 |

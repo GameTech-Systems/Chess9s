@@ -2,9 +2,9 @@
   "$schema": "../schema/ruleset.schema.json",
   "id": "draft-2p",
   "name": "Draft 2-Player (unratified)",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "status": "proposed",
   "players": 2,
-  "description": "Working ruleset that plays every parameter at its default. Seed values are unverified and this ruleset is not official.",
+  "description": "The owner's suggested default 2-player rules, draft v0.2 (docs/RULES.md). Plays every 2-player parameter at its default. Not yet fairness-checked, so not a Candidate and not official.",
   "overrides": {}
 }
