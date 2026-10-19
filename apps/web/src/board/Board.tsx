@@ -289,6 +289,7 @@ const MARK = {
   target: '#e0b84c',
   capture: '#e0574b',
   check: '#e0574b',
+  danger: '#e08a3c',
 };
 
 /** Selection, move targets, the last move and check, drawn between the squares and the pieces. */
@@ -314,6 +315,22 @@ function Marks({
           fillOpacity="0.32"
         />
       ))}
+      {highlights.danger?.map((at) => {
+        const { x, y } = centerOf(at);
+        return (
+          <circle
+            key={`danger-${at}`}
+            data-danger={at}
+            cx={x}
+            cy={y}
+            r="46"
+            fill="none"
+            stroke={MARK.danger}
+            strokeWidth="5"
+            strokeDasharray="10 7"
+          />
+        );
+      })}
       {highlights.check.map((at) => {
         const { x, y } = centerOf(at);
         return (

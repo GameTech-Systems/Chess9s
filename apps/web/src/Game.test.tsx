@@ -58,7 +58,7 @@ describe('Game screen', () => {
       lost: { light: ['knight', 'pawn', 'pawn'] },
     });
     const html = render({
-      game,
+      ...fromGame(game),
       selected: 'b8',
       promoting: { from: 'b8', to: 'b9', choices: ['bishop', 'knight', 'queen', 'rook'] },
     });
@@ -84,5 +84,14 @@ describe('Rule picker', () => {
 
   it('the game screen offers a way back to the picker', () => {
     expect(render()).toContain('Change ruleset');
+  });
+});
+
+describe('play aids on the screen', () => {
+  it('has the legal-moves toggle on, the danger toggle off, and undo disabled at the start', () => {
+    const html = render();
+    expect(html).toMatch(/aria-pressed="true"[^>]*>Show legal moves/);
+    expect(html).toMatch(/aria-pressed="false"[^>]*>Show danger/);
+    expect(html).toMatch(/<button[^>]*disabled=""[^>]*>Undo/);
   });
 });
