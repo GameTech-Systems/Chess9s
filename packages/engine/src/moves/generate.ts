@@ -122,9 +122,9 @@ function relativeSteps(move: Move): Step[] {
   return [...seen.values()];
 }
 
-/** Square types by coordinate, built once per board. */
+/** Square types by coordinate (squares the board data does not list have none), built once per board. */
 const typeCache = new WeakMap<Board, Map<string, string[]>>();
-function squareTypes(board: Board): Map<string, string[]> {
+export function squareTypes(board: Board): Map<string, string[]> {
   let types = typeCache.get(board);
   if (!types) {
     types = new Map(board.squares.map((s) => [s.at, s.types]));
