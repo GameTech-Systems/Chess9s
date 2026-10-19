@@ -1,0 +1,25 @@
+{
+  "$schema": "../../../../../rules/schema/piece.schema.json",
+  "id": "slider",
+  "name": "Slider",
+  "letter": "S",
+  "moves": [{ "directions": ["orthogonal"] }],
+  "squares": [
+    {
+      "type": "void",
+      "stop": { "param": "slider.canEnterVoid" },
+      "pass": { "param": "slider.canEnterVoid" }
+    },
+    {
+      "type": "gateway",
+      "stop": false,
+      "when": { "param": "gate.occupants", "is": "hopper-only" }
+    },
+    {
+      "type": "gateway",
+      "pass": false,
+      "when": { "not": { "param": "gate.passThrough", "has": "slider" } }
+    }
+  ],
+  "source": "Test fixture (S9). Not a Chess Nines piece."
+}

@@ -1,0 +1,105 @@
+{
+  "$schema": "../../../../rules/schema/parameters.schema.json",
+  "version": "0.0.1",
+  "parameters": [
+    {
+      "id": "guard.range",
+      "label": "Guard range",
+      "piece": "guard",
+      "players": [2, 3],
+      "type": "integer",
+      "default": 1,
+      "options": [1, 2],
+      "status": "experimental",
+      "source": "Test fixture (S9). Not a Chess Nines rule."
+    },
+    {
+      "id": "guard.canJump",
+      "label": "Guard can jump",
+      "piece": "guard",
+      "players": [2, 3],
+      "type": "boolean",
+      "default": false,
+      "options": [false, true],
+      "status": "experimental",
+      "source": "Test fixture (S9). Not a Chess Nines rule."
+    },
+    {
+      "id": "slider.canEnterVoid",
+      "label": "Slider can enter the void",
+      "piece": "slider",
+      "players": [2, 3],
+      "type": "boolean",
+      "default": false,
+      "options": [false, true],
+      "status": "experimental",
+      "source": "Test fixture (S9). Not a Chess Nines rule."
+    },
+    {
+      "id": "stepper.firstMoveDouble",
+      "label": "Stepper double first step",
+      "piece": "stepper",
+      "players": [2, 3],
+      "type": "boolean",
+      "default": true,
+      "options": [true, false],
+      "status": "experimental",
+      "source": "Test fixture (S9). Not a Chess Nines rule."
+    },
+    {
+      "id": "stepper.promotion.targets",
+      "label": "Stepper promotion targets",
+      "piece": "stepper",
+      "players": [2, 3],
+      "type": "enumSet",
+      "default": ["slider", "leaper"],
+      "options": ["slider", "leaper"],
+      "status": "experimental",
+      "source": "Test fixture (S9). Not a Chess Nines rule."
+    },
+    {
+      "id": "gate.occupants",
+      "label": "Who may stop on a gateway",
+      "piece": null,
+      "players": [2, 3],
+      "type": "enum",
+      "default": "hopper-only",
+      "options": ["hopper-only", "any"],
+      "status": "experimental",
+      "source": "Test fixture (S9). Not a Chess Nines rule."
+    },
+    {
+      "id": "gate.passThrough",
+      "label": "Who may pass over a gateway",
+      "piece": null,
+      "players": [2, 3],
+      "type": "enumSet",
+      "default": ["slider"],
+      "options": ["slider", "leaper", "guard"],
+      "status": "experimental",
+      "source": "Test fixture (S9). Not a Chess Nines rule."
+    },
+    {
+      "id": "hopper.capturable",
+      "label": "Hopper can be captured",
+      "piece": "hopper",
+      "players": [2, 3],
+      "type": "boolean",
+      "default": false,
+      "options": [false, true],
+      "status": "experimental",
+      "source": "Test fixture (S9). Not a Chess Nines rule."
+    },
+    {
+      "id": "fixture.retired",
+      "label": "Retired fixture parameter",
+      "piece": null,
+      "players": [2],
+      "type": "boolean",
+      "default": false,
+      "options": [false, true],
+      "status": "deprecated",
+      "source": "Test fixture (S9): used to test that deprecated parameters are refused."
+    }
+  ]
+}

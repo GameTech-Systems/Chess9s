@@ -1,0 +1,26 @@
+{
+  "$schema": "../../../../../rules/schema/piece.schema.json",
+  "id": "stepper",
+  "name": "Stepper",
+  "letter": "T",
+  "moves": [
+    { "directions": ["forward"], "range": 1, "capture": "move-only" },
+    {
+      "vectors": [[0, 1]],
+      "range": 2,
+      "capture": "move-only",
+      "when": { "all": [{ "firstMove": true }, { "param": "stepper.firstMoveDouble", "is": true }] }
+    },
+    { "directions": ["forward-diagonal"], "range": 1, "capture": "capture-only" },
+    {
+      "vectors": [[1, 0]],
+      "symmetry": "mirror",
+      "range": 1,
+      "capture": "move-only",
+      "when": { "from": "home" }
+    }
+  ],
+  "squares": [{ "type": "gateway", "stop": false, "pass": false }],
+  "promotion": { "to": { "param": "stepper.promotion.targets" } },
+  "source": "Test fixture (S9). Not a Chess Nines piece."
+}

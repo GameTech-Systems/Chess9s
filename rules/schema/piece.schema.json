@@ -1,0 +1,194 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Chess Nines piece",
+  "description": "One piece and its movement as data. Format: docs/decisions/0007-board-and-piece-formats.md.",
+  "type": "object",
+  "required": ["id", "name", "letter", "moves"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": { "$ref": "#/$defs/id" },
+    "name": { "type": "string" },
+    "letter": { "description": "Placeholder glyph until art exists.", "type": "string", "minLength": 1, "maxLength": 2 },
+    "description": { "type": "string" },
+    "royal": { "description": "Checkmate target. Default false.", "type": "boolean" },
+    "capturable": { "description": "Default true.", "$ref": "#/$defs/flag" },
+    "givesCheck": { "description": "Its attacks count as check. Default true.", "$ref": "#/$defs/flag" },
+    "moves": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/move" }
+    },
+    "squares": {
+      "description": "Square rules for every move of this piece.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/squareRule" }
+    },
+    "promotion": { "$ref": "#/$defs/promotion" },
+    "source": { "type": "string" },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+    "paramId": { "type": "string", "pattern": "^[a-zA-Z0-9]+(\\.[a-zA-Z0-9]+)+$" },
+    "paramRef": {
+      "description": "Take the value from a parameter of the resolved ruleset.",
+      "type": "object",
+      "required": ["param"],
+      "properties": { "param": { "$ref": "#/$defs/paramId" } },
+      "additionalProperties": false
+    },
+    "flag": { "oneOf": [{ "type": "boolean" }, { "$ref": "#/$defs/paramRef" }] },
+    "scalar": { "type": ["string", "integer", "boolean"] },
+    "direction": {
+      "enum": ["orthogonal", "diagonal", "forward", "backward", "sideways", "forward-diagonal", "backward-diagonal"]
+    },
+    "vector": {
+      "description": "[files, ranks] per step; positive ranks are toward the side's forward.",
+      "type": "array",
+      "items": { "type": "integer", "minimum": -8, "maximum": 8 },
+      "minItems": 2,
+      "maxItems": 2,
+      "not": { "const": [0, 0] }
+    },
+    "move": {
+      "type": "object",
+      "properties": {
+        "directions": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/direction" } },
+        "vectors": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/vector" } },
+        "symmetry": {
+          "description": "With vectors: none as written, mirror adds the left-right image, all adds all 8 images. Default none.",
+          "enum": ["none", "mirror", "all"]
+        },
+        "targets": {
+          "description": "Move directly to any square of these types; squares in between don't matter.",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "range": {
+          "description": "Most steps along a direction or vector. Omitted means unlimited.",
+          "oneOf": [{ "type": "integer", "minimum": 1, "maximum": 8 }, { "$ref": "#/$defs/paramRef" }]
+        },
+        "jump": { "description": "May pass occupied squares. Default false.", "$ref": "#/$defs/flag" },
+        "capture": {
+          "description": "Default move-or-capture.",
+          "enum": ["move-or-capture", "move-only", "capture-only"]
+        },
+        "squares": { "type": "array", "items": { "$ref": "#/$defs/squareRule" } },
+        "when": { "$ref": "#/$defs/condition" },
+        "notes": { "type": "string" }
+      },
+      "oneOf": [
+        { "required": ["directions"], "not": { "anyOf": [{ "required": ["vectors"] }, { "required": ["targets"] }] } },
+        { "required": ["vectors"], "not": { "anyOf": [{ "required": ["directions"] }, { "required": ["targets"] }] } },
+        {
+          "required": ["targets"],
+          "not": {
+            "anyOf": [
+              { "required": ["directions"] },
+              { "required": ["vectors"] },
+              { "required": ["range"] },
+              { "required": ["jump"] }
+            ]
+          }
+        }
+      ],
+      "dependentSchemas": { "symmetry": { "required": ["vectors"] } },
+      "additionalProperties": false
+    },
+    "squareRule": {
+      "description": "Whether the piece may stop on, or pass over, squares of a type. Both default to true.",
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": { "$ref": "#/$defs/id" },
+        "stop": { "$ref": "#/$defs/flag" },
+        "pass": { "$ref": "#/$defs/flag" },
+        "when": { "$ref": "#/$defs/condition" },
+        "notes": { "type": "string" }
+      },
+      "anyOf": [{ "required": ["stop"] }, { "required": ["pass"] }],
+      "additionalProperties": false
+    },
+    "promotion": {
+      "description": "Promotes on the last rank in the side's forward direction.",
+      "type": "object",
+      "required": ["to"],
+      "properties": {
+        "to": {
+          "oneOf": [
+            { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+            { "$ref": "#/$defs/paramRef" }
+          ]
+        },
+        "when": { "$ref": "#/$defs/condition" }
+      },
+      "additionalProperties": false
+    },
+    "condition": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["param", "is"],
+          "properties": { "param": { "$ref": "#/$defs/paramId" }, "is": { "$ref": "#/$defs/scalar" } },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["param", "in"],
+          "properties": {
+            "param": { "$ref": "#/$defs/paramId" },
+            "in": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/scalar" } }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["param", "has"],
+          "properties": { "param": { "$ref": "#/$defs/paramId" }, "has": { "$ref": "#/$defs/scalar" } },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["players"],
+          "properties": {
+            "players": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": [2, 3] } }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["from"],
+          "properties": { "from": { "$ref": "#/$defs/id" } },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["firstMove"],
+          "properties": { "firstMove": { "type": "boolean" } },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["not"],
+          "properties": { "not": { "$ref": "#/$defs/condition" } },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["all"],
+          "properties": { "all": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/condition" } } },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["any"],
+          "properties": { "any": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/condition" } } },
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

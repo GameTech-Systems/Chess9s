@@ -1,0 +1,27 @@
+{
+  "$schema": "../../../../../rules/schema/piece.schema.json",
+  "id": "guard",
+  "name": "Guard",
+  "letter": "G",
+  "royal": true,
+  "moves": [
+    {
+      "directions": ["orthogonal", "diagonal"],
+      "range": { "param": "guard.range" },
+      "jump": { "param": "guard.canJump" }
+    }
+  ],
+  "squares": [
+    {
+      "type": "gateway",
+      "stop": false,
+      "when": { "param": "gate.occupants", "in": ["hopper-only"] }
+    },
+    {
+      "type": "gateway",
+      "pass": false,
+      "when": { "not": { "param": "gate.passThrough", "has": "guard" } }
+    }
+  ],
+  "source": "Test fixture (S9). Not a Chess Nines piece."
+}
