@@ -68,7 +68,7 @@ The owner provides the board layout, special squares, starting position, and pie
 Done when: the data validates against the S9 schemas.
 Decisions: D1.
 
-### S11 — Move generator · Opus 5.5 · high · `todo`
+### S11 — Move generator · Opus 5.5 · high · `done`
 Generic pseudo-legal move generation from piece movement data and board data: directions, range, jumping, capture modes, restricted squares, gateways. Deterministic. No piece-specific code paths.
 Done when: fixture positions produce exactly the expected move lists.
 
