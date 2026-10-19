@@ -5,3 +5,4 @@ export * from './moves/check';
 export * from './game/turns';
 export * from './game/game';
 export * from './rules/interactions';
+export * from './ai/search';

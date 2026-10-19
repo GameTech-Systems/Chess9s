@@ -1,0 +1,54 @@
+{
+  "description": "S23: positions for the search computer opponent on the real board (rules/boards/standard-9x9.json, rules/pieces/) under the draft 2-player ruleset with the case's overrides. The Coast is open and there is no Tail, so only the pieces listed play. 'mates' means the chosen move must end the game in checkmate; 'plays' names the one move the bot must choose; 'avoids' names a move it must not choose.",
+  "cases": [
+    {
+      "name": "mate in one: rooks hold the g- and h-files, a third rook closes the i-file",
+      "overrides": {},
+      "turn": "light",
+      "pieces": {
+        "c1": { "piece": "king", "side": "light", "moved": true },
+        "g2": { "piece": "rook", "side": "light", "moved": true },
+        "h3": { "piece": "rook", "side": "light", "moved": true },
+        "b4": { "piece": "rook", "side": "light", "moved": true },
+        "i9": { "piece": "king", "side": "dark", "moved": true }
+      },
+      "expect": { "mates": true }
+    },
+    {
+      "name": "a queen left undefended on the rook's rank is taken",
+      "overrides": {},
+      "turn": "light",
+      "pieces": {
+        "c1": { "piece": "king", "side": "light", "moved": true },
+        "b7": { "piece": "rook", "side": "light", "moved": true },
+        "g7": { "piece": "queen", "side": "dark", "moved": true },
+        "i9": { "piece": "king", "side": "dark", "moved": true }
+      },
+      "expect": { "plays": "b7xg7" }
+    },
+    {
+      "name": "sunMoon.capture = any-move-square: the Sun takes the Queen straight ahead",
+      "overrides": { "sunMoon.capture": "any-move-square" },
+      "turn": "light",
+      "pieces": {
+        "c1": { "piece": "king", "side": "light", "moved": true },
+        "c6": { "piece": "sun", "side": "light", "moved": true },
+        "c7": { "piece": "queen", "side": "dark", "moved": true },
+        "i9": { "piece": "king", "side": "dark", "moved": true }
+      },
+      "expect": { "plays": "c6xc7" }
+    },
+    {
+      "name": "sunMoon.capture = diagonal-only: the Sun cannot take straight ahead, so it does not try",
+      "overrides": { "sunMoon.capture": "diagonal-only" },
+      "turn": "light",
+      "pieces": {
+        "c1": { "piece": "king", "side": "light", "moved": true },
+        "c6": { "piece": "sun", "side": "light", "moved": true },
+        "c7": { "piece": "queen", "side": "dark", "moved": true },
+        "i9": { "piece": "king", "side": "dark", "moved": true }
+      },
+      "expect": { "avoids": "c6xc7" }
+    }
+  ]
+}
