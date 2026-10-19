@@ -107,7 +107,7 @@ Pick a ruleset before a game, with status badges (proposed, experimental, candid
 ### S20 — Play aids, part 1 · Sonnet 5.5 · medium · `done`
 Show-legal-moves toggle (on by default), last-move highlight, undo (disabled in online play later), pieces-in-danger indicator.
 
-### S21 — Play aids, part 2 · Sonnet 5.5 · low · `todo`
+### S21 — Play aids, part 2 · Sonnet 5.5 · low · `done`
 Sound with an on/off toggle (knock on move, chime on your turn, CC0 sounds only, credited in NOTICE), a rules screen opened from a "?" button, and an elapsed-time display (not a chess clock).
 
 ### S22 — Computer opponent v0 and guest play · Sonnet 5.5 · low · `todo`

@@ -1,15 +1,15 @@
 # Handoff
 
-Updated 2026-10-19 by S20 (Sonnet 5.5 · medium). `/end-session` rewrites this file; keep it under 40 lines.
+Updated 2026-10-19 by S21 (Sonnet 5.5 · medium). `/end-session` rewrites this file; keep it under 40 lines.
 
 ## State
-- Phase 2. The game screen has "Show legal moves" (on), "Show danger" (off) and "Undo" (disabled at the start). `Model` keeps `history` (a stack of states), `showMoves` and `showDanger`; `undo`, `canUndo`, `toggleMoves` and `toggleDanger` are in `game/session.ts`. Danger marks the side-to-move's pieces the other side attacks (engine `attackMap`), drawn as a dashed ring. Last-move highlight already existed. Lint, typecheck, `validate:rules`, build and 980 tests pass.
-- Playwright still not added; screens are tested by rendering to markup.
+- Phase 2. The game screen now has a "Sound" toggle (on), a "?" button opening a rules dialog (`Rules.tsx`) and an elapsed-time display (stops at game end, resets on a new game). `game/aids.ts` holds `formatElapsed`, `soundsFor` and `play`. Lint, typecheck, `validate:rules`, build and 987 tests pass.
+- Playwright still not added; screens are tested by rendering to markup. Sound and the dialog were not checked in a browser.
 
 ## Next session
-**S21 — Play aids, part 2** · Sonnet 5.5 · low
-Why: next Phase 2 step; sounds must be CC0 and credited in NOTICE.
-Start with: `/start-session S21`
+**S22 — Computer opponent v0 and guest play** · Sonnet 5.5 · low
+Why: next Phase 2 step; a random legal mover plus browser-kept state.
+Start with: `/start-session S22`
 
 ## Proposed Phase 2 changes (for the owner's plan review)
 - **Insert an engine step before S23: the missing 2-player rules** (threefold repetition, 50-move, insufficient material, castling, en passant, pawn safe zones, owner-listed Coast rules). Without draw rules, bot self-play (S24) may never end. Suggested: Opus 5.5 · high.
@@ -20,6 +20,7 @@ Start with: `/start-session S21`
 - D3, D6: applied in rule set v0.2. D1: pieces are unverified seeds. D34: dark's view is turned 180°. D36: tetrahedron on e5.
 
 ## Open questions for the owner
+- Provisional (S21): sounds are synthesized with Web Audio (no CC0 files); say if you want recorded CC0 sounds. The rules dialog links to docs/RULES.md rather than restating rules.
 - Provisional (S20): danger indicator off by default; undo takes back one move at a time with no limit. Defaults kept unless told otherwise.
 - Keep the option `tail.2p.canCapture`? Default: kept; when on, the Tail takes only the other side's pieces.
 - Is a closed Coast closed to Kings and Queens too? Default: yes. Confirm the opener's exception (a5-e5, then e5-i5 on the very next turn only). Default: as written.
