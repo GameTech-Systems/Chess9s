@@ -1,0 +1,55 @@
+{
+  "$schema": "../schema/piece.schema.json",
+  "id": "king",
+  "name": "King",
+  "letter": "K",
+  "royal": true,
+  "moves": [
+    {
+      "directions": [
+        "orthogonal",
+        "diagonal"
+      ],
+      "range": {
+        "param": "king.range"
+      },
+      "jump": {
+        "param": "king.canJump"
+      }
+    }
+  ],
+  "squares": [
+    {
+      "type": "coast",
+      "stop": {
+        "param": "king.canEnterCoast"
+      },
+      "pass": {
+        "param": "king.canEnterCoast"
+      }
+    },
+    {
+      "type": "center",
+      "stop": false,
+      "when": {
+        "param": "center.occupants",
+        "in": [
+          "dragons",
+          "dragons-and-sun-moon"
+        ]
+      }
+    },
+    {
+      "type": "center",
+      "pass": false,
+      "when": {
+        "not": {
+          "param": "center.passThrough",
+          "has": "king"
+        }
+      }
+    }
+  ],
+  "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026.",
+  "notes": "Not expressed yet (engine features): castling (castling.enabled), and a King captured by the Dragon in 3-player games."
+}

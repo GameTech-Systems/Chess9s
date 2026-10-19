@@ -1,0 +1,399 @@
+{
+  "$schema": "../schema/board.schema.json",
+  "id": "standard-9x9",
+  "name": "Chess Nines board",
+  "version": "0.1.0",
+  "description": "The 9x9 Chess Nines board: the Coast (file a), an 8-column checkered board (files b to i) split by the void (rank 5), and the start positions for 2 and 3 players.",
+  "squareTypes": [
+    {
+      "id": "coast",
+      "label": "Coast",
+      "description": "File a, home of the 5 Coast pieces."
+    },
+    {
+      "id": "coast-gate",
+      "label": "Coast gate",
+      "description": "a5: the Dragon Tail's start, and in 3-player games each Coast piece's first way out."
+    },
+    {
+      "id": "void",
+      "label": "Void",
+      "description": "b5, c5, d5, f5, g5 and h5: the gray row between the halves."
+    },
+    {
+      "id": "center",
+      "label": "Center",
+      "description": "e5: only the dragons may stand here by default."
+    },
+    {
+      "id": "ting-yang",
+      "label": "Ting Yang",
+      "description": "i5: the marked end square of rank 5."
+    },
+    {
+      "id": "tail-square",
+      "label": "Tail square",
+      "description": "a5, e5 and i5: the squares the Dragon Tail jumps between in 2-player games."
+    },
+    {
+      "id": "safe-zone",
+      "label": "Pawn-safe zone",
+      "description": "The 12 colored squares, 6 pairs mirrored across the void. side is the half the square is on."
+    }
+  ],
+  "squares": [
+    {
+      "at": "a1",
+      "types": [
+        "coast"
+      ],
+      "color": "#1083f6"
+    },
+    {
+      "at": "a2",
+      "types": [
+        "coast"
+      ],
+      "color": "#1083f6"
+    },
+    {
+      "at": "a3",
+      "types": [
+        "coast"
+      ],
+      "color": "#1083f6"
+    },
+    {
+      "at": "a4",
+      "types": [
+        "coast"
+      ],
+      "color": "#1083f6"
+    },
+    {
+      "at": "a5",
+      "types": [
+        "coast",
+        "coast-gate",
+        "tail-square"
+      ],
+      "color": "#1083f6"
+    },
+    {
+      "at": "a6",
+      "types": [
+        "coast"
+      ],
+      "color": "#1083f6"
+    },
+    {
+      "at": "a7",
+      "types": [
+        "coast"
+      ],
+      "color": "#1083f6"
+    },
+    {
+      "at": "a8",
+      "types": [
+        "coast"
+      ],
+      "color": "#1083f6"
+    },
+    {
+      "at": "a9",
+      "types": [
+        "coast"
+      ],
+      "color": "#1083f6"
+    },
+    {
+      "at": "b5",
+      "types": [
+        "void"
+      ],
+      "color": "#929292"
+    },
+    {
+      "at": "c5",
+      "types": [
+        "void"
+      ],
+      "color": "#cdc3c4"
+    },
+    {
+      "at": "d5",
+      "types": [
+        "void"
+      ],
+      "color": "#929292"
+    },
+    {
+      "at": "f5",
+      "types": [
+        "void"
+      ],
+      "color": "#929292"
+    },
+    {
+      "at": "g5",
+      "types": [
+        "void"
+      ],
+      "color": "#cdc3c4"
+    },
+    {
+      "at": "h5",
+      "types": [
+        "void"
+      ],
+      "color": "#929292"
+    },
+    {
+      "at": "e5",
+      "types": [
+        "center",
+        "tail-square"
+      ],
+      "label": "Center",
+      "color": "#359b35"
+    },
+    {
+      "at": "i5",
+      "types": [
+        "ting-yang",
+        "tail-square"
+      ],
+      "label": "Ting Yang"
+    },
+    {
+      "at": "b2",
+      "types": [
+        "safe-zone"
+      ],
+      "side": "light",
+      "label": "Red",
+      "color": "#ff000e"
+    },
+    {
+      "at": "b8",
+      "types": [
+        "safe-zone"
+      ],
+      "side": "dark",
+      "label": "Pink",
+      "color": "#f440ad"
+    },
+    {
+      "at": "c3",
+      "types": [
+        "safe-zone"
+      ],
+      "side": "light",
+      "label": "Orange",
+      "color": "#ff7900"
+    },
+    {
+      "at": "c7",
+      "types": [
+        "safe-zone"
+      ],
+      "side": "dark",
+      "label": "Burnt orange",
+      "color": "#db7209"
+    },
+    {
+      "at": "d4",
+      "types": [
+        "safe-zone"
+      ],
+      "side": "light",
+      "label": "Yellow",
+      "color": "#fef200"
+    },
+    {
+      "at": "d6",
+      "types": [
+        "safe-zone"
+      ],
+      "side": "dark",
+      "label": "Dark yellow",
+      "color": "#ecd317"
+    },
+    {
+      "at": "f4",
+      "types": [
+        "safe-zone"
+      ],
+      "side": "light",
+      "label": "Blue",
+      "color": "#3c5ffb"
+    },
+    {
+      "at": "f6",
+      "types": [
+        "safe-zone"
+      ],
+      "side": "dark",
+      "label": "Dark blue",
+      "color": "#23479f"
+    },
+    {
+      "at": "g3",
+      "types": [
+        "safe-zone"
+      ],
+      "side": "light",
+      "label": "Indigo",
+      "color": "#d087f3"
+    },
+    {
+      "at": "g7",
+      "types": [
+        "safe-zone"
+      ],
+      "side": "dark",
+      "label": "Dark indigo",
+      "color": "#c800ff"
+    },
+    {
+      "at": "h2",
+      "types": [
+        "safe-zone"
+      ],
+      "side": "light",
+      "label": "Violet",
+      "color": "#760c7b"
+    },
+    {
+      "at": "h8",
+      "types": [
+        "safe-zone"
+      ],
+      "side": "dark",
+      "label": "Dark violet",
+      "color": "#6c065a"
+    }
+  ],
+  "sides": [
+    {
+      "id": "light",
+      "forward": "up",
+      "view": {
+        "rotate": 0
+      }
+    },
+    {
+      "id": "dark",
+      "forward": "down"
+    },
+    {
+      "id": "dragon",
+      "view": {
+        "rotate": 270
+      }
+    }
+  ],
+  "setups": [
+    {
+      "players": 2,
+      "pieces": {
+        "light": {
+          "a1": "light-dragon-head",
+          "a2": "sun",
+          "b1": "rook",
+          "c1": "knight",
+          "d1": "bishop",
+          "e1": "queen",
+          "f1": "king",
+          "g1": "bishop",
+          "h1": "knight",
+          "i1": "rook",
+          "b2": "pawn",
+          "c2": "pawn",
+          "d2": "pawn",
+          "e2": "pawn",
+          "f2": "pawn",
+          "g2": "pawn",
+          "h2": "pawn",
+          "i2": "pawn"
+        },
+        "dark": {
+          "a9": "dark-dragon-head",
+          "a8": "moon",
+          "b9": "rook",
+          "c9": "knight",
+          "d9": "bishop",
+          "e9": "queen",
+          "f9": "king",
+          "g9": "bishop",
+          "h9": "knight",
+          "i9": "rook",
+          "b8": "pawn",
+          "c8": "pawn",
+          "d8": "pawn",
+          "e8": "pawn",
+          "f8": "pawn",
+          "g8": "pawn",
+          "h8": "pawn",
+          "i8": "pawn"
+        },
+        "neutral": {
+          "a5": "dragon-tail"
+        }
+      },
+      "notes": "Mirror image across rank 5. The Dragon Tail belongs to neither side; either player may move it."
+    },
+    {
+      "players": 3,
+      "pieces": {
+        "light": {
+          "b1": "rook",
+          "c1": "knight",
+          "d1": "bishop",
+          "e1": "queen",
+          "f1": "king",
+          "g1": "bishop",
+          "h1": "knight",
+          "i1": "rook",
+          "b2": "pawn",
+          "c2": "pawn",
+          "d2": "pawn",
+          "e2": "pawn",
+          "f2": "pawn",
+          "g2": "pawn",
+          "h2": "pawn",
+          "i2": "pawn"
+        },
+        "dark": {
+          "b9": "rook",
+          "c9": "knight",
+          "d9": "bishop",
+          "e9": "queen",
+          "f9": "king",
+          "g9": "bishop",
+          "h9": "knight",
+          "i9": "rook",
+          "b8": "pawn",
+          "c8": "pawn",
+          "d8": "pawn",
+          "e8": "pawn",
+          "f8": "pawn",
+          "g8": "pawn",
+          "h8": "pawn",
+          "i8": "pawn"
+        },
+        "dragon": {
+          "a9": "dark-dragon-head",
+          "a8": "sun",
+          "a5": "dragon-tail",
+          "a2": "moon",
+          "a1": "light-dragon-head"
+        }
+      },
+      "notes": "As 2 players, except the Sun and Moon switch (Sun a8, Moon a2) and all 5 Coast pieces belong to the Dragon player."
+    }
+  ],
+  "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026.",
+  "notes": "Checkered squares: b1 is black and colors alternate, so Kings start on black (f1, f9) and Queens on white (e1, e9); unlisted squares are #000000 or #ffffff. i5 shows the Ting Yang symbol on white; in 3-player games the symbol turns 90 degrees clockwise. e5 shows an arrow pointing toward i5 in both of the owner's views; no rule is attached to it. Views: light sees the standard diagram; the Dragon player sees the Coast at the bottom with rank 9 on the left (owner's image, 19 Oct). Dark has no view yet. The Dragon side has no forward direction: none of its moves is forward-relative today. setup.swapKingQueen (D30) is an engine feature, not a separate setup."
+}
