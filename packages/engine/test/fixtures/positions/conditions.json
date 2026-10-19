@@ -1,0 +1,208 @@
+{
+  "description": "Conditional moves (firstMove, from, players, parameters), capture modes, targets, capturable and promotion on the neutral fixture. Expected moves worked out by hand (S11).",
+  "cases": [
+    {
+      "name": "stepper on its home square before its first move: single, double and sideways steps",
+      "players": 2,
+      "side": "light",
+      "pieces": { "e2": { "piece": "stepper", "side": "light" } },
+      "expected": ["e2-d2", "e2-e3", "e2-e4", "e2-f2"]
+    },
+    {
+      "name": "stepper.firstMoveDouble false: no double step",
+      "players": 2,
+      "overrides": { "stepper.firstMoveDouble": false },
+      "side": "light",
+      "pieces": { "e2": { "piece": "stepper", "side": "light" } },
+      "expected": ["e2-d2", "e2-e3", "e2-f2"]
+    },
+    {
+      "name": "a stepper that has moved gets no double step",
+      "players": 2,
+      "side": "light",
+      "pieces": { "e2": { "piece": "stepper", "side": "light", "moved": true } },
+      "expected": ["e2-d2", "e2-e3", "e2-f2"]
+    },
+    {
+      "name": "move-only steps are blocked by any piece; capture-only steps need an enemy",
+      "players": 2,
+      "side": "light",
+      "from": "c2",
+      "pieces": {
+        "c2": { "piece": "stepper", "side": "light" },
+        "c3": { "piece": "slider", "side": "dark" },
+        "b3": { "piece": "guard", "side": "dark" },
+        "d3": { "piece": "leaper", "side": "light" }
+      },
+      "expected": ["c2xb3"]
+    },
+    {
+      "name": "a down-facing stepper moves and captures toward rank 1",
+      "players": 2,
+      "side": "dark",
+      "from": "d8",
+      "pieces": {
+        "d8": { "piece": "stepper", "side": "dark" },
+        "e7": { "piece": "leaper", "side": "light" }
+      },
+      "expected": ["d8-d6", "d8-d7", "d8xe7"]
+    },
+    {
+      "name": "the stepper never stops on or passes a gateway, whatever gate.occupants says",
+      "players": 2,
+      "overrides": { "gate.occupants": "any" },
+      "side": "light",
+      "from": "b5",
+      "pieces": {
+        "b5": { "piece": "stepper", "side": "light" },
+        "a6": { "piece": "slider", "side": "dark" }
+      },
+      "expected": ["b5xa6"]
+    },
+    {
+      "name": "promotion on the last rank, default targets",
+      "players": 2,
+      "side": "light",
+      "from": "d8",
+      "pieces": {
+        "d8": { "piece": "stepper", "side": "light", "moved": true },
+        "c9": { "piece": "slider", "side": "dark" }
+      },
+      "expected": ["d8-d9=leaper", "d8-d9=slider", "d8xc9=leaper", "d8xc9=slider"]
+    },
+    {
+      "name": "stepper.promotion.targets slider only",
+      "players": 2,
+      "overrides": { "stepper.promotion.targets": ["slider"] },
+      "side": "light",
+      "from": "d8",
+      "pieces": {
+        "d8": { "piece": "stepper", "side": "light", "moved": true },
+        "c9": { "piece": "slider", "side": "dark" }
+      },
+      "expected": ["d8-d9=slider", "d8xc9=slider"]
+    },
+    {
+      "name": "stepper.promotion.targets leaper only",
+      "players": 2,
+      "overrides": { "stepper.promotion.targets": ["leaper"] },
+      "side": "light",
+      "from": "d8",
+      "pieces": {
+        "d8": { "piece": "stepper", "side": "light", "moved": true },
+        "c9": { "piece": "slider", "side": "dark" }
+      },
+      "expected": ["d8-d9=leaper", "d8xc9=leaper"]
+    },
+    {
+      "name": "a down-facing stepper promotes on rank 1",
+      "players": 2,
+      "side": "dark",
+      "pieces": { "f2": { "piece": "stepper", "side": "dark", "moved": true } },
+      "expected": ["f2-f1=leaper", "f2-f1=slider"]
+    },
+    {
+      "name": "2-player neutral hopper: only its gateway move",
+      "players": 2,
+      "side": "neutral",
+      "pieces": { "b6": { "piece": "hopper", "side": "neutral" } },
+      "expected": ["b6-h4"]
+    },
+    {
+      "name": "the hopper's gateway move is move-only",
+      "players": 2,
+      "side": "neutral",
+      "pieces": {
+        "b6": { "piece": "hopper", "side": "neutral" },
+        "h4": { "piece": "guard", "side": "light" }
+      },
+      "expected": []
+    },
+    {
+      "name": "away from a gateway, a 2-player hopper still only moves to gateways",
+      "players": 2,
+      "side": "neutral",
+      "pieces": { "e3": { "piece": "hopper", "side": "neutral" } },
+      "expected": ["e3-b6", "e3-h4"]
+    },
+    {
+      "name": "gate.occupants any gives the 2-player hopper its step",
+      "players": 2,
+      "overrides": { "gate.occupants": "any" },
+      "side": "neutral",
+      "pieces": { "b6": { "piece": "hopper", "side": "neutral" } },
+      "expected": ["b6-a6", "b6-b5", "b6-b7", "b6-c6", "b6-h4"]
+    },
+    {
+      "name": "3-player start position, third side (no forward direction)",
+      "players": 3,
+      "side": "third",
+      "start": true,
+      "expected": ["b6-a6", "b6-b5", "b6-b7", "b6-c6", "h4-g4", "h4-h3", "h4-h5", "h4-i4"]
+    },
+    {
+      "name": "the hopper's step may not stop on a home square",
+      "players": 3,
+      "side": "third",
+      "pieces": { "e3": { "piece": "hopper", "side": "third" } },
+      "expected": ["e3-b6", "e3-d3", "e3-e4", "e3-f3", "e3-h4"]
+    },
+    {
+      "name": "the hopper's step captures; its gateway move does not",
+      "players": 3,
+      "side": "third",
+      "from": "e5",
+      "pieces": {
+        "e5": { "piece": "hopper", "side": "third" },
+        "e6": { "piece": "guard", "side": "light" },
+        "h4": { "piece": "stepper", "side": "dark" }
+      },
+      "expected": ["e5-b6", "e5-d5", "e5-e4", "e5-f5", "e5xe6"]
+    },
+    {
+      "name": "hopper.capturable false: the hopper can't be captured",
+      "players": 3,
+      "side": "light",
+      "from": "e5",
+      "pieces": {
+        "e5": { "piece": "guard", "side": "light" },
+        "e6": { "piece": "hopper", "side": "third" }
+      },
+      "expected": ["e5-d4", "e5-d5", "e5-d6", "e5-e4", "e5-f4", "e5-f5", "e5-f6"]
+    },
+    {
+      "name": "hopper.capturable true: the hopper can be captured",
+      "players": 3,
+      "overrides": { "hopper.capturable": true },
+      "side": "light",
+      "from": "e5",
+      "pieces": {
+        "e5": { "piece": "guard", "side": "light" },
+        "e6": { "piece": "hopper", "side": "third" }
+      },
+      "expected": ["e5-d4", "e5-d5", "e5-d6", "e5-e4", "e5-f4", "e5-f5", "e5-f6", "e5xe6"]
+    },
+    {
+      "name": "a neutral hopper can't be captured by default",
+      "players": 2,
+      "overrides": { "gate.occupants": "any" },
+      "side": "light",
+      "pieces": {
+        "a5": { "piece": "guard", "side": "light" },
+        "b6": { "piece": "hopper", "side": "neutral" }
+      },
+      "expected": ["a5-a4", "a5-a6", "a5-b4", "a5-b5"]
+    },
+    {
+      "name": "hopper.capturable true: a neutral hopper is captured like any other piece",
+      "players": 2,
+      "overrides": { "gate.occupants": "any", "hopper.capturable": true },
+      "side": "light",
+      "pieces": {
+        "a5": { "piece": "guard", "side": "light" },
+        "b6": { "piece": "hopper", "side": "neutral" }
+      },
+      "expected": ["a5-a4", "a5-a6", "a5-b4", "a5-b5", "a5xb6"]
+    }
+  ]
+}
