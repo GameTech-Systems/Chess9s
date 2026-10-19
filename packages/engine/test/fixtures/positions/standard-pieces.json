@@ -1,0 +1,2439 @@
+{
+  "description": "S13: King, Rook, Bishop and Knight on the real board (rules/boards/standard-9x9.json, rules/pieces/) under the draft 2-player ruleset. Expected moves come from plain geometry worked out independently of the engine.",
+  "cases": [
+    {
+      "name": "king, defaults: two squares, may stand on the Coast, cannot stop on e5",
+      "players": 2,
+      "side": "light",
+      "from": "c3",
+      "pieces": {
+        "c3": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "c3-a1",
+        "c3-a3",
+        "c3-a5",
+        "c3-b2",
+        "c3-b3",
+        "c3-b4",
+        "c3-c1",
+        "c3-c2",
+        "c3-c4",
+        "c3-c5",
+        "c3-d2",
+        "c3-d3",
+        "c3-d4",
+        "c3-e1",
+        "c3-e3"
+      ]
+    },
+    {
+      "name": "king.range 1 in the open",
+      "players": 2,
+      "side": "light",
+      "from": "g2",
+      "pieces": {
+        "g2": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "king.range": 1
+      },
+      "expected": ["g2-f1", "g2-f2", "g2-f3", "g2-g1", "g2-g3", "g2-h1", "g2-h2", "g2-h3"]
+    },
+    {
+      "name": "king.range 2 in the open",
+      "players": 2,
+      "side": "light",
+      "from": "g2",
+      "pieces": {
+        "g2": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "g2-e2",
+        "g2-e4",
+        "g2-f1",
+        "g2-f2",
+        "g2-f3",
+        "g2-g1",
+        "g2-g3",
+        "g2-g4",
+        "g2-h1",
+        "g2-h2",
+        "g2-h3",
+        "g2-i2",
+        "g2-i4"
+      ]
+    },
+    {
+      "name": "king.range 3 in the open",
+      "players": 2,
+      "side": "light",
+      "from": "g2",
+      "pieces": {
+        "g2": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "king.range": 3
+      },
+      "expected": [
+        "g2-d2",
+        "g2-d5",
+        "g2-e2",
+        "g2-e4",
+        "g2-f1",
+        "g2-f2",
+        "g2-f3",
+        "g2-g1",
+        "g2-g3",
+        "g2-g4",
+        "g2-g5",
+        "g2-h1",
+        "g2-h2",
+        "g2-h3",
+        "g2-i2",
+        "g2-i4"
+      ]
+    },
+    {
+      "name": "king.range 4 in the open",
+      "players": 2,
+      "side": "light",
+      "from": "g2",
+      "pieces": {
+        "g2": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "king.range": 4
+      },
+      "expected": [
+        "g2-c2",
+        "g2-c6",
+        "g2-d2",
+        "g2-d5",
+        "g2-e2",
+        "g2-e4",
+        "g2-f1",
+        "g2-f2",
+        "g2-f3",
+        "g2-g1",
+        "g2-g3",
+        "g2-g4",
+        "g2-g5",
+        "g2-g6",
+        "g2-h1",
+        "g2-h2",
+        "g2-h3",
+        "g2-i2",
+        "g2-i4"
+      ]
+    },
+    {
+      "name": "king slides: own piece blocks, enemy piece is captured and blocks",
+      "players": 2,
+      "side": "light",
+      "from": "g4",
+      "pieces": {
+        "g4": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "g5": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "h5": {
+          "piece": "bishop",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": [
+        "g4-e2",
+        "g4-e4",
+        "g4-e6",
+        "g4-f3",
+        "g4-f4",
+        "g4-f5",
+        "g4-g2",
+        "g4-g3",
+        "g4-h3",
+        "g4-h4",
+        "g4-i2",
+        "g4-i4",
+        "g4xh5"
+      ]
+    },
+    {
+      "name": "king.canJump true: passes over own and enemy pieces on the first square",
+      "players": 2,
+      "side": "light",
+      "from": "g4",
+      "pieces": {
+        "g4": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "g5": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "h5": {
+          "piece": "bishop",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "king.canJump": true
+      },
+      "expected": [
+        "g4-e2",
+        "g4-e4",
+        "g4-e6",
+        "g4-f3",
+        "g4-f4",
+        "g4-f5",
+        "g4-g2",
+        "g4-g3",
+        "g4-g6",
+        "g4-h3",
+        "g4-h4",
+        "g4-i2",
+        "g4-i4",
+        "g4-i6",
+        "g4xh5"
+      ]
+    },
+    {
+      "name": "king.range 1 with king.canJump true is the same as range 1",
+      "players": 2,
+      "side": "light",
+      "from": "g4",
+      "pieces": {
+        "g4": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "g5": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "h5": {
+          "piece": "bishop",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "king.range": 1,
+        "king.canJump": true
+      },
+      "expected": ["g4-f3", "g4-f4", "g4-f5", "g4-g3", "g4-h3", "g4-h4", "g4xh5"]
+    },
+    {
+      "name": "king.range 3 with king.canJump true",
+      "players": 2,
+      "side": "light",
+      "from": "g4",
+      "pieces": {
+        "g4": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "g5": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "h5": {
+          "piece": "bishop",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "king.range": 3,
+        "king.canJump": true
+      },
+      "expected": [
+        "g4-d1",
+        "g4-d4",
+        "g4-d7",
+        "g4-e2",
+        "g4-e4",
+        "g4-e6",
+        "g4-f3",
+        "g4-f4",
+        "g4-f5",
+        "g4-g1",
+        "g4-g2",
+        "g4-g3",
+        "g4-g6",
+        "g4-g7",
+        "g4-h3",
+        "g4-h4",
+        "g4-i2",
+        "g4-i4",
+        "g4-i6",
+        "g4xh5"
+      ]
+    },
+    {
+      "name": "king.canEnterCoast true: captures an enemy on the Coast",
+      "players": 2,
+      "side": "light",
+      "from": "c3",
+      "pieces": {
+        "c3": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "a3": {
+          "piece": "queen",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": [
+        "c3-a1",
+        "c3-a5",
+        "c3-b2",
+        "c3-b3",
+        "c3-b4",
+        "c3-c1",
+        "c3-c2",
+        "c3-c4",
+        "c3-c5",
+        "c3-d2",
+        "c3-d3",
+        "c3-d4",
+        "c3-e1",
+        "c3-e3",
+        "c3xa3"
+      ]
+    },
+    {
+      "name": "king.canEnterCoast false: stays off file a",
+      "players": 2,
+      "side": "light",
+      "from": "c3",
+      "pieces": {
+        "c3": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "king.canEnterCoast": false
+      },
+      "expected": [
+        "c3-b2",
+        "c3-b3",
+        "c3-b4",
+        "c3-c1",
+        "c3-c2",
+        "c3-c4",
+        "c3-c5",
+        "c3-d2",
+        "c3-d3",
+        "c3-d4",
+        "c3-e1",
+        "c3-e3"
+      ]
+    },
+    {
+      "name": "king.canEnterCoast false: cannot capture on the Coast",
+      "players": 2,
+      "side": "light",
+      "from": "c3",
+      "pieces": {
+        "c3": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "a3": {
+          "piece": "queen",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "king.canEnterCoast": false
+      },
+      "expected": [
+        "c3-b2",
+        "c3-b3",
+        "c3-b4",
+        "c3-c1",
+        "c3-c2",
+        "c3-c4",
+        "c3-c5",
+        "c3-d2",
+        "c3-d3",
+        "c3-d4",
+        "c3-e1",
+        "c3-e3"
+      ]
+    },
+    {
+      "name": "king.canEnterCoast false at range 4",
+      "players": 2,
+      "side": "light",
+      "from": "e2",
+      "pieces": {
+        "e2": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "king.canEnterCoast": false,
+        "king.range": 4
+      },
+      "expected": [
+        "e2-b2",
+        "e2-b5",
+        "e2-c2",
+        "e2-c4",
+        "e2-d1",
+        "e2-d2",
+        "e2-d3",
+        "e2-e1",
+        "e2-e3",
+        "e2-e4",
+        "e2-e6",
+        "e2-f1",
+        "e2-f2",
+        "e2-f3",
+        "e2-g2",
+        "e2-g4",
+        "e2-h2",
+        "e2-h5",
+        "e2-i2",
+        "e2-i6"
+      ]
+    },
+    {
+      "name": "king.canEnterCoast true at range 4 reaches a2 and a5",
+      "players": 2,
+      "side": "light",
+      "from": "e2",
+      "pieces": {
+        "e2": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "king.range": 4
+      },
+      "expected": [
+        "e2-a2",
+        "e2-a6",
+        "e2-b2",
+        "e2-b5",
+        "e2-c2",
+        "e2-c4",
+        "e2-d1",
+        "e2-d2",
+        "e2-d3",
+        "e2-e1",
+        "e2-e3",
+        "e2-e4",
+        "e2-e6",
+        "e2-f1",
+        "e2-f2",
+        "e2-f3",
+        "e2-g2",
+        "e2-g4",
+        "e2-h2",
+        "e2-h5",
+        "e2-i2",
+        "e2-i6"
+      ]
+    },
+    {
+      "name": "rook, defaults: stops short of the Coast, may stand on void squares",
+      "players": 2,
+      "side": "light",
+      "from": "c3",
+      "pieces": {
+        "c3": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "c3-b3",
+        "c3-c1",
+        "c3-c2",
+        "c3-c4",
+        "c3-c5",
+        "c3-c6",
+        "c3-c7",
+        "c3-c8",
+        "c3-c9",
+        "c3-d3",
+        "c3-e3",
+        "c3-f3",
+        "c3-g3",
+        "c3-h3",
+        "c3-i3"
+      ]
+    },
+    {
+      "name": "rook: blockers and captures",
+      "players": 2,
+      "side": "light",
+      "from": "g4",
+      "pieces": {
+        "g4": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "g7": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        },
+        "c4": {
+          "piece": "queen",
+          "side": "dark",
+          "moved": true
+        },
+        "g2": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "i4": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": ["g4-d4", "g4-e4", "g4-f4", "g4-g3", "g4-g5", "g4-g6", "g4-h4", "g4xc4", "g4xg2"]
+    },
+    {
+      "name": "rook cannot capture a piece on the Coast",
+      "players": 2,
+      "side": "light",
+      "from": "c3",
+      "pieces": {
+        "c3": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "a3": {
+          "piece": "queen",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": [
+        "c3-b3",
+        "c3-c1",
+        "c3-c2",
+        "c3-c4",
+        "c3-c5",
+        "c3-c6",
+        "c3-c7",
+        "c3-c8",
+        "c3-c9",
+        "c3-d3",
+        "c3-e3",
+        "c3-f3",
+        "c3-g3",
+        "c3-h3",
+        "c3-i3"
+      ]
+    },
+    {
+      "name": "bishop, defaults: stops short of the Coast and e5",
+      "players": 2,
+      "side": "light",
+      "from": "c3",
+      "pieces": {
+        "c3": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": ["c3-b2", "c3-b4", "c3-d2", "c3-d4", "c3-e1"]
+    },
+    {
+      "name": "bishop: blockers and captures",
+      "players": 2,
+      "side": "light",
+      "from": "c4",
+      "pieces": {
+        "c4": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        },
+        "f7": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        },
+        "e2": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": ["c4-b3", "c4-b5", "c4-d3", "c4-d5", "c4-e6", "c4xe2"]
+    },
+    {
+      "name": "bishop in the open",
+      "players": 2,
+      "side": "light",
+      "from": "g2",
+      "pieces": {
+        "g2": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": ["g2-b7", "g2-c6", "g2-d5", "g2-e4", "g2-f1", "g2-f3", "g2-h1", "g2-h3", "g2-i4"]
+    },
+    {
+      "name": "knight, defaults: eight squares",
+      "players": 2,
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": ["d4-b3", "d4-b5", "d4-c2", "d4-c6", "d4-e2", "d4-e6", "d4-f3", "d4-f5"]
+    },
+    {
+      "name": "knight cannot stand on the Coast",
+      "players": 2,
+      "side": "light",
+      "from": "c3",
+      "pieces": {
+        "c3": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": ["c3-b1", "c3-b5", "c3-d1", "c3-d5", "c3-e2", "c3-e4"]
+    },
+    {
+      "name": "knight in a corner region",
+      "players": 2,
+      "side": "light",
+      "from": "b1",
+      "pieces": {
+        "b1": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": ["b1-c3", "b1-d2"]
+    },
+    {
+      "name": "knight jumps over a full ring and captures enemies",
+      "players": 2,
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        },
+        "c3": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "c4": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "c5": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "d3": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "d5": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "e3": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "e4": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "e6": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "c2": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "f5": {
+          "piece": "bishop",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": ["d4-b3", "d4-b5", "d4-c6", "d4-e2", "d4-f3", "d4xe6", "d4xf5"]
+    },
+    {
+      "name": "center.passThrough dragon-head only: king next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["dragon-head"]
+      },
+      "expected": [
+        "e4-c2",
+        "e4-c4",
+        "e4-c6",
+        "e4-d3",
+        "e4-d4",
+        "e4-d5",
+        "e4-e2",
+        "e4-e3",
+        "e4-f3",
+        "e4-f4",
+        "e4-f5",
+        "e4-g2",
+        "e4-g4",
+        "e4-g6"
+      ]
+    },
+    {
+      "name": "center.passThrough dragon-head only: rook next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["dragon-head"]
+      },
+      "expected": [
+        "e4-b4",
+        "e4-c4",
+        "e4-d4",
+        "e4-e1",
+        "e4-e2",
+        "e4-e3",
+        "e4-f4",
+        "e4-g4",
+        "e4-h4",
+        "e4-i4"
+      ]
+    },
+    {
+      "name": "center.passThrough dragon-head only: bishop next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["dragon-head"]
+      },
+      "expected": ["d4-b2", "d4-b6", "d4-c3", "d4-c5", "d4-e3", "d4-f2", "d4-g1"]
+    },
+    {
+      "name": "center.passThrough dragon-head only: knight next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "d3",
+      "pieces": {
+        "d3": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["dragon-head"]
+      },
+      "expected": ["d3-b2", "d3-b4", "d3-c1", "d3-c5", "d3-e1", "d3-f2", "d3-f4"]
+    },
+    {
+      "name": "center.passThrough queen only: king next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["queen"]
+      },
+      "expected": [
+        "e4-c2",
+        "e4-c4",
+        "e4-c6",
+        "e4-d3",
+        "e4-d4",
+        "e4-d5",
+        "e4-e2",
+        "e4-e3",
+        "e4-f3",
+        "e4-f4",
+        "e4-f5",
+        "e4-g2",
+        "e4-g4",
+        "e4-g6"
+      ]
+    },
+    {
+      "name": "center.passThrough queen only: rook next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["queen"]
+      },
+      "expected": [
+        "e4-b4",
+        "e4-c4",
+        "e4-d4",
+        "e4-e1",
+        "e4-e2",
+        "e4-e3",
+        "e4-f4",
+        "e4-g4",
+        "e4-h4",
+        "e4-i4"
+      ]
+    },
+    {
+      "name": "center.passThrough queen only: bishop next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["queen"]
+      },
+      "expected": ["d4-b2", "d4-b6", "d4-c3", "d4-c5", "d4-e3", "d4-f2", "d4-g1"]
+    },
+    {
+      "name": "center.passThrough queen only: knight next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "d3",
+      "pieces": {
+        "d3": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["queen"]
+      },
+      "expected": ["d3-b2", "d3-b4", "d3-c1", "d3-c5", "d3-e1", "d3-f2", "d3-f4"]
+    },
+    {
+      "name": "center.passThrough king only: king next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["king"]
+      },
+      "expected": [
+        "e4-c2",
+        "e4-c4",
+        "e4-c6",
+        "e4-d3",
+        "e4-d4",
+        "e4-d5",
+        "e4-e2",
+        "e4-e3",
+        "e4-e6",
+        "e4-f3",
+        "e4-f4",
+        "e4-f5",
+        "e4-g2",
+        "e4-g4",
+        "e4-g6"
+      ]
+    },
+    {
+      "name": "center.passThrough king only: rook next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["king"]
+      },
+      "expected": [
+        "e4-b4",
+        "e4-c4",
+        "e4-d4",
+        "e4-e1",
+        "e4-e2",
+        "e4-e3",
+        "e4-f4",
+        "e4-g4",
+        "e4-h4",
+        "e4-i4"
+      ]
+    },
+    {
+      "name": "center.passThrough king only: bishop next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["king"]
+      },
+      "expected": ["d4-b2", "d4-b6", "d4-c3", "d4-c5", "d4-e3", "d4-f2", "d4-g1"]
+    },
+    {
+      "name": "center.passThrough king only: knight next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "d3",
+      "pieces": {
+        "d3": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["king"]
+      },
+      "expected": ["d3-b2", "d3-b4", "d3-c1", "d3-c5", "d3-e1", "d3-f2", "d3-f4"]
+    },
+    {
+      "name": "center.passThrough sun-moon-pawn only: king next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["sun-moon-pawn"]
+      },
+      "expected": [
+        "e4-c2",
+        "e4-c4",
+        "e4-c6",
+        "e4-d3",
+        "e4-d4",
+        "e4-d5",
+        "e4-e2",
+        "e4-e3",
+        "e4-f3",
+        "e4-f4",
+        "e4-f5",
+        "e4-g2",
+        "e4-g4",
+        "e4-g6"
+      ]
+    },
+    {
+      "name": "center.passThrough sun-moon-pawn only: rook next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["sun-moon-pawn"]
+      },
+      "expected": [
+        "e4-b4",
+        "e4-c4",
+        "e4-d4",
+        "e4-e1",
+        "e4-e2",
+        "e4-e3",
+        "e4-f4",
+        "e4-g4",
+        "e4-h4",
+        "e4-i4"
+      ]
+    },
+    {
+      "name": "center.passThrough sun-moon-pawn only: bishop next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["sun-moon-pawn"]
+      },
+      "expected": ["d4-b2", "d4-b6", "d4-c3", "d4-c5", "d4-e3", "d4-f2", "d4-g1"]
+    },
+    {
+      "name": "center.passThrough sun-moon-pawn only: knight next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "d3",
+      "pieces": {
+        "d3": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["sun-moon-pawn"]
+      },
+      "expected": ["d3-b2", "d3-b4", "d3-c1", "d3-c5", "d3-e1", "d3-f2", "d3-f4"]
+    },
+    {
+      "name": "center.passThrough knight only: king next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["knight"]
+      },
+      "expected": [
+        "e4-c2",
+        "e4-c4",
+        "e4-c6",
+        "e4-d3",
+        "e4-d4",
+        "e4-d5",
+        "e4-e2",
+        "e4-e3",
+        "e4-f3",
+        "e4-f4",
+        "e4-f5",
+        "e4-g2",
+        "e4-g4",
+        "e4-g6"
+      ]
+    },
+    {
+      "name": "center.passThrough knight only: rook next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["knight"]
+      },
+      "expected": [
+        "e4-b4",
+        "e4-c4",
+        "e4-d4",
+        "e4-e1",
+        "e4-e2",
+        "e4-e3",
+        "e4-f4",
+        "e4-g4",
+        "e4-h4",
+        "e4-i4"
+      ]
+    },
+    {
+      "name": "center.passThrough knight only: bishop next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["knight"]
+      },
+      "expected": ["d4-b2", "d4-b6", "d4-c3", "d4-c5", "d4-e3", "d4-f2", "d4-g1"]
+    },
+    {
+      "name": "center.passThrough knight only: knight next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "d3",
+      "pieces": {
+        "d3": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["knight"]
+      },
+      "expected": ["d3-b2", "d3-b4", "d3-c1", "d3-c5", "d3-e1", "d3-f2", "d3-f4"]
+    },
+    {
+      "name": "center.passThrough rook only: king next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["rook"]
+      },
+      "expected": [
+        "e4-c2",
+        "e4-c4",
+        "e4-c6",
+        "e4-d3",
+        "e4-d4",
+        "e4-d5",
+        "e4-e2",
+        "e4-e3",
+        "e4-f3",
+        "e4-f4",
+        "e4-f5",
+        "e4-g2",
+        "e4-g4",
+        "e4-g6"
+      ]
+    },
+    {
+      "name": "center.passThrough rook only: rook next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["rook"]
+      },
+      "expected": [
+        "e4-b4",
+        "e4-c4",
+        "e4-d4",
+        "e4-e1",
+        "e4-e2",
+        "e4-e3",
+        "e4-e6",
+        "e4-e7",
+        "e4-e8",
+        "e4-e9",
+        "e4-f4",
+        "e4-g4",
+        "e4-h4",
+        "e4-i4"
+      ]
+    },
+    {
+      "name": "center.passThrough rook only: bishop next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["rook"]
+      },
+      "expected": ["d4-b2", "d4-b6", "d4-c3", "d4-c5", "d4-e3", "d4-f2", "d4-g1"]
+    },
+    {
+      "name": "center.passThrough rook only: knight next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "d3",
+      "pieces": {
+        "d3": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["rook"]
+      },
+      "expected": ["d3-b2", "d3-b4", "d3-c1", "d3-c5", "d3-e1", "d3-f2", "d3-f4"]
+    },
+    {
+      "name": "center.passThrough bishop only: king next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["bishop"]
+      },
+      "expected": [
+        "e4-c2",
+        "e4-c4",
+        "e4-c6",
+        "e4-d3",
+        "e4-d4",
+        "e4-d5",
+        "e4-e2",
+        "e4-e3",
+        "e4-f3",
+        "e4-f4",
+        "e4-f5",
+        "e4-g2",
+        "e4-g4",
+        "e4-g6"
+      ]
+    },
+    {
+      "name": "center.passThrough bishop only: rook next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["bishop"]
+      },
+      "expected": [
+        "e4-b4",
+        "e4-c4",
+        "e4-d4",
+        "e4-e1",
+        "e4-e2",
+        "e4-e3",
+        "e4-f4",
+        "e4-g4",
+        "e4-h4",
+        "e4-i4"
+      ]
+    },
+    {
+      "name": "center.passThrough bishop only: bishop next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["bishop"]
+      },
+      "expected": [
+        "d4-b2",
+        "d4-b6",
+        "d4-c3",
+        "d4-c5",
+        "d4-e3",
+        "d4-f2",
+        "d4-f6",
+        "d4-g1",
+        "d4-g7",
+        "d4-h8",
+        "d4-i9"
+      ]
+    },
+    {
+      "name": "center.passThrough bishop only: knight next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "d3",
+      "pieces": {
+        "d3": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["bishop"]
+      },
+      "expected": ["d3-b2", "d3-b4", "d3-c1", "d3-c5", "d3-e1", "d3-f2", "d3-f4"]
+    },
+    {
+      "name": "center.passThrough pawn only: king next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["pawn"]
+      },
+      "expected": [
+        "e4-c2",
+        "e4-c4",
+        "e4-c6",
+        "e4-d3",
+        "e4-d4",
+        "e4-d5",
+        "e4-e2",
+        "e4-e3",
+        "e4-f3",
+        "e4-f4",
+        "e4-f5",
+        "e4-g2",
+        "e4-g4",
+        "e4-g6"
+      ]
+    },
+    {
+      "name": "center.passThrough pawn only: rook next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["pawn"]
+      },
+      "expected": [
+        "e4-b4",
+        "e4-c4",
+        "e4-d4",
+        "e4-e1",
+        "e4-e2",
+        "e4-e3",
+        "e4-f4",
+        "e4-g4",
+        "e4-h4",
+        "e4-i4"
+      ]
+    },
+    {
+      "name": "center.passThrough pawn only: bishop next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["pawn"]
+      },
+      "expected": ["d4-b2", "d4-b6", "d4-c3", "d4-c5", "d4-e3", "d4-f2", "d4-g1"]
+    },
+    {
+      "name": "center.passThrough pawn only: knight next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "d3",
+      "pieces": {
+        "d3": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["pawn"]
+      },
+      "expected": ["d3-b2", "d3-b4", "d3-c1", "d3-c5", "d3-e1", "d3-f2", "d3-f4"]
+    },
+    {
+      "name": "default center.passThrough: king next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "e4-c2",
+        "e4-c4",
+        "e4-c6",
+        "e4-d3",
+        "e4-d4",
+        "e4-d5",
+        "e4-e2",
+        "e4-e3",
+        "e4-e6",
+        "e4-f3",
+        "e4-f4",
+        "e4-f5",
+        "e4-g2",
+        "e4-g4",
+        "e4-g6"
+      ]
+    },
+    {
+      "name": "default center.passThrough: rook next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "e4-b4",
+        "e4-c4",
+        "e4-d4",
+        "e4-e1",
+        "e4-e2",
+        "e4-e3",
+        "e4-f4",
+        "e4-g4",
+        "e4-h4",
+        "e4-i4"
+      ]
+    },
+    {
+      "name": "default center.passThrough: bishop next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": ["d4-b2", "d4-b6", "d4-c3", "d4-c5", "d4-e3", "d4-f2", "d4-g1"]
+    },
+    {
+      "name": "default center.passThrough: knight next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "d3",
+      "pieces": {
+        "d3": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": ["d3-b2", "d3-b4", "d3-c1", "d3-c5", "d3-e1", "d3-f2", "d3-f4"]
+    },
+    {
+      "name": "center.occupants dragons: king next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "e4-c2",
+        "e4-c4",
+        "e4-c6",
+        "e4-d3",
+        "e4-d4",
+        "e4-d5",
+        "e4-e2",
+        "e4-e3",
+        "e4-e6",
+        "e4-f3",
+        "e4-f4",
+        "e4-f5",
+        "e4-g2",
+        "e4-g4",
+        "e4-g6"
+      ]
+    },
+    {
+      "name": "center.occupants dragons: king next to a dark Dragon Head on e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e5": {
+          "piece": "dark-dragon-head",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": [
+        "e4-c2",
+        "e4-c4",
+        "e4-c6",
+        "e4-d3",
+        "e4-d4",
+        "e4-d5",
+        "e4-e2",
+        "e4-e3",
+        "e4-f3",
+        "e4-f4",
+        "e4-f5",
+        "e4-g2",
+        "e4-g4",
+        "e4-g6"
+      ]
+    },
+    {
+      "name": "center.occupants dragons: rook next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "e4-b4",
+        "e4-c4",
+        "e4-d4",
+        "e4-e1",
+        "e4-e2",
+        "e4-e3",
+        "e4-f4",
+        "e4-g4",
+        "e4-h4",
+        "e4-i4"
+      ]
+    },
+    {
+      "name": "center.occupants dragons: rook next to a dark Dragon Head on e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "e5": {
+          "piece": "dark-dragon-head",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": [
+        "e4-b4",
+        "e4-c4",
+        "e4-d4",
+        "e4-e1",
+        "e4-e2",
+        "e4-e3",
+        "e4-f4",
+        "e4-g4",
+        "e4-h4",
+        "e4-i4"
+      ]
+    },
+    {
+      "name": "center.occupants dragons: bishop next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": ["d4-b2", "d4-b6", "d4-c3", "d4-c5", "d4-e3", "d4-f2", "d4-g1"]
+    },
+    {
+      "name": "center.occupants dragons: bishop next to a dark Dragon Head on e5",
+      "players": 2,
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        },
+        "e5": {
+          "piece": "dark-dragon-head",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": ["d4-b2", "d4-b6", "d4-c3", "d4-c5", "d4-e3", "d4-f2", "d4-g1"]
+    },
+    {
+      "name": "center.occupants dragons: knight next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "d3",
+      "pieces": {
+        "d3": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": ["d3-b2", "d3-b4", "d3-c1", "d3-c5", "d3-e1", "d3-f2", "d3-f4"]
+    },
+    {
+      "name": "center.occupants dragons: knight next to a dark Dragon Head on e5",
+      "players": 2,
+      "side": "light",
+      "from": "d3",
+      "pieces": {
+        "d3": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        },
+        "e5": {
+          "piece": "dark-dragon-head",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": ["d3-b2", "d3-b4", "d3-c1", "d3-c5", "d3-e1", "d3-f2", "d3-f4"]
+    },
+    {
+      "name": "center.occupants dragons-and-sun-moon: king next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.occupants": "dragons-and-sun-moon"
+      },
+      "expected": [
+        "e4-c2",
+        "e4-c4",
+        "e4-c6",
+        "e4-d3",
+        "e4-d4",
+        "e4-d5",
+        "e4-e2",
+        "e4-e3",
+        "e4-e6",
+        "e4-f3",
+        "e4-f4",
+        "e4-f5",
+        "e4-g2",
+        "e4-g4",
+        "e4-g6"
+      ]
+    },
+    {
+      "name": "center.occupants dragons-and-sun-moon: king next to a dark Dragon Head on e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e5": {
+          "piece": "dark-dragon-head",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.occupants": "dragons-and-sun-moon"
+      },
+      "expected": [
+        "e4-c2",
+        "e4-c4",
+        "e4-c6",
+        "e4-d3",
+        "e4-d4",
+        "e4-d5",
+        "e4-e2",
+        "e4-e3",
+        "e4-f3",
+        "e4-f4",
+        "e4-f5",
+        "e4-g2",
+        "e4-g4",
+        "e4-g6"
+      ]
+    },
+    {
+      "name": "center.occupants dragons-and-sun-moon: rook next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.occupants": "dragons-and-sun-moon"
+      },
+      "expected": [
+        "e4-b4",
+        "e4-c4",
+        "e4-d4",
+        "e4-e1",
+        "e4-e2",
+        "e4-e3",
+        "e4-f4",
+        "e4-g4",
+        "e4-h4",
+        "e4-i4"
+      ]
+    },
+    {
+      "name": "center.occupants dragons-and-sun-moon: rook next to a dark Dragon Head on e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "e5": {
+          "piece": "dark-dragon-head",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.occupants": "dragons-and-sun-moon"
+      },
+      "expected": [
+        "e4-b4",
+        "e4-c4",
+        "e4-d4",
+        "e4-e1",
+        "e4-e2",
+        "e4-e3",
+        "e4-f4",
+        "e4-g4",
+        "e4-h4",
+        "e4-i4"
+      ]
+    },
+    {
+      "name": "center.occupants dragons-and-sun-moon: bishop next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.occupants": "dragons-and-sun-moon"
+      },
+      "expected": ["d4-b2", "d4-b6", "d4-c3", "d4-c5", "d4-e3", "d4-f2", "d4-g1"]
+    },
+    {
+      "name": "center.occupants dragons-and-sun-moon: bishop next to a dark Dragon Head on e5",
+      "players": 2,
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        },
+        "e5": {
+          "piece": "dark-dragon-head",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.occupants": "dragons-and-sun-moon"
+      },
+      "expected": ["d4-b2", "d4-b6", "d4-c3", "d4-c5", "d4-e3", "d4-f2", "d4-g1"]
+    },
+    {
+      "name": "center.occupants dragons-and-sun-moon: knight next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "d3",
+      "pieces": {
+        "d3": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.occupants": "dragons-and-sun-moon"
+      },
+      "expected": ["d3-b2", "d3-b4", "d3-c1", "d3-c5", "d3-e1", "d3-f2", "d3-f4"]
+    },
+    {
+      "name": "center.occupants dragons-and-sun-moon: knight next to a dark Dragon Head on e5",
+      "players": 2,
+      "side": "light",
+      "from": "d3",
+      "pieces": {
+        "d3": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        },
+        "e5": {
+          "piece": "dark-dragon-head",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.occupants": "dragons-and-sun-moon"
+      },
+      "expected": ["d3-b2", "d3-b4", "d3-c1", "d3-c5", "d3-e1", "d3-f2", "d3-f4"]
+    },
+    {
+      "name": "center.occupants any: king next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.occupants": "any"
+      },
+      "expected": [
+        "e4-c2",
+        "e4-c4",
+        "e4-c6",
+        "e4-d3",
+        "e4-d4",
+        "e4-d5",
+        "e4-e2",
+        "e4-e3",
+        "e4-e5",
+        "e4-e6",
+        "e4-f3",
+        "e4-f4",
+        "e4-f5",
+        "e4-g2",
+        "e4-g4",
+        "e4-g6"
+      ]
+    },
+    {
+      "name": "center.occupants any: king next to a dark Dragon Head on e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e5": {
+          "piece": "dark-dragon-head",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.occupants": "any"
+      },
+      "expected": [
+        "e4-c2",
+        "e4-c4",
+        "e4-c6",
+        "e4-d3",
+        "e4-d4",
+        "e4-d5",
+        "e4-e2",
+        "e4-e3",
+        "e4-f3",
+        "e4-f4",
+        "e4-f5",
+        "e4-g2",
+        "e4-g4",
+        "e4-g6",
+        "e4xe5"
+      ]
+    },
+    {
+      "name": "center.occupants any: rook next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.occupants": "any"
+      },
+      "expected": [
+        "e4-b4",
+        "e4-c4",
+        "e4-d4",
+        "e4-e1",
+        "e4-e2",
+        "e4-e3",
+        "e4-e5",
+        "e4-f4",
+        "e4-g4",
+        "e4-h4",
+        "e4-i4"
+      ]
+    },
+    {
+      "name": "center.occupants any: rook next to a dark Dragon Head on e5",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "e5": {
+          "piece": "dark-dragon-head",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.occupants": "any"
+      },
+      "expected": [
+        "e4-b4",
+        "e4-c4",
+        "e4-d4",
+        "e4-e1",
+        "e4-e2",
+        "e4-e3",
+        "e4-f4",
+        "e4-g4",
+        "e4-h4",
+        "e4-i4",
+        "e4xe5"
+      ]
+    },
+    {
+      "name": "center.occupants any: bishop next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.occupants": "any"
+      },
+      "expected": ["d4-b2", "d4-b6", "d4-c3", "d4-c5", "d4-e3", "d4-e5", "d4-f2", "d4-g1"]
+    },
+    {
+      "name": "center.occupants any: bishop next to a dark Dragon Head on e5",
+      "players": 2,
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        },
+        "e5": {
+          "piece": "dark-dragon-head",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.occupants": "any"
+      },
+      "expected": ["d4-b2", "d4-b6", "d4-c3", "d4-c5", "d4-e3", "d4-f2", "d4-g1", "d4xe5"]
+    },
+    {
+      "name": "center.occupants any: knight next to an empty e5",
+      "players": 2,
+      "side": "light",
+      "from": "d3",
+      "pieces": {
+        "d3": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.occupants": "any"
+      },
+      "expected": ["d3-b2", "d3-b4", "d3-c1", "d3-c5", "d3-e1", "d3-e5", "d3-f2", "d3-f4"]
+    },
+    {
+      "name": "center.occupants any: knight next to a dark Dragon Head on e5",
+      "players": 2,
+      "side": "light",
+      "from": "d3",
+      "pieces": {
+        "d3": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        },
+        "e5": {
+          "piece": "dark-dragon-head",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.occupants": "any"
+      },
+      "expected": ["d3-b2", "d3-b4", "d3-c1", "d3-c5", "d3-e1", "d3-f2", "d3-f4", "d3xe5"]
+    },
+    {
+      "name": "king.canJump jumps over a Dragon Head on e5 (jumps ignore no-passing)",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        },
+        "e5": {
+          "piece": "dark-dragon-head",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "king.canJump": true
+      },
+      "expected": [
+        "e4-c2",
+        "e4-c4",
+        "e4-c6",
+        "e4-d3",
+        "e4-d4",
+        "e4-d5",
+        "e4-e2",
+        "e4-e3",
+        "e4-e6",
+        "e4-f3",
+        "e4-f4",
+        "e4-f5",
+        "e4-g2",
+        "e4-g4",
+        "e4-g6"
+      ]
+    },
+    {
+      "name": "king.canJump jumps over an empty e5 even if kings may not pass",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "king.canJump": true,
+        "center.passThrough": ["rook"]
+      },
+      "expected": [
+        "e4-c2",
+        "e4-c4",
+        "e4-c6",
+        "e4-d3",
+        "e4-d4",
+        "e4-d5",
+        "e4-e2",
+        "e4-e3",
+        "e4-e6",
+        "e4-f3",
+        "e4-f4",
+        "e4-f5",
+        "e4-g2",
+        "e4-g4",
+        "e4-g6"
+      ]
+    },
+    {
+      "name": "king.range 4 passes e5 along the e-file",
+      "players": 2,
+      "side": "light",
+      "from": "e2",
+      "pieces": {
+        "e2": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "king.range": 4
+      },
+      "expected": [
+        "e2-a2",
+        "e2-a6",
+        "e2-b2",
+        "e2-b5",
+        "e2-c2",
+        "e2-c4",
+        "e2-d1",
+        "e2-d2",
+        "e2-d3",
+        "e2-e1",
+        "e2-e3",
+        "e2-e4",
+        "e2-e6",
+        "e2-f1",
+        "e2-f2",
+        "e2-f3",
+        "e2-g2",
+        "e2-g4",
+        "e2-h2",
+        "e2-h5",
+        "e2-i2",
+        "e2-i6"
+      ]
+    },
+    {
+      "name": "king.range 4 does not pass e5 when kings may not",
+      "players": 2,
+      "side": "light",
+      "from": "e2",
+      "pieces": {
+        "e2": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "king.range": 4,
+        "center.passThrough": ["rook"]
+      },
+      "expected": [
+        "e2-a2",
+        "e2-a6",
+        "e2-b2",
+        "e2-b5",
+        "e2-c2",
+        "e2-c4",
+        "e2-d1",
+        "e2-d2",
+        "e2-d3",
+        "e2-e1",
+        "e2-e3",
+        "e2-e4",
+        "e2-f1",
+        "e2-f2",
+        "e2-f3",
+        "e2-g2",
+        "e2-g4",
+        "e2-h2",
+        "e2-h5",
+        "e2-i2",
+        "e2-i6"
+      ]
+    },
+    {
+      "name": "rook passes e5 along the rank when rooks may",
+      "players": 2,
+      "side": "light",
+      "from": "d5",
+      "pieces": {
+        "d5": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["rook"]
+      },
+      "expected": [
+        "d5-b5",
+        "d5-c5",
+        "d5-d1",
+        "d5-d2",
+        "d5-d3",
+        "d5-d4",
+        "d5-d6",
+        "d5-d7",
+        "d5-d8",
+        "d5-d9",
+        "d5-f5",
+        "d5-g5",
+        "d5-h5",
+        "d5-i5"
+      ]
+    },
+    {
+      "name": "rook stops on e5 under center.occupants any but does not pass",
+      "players": 2,
+      "side": "light",
+      "from": "e2",
+      "pieces": {
+        "e2": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.occupants": "any"
+      },
+      "expected": [
+        "e2-b2",
+        "e2-c2",
+        "e2-d2",
+        "e2-e1",
+        "e2-e3",
+        "e2-e4",
+        "e2-e5",
+        "e2-f2",
+        "e2-g2",
+        "e2-h2",
+        "e2-i2"
+      ]
+    },
+    {
+      "name": "bishop passes e5 when bishops may, and captures beyond",
+      "players": 2,
+      "side": "light",
+      "from": "c3",
+      "pieces": {
+        "c3": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        },
+        "g7": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "center.passThrough": ["bishop"]
+      },
+      "expected": ["c3-b2", "c3-b4", "c3-d2", "c3-d4", "c3-e1", "c3-f6", "c3xg7"]
+    }
+  ]
+}
