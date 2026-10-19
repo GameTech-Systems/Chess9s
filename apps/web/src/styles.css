@@ -117,8 +117,9 @@ body {
 }
 
 .table-board {
-  flex: 0 1 auto;
+  flex: 1 1 460px;
   min-width: 0;
+  max-width: min(880px, calc(100svh - 8rem));
 }
 
 .panel {

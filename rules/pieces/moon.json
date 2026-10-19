@@ -405,5 +405,5 @@
     }
   ],
   "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026.",
-  "notes": "Each capture option of sunMoon.capture is its own group of moves. Reading of diagonal-only: it moves as usual but captures only on diagonal moves. Not expressed yet (engine features): Coast opening and exits, capture on the Coast, promotion (sunMoon.canPromote: no promotion targets have been given), and 3-player check (dragon.3p.givesCheck). givesCheck follows the 2-player setting."
+  "notes": "Each capture option of sunMoon.capture is its own group of moves. Reading of diagonal-only: it moves as usual but captures only on diagonal moves. Coast opening is game state (S17). Not expressed yet (engine features): Coast exits, capture on the Coast, promotion (sunMoon.canPromote: no promotion targets have been given), and 3-player check (dragon.3p.givesCheck). givesCheck follows the 2-player setting."
 }

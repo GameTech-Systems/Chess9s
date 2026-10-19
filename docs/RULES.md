@@ -90,10 +90,10 @@ All Coast pieces move in straight lines and stop when blocked; none may turn a c
 
 ### Opening the Coast: 2-player
 
-1. Either player, on their turn, may use their move to put the Dragon Tail from A5 on E5. This opens the Coast (`coast.2p.initiation` = tail-to-center). Until then no Coast piece may move. Once open, the Coast stays open, even if the Tail returns to A5.
+1. Either player, on their turn, may use their move to put the Dragon Tail from A5 on E5. This opens the Coast (`coast.2p.initiation` = tail-to-center). Until then no Coast piece may move, and none gives check. Once open, the Coast stays open, even if the Tail returns to A5.
 2. After that, either player may use a turn to jump the Tail to whichever of A5, E5 and I5 is empty. Pieces in between don't block it, and it may never stand anywhere else.
 3. A player may not move the Tail on two of their own turns in a row (`tail.repeatLimit` = 1). One exception: the player who opens the Coast may move the Tail A5 to E5 and then E5 to I5 on their next turn, the first time it reaches those squares.
-4. The Tail can't capture, can't check a King, and can't be captured. It blocks lines like any piece, so moving it can block or open a check.
+4. The Tail can't capture, can't check a King, and can't be captured; it is neutral, so it never takes a piece of the player moving it, whatever `tail.2p.canCapture` says. It blocks lines like any piece, so moving it can block or open a check.
 
 ### Leaving the Coast: 2-player
 
