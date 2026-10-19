@@ -2,7 +2,7 @@
   "$schema": "../schema/board.schema.json",
   "id": "standard-9x9",
   "name": "Chess Nines board",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "The 9x9 Chess Nines board: the Coast (file a), an 8-column checkered board (files b to i) split by the void (rank 5), and the start positions for 2 and 3 players.",
   "squareTypes": [
     {
@@ -285,7 +285,10 @@
     },
     {
       "id": "dark",
-      "forward": "down"
+      "forward": "down",
+      "view": {
+        "rotate": 180
+      }
     },
     {
       "id": "dragon",
@@ -395,5 +398,5 @@
     }
   ],
   "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026.",
-  "notes": "Checkered squares: b1 is black and colors alternate, so Kings start on black (f1, f9) and Queens on white (e1, e9); unlisted squares are #000000 or #ffffff. i5 shows the Ting Yang symbol on white; in 3-player games the symbol turns 90 degrees clockwise. e5 shows an arrow pointing toward i5 in both of the owner's views; no rule is attached to it. Views: light sees the standard diagram; the Dragon player sees the Coast at the bottom with rank 9 on the left (owner's image, 19 Oct). Dark has no view yet. The Dragon side has no forward direction: none of its moves is forward-relative today. setup.swapKingQueen (D30) is an engine feature, not a separate setup."
+  "notes": "Checkered squares: b1 is black and colors alternate, so Kings start on black (f1, f9) and Queens on white (e1, e9); unlisted squares are #000000 or #ffffff. i5 shows the Ting Yang symbol on white; in 3-player games the symbol turns 90 degrees clockwise. e5 shows a tetrahedron symbol, not a rule (D36): the base is three corners of a cube, one base side parallel to the Coast column, the opposite vertex pointing at i5 (the owner's arrows), apex centered, size related to phi. The home-play board will carry it too, and the three Dragon pieces get hollow pyramidal bases that fit over it like a cap. Views: light sees the standard diagram; the Dragon player sees the Coast at the bottom with rank 9 on the left (owner's image, 19 Oct). Dark is turned 180 degrees, as in regular chess: rank 9 at the bottom, the Coast on the right (D34, 19 Oct). The Dragon side has no forward direction: none of its moves is forward-relative today. setup.swapKingQueen (D30) is an engine feature, not a separate setup."
 }
