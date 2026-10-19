@@ -314,3 +314,13 @@ describe('play aids', () => {
     expect(highlights(on).danger).toEqual(['c4']);
   });
 });
+
+describe('a move made for the computer', () => {
+  it('plays the given legal move and can be undone', async () => {
+    const { playFor } = await import('./session');
+    const m = newModel();
+    const next = playFor(m, m.game.legal[0]!);
+    expect(next.game.moves).toHaveLength(1);
+    expect(undo(next).game.moves).toHaveLength(0);
+  });
+});

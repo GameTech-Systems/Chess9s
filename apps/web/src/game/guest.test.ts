@@ -42,18 +42,34 @@ describe('guest play kept in the browser', () => {
 
   it('ignores damaged, foreign or other-ruleset data', () => {
     const store = memory();
-    for (const bad of ['{', '[]', '{"v":1,"ruleset":"draft-2p","version":"0","mode":"x","moves":[]}']) {
+    for (const bad of [
+      '{',
+      '[]',
+      '{"v":1,"ruleset":"draft-2p","version":"0","mode":"x","moves":[]}',
+    ]) {
       store.setItem('chess9s.guest', bad);
       expect(loadGuest(store, createRules(), ruleset)).toBeNull();
     }
     store.setItem(
       'chess9s.guest',
-      JSON.stringify({ v: 1, ruleset: 'other', version: ruleset.version, mode: 'computer', moves: [] }),
+      JSON.stringify({
+        v: 1,
+        ruleset: 'other',
+        version: ruleset.version,
+        mode: 'computer',
+        moves: [],
+      }),
     );
     expect(loadGuest(store, createRules(), ruleset)).toBeNull();
     store.setItem(
       'chess9s.guest',
-      JSON.stringify({ v: 1, ruleset: ruleset.id, version: ruleset.version, mode: 'computer', moves: ['z9-z8'] }),
+      JSON.stringify({
+        v: 1,
+        ruleset: ruleset.id,
+        version: ruleset.version,
+        mode: 'computer',
+        moves: ['z9-z8'],
+      }),
     );
     expect(loadGuest(store, createRules(), ruleset)).toBeNull();
   });
