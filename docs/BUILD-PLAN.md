@@ -104,7 +104,7 @@ Run everything, fix rough edges, remove dead code, update docs, and propose any 
 ### S19 — Rule picker · Sonnet 5.5 · medium · `done`
 Pick a ruleset before a game, with status badges (proposed, experimental, candidate, official).
 
-### S20 — Play aids, part 1 · Sonnet 5.5 · medium · `todo`
+### S20 — Play aids, part 1 · Sonnet 5.5 · medium · `done`
 Show-legal-moves toggle (on by default), last-move highlight, undo (disabled in online play later), pieces-in-danger indicator.
 
 ### S21 — Play aids, part 2 · Sonnet 5.5 · low · `todo`
