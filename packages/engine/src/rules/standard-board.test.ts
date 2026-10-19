@@ -83,15 +83,15 @@ describe('standard board data', () => {
       const coast = ['sun', 'moon', 'light-dragon-head', 'dark-dragon-head'];
       if (!coast.includes(p.piece)) expect(other.piece).toBe(p.piece);
     }
-    expect(start.f1).toEqual({ piece: 'king', side: 'light' });
-    expect(start.e9).toEqual({ piece: 'queen', side: 'dark' });
-    expect(start.a5).toEqual({ piece: 'dragon-tail', side: 'neutral' });
+    expect(start.f1).toEqual({ piece: 'king', side: 'light', home: 'f1' });
+    expect(start.e9).toEqual({ piece: 'queen', side: 'dark', home: 'e9' });
+    expect(start.a5).toEqual({ piece: 'dragon-tail', side: 'neutral', home: 'a5' });
   });
 
   it('switches the Sun and Moon and gives the Coast to the Dragon in 3-player games', () => {
     const start = startPosition(board, 3);
-    expect(start.a8).toEqual({ piece: 'sun', side: 'dragon' });
-    expect(start.a2).toEqual({ piece: 'moon', side: 'dragon' });
+    expect(start.a8).toEqual({ piece: 'sun', side: 'dragon', home: 'a8' });
+    expect(start.a2).toEqual({ piece: 'moon', side: 'dragon', home: 'a2' });
     for (const r of [1, 5, 9]) expect(start[`a${r}`]!.side).toBe('dragon');
   });
 });

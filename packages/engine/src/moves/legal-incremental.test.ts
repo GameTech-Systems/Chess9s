@@ -7,7 +7,7 @@ import { newGame, playMove, turnOptionsOf, type GameState } from '../game/game';
 import { validateBoardAndPieces } from '../rules/formats';
 import { resolveRuleset, type Registry } from '../rules/loader';
 import { applyMove, inCheck, legalMoves, type TurnOptions } from './check';
-import { generateMoves, toNotation, type MoveRules, type Position } from './generate';
+import { castlePath, generateMoves, toNotation, type MoveRules, type Position } from './generate';
 
 const root = new URL('../../../../', import.meta.url).pathname;
 const read = (path: string): unknown => JSON.parse(readFileSync(root + path, 'utf8'));
@@ -26,13 +26,21 @@ function reference(
   rules: MoveRules,
   position: Position,
   side: string,
-  { lost, alsoMove = [], allow, inert, lifts }: TurnOptions,
+  { lost, passing, alsoMove = [], allow, inert, lifts }: TurnOptions,
 ): string[] {
+  // Castling (S22a): not out of check, and not across a square where the King would be in check.
+  const castles = (m: ReturnType<typeof generateMoves>[number]) =>
+    !m.castle ||
+    [m.from, ...castlePath(m)].every(
+      (at) =>
+        !inCheck(rules, applyMove(position, { from: m.from, to: at, piece: m.piece }), side, inert),
+    );
   return [...new Set([side, ...alsoMove])]
     .flatMap((mover) =>
-      generateMoves(rules, position, mover, lost)
-        .filter((m) => mover === side || position[m.to]?.side !== side)
+      generateMoves(rules, position, mover, lost, passing)
+        .filter((m) => mover === side || position[m.captureAt ?? m.to]?.side !== side)
         .filter((m) => allow?.(m, mover) !== false)
+        .filter(castles)
         .filter(
           (m) =>
             !inCheck(rules, applyMove(position, m), side, lifts?.(m, mover) ? undefined : inert),

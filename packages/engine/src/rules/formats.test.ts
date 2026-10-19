@@ -271,6 +271,25 @@ describe('piece format: square rules and promotion', () => {
     expect(() => validatePiece(p, validBoard(), registry())).toThrow(/fails its schema/);
   });
 
+  it('accepts the S22a fields: capturable, outside, owner and homeFile square rules', () => {
+    const p = clone(slider) as Json;
+    p.squares = [{ type: 'home', owner: 'other', homeFile: true, outside: false, capturable: false }];
+    p.irreversible = true;
+    expect(() => validatePiece(p, validBoard(), registry())).not.toThrow();
+  });
+
+  it('rejects a capturable rule on a move: capture depends on where a piece stands, not how it moves', () => {
+    const p = clone(hopper) as Json;
+    (p.moves as Json[])[1]!.squares = [{ type: 'void', capturable: false }];
+    expect(pieceIssues(p)).toContain('hopper: moves[1].squares[0].capturable belongs on a piece-level square rule');
+  });
+
+  it('rejects inPassing on a move that is not capture-only', () => {
+    const p = clone(stepper) as Json;
+    (p.moves as Json[])[0]!.inPassing = true;
+    expect(pieceIssues(p)).toContain('stepper: moves[0].inPassing needs a capture-only move');
+  });
+
   it('accepts a fixed promotion list with a condition', () => {
     const p = clone(stepper) as Json;
     p.promotion = { to: ['slider'], when: { players: [2] } };
@@ -290,6 +309,17 @@ describe('board and pieces together', () => {
   it('rejects a duplicate piece id', () => {
     const list = [...pieces(), clone(slider) as Json];
     expect(issuesOf(() => validateBoardAndPieces(board(), list, registry()))).toContain('slider: piece id is used twice');
+  });
+
+  it('rejects castling with an unknown partner, and a castle of fewer than 2 steps', () => {
+    const list = pieces();
+    list.find((p) => p.id === 'guard')!.castle = { partner: 'wizard', steps: 2 };
+    expect(issuesOf(() => validateBoardAndPieces(board(), list, registry()))).toContain(
+      'guard: castle.partner names unknown piece wizard',
+    );
+    const p = clone(guard) as Json;
+    p.castle = { partner: 'slider', steps: 1 };
+    expect(() => validatePiece(p, validBoard(), registry())).toThrow(/fails its schema/);
   });
 
   it('rejects a promotion to an unknown piece', () => {

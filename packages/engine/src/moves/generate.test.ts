@@ -111,9 +111,9 @@ describe('fixture coverage', () => {
 describe('startPosition', () => {
   it('places every piece of the setup for its side, unmoved', () => {
     const p = startPosition(set.board, 2);
-    expect(p['e1']).toEqual({ piece: 'guard', side: 'light' });
-    expect(p['f8']).toEqual({ piece: 'stepper', side: 'dark' });
-    expect(p['b6']).toEqual({ piece: 'hopper', side: 'neutral' });
+    expect(p['e1']).toEqual({ piece: 'guard', side: 'light', home: 'e1' });
+    expect(p['f8']).toEqual({ piece: 'stepper', side: 'dark', home: 'f8' });
+    expect(p['b6']).toEqual({ piece: 'hopper', side: 'neutral', home: 'b6' });
     expect(Object.keys(p)).toHaveLength(15);
   });
 
