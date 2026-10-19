@@ -63,7 +63,7 @@ Design `rules/schema/board.schema.json` (coordinates a–i and 1–9, square typ
 Done when: schemas validate the fixture and the formats are documented in `docs/RULES-FRAMEWORK.md`.
 Decisions: D1.
 
-### S10 — Enter the real board and pieces · Owner with Claude in chat · `todo`
+### S10 — Enter the real board and pieces · Owner with Claude in chat · `done`
 The owner provides the board layout, special squares, starting position, and piece list from the original design. Claude converts them into `rules/boards/standard-9x9.json` and `rules/pieces/`, marked as unverified seeds, and opens a PR.
 Done when: the data validates against the S9 schemas.
 Decisions: D1.
@@ -158,7 +158,7 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 
 | ID | Topic | In effect | Needed by |
 |---|---|---|---|
-| D1 | Board and piece spec | Default: build formats against a neutral fixture (S9, S12); the real data arrives in S10; piece batches wait for S10 | S9 |
+| D1 | Board and piece spec | Applied: formats built against a neutral fixture (S9); the real data is in `rules/boards/` and `rules/pieces/` (S10) | S9 |
 | D2 | `pawn.promotion.targets` | Decided: queen, rook, bishop, knight (rule set v0.2) | S8 |
 | D3 | `dragons.2p.mode` | Superseded by rule set v0.2: Coast pieces play in 2-player games (`coast.2p.initiation`) | S8 |
 | D4 | `dragon.rangeMode` | Decided: straight-line squares for all 5 Coast pieces, no corner option (rule set v0.2) | S32 |

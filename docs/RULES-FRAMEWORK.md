@@ -42,14 +42,14 @@ An **Official** ruleset is immutable. Any change is a new version, and the old o
 
 ## Boards
 
-Boards live in `rules/boards/` (the real board arrives in S10) and are validated by [`rules/schema/board.schema.json`](../rules/schema/board.schema.json). The format is recorded in [decision 0007](decisions/0007-board-and-piece-formats.md).
+Boards live in `rules/boards/` (the Chess Nines board is `standard-9x9.json`) and are validated by [`rules/schema/board.schema.json`](../rules/schema/board.schema.json). The format is recorded in [decision 0007](decisions/0007-board-and-piece-formats.md).
 
 | Field | Meaning |
 |---|---|
 | `id`, `name`, `version` | Identity; versions follow semantic versioning |
 | `squareTypes` | The kinds of special square, each with an `id` and `label` |
-| `squares` | The special squares: `at` (such as `e5`), one or more `types`, an optional owning `side` and a display `label`. Unlisted squares are plain |
-| `sides` | Each side's `id` and its `forward` direction: `up` (toward rank 9) or `down`. A side may have none if it holds no forward-relative pieces |
+| `squares` | The special squares: `at` (such as `e5`), one or more `types`, an optional owning `side`, a display `label` and a display `color` (`#rrggbb`). Unlisted squares are plain |
+| `sides` | Each side's `id`, its `forward` direction (`up`, toward rank 9, or `down`) and an optional `view`: how the board is drawn for that seat, as a clockwise `rotate` of the standard diagram (0, 90, 180 or 270). A side may have no forward direction if none of its moves in that player count is forward-relative |
 | `setups` | One start position per player count: side id, or `neutral` for unowned pieces, to square to piece id |
 
 Coordinates are lowercase: files `a` to `i` from the left, ranks `1` to `9` from the light side.
@@ -103,7 +103,7 @@ A **square rule** names a square type and says whether the piece may `stop` ther
 }
 ```
 
-The engine checks what a schema can't: unique ids, declared square types and sides, parameter references that exist, aren't deprecated and have the right type, condition values that are options, setups that place only known pieces, and no forward-relative piece starting for a side without a forward direction. The test layout in `packages/engine/test/fixtures/` shows every field and is deliberately not the Chess Nines board.
+The engine checks what a schema can't: unique ids, declared square types and sides, parameter references that exist, aren't deprecated and have the right type, condition values that are options, setups that place only known pieces, and no forward-relative piece starting for a side without a forward direction (moves limited by `players` to other player counts don't count). The test layout in `packages/engine/test/fixtures/` shows every field and is deliberately not the Chess Nines board.
 
 Special rules such as en passant, castling and opening the Coast are engine features switched by parameters; the format grows to describe them as they are built. Betza notation, which the fairy-chess community already uses, may later be accepted as a shorthand that converts into this format.
 
