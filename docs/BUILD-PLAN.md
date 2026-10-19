@@ -53,7 +53,7 @@ Pre-approved dependencies (D21): typescript, vite, react, react-dom, @vitejs/plu
 Done when: CI passes on the PR, `pnpm dev` serves a blank app shell, and `validate:rules` passes.
 Decisions: D7, D8, D10, D21.
 
-### S8 — Rules loader and registry fixes · Sonnet 5.5 · medium · `todo`
+### S8 — Rules loader and registry fixes · Sonnet 5.5 · medium · `done`
 In `packages/engine`: load `parameters.json` and a ruleset, validate both against the schemas, check every default is one of its options, apply overrides, and refuse to start a game that depends on a parameter whose resolved value is still null. The registry fixes from D2, D3, D5 and D6 already landed with rule set v0.2 (`docs/RULES.md`); deprecated parameters must load but never resolve into a new game. Tests: every parameter at its default and every option resolves correctly.
 Done when: loader tests pass and the draft ruleset resolves with no null values for 2-player.
 Decisions: D2, D3, D5, D6.

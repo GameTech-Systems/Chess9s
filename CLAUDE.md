@@ -9,7 +9,7 @@ Chess Nines is a 9×9 chess variant (custom pieces and special squares). 2-playe
 1. **Start** with `/start-session S<n>`. One build-plan step per session, one pull request per step. The step list is `docs/BUILD-PLAN.md`; read only your step's section.
 2. **Model and effort** come from the step (or the owner's pasted ledger brief). If the session runs on something else, give the owner the exact commands (`/model sonnet`, `/effort medium`) at the top of your first reply. Don't switch models mid-session yourself: it drops the prompt cache.
 3. **Plan mode** before any change that touches several files. **Write the failing test first.** Commit after every green task.
-4. **End** with `/end-session`: checks, handoff, log, PR, CI, merge, and the next-session recommendation with a `ledger-sync` block. If usage is running low, run it early; unfinished work stays on its branch.
+4. **End** automatically with `/end-session` when the step is done (no prompt needed). Keep replies brief: facts, plus problems the owner must resolve before the next session. `/end-session`: checks, handoff, log, PR, CI, merge, and the next-session recommendation with a `ledger-sync` block. If usage is running low, run it early; unfinished work stays on its branch.
 
 ## Decisions and defaults
 - Owner decisions are made in a private ledger. Public ones reach you through the owner's brief, the "Decision defaults" table in `docs/BUILD-PLAN.md`, and `docs/decisions/`.
