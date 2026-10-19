@@ -84,7 +84,7 @@ Decisions: D1.
 `queen.canEnterVoid`, `queen.enemyTerritoryEntry` (gateways), `pawn.initialDoubleStep`, `pawn.promotion.targets`. Tests at every option.
 Decisions: D2.
 
-### S15 — Pieces, batch 3: Sun and Moon pawns and Dragons in 2-player · Sonnet 5.5 · high · `todo`
+### S15 — Pieces, batch 3: Sun and Moon pawns and Dragons in 2-player · Sonnet 5.5 · high · `done`
 `sunMoon.range`, `sunMoon.canPromote`, the Sun and Moon capture rule, and `dragons.2p.mode` (blocking or removed). Tests at every option.
 Decisions: D3, D6.
 
