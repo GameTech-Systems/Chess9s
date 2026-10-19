@@ -64,4 +64,61 @@ describe('Board', () => {
     expect(html).toContain('aria-label="Chess Nines board, light seat"');
     expect(html).toMatch(/<title>e5 · Center/);
   });
+
+  describe('in a game', () => {
+    const position = {
+      f1: { piece: 'king', side: 'light' },
+      f9: { piece: 'king', side: 'dark' },
+      a5: { piece: 'dragon-tail', side: 'neutral' },
+    };
+    const highlights = {
+      selected: 'f1',
+      targets: [
+        { at: 'f2', capture: false },
+        { at: 'g2', capture: true },
+      ],
+      lastMove: ['b8', 'b6'] as [string, string],
+      check: ['f9'],
+      movable: ['f1', 'a5'],
+    };
+
+    it('draws the given position instead of the start position', () => {
+      const html = render({ position });
+      expect(count(html, /data-piece="/g)).toBe(3);
+      expect(html).toMatch(/data-piece="dragon-tail" data-at="a5" data-side="neutral"/);
+    });
+
+    it('marks the selected square, move targets, captures, the last move and a King in check', () => {
+      const html = render({ position, highlights });
+      expect(html).toMatch(/data-selected="f1"/);
+      expect(html).toMatch(/data-target="f2"/);
+      expect(html).toMatch(/data-target="g2" data-capture=""/);
+      expect(html).toMatch(/data-last-move="b8"/);
+      expect(html).toMatch(/data-last-move="b6"/);
+      expect(html).toMatch(/data-check="f9"/);
+    });
+
+    it('draws no marks without highlights', () => {
+      const html = render({ position });
+      for (const mark of ['data-selected', 'data-target', 'data-last-move', 'data-check']) {
+        expect(html).not.toContain(mark);
+      }
+    });
+
+    it('is clickable only when given a click handler: one hit area per square', () => {
+      expect(render({ position })).not.toContain('data-hit');
+      const html = render({ position, highlights, onSquareClick: () => {} });
+      expect(count(html, /data-hit="/g)).toBe(81);
+      // Only squares with something to do are reachable by keyboard: movable pieces and targets.
+      expect(count(html, /data-hit="[a-i][1-9]"[^>]*tabindex="0"/g)).toBe(4);
+      expect(html).not.toContain('role="img"');
+      expect(html).toContain('role="group"');
+    });
+
+    it('names a hit area by its square and piece', () => {
+      const html = render({ position, onSquareClick: () => {} });
+      expect(html).toMatch(/data-hit="f1"[^>]*aria-label="f1, king, light"/);
+      expect(html).toMatch(/data-hit="e4"[^>]*aria-label="e4"/);
+    });
+  });
 });

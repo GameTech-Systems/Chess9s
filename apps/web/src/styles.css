@@ -105,6 +105,143 @@ body {
   user-select: none;
 }
 
+/* Hot-seat game: the board with a panel beside it on wide screens, below it on narrow ones. */
+.table {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 1.25rem 2rem;
+  width: 100%;
+  max-width: 1280px;
+}
+
+.table-board {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  flex: 1 1 260px;
+  max-width: 360px;
+  min-width: 240px;
+}
+
+.panel .status {
+  margin: 0;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--gold) 55%, transparent);
+  border-radius: 10px;
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+}
+
+.panel .status[data-check] {
+  border-color: #e0574b;
+  color: #ffb3aa;
+}
+
+.panel .status[data-result='win'],
+.panel .status[data-result='draw'] {
+  background: color-mix(in srgb, var(--gold) 20%, transparent);
+}
+
+.panel .facts {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.panel .facts strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.panel .small {
+  font-size: 0.8rem;
+}
+
+.promotion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.promotion span {
+  color: var(--muted);
+}
+
+.panel button:not(.segmented button),
+.promotion button {
+  min-height: 40px;
+  padding: 0 1rem;
+  border: 1px solid color-mix(in srgb, var(--gold) 55%, transparent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.panel button:not(.segmented button):hover,
+.promotion button:hover {
+  background: color-mix(in srgb, var(--gold) 18%, transparent);
+}
+
+.panel button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.again[data-over] {
+  background: color-mix(in srgb, var(--gold) 28%, transparent);
+}
+
+.moves {
+  margin: 0;
+  padding: 0.4rem 0.6rem 0.4rem 2.4rem;
+  max-height: 14rem;
+  overflow-y: auto;
+  border: 1px solid color-mix(in srgb, var(--gold) 25%, transparent);
+  border-radius: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.moves:empty::before {
+  content: 'No moves yet';
+  color: var(--muted);
+  margin-left: -1.8rem;
+}
+
+.moves li span {
+  display: inline-block;
+  min-width: 5.5rem;
+}
+
+.missing {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.missing summary {
+  cursor: pointer;
+}
+
+.missing ul {
+  margin: 0.4rem 0 0;
+  padding-left: 1.2rem;
+}
+
+.board [data-hit]:focus-visible {
+  outline: none;
+  stroke: var(--gold);
+  stroke-width: 5;
+}
+
 @media (max-width: 520px) {
   .page {
     padding-inline: 8px;

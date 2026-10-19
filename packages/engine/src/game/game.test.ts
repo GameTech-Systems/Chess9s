@@ -3,6 +3,7 @@
 // real board, pieces and draft-2p ruleset.
 import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import hotSeatMate from '../../test/fixtures/games/hot-seat-mate.json';
 import { toNotation, type GeneratedMove, type MoveRules, type Position } from '../moves/generate';
 import { NEUTRAL, validateBoardAndPieces } from '../rules/formats';
 import { RulesError, resolveRuleset, type Registry } from '../rules/loader';
@@ -388,5 +389,33 @@ describe('features the game does not play yet', () => {
     expect(on).toContain('castling.enabled');
     const off = unbuiltFeatures(rulesFor(2, { 'pawn.safeZones': 'off' })).map((f) => f.id);
     expect(off).not.toContain('pawn.safeZones');
+  });
+});
+
+describe('a whole game', () => {
+  const replay = (moves: string[], overrides: Record<string, unknown> = {}) =>
+    moves.reduce(play, newGame(rulesFor(2, overrides), ID));
+
+  it('replays a full game from the start position to checkmate (fixture)', () => {
+    const g = replay(hotSeatMate.moves, hotSeatMate.overrides);
+    expect(g.result).toEqual(hotSeatMate.result);
+    expect(g.moves).toHaveLength(80);
+    expect(g.turn).toBe('dark');
+    expect(g.inCheck).toBe(true);
+    expect(g.checkers).toEqual(['i9']);
+    expect(g.legal).toEqual([]);
+    expect(g.coastOpen).toBe(true);
+    expect(gameRecord(g)).toMatchObject({
+      ruleset: hotSeatMate.ruleset,
+      moves: hotSeatMate.moves,
+      result: hotSeatMate.result,
+    });
+  });
+
+  it('accounts for every piece: those on the board plus those lost are the 37 that began', () => {
+    const g = replay(hotSeatMate.moves);
+    const lost = Object.values(g.lost).reduce((n, l) => n + l.length, 0);
+    expect(Object.keys(g.position).length + lost).toBe(37);
+    expect(lost).toBe(23);
   });
 });
