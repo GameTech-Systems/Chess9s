@@ -40,6 +40,8 @@ export interface Setup {
   players: 2 | 3;
   /** Side id (or NEUTRAL) to square to piece id. */
   pieces: Record<string, Record<string, string>>;
+  /** Seats in order of play: every side with pieces here, once, never NEUTRAL. */
+  turnOrder?: string[];
   notes?: string;
 }
 
@@ -178,6 +180,17 @@ export function validateBoard(board: unknown): asserts board is Board {
         const other = usedBy.get(at);
         if (other !== undefined) issues.push(`${where}: ${at} is used by ${other} and ${side}`);
         else usedBy.set(at, side);
+      }
+    }
+    if (setup.turnOrder) {
+      const seated = new Set<string>();
+      for (const side of setup.turnOrder) {
+        if (side === NEUTRAL || !sides.has(side)) issues.push(`${where}: turnOrder seats undeclared side ${side}`);
+        else if (seated.has(side)) issues.push(`${where}: turnOrder seats ${side} twice`);
+        seated.add(side);
+      }
+      for (const side of Object.keys(setup.pieces)) {
+        if (side !== NEUTRAL && !seated.has(side)) issues.push(`${where}: turnOrder leaves out ${side}`);
       }
     }
   }

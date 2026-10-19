@@ -1,7 +1,8 @@
 // Move generator: pseudo-legal moves from piece movement data, board data and
 // resolved parameter values. No piece-specific code paths: a piece moves only
 // as its moves and square rules say. Pure and deterministic; results are
-// sorted by notation. Legality (check) is a later step.
+// sorted by notation. Attack maps come from the same walk; legality (check)
+// is in check.ts.
 // Semantics: docs/RULES-FRAMEWORK.md, "Move generation".
 import {
   type Board,
@@ -219,55 +220,43 @@ function lostTargets(rules: MoveRules, side: string, lost: Lost | undefined): st
   return ids.filter((id) => !rules.pieces[id]!.royal && !rules.pieces[id]!.promotion);
 }
 
+/** What a piece's moves depend on: its data, its side's forward direction and its square. */
+interface Context {
+  piece: Piece;
+  placed: PlacedPiece;
+  forward: 'up' | 'down' | undefined;
+  env: Env;
+}
+
+function context(rules: MoveRules, from: string, placed: PlacedPiece): Context {
+  const forward = rules.board.sides.find((s) => s.id === placed.side)?.forward;
+  const fromTypes = squareTypes(rules.board).get(from) ?? [];
+  return {
+    piece: pieceOf(rules, from, placed),
+    placed,
+    forward,
+    env: { rules, fromTypes, moved: placed.moved === true },
+  };
+}
+
+type CaptureMode = NonNullable<Move['capture']>;
+
 /**
- * Pseudo-legal moves of the piece on `from`, or none if the square is empty. `lost` lists the
- * pieces each side has lost; it is read only by a promotion under `captured-piece`.
+ * Walk every move of the piece on `from` and report each square it may end on (stop rules
+ * applied) with that move's capture mode. Lines end at the first occupied square, which is
+ * reported too, unless the move jumps. Who stands on a reported square is the caller's concern.
  */
-export function movesFrom(
+function walk(
   rules: MoveRules,
   position: Position,
   from: string,
-  lost?: Lost,
-): GeneratedMove[] {
-  const placed = position[from];
-  if (!placed) return [];
-  const piece = pieceOf(rules, from, placed);
+  { piece, placed, forward, env }: Context,
+  visit: (to: string, mode: CaptureMode) => void,
+): void {
   const types = squareTypes(rules.board);
   const typesAt = (at: string) => types.get(at) ?? [];
-  const forward = rules.board.sides.find((s) => s.id === placed.side)?.forward;
   const sign = forward === 'down' ? -1 : 1;
-  const env: Env = { rules, fromTypes: typesAt(from), moved: placed.moved === true };
   const [f0, r0] = parse(from);
-  const moves: GeneratedMove[] = [];
-
-  const promotions = (to: string): (string | undefined)[] => {
-    const promo = piece.promotion;
-    if (!promo || (promo.when && !holds(promo.when, env))) return [undefined];
-    if (forward === undefined) {
-      throw new RulesError(
-        `${piece.id} on ${from} promotes, but side ${placed.side} has no forward direction`,
-      );
-    }
-    if (parse(to)[1] !== (forward === 'up' ? SIZE - 1 : 0)) return [undefined];
-    const target = promo.to;
-    let ids: string[];
-    if (Array.isArray(target)) ids = target;
-    else {
-      const v = value(rules, target.param);
-      if (!Array.isArray(v))
-        throw new RulesError(`Parameter ${target.param} must be a list of pieces`);
-      ids = v.map(String);
-    }
-    if (ids.includes(CAPTURED_PIECE)) {
-      ids = [
-        ...ids.filter((id) => id !== CAPTURED_PIECE),
-        ...lostTargets(rules, placed.side, lost),
-      ];
-    }
-    // No targets means the piece does not promote: an empty list (decision 2026-10-19), or no
-    // lost piece to take back (decision 2026-10-19, section 5). The pawn stays a pawn.
-    return ids.length > 0 ? [...new Set(ids)].sort() : [undefined];
-  };
 
   for (const move of piece.moves) {
     if (move.when && !holds(move.when, env)) continue;
@@ -283,27 +272,8 @@ export function movesFrom(
     const mayStop = (at: string) => !typesAt(at).some((t) => noStop.has(t));
     const mayPass = (at: string) => !typesAt(at).some((t) => noPass.has(t));
     const mode = move.capture ?? 'move-or-capture';
-
     const land = (to: string) => {
-      if (!mayStop(to)) return;
-      const occupant = position[to];
-      let capture: string | undefined;
-      if (!occupant) {
-        if (mode === 'capture-only') return;
-      } else {
-        if (occupant.side === placed.side || mode === 'move-only') return;
-        if (!flag(rules, pieceOf(rules, to, occupant).capturable, true)) return;
-        capture = occupant.piece;
-      }
-      for (const promotion of promotions(to)) {
-        moves.push({
-          from,
-          to,
-          piece: piece.id,
-          ...(capture !== undefined && { capture }),
-          ...(promotion !== undefined && { promotion }),
-        });
-      }
+      if (mayStop(to)) visit(to, mode);
     };
 
     if (move.targets) {
@@ -339,7 +309,95 @@ export function movesFrom(
       }
     }
   }
+}
+
+/**
+ * Pseudo-legal moves of the piece on `from`, or none if the square is empty. `lost` lists the
+ * pieces each side has lost; it is read only by a promotion under `captured-piece`.
+ */
+export function movesFrom(
+  rules: MoveRules,
+  position: Position,
+  from: string,
+  lost?: Lost,
+): GeneratedMove[] {
+  const placed = position[from];
+  if (!placed) return [];
+  const ctx = context(rules, from, placed);
+  const { piece, forward, env } = ctx;
+  const moves: GeneratedMove[] = [];
+
+  const promotions = (to: string): (string | undefined)[] => {
+    const promo = piece.promotion;
+    if (!promo || (promo.when && !holds(promo.when, env))) return [undefined];
+    if (forward === undefined) {
+      throw new RulesError(
+        `${piece.id} on ${from} promotes, but side ${placed.side} has no forward direction`,
+      );
+    }
+    if (parse(to)[1] !== (forward === 'up' ? SIZE - 1 : 0)) return [undefined];
+    const target = promo.to;
+    let ids: string[];
+    if (Array.isArray(target)) ids = target;
+    else {
+      const v = value(rules, target.param);
+      if (!Array.isArray(v))
+        throw new RulesError(`Parameter ${target.param} must be a list of pieces`);
+      ids = v.map(String);
+    }
+    if (ids.includes(CAPTURED_PIECE)) {
+      ids = [
+        ...ids.filter((id) => id !== CAPTURED_PIECE),
+        ...lostTargets(rules, placed.side, lost),
+      ];
+    }
+    // No targets means the piece does not promote: an empty list (decision 2026-10-19), or no
+    // lost piece to take back (decision 2026-10-19, section 5). The pawn stays a pawn.
+    return ids.length > 0 ? [...new Set(ids)].sort() : [undefined];
+  };
+
+  walk(rules, position, from, ctx, (to, mode) => {
+    const occupant = position[to];
+    let capture: string | undefined;
+    if (!occupant) {
+      if (mode === 'capture-only') return;
+    } else {
+      if (occupant.side === placed.side || mode === 'move-only') return;
+      if (!flag(rules, pieceOf(rules, to, occupant).capturable, true)) return;
+      capture = occupant.piece;
+    }
+    for (const promotion of promotions(to)) {
+      moves.push({
+        from,
+        to,
+        piece: piece.id,
+        ...(capture !== undefined && { capture }),
+        ...(promotion !== undefined && { promotion }),
+      });
+    }
+  });
   return sortUnique(moves);
+}
+
+/**
+ * Squares the piece on `from` attacks: where one of its moves could capture an enemy piece
+ * standing there. Built from the same walk as its moves, so every parameter that shapes
+ * movement shapes attacks too. Squares of its own side's pieces count (they are defended);
+ * whether the piece standing on a square may be captured does not. Sorted; none if empty.
+ */
+export function attacksFrom(rules: MoveRules, position: Position, from: string): string[] {
+  const placed = position[from];
+  if (!placed) return [];
+  const squares = new Set<string>();
+  walk(rules, position, from, context(rules, from, placed), (to, mode) => {
+    if (mode !== 'move-only') squares.add(to);
+  });
+  return [...squares].sort();
+}
+
+/** Whether a piece's attacks count as check (`givesCheck`, true unless its data says otherwise). */
+export function givesCheck(rules: MoveRules, at: string, placed: PlacedPiece): boolean {
+  return flag(rules, pieceOf(rules, at, placed).givesCheck, true);
 }
 
 /** Pseudo-legal moves of every piece of `side` (a side id, or NEUTRAL). */
