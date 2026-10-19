@@ -1,31 +1,31 @@
 # Handoff
 
-Updated 2026-10-19 by S10 (Opus 5.5 in chat · high). `/end-session` rewrites this file; keep it under 40 lines.
+Updated 2026-10-19 by S12 (Sonnet 5.5 · medium). `/end-session` rewrites this file; keep it under 40 lines.
 
 ## State
-- Phase 1. The real board and pieces are in: `rules/boards/standard-9x9.json` and 11 files in `rules/pieces/` (king, queen, rook, bishop, knight, pawn, light-dragon-head, dark-dragon-head, sun, moon, dragon-tail). All are unverified seeds from `docs/RULES.md` v0.2 and the owner's board images.
-- The board format gained display-only `color` on squares and `view` on sides (decision 0007, "S10 additions"). `packages/engine/src/rules/standard-board.test.ts` checks the data, both start positions and every parameter the pieces read at every option. 367 tests pass.
-- Each piece's `notes` lists the rules it doesn't express yet (engine features: Coast opening and exits, Tail repeat limit, capture on the Coast, castling, en passant, Queen-pawn swap, safe zones, 3-player check and stone).
+- Phase 1. `apps/web` renders the real board (`rules/boards/standard-9x9.json`): all 81 squares, every special square type, edge coordinates, the 2- or 3-player start position as placeholder discs (letter from each piece's data), Ting Yang placeholder on i5 (turns 90° cw in 3-player), and a tetrahedron symbol on e5 (D36, replaces the arrow). A small `App` switches players (2/3) and seat (light, dark, Dragon). Checked at 1280 px and 375 px: no horizontal scroll.
+- View logic is pure and tested in `apps/web/src/board/view.ts`; the SVG is `Board.tsx`. 402 tests pass.
+- Board data is now version 0.1.1: dark has `view: {rotate: 180}` (D34).
 
 ## Next session
-**S12 — Board renderer** · Sonnet 5.5 · effort medium
-Why: next step in the plan, and it can now render the real board instead of the fixture.
-Start with: `/model sonnet`, `/effort medium`, then `/start-session S12`
+**S13 — Pieces, batch 1: King and the standard-movement pieces** · Sonnet 5.5 · effort high
+Why: next step in the plan; the board and move generator are both in.
+Start with: `/model sonnet`, `/effort high`, then `/start-session S13`
 
 ## Decisions in effect for the next step
-- D1: applied; render `rules/boards/standard-9x9.json`.
-- Square colors: use each square's `color`; unlisted squares are black or white, b1 black. Draw the Ting Yang symbol on i5 and an arrow on e5 pointing toward i5 (placeholders, no art).
-- Seat views: light `rotate: 0`; Dragon `rotate: 270` (Coast at the bottom, rank 9 on the left). Dark has no view yet: use 0 until the owner says.
+- D1: applied; pieces are the unverified seeds in `rules/pieces/`.
+- D34: decided; dark view turned 180°. D36: decided; e5 symbol is a tetrahedron, no rule.
 
 ## Open questions for the owner
-- Dark's view: turned 180° as in regular chess? Default: no view (renderer uses 0).
+- Tetrahedron size: base side is phi/2 of a square (provisional; "phi significant" was the brief). Is another phi relation intended?
+- Ting Yang symbol is a plain placeholder (ring, dot, pointer). Art comes from the owner.
 - Sun and Moon promotion (`sunMoon.canPromote`): to which pieces, and on which rank in 3-player games? Default: no promotion in the data.
-- Does the e5 arrow carry a rule? Default: display only.
-- Does the Dragon Tail in 3-player games pass over an empty e5 like a Dragon Head? Default: yes (no restriction in the data).
-- None blocking S12.
+- Does the Dragon Tail in 3-player games pass over an empty e5 like a Dragon Head? Default: yes.
+- None blocking S13.
 
 ## Notes for Claude
 - Use `scripts/claude/ship.sh` (`gh pr` and `gh issue` fail in cloud sessions). `/end-session` may be invoked by Claude directly.
+- Web imports engine types only. Don't import runtime values from `@chess9s/engine` in `apps/web` (it pulls Ajv into the bundle; the bundle is 248 kB without it).
+- The board data lists only the 29 special squares; the renderer fills the other 52 as checkered.
 - Notation: `e2-e4`, `e5xd6`, `d8-d9=queen`. Output is sorted by notation.
-- `givesCheck` on Coast pieces reads the 2-player parameter; 3-player check (`dragon.3p.givesCheck`) needs an engine feature before S32.
-- Prettier formats `packages/engine/test/fixtures/` (run `npx prettier --write` after editing fixtures); it ignores `rules/`, `docs/`, `*.md`.
+- Prettier formats `packages/engine/test/fixtures/` and `apps/web/src`; it ignores `rules/`, `docs/`, `*.md`.
