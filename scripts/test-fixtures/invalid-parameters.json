@@ -1,0 +1,14 @@
+{
+  "version": "0.0.0",
+  "parameters": [
+    {
+      "id": "king.range",
+      "label": "King range",
+      "piece": "king",
+      "players": [2],
+      "type": "integer",
+      "options": [1, 2],
+      "status": "proposed"
+    }
+  ]
+}

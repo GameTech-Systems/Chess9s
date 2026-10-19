@@ -35,7 +35,14 @@ Chess Nines is a 9×9 chess variant (custom pieces and special squares). 2-playe
 TypeScript, pnpm workspaces (`packages/engine`, `packages/sim`, `apps/web`), Vite + React static SPA, Vitest. See `docs/decisions/0002-stack.md`. Hosting: Cloudflare, provisional (`docs/decisions/0003-hosting.md`).
 
 ## Commands
-Filled in by S7 (install, dev, test, lint, typecheck, validate:rules).
+Node 22, pnpm 10 (pinned in `package.json`).
+- `pnpm install`: install dependencies.
+- `pnpm dev`: serve the web app (Vite).
+- `pnpm build`: build all workspaces.
+- `pnpm test`: Vitest, whole repo.
+- `pnpm lint`: ESLint and Prettier check.
+- `pnpm typecheck`: `tsc --noEmit` in every workspace.
+- `pnpm validate:rules`: Ajv-validate `rules/` against `rules/schema/`.
 
 ## Where things live
 - `docs/HANDOFF.md`: current state and the next session (rewritten every session). `docs/sessions/LOG.md`: one line per session.

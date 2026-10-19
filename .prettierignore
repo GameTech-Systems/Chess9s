@@ -1,0 +1,9 @@
+pnpm-lock.yaml
+rules/
+docs/
+assets/
+*.md
+.github/ISSUE_TEMPLATE/
+.github/DISCUSSION_TEMPLATE/
+.github/PULL_REQUEST_TEMPLATE.md
+.claude/
