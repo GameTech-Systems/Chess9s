@@ -248,6 +248,30 @@ describe('status line and move list', () => {
     expect(status('win-for-stalemated')).toBe('Stalemate · Dark wins');
   });
 
+  it('names the other draws in words', () => {
+    const bare: Position = { f1: king('light'), f9: king('dark') };
+    const drawn = newGame(createRules(), ruleset, { position: bare });
+    expect(statusLine(drawn)).toBe('Insufficient material · draw');
+  });
+
+  it('castles when the King is clicked, then its Rook; the King’s own square stays a plain move', () => {
+    const r = createRules();
+    const rules = { ...r, values: { ...r.values, 'castling.enabled': true } };
+    const position: Position = {
+      f1: king('light'),
+      i1: { piece: 'rook', side: 'light' },
+      f9: king('dark'),
+    };
+    const m = fromGame(newGame(rules, ruleset, { position, turn: 'light' }));
+    expect(highlights(click(m, 'f1')).targets).toContainEqual({ at: 'i1', capture: false });
+    const castled = clicks(m, 'f1', 'i1').game;
+    expect(castled.position.h1).toMatchObject({ piece: 'king' });
+    expect(castled.position.g1).toMatchObject({ piece: 'rook' });
+    const plain = clicks(m, 'f1', 'h1').game;
+    expect(plain.position.h1).toMatchObject({ piece: 'king' });
+    expect(plain.position.i1).toMatchObject({ piece: 'rook' });
+  });
+
   it('lists moves by round, the first mover’s first', () => {
     const m = clicks(newModel(), 'b8', 'b6', 'b2', 'b4', 'c8', 'c6');
     expect(rounds(m.game)).toEqual([

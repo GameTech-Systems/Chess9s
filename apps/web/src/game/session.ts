@@ -53,6 +53,9 @@ export function newModel(
 const movesFrom = (game: GameState, from: string): GeneratedMove[] =>
   game.legal.filter((m) => m.from === from);
 
+/** The square a move is chosen by: its to-square, or for castling the partner's (King onto Rook). */
+const pickedAt = (m: GeneratedMove): string => m.castle?.from ?? m.to;
+
 const played = (model: Model, move: GeneratedMove): Model => ({
   ...model,
   game: playMove(model.game, move),
@@ -82,7 +85,7 @@ export function click(model: Model, at: string): Model {
   if (game.result.status !== 'ongoing' || model.promoting) return model;
 
   if (selected && at !== selected) {
-    const moves = movesFrom(game, selected).filter((m) => m.to === at);
+    const moves = movesFrom(game, selected).filter((m) => pickedAt(m) === at);
     if (moves.length === 1 && moves[0]!.promotion === undefined) return played(model, moves[0]!);
     if (moves.length > 0) {
       const choices = moves.flatMap((m) => m.promotion ?? []);
@@ -129,10 +132,9 @@ export function highlights(model: Model): Highlights {
     ...(selected && { selected }),
     targets:
       selected && showMoves
-        ? [...new Map(movesFrom(game, selected).map((m) => [m.to, m])).values()].map((m) => ({
-            at: m.to,
-            capture: m.capture !== undefined,
-          }))
+        ? [...new Map(movesFrom(game, selected).map((m) => [pickedAt(m), m])).values()].map(
+            (m) => ({ at: pickedAt(m), capture: m.capture !== undefined }),
+          )
         : [],
     ...(last && { lastMove: [last.from, last.to] as [string, string] }),
     check: game.inCheck ? royal : [],
@@ -143,13 +145,19 @@ export function highlights(model: Model): Highlights {
 
 const title = (id: string) => id.charAt(0).toUpperCase() + id.slice(1);
 
+const REASONS: Record<string, string> = {
+  'insufficient-material': 'Insufficient material',
+  'fifty-move': 'Fifty-move rule',
+  repetition: 'Threefold repetition',
+};
+
 /** One line on the state of the game: whose move, check, or how it ended. */
 export function statusLine({ result, turn, inCheck }: GameState): string {
   switch (result.status) {
     case 'ongoing':
       return `${title(turn)} to move${inCheck ? ' · in check' : ''}`;
     case 'draw':
-      return `${title(result.reason)} · draw`;
+      return `${REASONS[result.reason] ?? title(result.reason)} · draw`;
     case 'win':
       return `${title(result.reason)} · ${title(result.winner)} wins`;
   }

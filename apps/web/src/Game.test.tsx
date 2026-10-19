@@ -20,10 +20,8 @@ describe('Game screen', () => {
     expect(html).toContain('data-hit="e5"');
   });
 
-  it('says what the build does not play yet', () => {
-    const html = render();
-    expect(html).toContain('Not in this build yet');
-    expect(html).toContain('En passant');
+  it('lists nothing as not built at the draft defaults (S22a built the rest)', () => {
+    expect(render()).not.toContain('Not in this build yet');
   });
 
   it('shows the end of a full game: checkmate, the winner, the moves, an open Coast', () => {
