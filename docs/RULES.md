@@ -61,7 +61,7 @@ Rooks, Knights and Bishops move exactly as in regular chess, except that Rooks a
 
 ### Pawns
 
-- Pawns move, take their initial double step, capture, take en passant and promote as in chess, and may stand on void squares. Light pawns promote on rank 9 and dark pawns on rank 1, to a Queen, Rook, Bishop or Knight.
+- Pawns move, take their initial double step, capture, take en passant and promote as in chess, and may stand on void squares. Light pawns promote on rank 9 and dark pawns on rank 1, to a Queen, Rook, Bishop or Knight. Option, off by default (`pawn.promotion.targets` = captured-piece): a pawn may instead promote to a piece its side has lost (Queen, Rook, Bishop, Knight or Coast piece). If its side has lost none, the pawn stays a pawn.
 - No pawn may enter E5, so an E-file pawn is blocked at E4 or E6 until it captures off the file.
 - **Pawn-safe zones** (`pawn.safeZones`). Each pawn is named by the color of its starting file. After it crosses the void, it can't be captured while it stands on the opponent's colored square in its own starting file. A pawn on its own side's colored squares gets no protection. A safe pawn can still move, capture and give check; only capturing it is blocked.
 

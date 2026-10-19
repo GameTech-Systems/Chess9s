@@ -1,0 +1,2437 @@
+{
+  "description": "S14: Queen and Pawn on the real board (rules/boards/standard-9x9.json, rules/pieces/) under the draft 2-player ruleset. Expected moves come from plain geometry worked out independently of the engine. `lost` is the pieces each side has lost so far (input to promotion under pawn.promotion.targets captured-piece); `error` is a substring of the RulesError the case must raise.",
+  "cases": [
+    {
+      "name": "queen defaults: open board, crosses e5 on the file and diagonals, void and e5 barred",
+      "players": 2,
+      "side": "light",
+      "from": "e3",
+      "pieces": {
+        "e3": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "e3-a3",
+        "e3-b3",
+        "e3-c1",
+        "e3-c3",
+        "e3-d2",
+        "e3-d3",
+        "e3-d4",
+        "e3-e1",
+        "e3-e2",
+        "e3-e4",
+        "e3-e6",
+        "e3-e7",
+        "e3-e8",
+        "e3-e9",
+        "e3-f2",
+        "e3-f3",
+        "e3-f4",
+        "e3-g1",
+        "e3-g3",
+        "e3-h3",
+        "e3-i3"
+      ]
+    },
+    {
+      "name": "queen defaults: from d4 she crosses e5 on the diagonal to f6",
+      "players": 2,
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "d4-a1",
+        "d4-a4",
+        "d4-b2",
+        "d4-b4",
+        "d4-c3",
+        "d4-c4",
+        "d4-d1",
+        "d4-d2",
+        "d4-d3",
+        "d4-e3",
+        "d4-e4",
+        "d4-f2",
+        "d4-f4",
+        "d4-f6",
+        "d4-g1",
+        "d4-g4",
+        "d4-g7",
+        "d4-h4",
+        "d4-h8",
+        "d4-i4",
+        "d4-i9"
+      ]
+    },
+    {
+      "name": "queen defaults: from f4 she crosses e5 on the diagonal to d6",
+      "players": 2,
+      "side": "light",
+      "from": "f4",
+      "pieces": {
+        "f4": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "f4-a4",
+        "f4-a9",
+        "f4-b4",
+        "f4-b8",
+        "f4-c1",
+        "f4-c4",
+        "f4-c7",
+        "f4-d2",
+        "f4-d4",
+        "f4-d6",
+        "f4-e3",
+        "f4-e4",
+        "f4-f1",
+        "f4-f2",
+        "f4-f3",
+        "f4-g3",
+        "f4-g4",
+        "f4-h2",
+        "f4-h4",
+        "f4-i1",
+        "f4-i4"
+      ]
+    },
+    {
+      "name": "queen defaults: dark queen crosses e5 downward",
+      "players": 2,
+      "side": "dark",
+      "from": "e7",
+      "pieces": {
+        "e7": {
+          "piece": "queen",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": [
+        "e7-a7",
+        "e7-b7",
+        "e7-c7",
+        "e7-c9",
+        "e7-d6",
+        "e7-d7",
+        "e7-d8",
+        "e7-e1",
+        "e7-e2",
+        "e7-e3",
+        "e7-e4",
+        "e7-e6",
+        "e7-e8",
+        "e7-e9",
+        "e7-f6",
+        "e7-f7",
+        "e7-f8",
+        "e7-g7",
+        "e7-g9",
+        "e7-h7",
+        "e7-i7"
+      ]
+    },
+    {
+      "name": "queen defaults: own piece blocks, enemy piece is captured",
+      "players": 2,
+      "side": "light",
+      "from": "e3",
+      "pieces": {
+        "e3": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        },
+        "e6": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "g3": {
+          "piece": "knight",
+          "side": "dark",
+          "moved": true
+        },
+        "c5": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "c1": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "e3-a3",
+        "e3-b3",
+        "e3-c3",
+        "e3-d2",
+        "e3-d3",
+        "e3-d4",
+        "e3-e1",
+        "e3-e2",
+        "e3-e4",
+        "e3-f2",
+        "e3-f3",
+        "e3-f4",
+        "e3-g1",
+        "e3xg3"
+      ]
+    },
+    {
+      "name": "queen defaults: the A file crosses a5, she may stop there",
+      "players": 2,
+      "side": "light",
+      "from": "a3",
+      "pieces": {
+        "a3": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "a3-a1",
+        "a3-a2",
+        "a3-a4",
+        "a3-a5",
+        "a3-a6",
+        "a3-a7",
+        "a3-a8",
+        "a3-a9",
+        "a3-b2",
+        "a3-b3",
+        "a3-b4",
+        "a3-c1",
+        "a3-c3",
+        "a3-d3",
+        "a3-e3",
+        "a3-f3",
+        "a3-g3",
+        "a3-h3",
+        "a3-i3"
+      ]
+    },
+    {
+      "name": "queen defaults: the I file crosses i5, she may stop there",
+      "players": 2,
+      "side": "light",
+      "from": "i3",
+      "pieces": {
+        "i3": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "i3-a3",
+        "i3-b3",
+        "i3-c3",
+        "i3-d3",
+        "i3-e3",
+        "i3-f3",
+        "i3-g1",
+        "i3-g3",
+        "i3-h2",
+        "i3-h3",
+        "i3-h4",
+        "i3-i1",
+        "i3-i2",
+        "i3-i4",
+        "i3-i5",
+        "i3-i6",
+        "i3-i7",
+        "i3-i8",
+        "i3-i9"
+      ]
+    },
+    {
+      "name": "queen defaults: she cannot cross a5 past an enemy piece on it, but captures it",
+      "players": 2,
+      "side": "light",
+      "from": "a3",
+      "pieces": {
+        "a3": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        },
+        "a5": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": [
+        "a3-a1",
+        "a3-a2",
+        "a3-a4",
+        "a3-b2",
+        "a3-b3",
+        "a3-b4",
+        "a3-c1",
+        "a3-c3",
+        "a3-d3",
+        "a3-e3",
+        "a3-f3",
+        "a3-g3",
+        "a3-h3",
+        "a3-i3",
+        "a3xa5"
+      ]
+    },
+    {
+      "name": "queen.voidCrossings e5-only: a5 is closed on the A file",
+      "players": 2,
+      "overrides": {
+        "queen.voidCrossings": "e5-only"
+      },
+      "side": "light",
+      "from": "a3",
+      "pieces": {
+        "a3": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "a3-a1",
+        "a3-a2",
+        "a3-a4",
+        "a3-b2",
+        "a3-b3",
+        "a3-b4",
+        "a3-c1",
+        "a3-c3",
+        "a3-d3",
+        "a3-e3",
+        "a3-f3",
+        "a3-g3",
+        "a3-h3",
+        "a3-i3"
+      ]
+    },
+    {
+      "name": "queen.voidCrossings e5-only: i5 is closed on the I file",
+      "players": 2,
+      "overrides": {
+        "queen.voidCrossings": "e5-only"
+      },
+      "side": "light",
+      "from": "i3",
+      "pieces": {
+        "i3": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "i3-a3",
+        "i3-b3",
+        "i3-c3",
+        "i3-d3",
+        "i3-e3",
+        "i3-f3",
+        "i3-g1",
+        "i3-g3",
+        "i3-h2",
+        "i3-h3",
+        "i3-h4",
+        "i3-i1",
+        "i3-i2",
+        "i3-i4"
+      ]
+    },
+    {
+      "name": "queen.voidCrossings none: a5 is closed on the A file",
+      "players": 2,
+      "overrides": {
+        "queen.voidCrossings": "none"
+      },
+      "side": "light",
+      "from": "a3",
+      "pieces": {
+        "a3": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "a3-a1",
+        "a3-a2",
+        "a3-a4",
+        "a3-b2",
+        "a3-b3",
+        "a3-b4",
+        "a3-c1",
+        "a3-c3",
+        "a3-d3",
+        "a3-e3",
+        "a3-f3",
+        "a3-g3",
+        "a3-h3",
+        "a3-i3"
+      ]
+    },
+    {
+      "name": "queen.voidCrossings none: i5 is closed on the I file",
+      "players": 2,
+      "overrides": {
+        "queen.voidCrossings": "none"
+      },
+      "side": "light",
+      "from": "i3",
+      "pieces": {
+        "i3": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "i3-a3",
+        "i3-b3",
+        "i3-c3",
+        "i3-d3",
+        "i3-e3",
+        "i3-f3",
+        "i3-g1",
+        "i3-g3",
+        "i3-h2",
+        "i3-h3",
+        "i3-h4",
+        "i3-i1",
+        "i3-i2",
+        "i3-i4"
+      ]
+    },
+    {
+      "name": "queen.voidCrossings e5-only: e5 is still crossed on the E file",
+      "players": 2,
+      "overrides": {
+        "queen.voidCrossings": "e5-only"
+      },
+      "side": "light",
+      "from": "e3",
+      "pieces": {
+        "e3": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "e3-a3",
+        "e3-b3",
+        "e3-c1",
+        "e3-c3",
+        "e3-d2",
+        "e3-d3",
+        "e3-d4",
+        "e3-e1",
+        "e3-e2",
+        "e3-e4",
+        "e3-e6",
+        "e3-e7",
+        "e3-e8",
+        "e3-e9",
+        "e3-f2",
+        "e3-f3",
+        "e3-f4",
+        "e3-g1",
+        "e3-g3",
+        "e3-h3",
+        "e3-i3"
+      ]
+    },
+    {
+      "name": "queen.voidCrossings e5-only: e5 is still crossed on a diagonal",
+      "players": 2,
+      "overrides": {
+        "queen.voidCrossings": "e5-only"
+      },
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "d4-a1",
+        "d4-a4",
+        "d4-b2",
+        "d4-b4",
+        "d4-c3",
+        "d4-c4",
+        "d4-d1",
+        "d4-d2",
+        "d4-d3",
+        "d4-e3",
+        "d4-e4",
+        "d4-f2",
+        "d4-f4",
+        "d4-f6",
+        "d4-g1",
+        "d4-g4",
+        "d4-g7",
+        "d4-h4",
+        "d4-h8",
+        "d4-i4",
+        "d4-i9"
+      ]
+    },
+    {
+      "name": "queen.voidCrossings none: e5 is closed on the E file",
+      "players": 2,
+      "overrides": {
+        "queen.voidCrossings": "none"
+      },
+      "side": "light",
+      "from": "e3",
+      "pieces": {
+        "e3": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "e3-a3",
+        "e3-b3",
+        "e3-c1",
+        "e3-c3",
+        "e3-d2",
+        "e3-d3",
+        "e3-d4",
+        "e3-e1",
+        "e3-e2",
+        "e3-e4",
+        "e3-f2",
+        "e3-f3",
+        "e3-f4",
+        "e3-g1",
+        "e3-g3",
+        "e3-h3",
+        "e3-i3"
+      ]
+    },
+    {
+      "name": "queen.voidCrossings none: e5 is closed on a diagonal",
+      "players": 2,
+      "overrides": {
+        "queen.voidCrossings": "none"
+      },
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "d4-a1",
+        "d4-a4",
+        "d4-b2",
+        "d4-b4",
+        "d4-c3",
+        "d4-c4",
+        "d4-d1",
+        "d4-d2",
+        "d4-d3",
+        "d4-e3",
+        "d4-e4",
+        "d4-f2",
+        "d4-f4",
+        "d4-g1",
+        "d4-g4",
+        "d4-h4",
+        "d4-i4"
+      ]
+    },
+    {
+      "name": "queen.voidCrossings a5-e5-i5 (named): same as the default from e3",
+      "players": 2,
+      "overrides": {
+        "queen.voidCrossings": "a5-e5-i5"
+      },
+      "side": "light",
+      "from": "e3",
+      "pieces": {
+        "e3": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "e3-a3",
+        "e3-b3",
+        "e3-c1",
+        "e3-c3",
+        "e3-d2",
+        "e3-d3",
+        "e3-d4",
+        "e3-e1",
+        "e3-e2",
+        "e3-e4",
+        "e3-e6",
+        "e3-e7",
+        "e3-e8",
+        "e3-e9",
+        "e3-f2",
+        "e3-f3",
+        "e3-f4",
+        "e3-g1",
+        "e3-g3",
+        "e3-h3",
+        "e3-i3"
+      ]
+    },
+    {
+      "name": "queen.canEnterVoid true: diagonals and ranks run through the void",
+      "players": 2,
+      "overrides": {
+        "queen.canEnterVoid": true
+      },
+      "side": "light",
+      "from": "e3",
+      "pieces": {
+        "e3": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "e3-a3",
+        "e3-a7",
+        "e3-b3",
+        "e3-b6",
+        "e3-c1",
+        "e3-c3",
+        "e3-c5",
+        "e3-d2",
+        "e3-d3",
+        "e3-d4",
+        "e3-e1",
+        "e3-e2",
+        "e3-e4",
+        "e3-e6",
+        "e3-e7",
+        "e3-e8",
+        "e3-e9",
+        "e3-f2",
+        "e3-f3",
+        "e3-f4",
+        "e3-g1",
+        "e3-g3",
+        "e3-g5",
+        "e3-h3",
+        "e3-h6",
+        "e3-i3",
+        "e3-i7"
+      ]
+    },
+    {
+      "name": "queen.canEnterVoid true: along rank 5 she cannot cross e5 sideways",
+      "players": 2,
+      "overrides": {
+        "queen.canEnterVoid": true
+      },
+      "side": "light",
+      "from": "b5",
+      "pieces": {
+        "b5": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "b5-a4",
+        "b5-a5",
+        "b5-a6",
+        "b5-b1",
+        "b5-b2",
+        "b5-b3",
+        "b5-b4",
+        "b5-b6",
+        "b5-b7",
+        "b5-b8",
+        "b5-b9",
+        "b5-c4",
+        "b5-c5",
+        "b5-c6",
+        "b5-d3",
+        "b5-d5",
+        "b5-d7",
+        "b5-e2",
+        "b5-e8",
+        "b5-f1",
+        "b5-f9"
+      ]
+    },
+    {
+      "name": "queen.canEnterVoid true: from the east of e5 she cannot cross it sideways",
+      "players": 2,
+      "overrides": {
+        "queen.canEnterVoid": true
+      },
+      "side": "light",
+      "from": "h5",
+      "pieces": {
+        "h5": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "h5-d1",
+        "h5-d9",
+        "h5-e2",
+        "h5-e8",
+        "h5-f3",
+        "h5-f5",
+        "h5-f7",
+        "h5-g4",
+        "h5-g5",
+        "h5-g6",
+        "h5-h1",
+        "h5-h2",
+        "h5-h3",
+        "h5-h4",
+        "h5-h6",
+        "h5-h7",
+        "h5-h8",
+        "h5-h9",
+        "h5-i4",
+        "h5-i5",
+        "h5-i6"
+      ]
+    },
+    {
+      "name": "queen.canEnterVoid true with e5-only: a5 and i5 stay closed on rank 5, the diagonals still run",
+      "players": 2,
+      "overrides": {
+        "queen.canEnterVoid": true,
+        "queen.voidCrossings": "e5-only"
+      },
+      "side": "light",
+      "from": "c5",
+      "pieces": {
+        "c5": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "c5-a3",
+        "c5-a7",
+        "c5-b4",
+        "c5-b5",
+        "c5-b6",
+        "c5-c1",
+        "c5-c2",
+        "c5-c3",
+        "c5-c4",
+        "c5-c6",
+        "c5-c7",
+        "c5-c8",
+        "c5-c9",
+        "c5-d4",
+        "c5-d5",
+        "c5-d6",
+        "c5-e3",
+        "c5-e7",
+        "c5-f2",
+        "c5-f8",
+        "c5-g1",
+        "c5-g9"
+      ]
+    },
+    {
+      "name": "queen.canEnterVoid true with none: e5 closed, a5 and i5 closed",
+      "players": 2,
+      "overrides": {
+        "queen.canEnterVoid": true,
+        "queen.voidCrossings": "none"
+      },
+      "side": "light",
+      "from": "b5",
+      "pieces": {
+        "b5": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "b5-a4",
+        "b5-a6",
+        "b5-b1",
+        "b5-b2",
+        "b5-b3",
+        "b5-b4",
+        "b5-b6",
+        "b5-b7",
+        "b5-b8",
+        "b5-b9",
+        "b5-c4",
+        "b5-c5",
+        "b5-c6",
+        "b5-d3",
+        "b5-d5",
+        "b5-d7",
+        "b5-e2",
+        "b5-e8",
+        "b5-f1",
+        "b5-f9"
+      ]
+    },
+    {
+      "name": "queen.canEnterVoid true: she captures an enemy pawn standing in the void",
+      "players": 2,
+      "overrides": {
+        "queen.canEnterVoid": true
+      },
+      "side": "light",
+      "from": "e3",
+      "pieces": {
+        "e3": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        },
+        "g5": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": [
+        "e3-a3",
+        "e3-a7",
+        "e3-b3",
+        "e3-b6",
+        "e3-c1",
+        "e3-c3",
+        "e3-c5",
+        "e3-d2",
+        "e3-d3",
+        "e3-d4",
+        "e3-e1",
+        "e3-e2",
+        "e3-e4",
+        "e3-e6",
+        "e3-e7",
+        "e3-e8",
+        "e3-e9",
+        "e3-f2",
+        "e3-f3",
+        "e3-f4",
+        "e3-g1",
+        "e3-g3",
+        "e3-h3",
+        "e3-i3",
+        "e3xg5"
+      ]
+    },
+    {
+      "name": "queen.canEnterCoast false: she stays off file a",
+      "players": 2,
+      "overrides": {
+        "queen.canEnterCoast": false
+      },
+      "side": "light",
+      "from": "b3",
+      "pieces": {
+        "b3": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "b3-b1",
+        "b3-b2",
+        "b3-b4",
+        "b3-c2",
+        "b3-c3",
+        "b3-c4",
+        "b3-d1",
+        "b3-d3",
+        "b3-e3",
+        "b3-f3",
+        "b3-g3",
+        "b3-h3",
+        "b3-i3"
+      ]
+    },
+    {
+      "name": "queen.canEnterCoast false: she cannot capture on the Coast",
+      "players": 2,
+      "overrides": {
+        "queen.canEnterCoast": false
+      },
+      "side": "light",
+      "from": "c3",
+      "pieces": {
+        "c3": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        },
+        "a3": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "a1": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": [
+        "c3-b2",
+        "c3-b3",
+        "c3-b4",
+        "c3-c1",
+        "c3-c2",
+        "c3-c4",
+        "c3-d2",
+        "c3-d3",
+        "c3-d4",
+        "c3-e1",
+        "c3-e3",
+        "c3-f3",
+        "c3-f6",
+        "c3-g3",
+        "c3-g7",
+        "c3-h3",
+        "c3-h8",
+        "c3-i3",
+        "c3-i9"
+      ]
+    },
+    {
+      "name": "queen.canEnterCoast true: she captures on the Coast",
+      "players": 2,
+      "overrides": {
+        "queen.canEnterCoast": true
+      },
+      "side": "light",
+      "from": "c3",
+      "pieces": {
+        "c3": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        },
+        "a3": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "a1": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": [
+        "c3-a5",
+        "c3-b2",
+        "c3-b3",
+        "c3-b4",
+        "c3-c1",
+        "c3-c2",
+        "c3-c4",
+        "c3-d2",
+        "c3-d3",
+        "c3-d4",
+        "c3-e1",
+        "c3-e3",
+        "c3-f3",
+        "c3-f6",
+        "c3-g3",
+        "c3-g7",
+        "c3-h3",
+        "c3-h8",
+        "c3-i3",
+        "c3-i9",
+        "c3xa1",
+        "c3xa3"
+      ]
+    },
+    {
+      "name": "queen.canEnterCoast false: a queen on i3 still has the I file (i5 open by default)",
+      "players": 2,
+      "overrides": {
+        "queen.canEnterCoast": false
+      },
+      "side": "light",
+      "from": "i3",
+      "pieces": {
+        "i3": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "i3-b3",
+        "i3-c3",
+        "i3-d3",
+        "i3-e3",
+        "i3-f3",
+        "i3-g1",
+        "i3-g3",
+        "i3-h2",
+        "i3-h3",
+        "i3-h4",
+        "i3-i1",
+        "i3-i2",
+        "i3-i4",
+        "i3-i5",
+        "i3-i6",
+        "i3-i7",
+        "i3-i8",
+        "i3-i9"
+      ]
+    },
+    {
+      "name": "e5 held by a Dragon Head: the file and the diagonal are closed and she cannot capture it",
+      "players": 2,
+      "side": "light",
+      "from": "e3",
+      "pieces": {
+        "e3": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        },
+        "e5": {
+          "piece": "dark-dragon-head",
+          "side": "dark",
+          "moved": true
+        },
+        "g3": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "e3-a3",
+        "e3-b3",
+        "e3-c1",
+        "e3-c3",
+        "e3-d2",
+        "e3-d3",
+        "e3-d4",
+        "e3-e1",
+        "e3-e2",
+        "e3-e4",
+        "e3-f2",
+        "e3-f3",
+        "e3-f4",
+        "e3-g1"
+      ]
+    },
+    {
+      "name": "e5 held by a Dragon Head: the diagonal through e5 is closed",
+      "players": 2,
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        },
+        "e5": {
+          "piece": "light-dragon-head",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "d4-a1",
+        "d4-a4",
+        "d4-b2",
+        "d4-b4",
+        "d4-c3",
+        "d4-c4",
+        "d4-d1",
+        "d4-d2",
+        "d4-d3",
+        "d4-e3",
+        "d4-e4",
+        "d4-f2",
+        "d4-f4",
+        "d4-g1",
+        "d4-g4",
+        "d4-h4",
+        "d4-i4"
+      ]
+    },
+    {
+      "name": "center.passThrough without queen: e5 is not crossed",
+      "players": 2,
+      "overrides": {
+        "center.passThrough": ["king", "knight"]
+      },
+      "side": "light",
+      "from": "e3",
+      "pieces": {
+        "e3": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "e3-a3",
+        "e3-b3",
+        "e3-c1",
+        "e3-c3",
+        "e3-d2",
+        "e3-d3",
+        "e3-d4",
+        "e3-e1",
+        "e3-e2",
+        "e3-e4",
+        "e3-f2",
+        "e3-f3",
+        "e3-f4",
+        "e3-g1",
+        "e3-g3",
+        "e3-h3",
+        "e3-i3"
+      ]
+    },
+    {
+      "name": "center.passThrough with queen only: e5 crossed",
+      "players": 2,
+      "overrides": {
+        "center.passThrough": ["queen"]
+      },
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "d4-a1",
+        "d4-a4",
+        "d4-b2",
+        "d4-b4",
+        "d4-c3",
+        "d4-c4",
+        "d4-d1",
+        "d4-d2",
+        "d4-d3",
+        "d4-e3",
+        "d4-e4",
+        "d4-f2",
+        "d4-f4",
+        "d4-f6",
+        "d4-g1",
+        "d4-g4",
+        "d4-g7",
+        "d4-h4",
+        "d4-h8",
+        "d4-i4",
+        "d4-i9"
+      ]
+    },
+    {
+      "name": "center.passThrough with queen and rook: e5 crossed by the queen",
+      "players": 2,
+      "overrides": {
+        "center.passThrough": ["queen", "rook"]
+      },
+      "side": "light",
+      "from": "f4",
+      "pieces": {
+        "f4": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "f4-a4",
+        "f4-a9",
+        "f4-b4",
+        "f4-b8",
+        "f4-c1",
+        "f4-c4",
+        "f4-c7",
+        "f4-d2",
+        "f4-d4",
+        "f4-d6",
+        "f4-e3",
+        "f4-e4",
+        "f4-f1",
+        "f4-f2",
+        "f4-f3",
+        "f4-g3",
+        "f4-g4",
+        "f4-h2",
+        "f4-h4",
+        "f4-i1",
+        "f4-i4"
+      ]
+    },
+    {
+      "name": "center.occupants any: the queen still never stops on e5",
+      "players": 2,
+      "overrides": {
+        "center.occupants": "any"
+      },
+      "side": "light",
+      "from": "e3",
+      "pieces": {
+        "e3": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "e3-a3",
+        "e3-b3",
+        "e3-c1",
+        "e3-c3",
+        "e3-d2",
+        "e3-d3",
+        "e3-d4",
+        "e3-e1",
+        "e3-e2",
+        "e3-e4",
+        "e3-e6",
+        "e3-e7",
+        "e3-e8",
+        "e3-e9",
+        "e3-f2",
+        "e3-f3",
+        "e3-f4",
+        "e3-g1",
+        "e3-g3",
+        "e3-h3",
+        "e3-i3"
+      ]
+    },
+    {
+      "name": "center.occupants dragons-and-sun-moon: the queen still never stops on e5",
+      "players": 2,
+      "overrides": {
+        "center.occupants": "dragons-and-sun-moon"
+      },
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "d4-a1",
+        "d4-a4",
+        "d4-b2",
+        "d4-b4",
+        "d4-c3",
+        "d4-c4",
+        "d4-d1",
+        "d4-d2",
+        "d4-d3",
+        "d4-e3",
+        "d4-e4",
+        "d4-f2",
+        "d4-f4",
+        "d4-f6",
+        "d4-g1",
+        "d4-g4",
+        "d4-g7",
+        "d4-h4",
+        "d4-h8",
+        "d4-i4",
+        "d4-i9"
+      ]
+    },
+    {
+      "name": "queen on the Coast corner a1: file a through a5, and the long diagonal across e5",
+      "players": 2,
+      "side": "light",
+      "from": "a1",
+      "pieces": {
+        "a1": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "a1-a2",
+        "a1-a3",
+        "a1-a4",
+        "a1-a5",
+        "a1-a6",
+        "a1-a7",
+        "a1-a8",
+        "a1-a9",
+        "a1-b1",
+        "a1-b2",
+        "a1-c1",
+        "a1-c3",
+        "a1-d1",
+        "a1-d4",
+        "a1-e1",
+        "a1-f1",
+        "a1-f6",
+        "a1-g1",
+        "a1-g7",
+        "a1-h1",
+        "a1-h8",
+        "a1-i1",
+        "a1-i9"
+      ]
+    },
+    {
+      "name": "center.passThrough with only bishop: the queen does not cross e5",
+      "players": 2,
+      "overrides": {
+        "center.passThrough": ["bishop"]
+      },
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "d4-a1",
+        "d4-a4",
+        "d4-b2",
+        "d4-b4",
+        "d4-c3",
+        "d4-c4",
+        "d4-d1",
+        "d4-d2",
+        "d4-d3",
+        "d4-e3",
+        "d4-e4",
+        "d4-f2",
+        "d4-f4",
+        "d4-g1",
+        "d4-g4",
+        "d4-h4",
+        "d4-i4"
+      ]
+    },
+    {
+      "name": "3 players: the Queen moves the same way (light queen e3)",
+      "players": 3,
+      "side": "light",
+      "from": "e3",
+      "pieces": {
+        "e3": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": [
+        "e3-a3",
+        "e3-b3",
+        "e3-c1",
+        "e3-c3",
+        "e3-d2",
+        "e3-d3",
+        "e3-d4",
+        "e3-e1",
+        "e3-e2",
+        "e3-e4",
+        "e3-e6",
+        "e3-e7",
+        "e3-e8",
+        "e3-e9",
+        "e3-f2",
+        "e3-f3",
+        "e3-f4",
+        "e3-g1",
+        "e3-g3",
+        "e3-h3",
+        "e3-i3"
+      ]
+    },
+    {
+      "name": "3 players: a Queen with voidCrossings none",
+      "players": 3,
+      "overrides": {
+        "queen.voidCrossings": "none"
+      },
+      "side": "dark",
+      "from": "e7",
+      "pieces": {
+        "e7": {
+          "piece": "queen",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": [
+        "e7-a7",
+        "e7-b7",
+        "e7-c7",
+        "e7-c9",
+        "e7-d6",
+        "e7-d7",
+        "e7-d8",
+        "e7-e6",
+        "e7-e8",
+        "e7-e9",
+        "e7-f6",
+        "e7-f7",
+        "e7-f8",
+        "e7-g7",
+        "e7-g9",
+        "e7-h7",
+        "e7-i7"
+      ]
+    },
+    {
+      "name": "pawn defaults: an unmoved pawn on d2 steps one or two",
+      "players": 2,
+      "side": "light",
+      "from": "d2",
+      "pieces": {
+        "d2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": false
+        }
+      },
+      "expected": ["d2-d3", "d2-d4"]
+    },
+    {
+      "name": "pawn defaults: a moved pawn steps one",
+      "players": 2,
+      "side": "light",
+      "from": "d3",
+      "pieces": {
+        "d3": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": ["d3-d4"]
+    },
+    {
+      "name": "pawn.initialDoubleStep false: an unmoved pawn steps one",
+      "players": 2,
+      "overrides": {
+        "pawn.initialDoubleStep": false
+      },
+      "side": "light",
+      "from": "d2",
+      "pieces": {
+        "d2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": false
+        }
+      },
+      "expected": ["d2-d3"]
+    },
+    {
+      "name": "pawn.initialDoubleStep true: dark pawn goes down two",
+      "players": 2,
+      "overrides": {
+        "pawn.initialDoubleStep": true
+      },
+      "side": "dark",
+      "from": "d8",
+      "pieces": {
+        "d8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": false
+        }
+      },
+      "expected": ["d8-d6", "d8-d7"]
+    },
+    {
+      "name": "pawn.initialDoubleStep false: dark pawn goes down one",
+      "players": 2,
+      "overrides": {
+        "pawn.initialDoubleStep": false
+      },
+      "side": "dark",
+      "from": "d8",
+      "pieces": {
+        "d8": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": false
+        }
+      },
+      "expected": ["d8-d7"]
+    },
+    {
+      "name": "pawn: a piece on the first square blocks both steps",
+      "players": 2,
+      "side": "light",
+      "from": "d2",
+      "pieces": {
+        "d2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": false
+        },
+        "d3": {
+          "piece": "knight",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": []
+    },
+    {
+      "name": "pawn: a piece on the second square blocks only the double step",
+      "players": 2,
+      "side": "light",
+      "from": "d2",
+      "pieces": {
+        "d2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": false
+        },
+        "d4": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": ["d2-d3"]
+    },
+    {
+      "name": "pawn captures diagonally forward only, never straight, never own",
+      "players": 2,
+      "side": "light",
+      "from": "d3",
+      "pieces": {
+        "d3": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "c4": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "e4": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        },
+        "d4": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": ["d3xc4"]
+    },
+    {
+      "name": "pawn may stand on and capture into the void",
+      "players": 2,
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "c5": {
+          "piece": "knight",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": ["d4-d5", "d4xc5"]
+    },
+    {
+      "name": "pawn moves into the void",
+      "players": 2,
+      "side": "light",
+      "from": "c4",
+      "pieces": {
+        "c4": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": ["c4-c5"]
+    },
+    {
+      "name": "pawn never enters the Coast: no step or capture onto file a",
+      "players": 2,
+      "side": "light",
+      "from": "b3",
+      "pieces": {
+        "b3": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "a4": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": ["b3-b4"]
+    },
+    {
+      "name": "pawn.canEnterCenter false with center.occupants dragons: e4 pawn",
+      "players": 2,
+      "overrides": {
+        "pawn.canEnterCenter": false,
+        "center.occupants": "dragons"
+      },
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": []
+    },
+    {
+      "name": "pawn.canEnterCenter false with center.occupants any: e4 pawn",
+      "players": 2,
+      "overrides": {
+        "pawn.canEnterCenter": false,
+        "center.occupants": "any"
+      },
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": []
+    },
+    {
+      "name": "pawn.canEnterCenter true with center.occupants dragons: e4 pawn",
+      "players": 2,
+      "overrides": {
+        "pawn.canEnterCenter": true,
+        "center.occupants": "dragons"
+      },
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": []
+    },
+    {
+      "name": "pawn.canEnterCenter true with center.occupants dragons-and-sun-moon: e4 pawn",
+      "players": 2,
+      "overrides": {
+        "pawn.canEnterCenter": true,
+        "center.occupants": "dragons-and-sun-moon"
+      },
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": []
+    },
+    {
+      "name": "pawn.canEnterCenter true with center.occupants any: e4 pawn",
+      "players": 2,
+      "overrides": {
+        "pawn.canEnterCenter": true,
+        "center.occupants": "any"
+      },
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": ["e4-e5"]
+    },
+    {
+      "name": "pawn.canEnterCenter true, occupants any: a pawn captures an enemy piece on e5",
+      "players": 2,
+      "overrides": {
+        "pawn.canEnterCenter": true,
+        "center.occupants": "any"
+      },
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "e5": {
+          "piece": "sun",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": ["d4-d5", "d4xe5"]
+    },
+    {
+      "name": "pawn.canEnterCenter true, occupants dragons: no capture on e5",
+      "players": 2,
+      "overrides": {
+        "pawn.canEnterCenter": true
+      },
+      "side": "light",
+      "from": "d4",
+      "pieces": {
+        "d4": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "e5": {
+          "piece": "dark-dragon-head",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": ["d4-d5"]
+    },
+    {
+      "name": "pawn: an occupied e5 stops a straight step",
+      "players": 2,
+      "overrides": {
+        "pawn.canEnterCenter": true,
+        "center.occupants": "any"
+      },
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "e5": {
+          "piece": "light-dragon-head",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": []
+    },
+    {
+      "name": "pawn double step defaults: from e3 it cannot stop on e5",
+      "players": 2,
+      "side": "light",
+      "from": "e3",
+      "pieces": {
+        "e3": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": false
+        }
+      },
+      "expected": ["e3-e4"]
+    },
+    {
+      "name": "pawn double step from e3 to e5 when it may enter",
+      "players": 2,
+      "overrides": {
+        "pawn.canEnterCenter": true,
+        "center.occupants": "any"
+      },
+      "side": "light",
+      "from": "e3",
+      "pieces": {
+        "e3": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": false
+        }
+      },
+      "expected": ["e3-e4", "e3-e5"]
+    },
+    {
+      "name": "pawn double step from e4 over e5 needs center.passThrough pawn",
+      "players": 2,
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": false
+        }
+      },
+      "expected": []
+    },
+    {
+      "name": "pawn double step from e4 over e5 with pawn in center.passThrough",
+      "players": 2,
+      "overrides": {
+        "center.passThrough": ["pawn"]
+      },
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": false
+        }
+      },
+      "expected": ["e4-e6"]
+    },
+    {
+      "name": "pawn double step from e4 over e5: may cross, but center.occupants dragons keeps it from stopping there",
+      "players": 2,
+      "overrides": {
+        "center.passThrough": ["pawn", "queen"],
+        "pawn.canEnterCenter": true
+      },
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": false
+        }
+      },
+      "expected": ["e4-e6"]
+    },
+    {
+      "name": "pawn dark double step from e6 over e5 with pawn in passThrough",
+      "players": 2,
+      "overrides": {
+        "center.passThrough": ["pawn"]
+      },
+      "side": "dark",
+      "from": "e6",
+      "pieces": {
+        "e6": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": false
+        }
+      },
+      "expected": ["e6-e4"]
+    },
+    {
+      "name": "pawn dark: captures down the board, e5 stays closed",
+      "players": 2,
+      "side": "dark",
+      "from": "d6",
+      "pieces": {
+        "d6": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "c5": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "e5": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "d5": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": ["d6xc5"]
+    },
+    {
+      "name": "pawn double step cannot jump an occupied e5 even when pawns may pass",
+      "players": 2,
+      "overrides": {
+        "center.passThrough": ["pawn"]
+      },
+      "side": "light",
+      "from": "e4",
+      "pieces": {
+        "e4": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": false
+        },
+        "e5": {
+          "piece": "light-dragon-head",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": []
+    },
+    {
+      "name": "3 players: pawns step and capture the same way",
+      "players": 3,
+      "side": "light",
+      "from": "d2",
+      "pieces": {
+        "d2": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": false
+        },
+        "c3": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": ["d2-d3", "d2-d4", "d2xc3"]
+    },
+    {
+      "name": "promotion defaults: d8 to d9 gives four moves",
+      "players": 2,
+      "side": "light",
+      "from": "d8",
+      "pieces": {
+        "d8": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": ["d8-d9=bishop", "d8-d9=knight", "d8-d9=queen", "d8-d9=rook"]
+    },
+    {
+      "name": "promotion defaults: capture onto the last rank promotes too",
+      "players": 2,
+      "side": "light",
+      "from": "d8",
+      "pieces": {
+        "d8": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "c9": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        },
+        "e9": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        },
+        "d9": {
+          "piece": "bishop",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": ["d8xc9=bishop", "d8xc9=knight", "d8xc9=queen", "d8xc9=rook"]
+    },
+    {
+      "name": "promotion defaults: dark pawn promotes on rank 1",
+      "players": 2,
+      "side": "dark",
+      "from": "f2",
+      "pieces": {
+        "f2": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": ["f2-f1=bishop", "f2-f1=knight", "f2-f1=queen", "f2-f1=rook"]
+    },
+    {
+      "name": "promotion defaults: dark pawn captures onto rank 1 and promotes",
+      "players": 2,
+      "side": "dark",
+      "from": "f2",
+      "pieces": {
+        "f2": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "e1": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "g1": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": [
+        "f2-f1=bishop",
+        "f2-f1=knight",
+        "f2-f1=queen",
+        "f2-f1=rook",
+        "f2xe1=bishop",
+        "f2xe1=knight",
+        "f2xe1=queen",
+        "f2xe1=rook"
+      ]
+    },
+    {
+      "name": "promotion defaults: a pawn on rank 7 with no capture does not promote",
+      "players": 2,
+      "side": "light",
+      "from": "d7",
+      "pieces": {
+        "d7": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": ["d7-d8"]
+    },
+    {
+      "name": "promotion defaults: an unmoved pawn on d7 promotes with its double step",
+      "players": 2,
+      "side": "light",
+      "from": "d7",
+      "pieces": {
+        "d7": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": false
+        }
+      },
+      "expected": ["d7-d8", "d7-d9=bishop", "d7-d9=knight", "d7-d9=queen", "d7-d9=rook"]
+    },
+    {
+      "name": "promotion defaults: without the double step it only reaches d8",
+      "players": 2,
+      "overrides": {
+        "pawn.initialDoubleStep": false
+      },
+      "side": "light",
+      "from": "d7",
+      "pieces": {
+        "d7": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": false
+        }
+      },
+      "expected": ["d7-d8"]
+    },
+    {
+      "name": "promotion targets queen only",
+      "players": 2,
+      "overrides": {
+        "pawn.promotion.targets": ["queen"]
+      },
+      "side": "light",
+      "from": "d8",
+      "pieces": {
+        "d8": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": ["d8-d9=queen"]
+    },
+    {
+      "name": "promotion targets rook and knight",
+      "players": 2,
+      "overrides": {
+        "pawn.promotion.targets": ["rook", "knight"]
+      },
+      "side": "light",
+      "from": "d8",
+      "pieces": {
+        "d8": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": ["d8-d9=knight", "d8-d9=rook"]
+    },
+    {
+      "name": "promotion targets bishop only, with a capture",
+      "players": 2,
+      "overrides": {
+        "pawn.promotion.targets": ["bishop"]
+      },
+      "side": "dark",
+      "from": "f2",
+      "pieces": {
+        "f2": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "e1": {
+          "piece": "queen",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": ["f2-f1=bishop", "f2xe1=bishop"]
+    },
+    {
+      "name": "promotion targets: an empty list means no promotion",
+      "players": 2,
+      "overrides": {
+        "pawn.promotion.targets": []
+      },
+      "side": "light",
+      "from": "d8",
+      "pieces": {
+        "d8": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": ["d8-d9"]
+    },
+    {
+      "name": "promotion targets captured-piece only: two lost rooks give one rook promotion",
+      "players": 2,
+      "overrides": {
+        "pawn.promotion.targets": ["captured-piece"]
+      },
+      "side": "light",
+      "from": "d8",
+      "pieces": {
+        "d8": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "lost": {
+        "light": ["rook", "rook"]
+      },
+      "expected": ["d8-d9=rook"]
+    },
+    {
+      "name": "promotion targets captured-piece only: queen, bishop, knight and rook lost",
+      "players": 2,
+      "overrides": {
+        "pawn.promotion.targets": ["captured-piece"]
+      },
+      "side": "light",
+      "from": "d8",
+      "pieces": {
+        "d8": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "lost": {
+        "light": ["knight", "queen", "bishop", "rook"]
+      },
+      "expected": ["d8-d9=bishop", "d8-d9=knight", "d8-d9=queen", "d8-d9=rook"]
+    },
+    {
+      "name": "promotion targets captured-piece only: a Coast piece lost may be chosen",
+      "players": 2,
+      "overrides": {
+        "pawn.promotion.targets": ["captured-piece"]
+      },
+      "side": "light",
+      "from": "d8",
+      "pieces": {
+        "d8": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "lost": {
+        "light": ["sun", "light-dragon-head", "moon"]
+      },
+      "expected": ["d8-d9=light-dragon-head", "d8-d9=moon", "d8-d9=sun"]
+    },
+    {
+      "name": "promotion targets captured-piece only: nothing lost, the pawn stays a pawn",
+      "players": 2,
+      "overrides": {
+        "pawn.promotion.targets": ["captured-piece"]
+      },
+      "side": "light",
+      "from": "d8",
+      "pieces": {
+        "d8": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "lost": {
+        "light": []
+      },
+      "expected": ["d8-d9"]
+    },
+    {
+      "name": "promotion targets captured-piece only: only pawns lost, the pawn stays a pawn",
+      "players": 2,
+      "overrides": {
+        "pawn.promotion.targets": ["captured-piece"]
+      },
+      "side": "light",
+      "from": "d8",
+      "pieces": {
+        "d8": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "lost": {
+        "light": ["pawn", "pawn"]
+      },
+      "expected": ["d8-d9"]
+    },
+    {
+      "name": "promotion targets captured-piece only: pieces lost by the other side do not count",
+      "players": 2,
+      "overrides": {
+        "pawn.promotion.targets": ["captured-piece"]
+      },
+      "side": "light",
+      "from": "d8",
+      "pieces": {
+        "d8": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "lost": {
+        "light": [],
+        "dark": ["queen", "rook"]
+      },
+      "expected": ["d8-d9"]
+    },
+    {
+      "name": "promotion targets captured-piece only: a side with no entry has lost nothing",
+      "players": 2,
+      "overrides": {
+        "pawn.promotion.targets": ["captured-piece"]
+      },
+      "side": "dark",
+      "from": "f2",
+      "pieces": {
+        "f2": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "lost": {
+        "light": ["queen"]
+      },
+      "expected": ["f2-f1"]
+    },
+    {
+      "name": "promotion targets captured-piece only: dark pawn, dark rook lost",
+      "players": 2,
+      "overrides": {
+        "pawn.promotion.targets": ["captured-piece"]
+      },
+      "side": "dark",
+      "from": "f2",
+      "pieces": {
+        "f2": {
+          "piece": "pawn",
+          "side": "dark",
+          "moved": true
+        },
+        "e1": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "lost": {
+        "dark": ["rook"],
+        "light": ["queen"]
+      },
+      "expected": ["f2-f1=rook", "f2xe1=rook"]
+    },
+    {
+      "name": "promotion targets captured-piece with queen: nothing lost, queen only",
+      "players": 2,
+      "overrides": {
+        "pawn.promotion.targets": ["queen", "captured-piece"]
+      },
+      "side": "light",
+      "from": "d8",
+      "pieces": {
+        "d8": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "lost": {
+        "light": []
+      },
+      "expected": ["d8-d9=queen"]
+    },
+    {
+      "name": "promotion targets captured-piece with queen: lost knight is added",
+      "players": 2,
+      "overrides": {
+        "pawn.promotion.targets": ["queen", "captured-piece"]
+      },
+      "side": "light",
+      "from": "d8",
+      "pieces": {
+        "d8": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "lost": {
+        "light": ["knight", "queen"]
+      },
+      "expected": ["d8-d9=knight", "d8-d9=queen"]
+    },
+    {
+      "name": "promotion targets captured-piece: before the last rank nothing needs the lost list",
+      "players": 2,
+      "overrides": {
+        "pawn.promotion.targets": ["captured-piece"]
+      },
+      "side": "light",
+      "from": "d7",
+      "pieces": {
+        "d7": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "expected": ["d7-d8"]
+    },
+    {
+      "name": "promotion targets captured-piece: a pawn that cannot promote moves on without the lost list",
+      "players": 2,
+      "overrides": {
+        "pawn.promotion.targets": ["captured-piece"]
+      },
+      "side": "light",
+      "from": "d6",
+      "pieces": {
+        "d6": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        },
+        "e7": {
+          "piece": "rook",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "expected": ["d6-d7", "d6xe7"]
+    },
+    {
+      "name": "promotion targets captured-piece: refused without the lost list",
+      "players": 2,
+      "overrides": {
+        "pawn.promotion.targets": ["captured-piece"]
+      },
+      "side": "light",
+      "from": "d8",
+      "pieces": {
+        "d8": {
+          "piece": "pawn",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "error": "lost"
+    }
+  ]
+}
