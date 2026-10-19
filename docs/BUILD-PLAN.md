@@ -47,7 +47,7 @@ Point chess9s.com and chessnines.com at Cloudflare DNS, and set up a project con
 
 ## Phase 1: Engine and board
 
-### S7 — Workspace, CI, and branch rules · Sonnet 5.5 · medium · `todo`
+### S7 — Workspace, CI, and branch rules · Sonnet 5.5 · medium · `done`
 Scaffold the pnpm workspace: `packages/engine` (pure TypeScript, no DOM), `apps/web` (Vite + React), shared strict tsconfig, Vitest, ESLint, Prettier. Root scripts: `dev`, `build`, `test`, `lint`, `typecheck`, `validate:rules` (Ajv validation of `rules/` against its schemas). Add `.github/workflows/ci.yml` (one job named `ci`: install, typecheck, lint, test, validate:rules) and pin Node 22 and pnpm in `package.json`. Write the commands into CLAUDE.md. Create the issue labels the templates use (`rule-proposal`, `movement-proposal`, `balance-report`, `playtest`) with `gh api`. Prepare `.github/rulesets/main.json` per D7 and apply it with `gh api` if permitted; otherwise leave the import steps for the owner in the handoff.
 Pre-approved dependencies (D21): typescript, vite, react, react-dom, @vitejs/plugin-react, vitest, eslint, typescript-eslint, prettier, ajv, ajv-formats.
 Done when: CI passes on the PR, `pnpm dev` serves a blank app shell, and `validate:rules` passes.
