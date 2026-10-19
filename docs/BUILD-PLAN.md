@@ -113,6 +113,9 @@ Sound with an on/off toggle (knock on move, chime on your turn, CC0 sounds only,
 ### S22 — Computer opponent v0 and guest play · Sonnet 5.5 · low · `done`
 A random legal mover, and play without an account (state kept in the browser).
 
+### S22a — Missing 2-player rules · Opus 5.5 · high · `todo`
+Inserted before S23 by the owner (plan review, 2026-10-19), so bot self-play can end. Engine rules still missing for 2-player: threefold repetition, 50-move rule, insufficient material, castling, en passant, pawn safe zones, and the owner-listed Coast rules. Each is data-driven: a parameter in `rules/parameters.json` with tests at its default and every option. Take any rule the rules documents and decisions do not specify to the handoff as an owner question; do not invent it. Id `S22a` avoids renumbering S23 onward.
+
 ### S23 — Computer opponent v1 · Opus 5.5 · high · `todo`
 A search AI built on our own engine (for example negamax with alpha-beta and a ruleset-aware evaluation), so it respects whichever ruleset is selected. No GPL engines.
 
