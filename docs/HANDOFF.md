@@ -1,31 +1,33 @@
 # Handoff
 
-Updated 2026-10-19 by S9 (Opus 5.5 · high). `/end-session` rewrites this file; keep it under 40 lines.
+Updated 2026-10-19 by S11 (Opus 5.5 · high). `/end-session` rewrites this file; keep it under 40 lines.
 
 ## State
-- Phase 1. Board and piece formats exist: `rules/schema/board.schema.json`, `rules/schema/piece.schema.json`, decision 0007, documented in `docs/RULES-FRAMEWORK.md`.
-- `packages/engine/src/rules/formats.ts`: `validateBoard`, `validatePiece`, `validateBoardAndPieces` (cross-checks beyond the schema). Neutral fixture in `packages/engine/test/fixtures/` (board, 5 pieces, own registry).
-- `validate:rules` also checks `rules/boards/` and `rules/pieces/` when present (`--boards`, `--pieces`). 166 tests pass.
-- `main` ruleset is active (PR, `ci` check, rebase only, no force-push or deletion).
+- Phase 1. Move generator: `packages/engine/src/moves/generate.ts` (`generateMoves`, `movesFrom`, `startPosition`, `toNotation`). Pseudo-legal only; no piece-specific code.
+- Position cases are data in `packages/engine/test/fixtures/positions/` (41 cases, expected lists worked out by hand). 219 tests pass.
+- Semantics are documented in `docs/RULES-FRAMEWORK.md`, "Move generation".
 
 ## Next session
-**S11 — Move generator** · Opus 5.5 · effort high
-Why: correctness-critical engine core; it runs on the neutral fixture, so it need not wait for S10.
-Start with: `/model opus`, `/effort high`, then `/start-session S11`
-S10 (real board and pieces) is an owner step in chat and can happen any time; its data must validate with `pnpm validate:rules`.
+**S12 — Board renderer** · Sonnet 5.5 · effort medium
+Why: next step in the plan; S13 to S15 wait for the real data (S10), and S12 can render the fixture.
+Start with: `/model sonnet`, `/effort medium`, then `/start-session S12`
+S10 (real board and pieces) is still an owner step in chat; its data must pass `pnpm validate:rules`.
 
 ## Decisions in effect for the next step
-- D1: formats built against the neutral fixture; real data arrives in S10 (default).
-- Owner confirmed: Knights are never stopped from passing the center, so `knight` in `center.passThrough` has no effect (leapers cross no squares).
-- Owner accepts lowercase coordinates in data (`e5`); docs keep uppercase.
+- D1: render the neutral fixture if S10 isn't done (default).
+- Owner instruction (S11): Claude writes its plan in the reply and goes ahead without waiting for approval (CLAUDE.md, start-session skill).
 
 ## Open questions for the owner
-- Provisional loader choices (S8): an override set to null is rejected; an `extends` parent must have the same player count. Say if either should change.
-- Dependencies beyond the D21 list (S8): `ajv`, `ajv-formats` (MIT) in `packages/engine`; `@types/*`; TypeScript ~6.0.
-- None blocking S11.
+- Provisional move-generator choices (S11). Say if any should change:
+  1. When several square rules apply, any `false` wins (a move-level `stop: true` can't override a piece-level `stop: false`).
+  2. `pass: false` ends the line on that square, but the piece may still stop there if stopping is allowed.
+  3. Neutral pieces can be captured by any side when `capturable`.
+  4. An empty promotion target list means no promotion.
+- Still open from S8: an override set to null is rejected; an `extends` parent must have the same player count. Dependencies beyond D21: `ajv`, `ajv-formats` (MIT), `@types/*`, TypeScript ~6.0.
+- None blocking S12.
 
 ## Notes for Claude
-- Use `scripts/claude/ship.sh` (`gh pr` and `gh issue` fail in cloud sessions). `/end-session` may now be invoked by Claude directly.
-- Move semantics for S11 are in decision 0007 and RULES-FRAMEWORK: vectors are relative to the side's forward; square rules apply to every stepped-through square, even when jumping; `targets` moves ignore squares in between.
-- Not yet in the format (add as minor schema versions when built): en passant, castling, pawn swap, safe zones, Coast opening, Tail repeat limit, stone, capture-by-class, per-mode royal, setup variants.
-- Prettier ignores `rules/`, `docs/`, `*.md`; engine fixtures are formatted by Prettier.
+- Use `scripts/claude/ship.sh` (`gh pr` and `gh issue` fail in cloud sessions). `/end-session` may be invoked by Claude directly.
+- Notation: `e2-e4`, `e5xd6`, `d8-d9=slider`. Output is sorted by notation.
+- S16 (attack maps) should reuse `movesFrom` and not duplicate the movement rules.
+- Prettier formats `packages/engine/test/fixtures/` (run `npx prettier --write` after editing fixtures); it ignores `rules/`, `docs/`, `*.md`.

@@ -10,3 +10,4 @@ One line per session, appended by `/end-session`. Usage is the owner's `/usage` 
 | 2026-10-19 | S7 | Sonnet 5.5 · medium | done | #4 | Workspace, CI, validate:rules, labels; main ruleset needs owner import |
 | 2026-10-19 | S8 | Sonnet 5.5 · medium | done | #5 | Engine rules loader: schema validation, extends/overrides, deprecated excluded, null refusal; 121 tests |
 | 2026-10-19 | S9 | Opus 5.5 · high | done | (this PR) | Board and piece schemas, neutral fixture, engine cross-checks, validate:rules for boards/pieces, decision 0007; 166 tests |
+| 2026-10-19 | S11 | Opus 5.5 · high | done | (this PR) | Generic pseudo-legal move generator, 41 hand-worked fixture positions, every fixture parameter at each option; plans no longer wait for approval; 219 tests |
