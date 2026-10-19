@@ -109,7 +109,7 @@ All Coast pieces move in straight lines and stop when blocked; none may turn a c
 3. The Sun and Moon move along the Coast one square at a time. Once the way is clear, a Dragon Head may move to A5 and then leave the Coast.
 4. From A5 a piece moves out along rank 5 toward E5, or diagonally to B4 or B6.
 5. Coast pieces can't be captured while they stand on the Coast.
-6. A Coast piece is **unemerged** until it has first left the Coast through A5, and **emerged** after (the game keeps this marker per piece). Until it has emerged it can give check only from A5. Once emerged it can return to the Coast and check and capture from there (owner, 19 Oct 2026; how this fits the no-check rule below is to be confirmed).
+6. A Coast piece is **unemerged** until it has first left the Coast through A5, and **emerged** after (the game keeps this marker per piece). Until it has emerged it can give check only from A5. Once emerged it can return to the Coast and check and capture from there (owner, 19 Oct 2026). The marker is shown on the piece, so players can see which Coast pieces may capture or checkmate from inside the Coast.
 
 ## Center square and general rules
 
@@ -128,7 +128,7 @@ The third player is the Dragon: it moves third each round and plays all 5 Coast 
 
 - **First Coast move**: the Sun or Moon one square, or the Tail off A5 to any legal square, which frees A5.
 - **Movement**: Dragon Heads and the Tail any distance in any direction; the Sun and Moon one square at a time on the Coast, then up to 2 squares in any direction. All in straight lines.
-- **Check**: Dragon pieces don't give check to Kings while both Kings are in play. Once a King has been captured, the Dragon must checkmate the remaining King to win. A King attacked by a Dragon piece isn't forced to respond, but the Dragon may capture it on its turn. The two Kings still check each other as usual.
+- **Check**: Dragon Heads may capture a King without giving check as notice; the Dragon then must checkmate the remaining King to win. A King attacked by a Dragon piece isn't forced to respond, but the Dragon may capture it on its turn. The two Kings still check each other as usual.
 - **The Tail**: it can capture any light or dark piece that isn't a Coast piece. It can't be captured, but it can be checkmated: a Kinged player's piece attacks it and the Dragon has no move that ends the attack. It plays the role of the Dragon's King.
 - **Tail turned to stone**: if the Tail is checkmated while both Kinged players are active, it switches places with the checkmating piece and turns to stone, blocking that square until a Kinged player checkmates the other King or the game ends in stalemate. If the Tail is on E5, no swap happens; it turns to stone where it stands. The Dragon plays on with its other pieces.
 - **Captured King**: when the Dragon captures a King, the King is removed like any captured piece, that side's turn is skipped, and its remaining pieces stay on the board in stone: they block, can't move, and can't be captured.
