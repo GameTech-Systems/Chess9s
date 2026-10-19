@@ -4,6 +4,7 @@ import { Board } from './board/Board';
 import { boardData, pieceLetters } from './board/data';
 import { DEFAULT_RULESET_ID, createRules, listRulesets, type RulesetInfo } from './game/rules';
 import {
+  canUndo,
   cancelPromotion,
   click,
   highlights,
@@ -11,6 +12,9 @@ import {
   promote,
   rounds,
   statusLine,
+  toggleDanger,
+  toggleMoves,
+  undo,
   type Model,
 } from './game/session';
 
@@ -117,6 +121,26 @@ export function Game({
               {v.label}
             </button>
           ))}
+        </div>
+
+        <div className="segmented" role="group" aria-label="Play aids">
+          <button
+            type="button"
+            aria-pressed={model.showMoves}
+            onClick={() => setModel(toggleMoves)}
+          >
+            Show legal moves
+          </button>
+          <button
+            type="button"
+            aria-pressed={model.showDanger}
+            onClick={() => setModel(toggleDanger)}
+          >
+            Show danger
+          </button>
+          <button type="button" disabled={!canUndo(model)} onClick={() => setModel(undo)}>
+            Undo
+          </button>
         </div>
 
         <ol className="moves" aria-label="Moves" ref={list}>

@@ -2,6 +2,7 @@
 // for a promotion piece. Pure functions over a model; React only draws it. The engine decides
 // every rule (legal moves, check, game end); nothing here knows how a piece moves.
 import {
+  attackMap,
   findMove,
   newGame,
   playMove,
@@ -25,9 +26,22 @@ export interface Model {
   selected: string | null;
   /** A promotion waiting for the player to pick a piece. */
   promoting: Promoting | null;
+  /** Earlier states of this game, oldest first; undo pops the last. */
+  history: GameState[];
+  /** Play aid: show the selected piece's legal moves (on by default). */
+  showMoves: boolean;
+  /** Play aid: mark the side to move's pieces that the other side attacks (off by default, provisional). */
+  showDanger: boolean;
 }
 
-export const fromGame = (game: GameState): Model => ({ game, selected: null, promoting: null });
+export const fromGame = (game: GameState): Model => ({
+  game,
+  selected: null,
+  promoting: null,
+  history: [],
+  showMoves: true,
+  showDanger: false,
+});
 
 export function newModel(
   rules: MoveRules = createRules(),
@@ -39,7 +53,25 @@ export function newModel(
 const movesFrom = (game: GameState, from: string): GeneratedMove[] =>
   game.legal.filter((m) => m.from === from);
 
-const played = (model: Model, move: GeneratedMove): Model => fromGame(playMove(model.game, move));
+const played = (model: Model, move: GeneratedMove): Model => ({
+  ...model,
+  game: playMove(model.game, move),
+  selected: null,
+  promoting: null,
+  history: [...model.history, model.game],
+});
+
+export const canUndo = (model: Model): boolean => model.history.length > 0;
+
+/** Take back the last move (hot-seat only; online play will not offer it). */
+export function undo(model: Model): Model {
+  const game = model.history.at(-1);
+  if (!game) return model;
+  return { ...model, game, selected: null, promoting: null, history: model.history.slice(0, -1) };
+}
+
+export const toggleMoves = (model: Model): Model => ({ ...model, showMoves: !model.showMoves });
+export const toggleDanger = (model: Model): Model => ({ ...model, showDanger: !model.showDanger });
 
 /** A click on a square: play a shown move, or select the piece standing there, or clear. */
 export function click(model: Model, at: string): Model {
@@ -69,9 +101,22 @@ export function promote(model: Model, piece: string): Model {
 export const cancelPromotion = (model: Model): Model =>
   model.promoting ? { ...model, selected: null, promoting: null } : model;
 
+/** Squares of the side to move's pieces that any other side attacks. */
+function endangered(game: GameState): string[] {
+  const threatened = new Set(
+    [...new Set(Object.values(game.position).map((p) => p.side))]
+      .filter((side) => side !== game.turn)
+      .flatMap((side) => attackMap(game.rules, game.position, side)),
+  );
+  return Object.entries(game.position)
+    .filter(([at, p]) => p.side === game.turn && threatened.has(at))
+    .map(([at]) => at)
+    .sort();
+}
+
 /** What the board shows besides the pieces. */
 export function highlights(model: Model): Highlights {
-  const { game, selected } = model;
+  const { game, selected, showMoves, showDanger } = model;
   const ongoing = game.result.status === 'ongoing';
   const last = game.moves.at(-1);
   const royal = Object.entries(game.position)
@@ -79,14 +124,16 @@ export function highlights(model: Model): Highlights {
     .map(([at]) => at);
   return {
     ...(selected && { selected }),
-    targets: selected
-      ? [...new Map(movesFrom(game, selected).map((m) => [m.to, m])).values()].map((m) => ({
-          at: m.to,
-          capture: m.capture !== undefined,
-        }))
-      : [],
+    targets:
+      selected && showMoves
+        ? [...new Map(movesFrom(game, selected).map((m) => [m.to, m])).values()].map((m) => ({
+            at: m.to,
+            capture: m.capture !== undefined,
+          }))
+        : [],
     ...(last && { lastMove: [last.from, last.to] as [string, string] }),
     check: game.inCheck ? royal : [],
+    danger: showDanger && ongoing ? endangered(game) : [],
     movable: ongoing ? [...new Set(game.legal.map((m) => m.from))].sort() : [],
   };
 }

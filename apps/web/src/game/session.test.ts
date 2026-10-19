@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { newGame, type Position } from '@chess9s/engine';
 import {
   cancelPromotion,
+  canUndo,
   click,
   fromGame,
   highlights,
@@ -9,6 +10,9 @@ import {
   promote,
   rounds,
   statusLine,
+  toggleDanger,
+  toggleMoves,
+  undo,
   type Model,
 } from './session';
 import { createRules, listRulesets, ruleset } from './rules';
@@ -251,5 +255,62 @@ describe('status line and move list', () => {
       { number: 2, first: 'c8-c6' },
     ]);
     expect(rounds(newModel().game)).toEqual([]);
+  });
+});
+
+describe('play aids', () => {
+  const play = (...squares: string[]) => clicks(newModel(), ...squares);
+  const first = () => {
+    const m = newModel();
+    const from = m.game.legal[0]!.from;
+    const to = m.game.legal[0]!.to;
+    return { m, from, to };
+  };
+
+  it('shows legal moves by default, and hides them when switched off', () => {
+    const { m, from } = first();
+    expect(m.showMoves).toBe(true);
+    expect(highlights(click(m, from)).targets.length).toBeGreaterThan(0);
+    const off = toggleMoves(m);
+    expect(off.showMoves).toBe(false);
+    const sel = click(off, from);
+    expect(sel.selected).toBe(from);
+    expect(highlights(sel).targets).toEqual([]);
+  });
+
+  it('undoes the last move, and has nothing to undo at the start', () => {
+    const { m, from, to } = first();
+    expect(canUndo(m)).toBe(false);
+    expect(undo(m)).toBe(m);
+    const after = play(from, to);
+    expect(after.game.moves).toHaveLength(1);
+    expect(canUndo(after)).toBe(true);
+    const back = undo(after);
+    expect(back.game.moves).toHaveLength(0);
+    expect(back.game.turn).toBe(m.game.turn);
+    expect(canUndo(back)).toBe(false);
+  });
+
+  it('keeps the aid settings when moving and undoing', () => {
+    const { m, from, to } = first();
+    const model = toggleDanger(toggleMoves(m));
+    const after = click(click(model, from), to);
+    expect(after.showMoves).toBe(false);
+    expect(after.showDanger).toBe(true);
+    expect(undo(after).showDanger).toBe(true);
+  });
+
+  it('marks pieces of the side to move that the other side attacks', () => {
+    const position: Position = {
+      e1: king('light'),
+      e9: king('dark'),
+      c4: { piece: 'rook', side: 'light' },
+      c8: { piece: 'rook', side: 'dark' },
+    };
+    const game = newGame(createRules(), ruleset, { position, turn: 'light' });
+    const model = fromGame(game);
+    expect(highlights(model).danger).toEqual([]);
+    const on = toggleDanger(model);
+    expect(highlights(on).danger).toEqual(['c4']);
   });
 });

@@ -24,6 +24,8 @@ export interface Highlights {
   lastMove?: [string, string];
   /** Squares of the Kings in check. */
   check: string[];
+  /** Squares of the side to move's pieces that the other side attacks (play aid). */
+  danger?: string[];
   /** Squares of the pieces that have a legal move. */
   movable: string[];
 }
