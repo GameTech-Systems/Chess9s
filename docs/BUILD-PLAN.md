@@ -88,7 +88,7 @@ Decisions: D2.
 `sunMoon.range`, `sunMoon.canPromote`, the Sun and Moon capture rule, and `dragons.2p.mode` (blocking or removed). Tests at every option.
 Decisions: D3, D6.
 
-### S16 — Attack maps, check, checkmate, stalemate · Opus 5.5 · high · `todo`
+### S16 — Attack maps, check, checkmate, stalemate · Opus 5.5 · high · `done`
 Attack maps computed from the same movement data (never hardcoded), check detection, legal-move filtering, checkmate, and `draw.stalemate`. Flag parameter combinations whose `affects` overlap so the simulation harness can test them later. N-player-ready turn order.
 Done when: the check and mate fixture suite passes at every king.range option.
 
