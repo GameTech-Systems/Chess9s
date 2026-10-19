@@ -7,13 +7,11 @@ Updated 2026-10-19 by S22 (Sonnet 5.5 · low). `/end-session` rewrites this file
 - Not checked in a browser: the bot delay and the restore on reload (tests render to markup).
 
 ## Next session
-**S23 — Computer opponent v1** · Opus 5.5 · high
-Why: next Phase 2 step; needs the speed task and the owner's call on the proposed draw-rules step below.
-Start with: `/start-session S23`
+**S22a — Missing 2-player rules** · Opus 5.5 · high
+Why: the owner approved inserting it before S23 (bot self-play needs draw rules to end). Then S23 starts with the `playMove` speed task (about 6.5 ms, a full legal scan; use incremental attack maps).
+Start with: `/start-session S22a`
 
-## Proposed Phase 2 changes (for the owner's plan review)
-- **Insert an engine step before S23: the missing 2-player rules** (threefold repetition, 50-move, insufficient material, castling, en passant, pawn safe zones, owner-listed Coast rules). Without draw rules, bot self-play (S24) may never end. Suggested: Opus 5.5 · high.
-- **S23 / S22:** `playMove` takes about 6.5 ms (a full legal scan). Start S23 with a speed task (incremental attack maps); S22's random mover is fine.
+## Proposed Phase 2 changes
 - **S27:** the web bundle includes Ajv (130 kB gzip), which uses `new Function`; a strict CSP needs a pre-resolved ruleset.
 
 ## Decisions in effect for the next step
