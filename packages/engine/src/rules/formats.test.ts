@@ -56,6 +56,18 @@ describe('neutral fixture', () => {
 });
 
 describe('board format', () => {
+  it('accepts square colors and seat views, and rejects malformed ones', () => {
+    const b = board();
+    (b.squares as Json[])[0]!.color = '#1083f6';
+    (b.sides as Json[])[0]!.view = { rotate: 270 };
+    expect(() => validateBoard(b)).not.toThrow();
+    (b.squares as Json[])[0]!.color = 'blue';
+    expect(() => validateBoard(b)).toThrow(RulesError);
+    (b.squares as Json[])[0]!.color = '#1083f6';
+    (b.sides as Json[])[0]!.view = { rotate: 45 };
+    expect(() => validateBoard(b)).toThrow(RulesError);
+  });
+
   it('rejects a coordinate off the 9x9 board', () => {
     const b = board();
     (b.squares as Json[])[0]!.at = 'j1';
@@ -305,6 +317,20 @@ describe('board and pieces together', () => {
     const b = board();
     ((b.setups as Json[])[1]!.pieces as Record<string, Json>).third!.a5 = 'leaper';
     expect(() => validateBoardAndPieces(b, pieces(), registry())).not.toThrow();
+  });
+
+  it('ignores moves and promotions that apply only to other player counts', () => {
+    const list = pieces();
+    const stepperPiece = list.find((p) => p.id === 'stepper')!;
+    for (const m of stepperPiece.moves as Json[]) m.when = { all: [{ players: [2] }, ...(m.when ? [m.when] : [])] };
+    stepperPiece.promotion = { ...(stepperPiece.promotion as Json), when: { players: [2] } };
+    const b = board();
+    ((b.setups as Json[])[1]!.pieces as Record<string, Json>).third!.a5 = 'stepper';
+    expect(() => validateBoardAndPieces(b, list, registry())).not.toThrow();
+    stepperPiece.promotion = { ...(stepperPiece.promotion as Json), when: { any: [{ players: [2] }, { players: [3] }] } };
+    expect(issuesOf(() => validateBoardAndPieces(b, list, registry()))).toContain(
+      'setup 3p: a5 places stepper for third, which has no forward direction',
+    );
   });
 
   it('validates the registry it is given', () => {

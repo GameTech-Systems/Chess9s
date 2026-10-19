@@ -24,12 +24,16 @@ export interface Square {
   types: string[];
   side?: string;
   label?: string;
+  /** Display color, #rrggbb. */
+  color?: string;
 }
 
 export interface Side {
   id: string;
   /** Up is toward rank 9. A side without one can't hold forward-relative pieces. */
   forward?: 'up' | 'down';
+  /** How the board is drawn for this seat: clockwise turn of the standard diagram. Display only. */
+  view?: { rotate: 0 | 90 | 180 | 270 };
 }
 
 export interface Setup {
@@ -264,10 +268,23 @@ export function validatePiece(piece: unknown, board: Board, registry: Registry):
 
 const RELATIVE_DIRECTIONS = new Set<Direction>(['forward', 'backward', 'forward-diagonal', 'backward-diagonal']);
 
-/** Whether the piece's movement depends on which way its side faces. */
-function needsForward(p: Piece): boolean {
-  if (p.promotion) return true;
+/**
+ * False only when a condition can never hold in a game of this player count
+ * (a `players` condition that leaves it out, alone or inside `all` or `any`).
+ */
+function mayApply(c: Condition | undefined, players: number): boolean {
+  if (c === undefined) return true;
+  if ('players' in c) return (c.players as number[]).includes(players);
+  if ('all' in c) return c.all.every((x) => mayApply(x, players));
+  if ('any' in c) return c.any.some((x) => mayApply(x, players));
+  return true;
+}
+
+/** Whether the piece's movement depends on which way its side faces, in a game of this player count. */
+function needsForward(p: Piece, players: number): boolean {
+  if (p.promotion && mayApply(p.promotion.when, players)) return true;
   return p.moves.some((m) => {
+    if (!mayApply(m.when, players)) return false;
     if (m.directions?.some((d) => RELATIVE_DIRECTIONS.has(d))) return true;
     if (!m.vectors || m.symmetry === 'all') return false;
     const steps = m.symmetry === 'mirror' ? m.vectors.flatMap(([f, r]) => [[f, r], [-f, r]]) : m.vectors;
@@ -303,7 +320,7 @@ export function validateBoardAndPieces(board: unknown, pieces: unknown[], regist
       for (const [at, id] of Object.entries(placed)) {
         const p = byId[id];
         if (!p) issues.push(`setup ${setup.players}p: ${at} places unknown piece ${id}`);
-        else if (facing.get(side) === undefined && needsForward(p)) {
+        else if (facing.get(side) === undefined && needsForward(p, setup.players)) {
           issues.push(`setup ${setup.players}p: ${at} places ${id} for ${side}, which has no forward direction`);
         }
       }

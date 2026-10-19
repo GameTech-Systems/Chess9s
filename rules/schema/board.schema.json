@@ -64,7 +64,12 @@
           "items": { "$ref": "#/$defs/id" }
         },
         "side": { "description": "The side this square belongs to, for side-specific rules.", "$ref": "#/$defs/id" },
-        "label": { "description": "Display name, such as a named square.", "type": "string" }
+        "label": { "description": "Display name, such as a named square.", "type": "string" },
+        "color": {
+          "description": "Display color of the square as #rrggbb. Unlisted squares use the checkered light and dark colors.",
+          "type": "string",
+          "pattern": "^#[0-9a-f]{6}$"
+        }
       },
       "additionalProperties": false
     },
@@ -76,6 +81,18 @@
         "forward": {
           "description": "Direction of the side's forward moves: up toward rank 9, down toward rank 1.",
           "enum": ["up", "down"]
+        },
+        "view": {
+          "description": "How the board is drawn for this side's seat. Display only.",
+          "type": "object",
+          "required": ["rotate"],
+          "properties": {
+            "rotate": {
+              "description": "Clockwise turn of the standard diagram (a1 at the bottom left), in degrees.",
+              "enum": [0, 90, 180, 270]
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
