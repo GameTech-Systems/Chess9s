@@ -24,7 +24,7 @@ Claude opens and merges its own pull requests after CI passes (decision record 0
 ## Habits that stretch the plan
 
 1. One step per session, one PR per step.
-2. Plan mode before any multi-file change.
+2. A written plan before any multi-file change; Claude goes ahead without waiting for approval.
 3. Failing test first; targeted test runs while working, the full suite at the end.
 4. Keep CLAUDE.md short. The handoff carries the moving state.
 5. Set model and effort at the start; switching mid-session re-reads the whole conversation without the cache.
