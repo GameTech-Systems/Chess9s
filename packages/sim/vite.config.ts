@@ -13,6 +13,7 @@ export default defineConfig({
         cli: 'src/cli.ts',
         worker: 'src/worker.ts',
         bench: 'src/bench-cli.ts',
+        merge: 'src/merge-cli.ts',
       },
       output: { entryFileNames: '[name].js', format: 'es' },
     },

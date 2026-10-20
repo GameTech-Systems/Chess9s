@@ -14,6 +14,7 @@ const game = (over: Partial<GameSummary>): GameSummary => ({
   winner: null,
   plies: 100,
   minDepth: 1,
+  capped: 0,
   key: 'k',
   ...over,
 });
@@ -102,6 +103,11 @@ describe('summarize', () => {
     expect(s.plies).toEqual({ mean: 30, median: 25, min: 10, max: 60 });
     expect(s.distinct).toBe(3);
     expect(s.minDepth).toBe(1);
+  });
+
+  it('counts the moves the node budget cut short', () => {
+    const s = summarize([game({ capped: 2 }), game({ capped: 0 }), game({ capped: 1 })]);
+    expect(s.capped).toBe(3);
   });
 
   it('uses the thresholds from decision 0008', () => {
