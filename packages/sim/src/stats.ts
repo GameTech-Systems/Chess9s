@@ -64,7 +64,7 @@ export function summarize(games: GameSummary[], measures: Measures = MEASURES): 
   // Rounded to a hundredth of a percent first, so 47.00% computed as 0.46999… still passes.
   const rounded = Math.round(score * 10000) / 10000;
   const flags: string[] = [];
-  if (rounded < measures.band.min || rounded > measures.band.max)
+  if (n > 0 && (rounded < measures.band.min || rounded > measures.band.max))
     flags.push(`score outside ${bandLabel(measures)}`);
   if (n < measures.minGames) flags.push('too few games');
   if (unfinished > 0) flags.push('unfinished games');

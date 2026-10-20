@@ -82,6 +82,10 @@ describe('summarize', () => {
     expect(s.pass).toBe(false);
   });
 
+  it('has no score to flag before any game is played', () => {
+    expect(summarize([]).flags).toEqual(['too few games']);
+  });
+
   it('flags games that hit the safety cap', () => {
     const s = summarize([...games(1, { reason: 'unfinished' }), ...games(1, win('first'), 1)]);
     expect(s.unfinished).toBe(1);
