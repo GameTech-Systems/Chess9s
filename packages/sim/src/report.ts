@@ -39,6 +39,24 @@ export interface FairnessReport {
 
 const SCREENING = 'too few games';
 
+const pct = (x: number) => `${(x * 100).toFixed(1)}%`;
+
+/**
+ * A sweep run's flags. With enough games, its own flags. A screening run (too few games) is
+ * flagged for its score only when the whole 95% interval misses the band (decision 0008,
+ * version 2): with 40 games the interval is about ±15 points, so a point estimate outside the
+ * band is mostly chance.
+ */
+function sweepFlags(s: RunSummary, m: Measures): string[] {
+  if (!s.flags.includes(SCREENING)) return s.flags;
+  const [lo, hi] = s.interval;
+  const flags = s.flags.filter((f) => f !== SCREENING && !f.startsWith('score outside'));
+  if (s.games > 0 && (hi < m.band.min || lo > m.band.max)) {
+    flags.unshift(`interval ${(lo * 100).toFixed(1)}–${pct(hi)} outside ${bandLabel(m)}`);
+  }
+  return flags;
+}
+
 /**
  * Pass when the ruleset as it is passes at every depth the measures name; fail when one of its
  * runs has enough games and is outside the band; otherwise incomplete.
@@ -63,7 +81,7 @@ export function buildReport(
 ): FairnessReport {
   const flagged = runs
     .filter((r) => r.combination !== 'default')
-    .map((r) => [r, r.summary.flags.filter((f) => f !== SCREENING)] as const)
+    .map((r) => [r, sweepFlags(r.summary, measures)] as const)
     .filter(([, flags]) => flags.length > 0)
     .map(([r, flags]) => `${r.combination} at depth ${r.depth}: ${flags.join(', ')}`);
   return {
@@ -79,7 +97,6 @@ export function buildReport(
   };
 }
 
-const pct = (x: number) => `${(x * 100).toFixed(1)}%`;
 const num = (x: number) => x.toLocaleString('en-US');
 
 export function toMarkdown(report: FairnessReport): string {
@@ -90,7 +107,7 @@ export function toMarkdown(report: FairnessReport): string {
     '',
     `Verdict: **${report.verdict}** (${report.date}).`,
     '',
-    `Measured as decision ${report.decision} sets out (ledger D12): the first player's score, counting a draw as half, must be ${bandLabel(m)} over at least ${num(m.minGames)} games at each of depths ${m.depths.join(' and ')}. The same search plays both seats; each game opens with ${m.openingPlies} random plies; at most ${num(m.nodes)} positions per move; games stop at ${num(m.maxPlies)} plies. Runs with fewer games are screening only.`,
+    `Measured as decision ${report.decision} (version ${m.version}) sets out (ledger D12): the first player's score, counting a draw as half, must be ${bandLabel(m)} over at least ${num(m.minGames)} games at each of depths ${m.depths.join(' and ')}. The same search plays both seats; each game opens with ${m.openingPlies} random plies; at most ${num(m.nodes)} positions per move; games stop at ${num(m.maxPlies)} plies. Runs with fewer games are screening only: a sweep combination is flagged when its whole 95% interval misses the band.`,
     '',
     '## Runs',
     '',

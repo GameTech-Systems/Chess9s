@@ -1,6 +1,6 @@
 # 0008: Fairness measures for 2-player rulesets
 
-**Status:** Accepted (ledger D12, default). Committed in S24 before any simulation run. The choices marked *provisional* are defaults picked by Claude within D12; the owner may change them, and a change is a new version of this record.
+**Status:** Accepted (ledger D12, default), version 2. Version 1 was committed in S24 before any simulation run; version 2 (S24, after the first sweep) changes only how screening sweeps are flagged. The choices marked *provisional* are defaults picked by Claude within D12; the owner may change them, and a change is a new version of this record.
 
 ## Context
 Decision [0004](0004-two-player-fairness-and-tournament-rules.md) requires the default 2-player ruleset to be fairness-checked before it is published as a Candidate. D12 sets the measure: the first player's score must fall between 47% and 53% over at least 2,000 bot games at two search depths, with the draw rate and game length reported. This record fixes how that is measured, so the thresholds can't be adjusted to fit the results afterwards.
@@ -19,7 +19,7 @@ Decision [0004](0004-two-player-fairness-and-tournament-rules.md) requires the d
 
 ## Parameter combinations
 - A sweep changes one 2-player parameter at a time from the ruleset's values: each other option of an integer, boolean or enum parameter, and each option added to or removed from an enumSet. Combinations the engine can't play yet (`unbuiltFeatures`) or that resolve to an invalid ruleset are listed as skipped.
-- Sweeps with fewer than 2,000 games per combination are screening only: a flag means "worth a full run", not a fairness verdict.
+- Sweeps with fewer than 2,000 games per combination are screening only: a flag means "worth a full run", not a fairness verdict. **Version 2:** a screening run is flagged for its score only when its whole 95% interval lies outside 47–53%. Version 1 flagged any point estimate outside the band; at 40 games the interval is about ±15 points, so 53 of 59 combinations were flagged by chance. The pass rule for a ruleset (2,000 games, point estimate in the band) is unchanged.
 
 ## Consequences
 - `packages/sim` implements these measures (`src/measures.ts` holds the numbers) and writes each report as JSON and Markdown to `docs/fairness/`.

@@ -2,6 +2,8 @@
 // that decision record.
 export const MEASURES = {
   decision: '0008',
+  /** Version of the record: 2 changed how screening sweeps are flagged. */
+  version: 2,
   /** First-player score band, inclusive. */
   band: { min: 0.47, max: 0.53 },
   /** Fewest finished games a run needs before its score counts. */
