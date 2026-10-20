@@ -8,6 +8,7 @@
   "decision": "0008",
   "measures": {
     "decision": "0008",
+    "version": 2,
     "band": {
       "min": 0.47,
       "max": 0.53
