@@ -70,6 +70,21 @@ describe('verdict', () => {
   });
 });
 
+describe('screening flags', () => {
+  const screen = (score: number, interval: [number, number]) =>
+    run(1, { games: 40, score, interval, pass: false, flags: ['too few games'] }, 'king.range=1');
+
+  it('flags a short sweep run only when its whole interval misses the band', () => {
+    const r = buildReport(ruleset, '2026-10-20', [screen(0.75, [0.6, 0.86])], []);
+    expect(r.flagged).toEqual(['king.range=1 at depth 1: interval 60.0–86.0% outside 47–53%']);
+  });
+
+  it('does not flag a short run whose interval reaches the band, however far its score is', () => {
+    const r = buildReport(ruleset, '2026-10-20', [screen(0.6, [0.45, 0.74])], []);
+    expect(r.flagged).toEqual([]);
+  });
+});
+
 describe('toMarkdown', () => {
   it('states the verdict, the measures and every run', () => {
     const r = buildReport(

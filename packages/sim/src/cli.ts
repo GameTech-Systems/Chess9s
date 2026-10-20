@@ -12,7 +12,8 @@
 //   --set <id=value>   override a parameter for every run (repeatable; value as JSON or a word)
 //   --out <dir>        report directory, from where pnpm was run (docs/fairness)
 //   --name <name>      report file name (the ruleset id)
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+//   --report <file>    play nothing: rebuild that report's .json and .md from its runs
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { availableParallelism } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -21,7 +22,13 @@ import { loadSource, rulesFor } from './load';
 import { MEASURES } from './measures';
 import type { GameSummary } from './play';
 import { runPool, type Job } from './pool';
-import { buildReport, toMarkdown, type RunReport, type Skipped } from './report';
+import {
+  buildReport,
+  toMarkdown,
+  type FairnessReport,
+  type RunReport,
+  type Skipped,
+} from './report';
 import { summarize } from './stats';
 import { combinations, playable, type Combination } from './sweep';
 
@@ -36,6 +43,7 @@ export interface Options {
   overrides: Record<string, unknown>;
   out: string;
   name: string;
+  report?: string;
 }
 
 const whole = (flag: string, text: string): number => {
@@ -58,6 +66,7 @@ export function options(argv: string[], cores: number): Options {
       set: { type: 'string', multiple: true, default: [] },
       out: { type: 'string', default: 'docs/fairness' },
       name: { type: 'string' },
+      report: { type: 'string' },
     },
   });
   const overrides: Record<string, unknown> = {};
@@ -84,6 +93,7 @@ export function options(argv: string[], cores: number): Options {
     overrides,
     out: v.out,
     name: v.name ?? v.ruleset,
+    ...(v.report === undefined ? {} : { report: v.report }),
   };
 }
 
@@ -95,9 +105,19 @@ function repoRoot(from: string): string {
   }
 }
 
+/** Rebuild a report from its runs, so a change to flags or wording needs no new games. */
+function rebuild(file: string): void {
+  const old = JSON.parse(readFileSync(file, 'utf8')) as FairnessReport;
+  const report = buildReport(old.ruleset, old.date, old.runs, old.skipped, old.overrides);
+  writeFileSync(file, JSON.stringify(report, null, 2) + '\n');
+  writeFileSync(file.replace(/\.json$/, '.md'), toMarkdown(report));
+  console.error(`Verdict: ${report.verdict}. Rebuilt ${file} and its .md`);
+}
+
 async function main(): Promise<void> {
   const o = options(process.argv.slice(2), availableParallelism());
   const cwd = process.env['INIT_CWD'] ?? process.cwd();
+  if (o.report !== undefined) return rebuild(resolve(cwd, o.report));
   const root = repoRoot(cwd);
   const source = loadSource(root);
   const { rules, ruleset } = rulesFor(source, o.ruleset, o.overrides);

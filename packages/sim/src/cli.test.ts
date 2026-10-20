@@ -15,6 +15,7 @@ describe('options', () => {
       overrides: {},
       out: 'docs/fairness',
       name: 'draft-2p',
+      report: undefined,
     });
   });
 
@@ -42,6 +43,8 @@ describe('options', () => {
         'x',
         '--name',
         'y',
+        '--report',
+        'r.json',
       ],
       4,
     );
@@ -56,6 +59,7 @@ describe('options', () => {
       overrides: { 'king.range': 1, 'pawn.safeZones': 'off' },
       out: 'x',
       name: 'y',
+      report: 'r.json',
     });
   });
 
