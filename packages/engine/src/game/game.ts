@@ -186,6 +186,25 @@ function positionKey(rules: MoveRules, s: Dynamic & { turn: string }, legal: Gen
   return `${s.turn}|${s.coastOpen ? 'open' : 'closed'}|${pieces.join(',')}|${legal.map(toNotation).join(',')}`;
 }
 
+/**
+ * Everything the rest of the game depends on apart from the moves that led here: the facts of
+ * positionKey plus the pieces each side has lost (promotions), the Tail's runs and the Coast
+ * opener's bonus, and what may be captured in passing. Two states with the same key, no earlier
+ * position that could repeat and no quiet moves counted play out the same (the search's
+ * transposition table, S35).
+ */
+export function stateKey(state: GameState): string {
+  const position = state.seen?.key ?? positionKey(state.rules, state, state.legal);
+  const lost = Object.keys(state.lost)
+    .sort()
+    .map((side) => `${side}:${[...state.lost[side]!].sort().join('+')}`);
+  const runs = Object.keys(state.tailRun)
+    .sort()
+    .map((side) => `${side}:${state.tailRun[side]}`);
+  const passing = state.passing ? `${state.passing.squares.join('+')}>${state.passing.at}` : '';
+  return `${position}|${lost.join(',')}|${runs.join(',')}|${state.tailBonus ?? ''}|${passing}`;
+}
+
 function occurrences(seen: Seen): number {
   let n = 0;
   for (let s: Seen | null = seen; s; s = s.prev) if (s.key === seen.key) n++;
