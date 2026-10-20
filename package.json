@@ -15,7 +15,8 @@
     "test": "vitest run",
     "lint": "eslint . && prettier --check .",
     "typecheck": "pnpm -r typecheck",
-    "validate:rules": "node scripts/validate-rules.mjs"
+    "validate:rules": "node scripts/validate-rules.mjs",
+    "sim": "pnpm --filter @chess9s/sim run sim"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",
