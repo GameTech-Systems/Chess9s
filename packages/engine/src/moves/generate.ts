@@ -72,6 +72,8 @@ const FILES = 'abcdefghi';
 const SIZE = 9;
 
 const coord = (f: number, r: number) => `${FILES[f]}${r + 1}`;
+/** Coordinates by file * SIZE + rank, so the walk builds no strings. */
+const COORDS = Array.from({ length: SIZE * SIZE }, (_, i) => coord(Math.floor(i / SIZE), i % SIZE));
 const parse = (at: string): Step => [FILES.indexOf(at[0]!), Number(at.slice(1)) - 1];
 const onBoard = (f: number, r: number) => f >= 0 && f < SIZE && r >= 0 && r < SIZE;
 
@@ -257,16 +259,32 @@ interface Context {
   placed: PlacedPiece;
   forward: 'up' | 'down' | undefined;
   env: Env;
+  /** access() results for this piece in this situation, by move (`null` for the piece alone). */
+  access: Map<Move | null, Access>;
 }
+
+/**
+ * access() results per ruleset, by everything they read besides the move: the piece, the
+ * from-square's types and the moved flag (for `when` conditions), and the side and home square
+ * (for `covers`). The search asks the same thing millions of times (S35).
+ */
+const accessCache = new WeakMap<MoveRules, Map<string, Map<Move | null, Access>>>();
 
 function context(rules: MoveRules, from: string, placed: PlacedPiece): Context {
   const forward = rules.board.sides.find((s) => s.id === placed.side)?.forward;
   const fromTypes = squareTypes(rules.board).get(from) ?? [];
+  const piece = pieceOf(rules, from, placed);
+  let byRules = accessCache.get(rules);
+  if (!byRules) accessCache.set(rules, (byRules = new Map()));
+  const key = `${piece.id}|${fromTypes.join('+')}|${placed.moved === true}|${placed.side}|${placed.home ?? ''}`;
+  let access = byRules.get(key);
+  if (!access) byRules.set(key, (access = new Map()));
   return {
-    piece: pieceOf(rules, from, placed),
+    piece,
     placed,
     forward,
     env: { rules, fromTypes, moved: placed.moved === true },
+    access,
   };
 }
 
@@ -281,15 +299,19 @@ function covers(rules: MoveRules, rule: SquareRule, at: string, placed: PlacedPi
   return rule.homeFile !== true || (placed.home !== undefined && placed.home[0] === at[0]);
 }
 
+interface Access {
+  mayStop: (at: string) => boolean;
+  mayPass: (at: string) => boolean;
+}
+
 /**
  * Where the piece may stop and pass under its own square rules and those of `move`; any
  * applicable `false` forbids (decision 2026-10-19: deny wins).
  */
-function access(
-  rules: MoveRules,
-  { piece, placed, env }: Context,
-  move?: Move,
-): { mayStop: (at: string) => boolean; mayPass: (at: string) => boolean } {
+function access(rules: MoveRules, ctx: Context, move?: Move): Access {
+  const cached = ctx.access.get(move ?? null);
+  if (cached) return cached;
+  const { piece, placed, env } = ctx;
   const noStop: SquareRule[] = [];
   const noPass: SquareRule[] = [];
   for (const rule of [...(piece.squares ?? []), ...(move?.squares ?? [])]) {
@@ -298,10 +320,16 @@ function access(
     if (!flag(rules, rule.stop, true)) noStop.push(rule);
     if (!flag(rules, rule.pass, true)) noPass.push(rule);
   }
-  return {
-    mayStop: (at) => !noStop.some((r) => covers(rules, r, at, placed)),
-    mayPass: (at) => !noPass.some((r) => covers(rules, r, at, placed)),
+  const blocked = (deny: SquareRule[]) =>
+    new Set(COORDS.filter((at) => deny.some((r) => covers(rules, r, at, placed))));
+  const noStopAt = blocked(noStop);
+  const noPassAt = blocked(noPass);
+  const found: Access = {
+    mayStop: (at) => !noStopAt.has(at),
+    mayPass: (at) => !noPassAt.has(at),
   };
+  ctx.access.set(move ?? null, found);
+  return found;
 }
 
 /**
@@ -376,7 +404,7 @@ function walk(
         f += df;
         r += dr;
         if (!onBoard(f, r)) break;
-        const at = coord(f, r);
+        const at = COORDS[f * SIZE + r]!;
         look?.(at);
         if (mayStop(at)) visit(at, move, [df, dr], n);
         // A no-passing rule ends sliding moves only; jumping moves ignore it (decision 2026-10-19).
