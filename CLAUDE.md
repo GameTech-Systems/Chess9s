@@ -43,6 +43,7 @@ Node 22, pnpm 10 (pinned in `package.json`).
 - `pnpm lint`: ESLint and Prettier check.
 - `pnpm typecheck`: `tsc --noEmit` in every workspace.
 - `pnpm validate:rules`: Ajv-validate `rules/` against `rules/schema/`.
+- `pnpm sim [--games n --depths 1,2 --sweep --set id=value]`: bot self-play; writes a fairness report to `docs/fairness/` (decision 0008).
 
 ## Where things live
 - `docs/HANDOFF.md`: current state and the next session (rewritten every session). `docs/sessions/LOG.md`: one line per session.
