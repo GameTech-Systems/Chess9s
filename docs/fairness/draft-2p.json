@@ -29,35 +29,35 @@
       "depth": 1,
       "nodes": 100000,
       "seed": 1,
-      "seconds": 2746,
+      "seconds": 3768,
       "summary": {
-        "games": 750,
-        "firstWins": 223,
-        "secondWins": 229,
-        "draws": 298,
-        "score": 0.496,
+        "games": 1000,
+        "firstWins": 305,
+        "secondWins": 303,
+        "draws": 392,
+        "score": 0.501,
         "interval": [
-          0.4603282761009644,
-          0.5317124921453091
+          0.47006526890602685,
+          0.5319270772968004
         ],
-        "drawRate": 0.3973333333333333,
+        "drawRate": 0.392,
         "winsBySide": {
-          "light": 229,
-          "dark": 223
+          "light": 303,
+          "dark": 305
         },
         "results": {
-          "checkmate": 452,
-          "repetition": 284,
+          "checkmate": 608,
+          "repetition": 375,
           "insufficient-material": 2,
-          "fifty-move": 12
+          "fifty-move": 15
         },
         "plies": {
-          "mean": 121.23866666666666,
+          "mean": 123.111,
           "median": 111,
-          "min": 6,
+          "min": 5,
           "max": 440
         },
-        "distinct": 750,
+        "distinct": 1000,
         "unfinished": 0,
         "minDepth": 1,
         "flags": [
