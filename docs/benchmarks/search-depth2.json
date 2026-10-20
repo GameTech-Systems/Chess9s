@@ -1,0 +1,3053 @@
+{
+  "date": "2026-10-20",
+  "ruleset": {
+    "id": "draft-2p",
+    "version": "0.2.0"
+  },
+  "depth": 2,
+  "nodes": 100000,
+  "search": {
+    "moves": 137,
+    "nodes": {
+      "mean": 640,
+      "median": 506,
+      "p95": 1506,
+      "max": 2456
+    },
+    "capped": 0,
+    "cappedShare": 0,
+    "msPerMove": 223
+  },
+  "reference": {
+    "moves": 137,
+    "nodes": {
+      "mean": 716,
+      "median": 556,
+      "p95": 1802,
+      "max": 2541
+    },
+    "capped": 0,
+    "cappedShare": 0,
+    "msPerMove": 244
+  },
+  "compared": {
+    "finished": 137,
+    "same": 137
+  },
+  "rows": [
+    {
+      "name": "seed 1 ply 8",
+      "plies": 8,
+      "legal": 49,
+      "search": {
+        "nodes": 587,
+        "ms": 329.908356,
+        "depth": 2,
+        "capped": false,
+        "move": "i8-i6",
+        "score": 240
+      },
+      "reference": {
+        "nodes": 913,
+        "ms": 352.3094269999999,
+        "depth": 2,
+        "capped": false,
+        "move": "i8-i6",
+        "score": 240
+      },
+      "same": true
+    },
+    {
+      "name": "seed 1 ply 32",
+      "plies": 32,
+      "legal": 49,
+      "search": {
+        "nodes": 1221,
+        "ms": 468.562238,
+        "depth": 2,
+        "capped": false,
+        "move": "f8-f9",
+        "score": 36
+      },
+      "reference": {
+        "nodes": 1256,
+        "ms": 585.2472489999996,
+        "depth": 2,
+        "capped": false,
+        "move": "f8-f9",
+        "score": 36
+      },
+      "same": true
+    },
+    {
+      "name": "seed 1 ply 56",
+      "plies": 56,
+      "legal": 57,
+      "search": {
+        "nodes": 420,
+        "ms": 173.23526599999968,
+        "depth": 2,
+        "capped": false,
+        "move": "e7-d7",
+        "score": 1156
+      },
+      "reference": {
+        "nodes": 424,
+        "ms": 161.55329600000005,
+        "depth": 2,
+        "capped": false,
+        "move": "e7-d7",
+        "score": 1156
+      },
+      "same": true
+    },
+    {
+      "name": "seed 1 ply 80",
+      "plies": 80,
+      "legal": 58,
+      "search": {
+        "nodes": 1501,
+        "ms": 499.23605599999973,
+        "depth": 2,
+        "capped": false,
+        "move": "a8-b8",
+        "score": 1156
+      },
+      "reference": {
+        "nodes": 1802,
+        "ms": 583.6693739999992,
+        "depth": 2,
+        "capped": false,
+        "move": "a8-b8",
+        "score": 1156
+      },
+      "same": true
+    },
+    {
+      "name": "seed 1 ply 104",
+      "plies": 104,
+      "legal": 57,
+      "search": {
+        "nodes": 1116,
+        "ms": 518.0942329999998,
+        "depth": 2,
+        "capped": false,
+        "move": "h8-g8",
+        "score": 1156
+      },
+      "reference": {
+        "nodes": 1390,
+        "ms": 554.4655490000005,
+        "depth": 2,
+        "capped": false,
+        "move": "h8-g8",
+        "score": 1156
+      },
+      "same": true
+    },
+    {
+      "name": "seed 1 ply 128",
+      "plies": 128,
+      "legal": 57,
+      "search": {
+        "nodes": 829,
+        "ms": 327.77356900000086,
+        "depth": 2,
+        "capped": false,
+        "move": "i9-e9",
+        "score": 1156
+      },
+      "reference": {
+        "nodes": 879,
+        "ms": 250.24877099999867,
+        "depth": 2,
+        "capped": false,
+        "move": "i9-e9",
+        "score": 1156
+      },
+      "same": true
+    },
+    {
+      "name": "seed 1 ply 152",
+      "plies": 152,
+      "legal": 67,
+      "search": {
+        "nodes": 427,
+        "ms": 147.40109700000176,
+        "depth": 2,
+        "capped": false,
+        "move": "d6xe4",
+        "score": 2016
+      },
+      "reference": {
+        "nodes": 427,
+        "ms": 144.6666179999993,
+        "depth": 2,
+        "capped": false,
+        "move": "d6xe4",
+        "score": 2016
+      },
+      "same": true
+    },
+    {
+      "name": "seed 1 ply 176",
+      "plies": 176,
+      "legal": 65,
+      "search": {
+        "nodes": 1017,
+        "ms": 298.6289749999996,
+        "depth": 2,
+        "capped": false,
+        "move": "c9-b9",
+        "score": 2016
+      },
+      "reference": {
+        "nodes": 1029,
+        "ms": 384.2277009999998,
+        "depth": 2,
+        "capped": false,
+        "move": "c9-b9",
+        "score": 2016
+      },
+      "same": true
+    },
+    {
+      "name": "seed 1 ply 200",
+      "plies": 200,
+      "legal": 58,
+      "search": {
+        "nodes": 588,
+        "ms": 167.79510799999844,
+        "depth": 2,
+        "capped": false,
+        "move": "b8-b7",
+        "score": 2871
+      },
+      "reference": {
+        "nodes": 533,
+        "ms": 151.55496399999902,
+        "depth": 2,
+        "capped": false,
+        "move": "b8-b7",
+        "score": 2871
+      },
+      "same": true
+    },
+    {
+      "name": "seed 1 ply 224",
+      "plies": 224,
+      "legal": 58,
+      "search": {
+        "nodes": 585,
+        "ms": 159.45530000000144,
+        "depth": 2,
+        "capped": false,
+        "move": "b8-b7",
+        "score": 2871
+      },
+      "reference": {
+        "nodes": 531,
+        "ms": 153.37886699999945,
+        "depth": 2,
+        "capped": false,
+        "move": "b8-b7",
+        "score": 2871
+      },
+      "same": true
+    },
+    {
+      "name": "seed 1 ply 248",
+      "plies": 248,
+      "legal": 56,
+      "search": {
+        "nodes": 797,
+        "ms": 187.04445600000327,
+        "depth": 2,
+        "capped": false,
+        "move": "i6-g7",
+        "score": 2866
+      },
+      "reference": {
+        "nodes": 868,
+        "ms": 211.9327459999986,
+        "depth": 2,
+        "capped": false,
+        "move": "i6-g7",
+        "score": 2866
+      },
+      "same": true
+    },
+    {
+      "name": "seed 1 ply 272",
+      "plies": 272,
+      "legal": 57,
+      "search": {
+        "nodes": 868,
+        "ms": 265.46687699999893,
+        "depth": 2,
+        "capped": false,
+        "move": "e6-f7",
+        "score": 2856
+      },
+      "reference": {
+        "nodes": 986,
+        "ms": 255.09921799999938,
+        "depth": 2,
+        "capped": false,
+        "move": "e6-f7",
+        "score": 2856
+      },
+      "same": true
+    },
+    {
+      "name": "seed 1 ply 296",
+      "plies": 296,
+      "legal": 58,
+      "search": {
+        "nodes": 630,
+        "ms": 165.0129330000018,
+        "depth": 2,
+        "capped": false,
+        "move": "b8-b7",
+        "score": 2871
+      },
+      "reference": {
+        "nodes": 585,
+        "ms": 198.62212200000067,
+        "depth": 2,
+        "capped": false,
+        "move": "b8-b7",
+        "score": 2871
+      },
+      "same": true
+    },
+    {
+      "name": "seed 1 ply 320",
+      "plies": 320,
+      "legal": 56,
+      "search": {
+        "nodes": 278,
+        "ms": 74.0336470000002,
+        "depth": 2,
+        "capped": false,
+        "move": "b1xb4",
+        "score": 4852
+      },
+      "reference": {
+        "nodes": 278,
+        "ms": 61.864534000000276,
+        "depth": 2,
+        "capped": false,
+        "move": "b1xb4",
+        "score": 4852
+      },
+      "same": true
+    },
+    {
+      "name": "seed 1 ply 344",
+      "plies": 344,
+      "legal": 55,
+      "search": {
+        "nodes": 196,
+        "ms": 34.817134999997506,
+        "depth": 2,
+        "capped": false,
+        "move": "b7-b6",
+        "score": 4946
+      },
+      "reference": {
+        "nodes": 196,
+        "ms": 34.48087999999916,
+        "depth": 2,
+        "capped": false,
+        "move": "b7-b6",
+        "score": 4946
+      },
+      "same": true
+    },
+    {
+      "name": "seed 1 ply 368",
+      "plies": 368,
+      "legal": 58,
+      "search": {
+        "nodes": 194,
+        "ms": 36.75724600000103,
+        "depth": 2,
+        "capped": false,
+        "move": "b3-b2",
+        "score": 5220
+      },
+      "reference": {
+        "nodes": 193,
+        "ms": 35.617888999997376,
+        "depth": 2,
+        "capped": false,
+        "move": "b3-b2",
+        "score": 5220
+      },
+      "same": true
+    },
+    {
+      "name": "seed 1 ply 392",
+      "plies": 392,
+      "legal": 79,
+      "search": {
+        "nodes": 263,
+        "ms": 63.03174600000057,
+        "depth": 2,
+        "capped": false,
+        "move": "b7-c7",
+        "score": 7135
+      },
+      "reference": {
+        "nodes": 268,
+        "ms": 58.49494600000253,
+        "depth": 2,
+        "capped": false,
+        "move": "b7-c7",
+        "score": 7135
+      },
+      "same": true
+    },
+    {
+      "name": "seed 1 ply 416",
+      "plies": 416,
+      "legal": 88,
+      "search": {
+        "nodes": 318,
+        "ms": 76.6597630000033,
+        "depth": 2,
+        "capped": false,
+        "move": "g9-g3",
+        "score": 7145
+      },
+      "reference": {
+        "nodes": 562,
+        "ms": 121.45543799999723,
+        "depth": 2,
+        "capped": false,
+        "move": "g9-g3",
+        "score": 7145
+      },
+      "same": true
+    },
+    {
+      "name": "seed 1 ply 440",
+      "plies": 440,
+      "legal": 85,
+      "search": {
+        "nodes": 274,
+        "ms": 66.02453500000411,
+        "depth": 2,
+        "capped": false,
+        "move": "c8-b7",
+        "score": 7135
+      },
+      "reference": {
+        "nodes": 457,
+        "ms": 94.21489699999802,
+        "depth": 2,
+        "capped": false,
+        "move": "c8-b7",
+        "score": 7135
+      },
+      "same": true
+    },
+    {
+      "name": "seed 2 ply 8",
+      "plies": 8,
+      "legal": 39,
+      "search": {
+        "nodes": 666,
+        "ms": 254.52389499999845,
+        "depth": 2,
+        "capped": false,
+        "move": "b8-b6",
+        "score": 190
+      },
+      "reference": {
+        "nodes": 680,
+        "ms": 316.07042399999773,
+        "depth": 2,
+        "capped": false,
+        "move": "b8-b6",
+        "score": 190
+      },
+      "same": true
+    },
+    {
+      "name": "seed 2 ply 32",
+      "plies": 32,
+      "legal": 57,
+      "search": {
+        "nodes": 1506,
+        "ms": 686.1543699999966,
+        "depth": 2,
+        "capped": false,
+        "move": "d9-e8",
+        "score": 265
+      },
+      "reference": {
+        "nodes": 2194,
+        "ms": 871.6953069999945,
+        "depth": 2,
+        "capped": false,
+        "move": "d9-e8",
+        "score": 265
+      },
+      "same": true
+    },
+    {
+      "name": "seed 2 ply 56",
+      "plies": 56,
+      "legal": 62,
+      "search": {
+        "nodes": 1944,
+        "ms": 880.5094160000008,
+        "depth": 2,
+        "capped": false,
+        "move": "b7-c8",
+        "score": 292
+      },
+      "reference": {
+        "nodes": 2063,
+        "ms": 863.8756450000001,
+        "depth": 2,
+        "capped": false,
+        "move": "b7-c8",
+        "score": 292
+      },
+      "same": true
+    },
+    {
+      "name": "seed 2 ply 80",
+      "plies": 80,
+      "legal": 58,
+      "search": {
+        "nodes": 1237,
+        "ms": 561.6197399999946,
+        "depth": 2,
+        "capped": false,
+        "move": "d9-d6",
+        "score": -2685
+      },
+      "reference": {
+        "nodes": 1237,
+        "ms": 586.5998379999946,
+        "depth": 2,
+        "capped": false,
+        "move": "d9-d6",
+        "score": -2685
+      },
+      "same": true
+    },
+    {
+      "name": "seed 2 ply 104",
+      "plies": 104,
+      "legal": 48,
+      "search": {
+        "nodes": 1460,
+        "ms": 565.648242999996,
+        "depth": 2,
+        "capped": false,
+        "move": "d7xg4",
+        "score": -3029
+      },
+      "reference": {
+        "nodes": 1464,
+        "ms": 740.4983920000013,
+        "depth": 2,
+        "capped": false,
+        "move": "d7xg4",
+        "score": -3029
+      },
+      "same": true
+    },
+    {
+      "name": "seed 2 ply 128",
+      "plies": 128,
+      "legal": 33,
+      "search": {
+        "nodes": 322,
+        "ms": 156.77953600000183,
+        "depth": 2,
+        "capped": false,
+        "move": "i2-g4",
+        "score": -3001
+      },
+      "reference": {
+        "nodes": 322,
+        "ms": 141.77948800000013,
+        "depth": 2,
+        "capped": false,
+        "move": "i2-g4",
+        "score": -3001
+      },
+      "same": true
+    },
+    {
+      "name": "seed 2 ply 152",
+      "plies": 152,
+      "legal": 36,
+      "search": {
+        "nodes": 706,
+        "ms": 219.92583100000047,
+        "depth": 2,
+        "capped": false,
+        "move": "b8-a7",
+        "score": -3156
+      },
+      "reference": {
+        "nodes": 706,
+        "ms": 280.47339900000225,
+        "depth": 2,
+        "capped": false,
+        "move": "b8-a7",
+        "score": -3156
+      },
+      "same": true
+    },
+    {
+      "name": "seed 2 ply 176",
+      "plies": 176,
+      "legal": 41,
+      "search": {
+        "nodes": 657,
+        "ms": 223.03642299999774,
+        "depth": 2,
+        "capped": false,
+        "move": "h8-h5",
+        "score": -3039
+      },
+      "reference": {
+        "nodes": 652,
+        "ms": 220.3101999999999,
+        "depth": 2,
+        "capped": false,
+        "move": "h8-h5",
+        "score": -3039
+      },
+      "same": true
+    },
+    {
+      "name": "seed 2 ply 200",
+      "plies": 200,
+      "legal": 23,
+      "search": {
+        "nodes": 700,
+        "ms": 264.1862459999975,
+        "depth": 2,
+        "capped": false,
+        "move": "d9-c9",
+        "score": -5711
+      },
+      "reference": {
+        "nodes": 716,
+        "ms": 182.36585899999773,
+        "depth": 2,
+        "capped": false,
+        "move": "d9-c9",
+        "score": -5711
+      },
+      "same": true
+    },
+    {
+      "name": "seed 3 ply 8",
+      "plies": 8,
+      "legal": 43,
+      "search": {
+        "nodes": 403,
+        "ms": 185.19394899999315,
+        "depth": 2,
+        "capped": false,
+        "move": "b8-b6",
+        "score": 240
+      },
+      "reference": {
+        "nodes": 405,
+        "ms": 151.70995300001232,
+        "depth": 2,
+        "capped": false,
+        "move": "b8-b6",
+        "score": 240
+      },
+      "same": true
+    },
+    {
+      "name": "seed 3 ply 32",
+      "plies": 32,
+      "legal": 50,
+      "search": {
+        "nodes": 714,
+        "ms": 247.5534090000001,
+        "depth": 2,
+        "capped": false,
+        "move": "f6-f5",
+        "score": 911
+      },
+      "reference": {
+        "nodes": 714,
+        "ms": 331.3028400000039,
+        "depth": 2,
+        "capped": false,
+        "move": "f6-f5",
+        "score": 911
+      },
+      "same": true
+    },
+    {
+      "name": "seed 3 ply 56",
+      "plies": 56,
+      "legal": 66,
+      "search": {
+        "nodes": 884,
+        "ms": 400.0031980000058,
+        "depth": 2,
+        "capped": false,
+        "move": "h6-i5",
+        "score": 996
+      },
+      "reference": {
+        "nodes": 894,
+        "ms": 391.9790939999948,
+        "depth": 2,
+        "capped": false,
+        "move": "h6-i5",
+        "score": 996
+      },
+      "same": true
+    },
+    {
+      "name": "seed 3 ply 80",
+      "plies": 80,
+      "legal": 60,
+      "search": {
+        "nodes": 885,
+        "ms": 408.4166519999999,
+        "depth": 2,
+        "capped": false,
+        "move": "i8-i7",
+        "score": 1379
+      },
+      "reference": {
+        "nodes": 899,
+        "ms": 518.8070049999951,
+        "depth": 2,
+        "capped": false,
+        "move": "i8-i7",
+        "score": 1379
+      },
+      "same": true
+    },
+    {
+      "name": "seed 3 ply 104",
+      "plies": 104,
+      "legal": 53,
+      "search": {
+        "nodes": 1350,
+        "ms": 520.9954979999893,
+        "depth": 2,
+        "capped": false,
+        "move": "h4-g4",
+        "score": 721
+      },
+      "reference": {
+        "nodes": 1677,
+        "ms": 614.1402270000108,
+        "depth": 2,
+        "capped": false,
+        "move": "h4-g4",
+        "score": 721
+      },
+      "same": true
+    },
+    {
+      "name": "seed 3 ply 128",
+      "plies": 128,
+      "legal": 60,
+      "search": {
+        "nodes": 594,
+        "ms": 274.178648000001,
+        "depth": 2,
+        "capped": false,
+        "move": "h9-h5",
+        "score": 1220
+      },
+      "reference": {
+        "nodes": 594,
+        "ms": 299.65800399999716,
+        "depth": 2,
+        "capped": false,
+        "move": "h9-h5",
+        "score": 1220
+      },
+      "same": true
+    },
+    {
+      "name": "seed 3 ply 152",
+      "plies": 152,
+      "legal": 63,
+      "search": {
+        "nodes": 635,
+        "ms": 311.55537699999695,
+        "depth": 2,
+        "capped": false,
+        "move": "f6xe4",
+        "score": 2196
+      },
+      "reference": {
+        "nodes": 635,
+        "ms": 224.9488229999988,
+        "depth": 2,
+        "capped": false,
+        "move": "f6xe4",
+        "score": 2196
+      },
+      "same": true
+    },
+    {
+      "name": "seed 3 ply 176",
+      "plies": 176,
+      "legal": 65,
+      "search": {
+        "nodes": 526,
+        "ms": 158.5558660000097,
+        "depth": 2,
+        "capped": false,
+        "move": "d2-c2",
+        "score": 3455
+      },
+      "reference": {
+        "nodes": 652,
+        "ms": 179.36283500000718,
+        "depth": 2,
+        "capped": false,
+        "move": "d2-c2",
+        "score": 3455
+      },
+      "same": true
+    },
+    {
+      "name": "seed 3 ply 200",
+      "plies": 200,
+      "legal": 11,
+      "search": {
+        "nodes": 261,
+        "ms": 67.89472900000692,
+        "depth": 2,
+        "capped": false,
+        "move": "c6-d7",
+        "score": 3813
+      },
+      "reference": {
+        "nodes": 261,
+        "ms": 63.09125700000732,
+        "depth": 2,
+        "capped": false,
+        "move": "c6-d7",
+        "score": 3813
+      },
+      "same": true
+    },
+    {
+      "name": "seed 4 ply 8",
+      "plies": 8,
+      "legal": 42,
+      "search": {
+        "nodes": 522,
+        "ms": 191.9578099999926,
+        "depth": 2,
+        "capped": false,
+        "move": "i9-i7",
+        "score": 225
+      },
+      "reference": {
+        "nodes": 538,
+        "ms": 196.68035600001167,
+        "depth": 2,
+        "capped": false,
+        "move": "i9-i7",
+        "score": 225
+      },
+      "same": true
+    },
+    {
+      "name": "seed 4 ply 32",
+      "plies": 32,
+      "legal": 66,
+      "search": {
+        "nodes": 1178,
+        "ms": 490.6386099999945,
+        "depth": 2,
+        "capped": false,
+        "move": "c5-f8",
+        "score": 121
+      },
+      "reference": {
+        "nodes": 1178,
+        "ms": 524.4490540000115,
+        "depth": 2,
+        "capped": false,
+        "move": "c5-f8",
+        "score": 121
+      },
+      "same": true
+    },
+    {
+      "name": "seed 4 ply 56",
+      "plies": 56,
+      "legal": 69,
+      "search": {
+        "nodes": 990,
+        "ms": 396.30510899999354,
+        "depth": 2,
+        "capped": false,
+        "move": "c5-f8",
+        "score": 141
+      },
+      "reference": {
+        "nodes": 990,
+        "ms": 483.3881859999965,
+        "depth": 2,
+        "capped": false,
+        "move": "c5-f8",
+        "score": 141
+      },
+      "same": true
+    },
+    {
+      "name": "seed 4 ply 80",
+      "plies": 80,
+      "legal": 65,
+      "search": {
+        "nodes": 1030,
+        "ms": 413.5443899999955,
+        "depth": 2,
+        "capped": false,
+        "move": "g7-h9",
+        "score": 146
+      },
+      "reference": {
+        "nodes": 1031,
+        "ms": 403.83383299999696,
+        "depth": 2,
+        "capped": false,
+        "move": "g7-h9",
+        "score": 146
+      },
+      "same": true
+    },
+    {
+      "name": "seed 4 ply 104",
+      "plies": 104,
+      "legal": 63,
+      "search": {
+        "nodes": 1140,
+        "ms": 515.78775399999,
+        "depth": 2,
+        "capped": false,
+        "move": "h7-i7",
+        "score": 305
+      },
+      "reference": {
+        "nodes": 1146,
+        "ms": 722.9095680000028,
+        "depth": 2,
+        "capped": false,
+        "move": "h7-i7",
+        "score": 305
+      },
+      "same": true
+    },
+    {
+      "name": "seed 4 ply 128",
+      "plies": 128,
+      "legal": 73,
+      "search": {
+        "nodes": 917,
+        "ms": 392.54390299999795,
+        "depth": 2,
+        "capped": false,
+        "move": "h8-h7",
+        "score": 277
+      },
+      "reference": {
+        "nodes": 917,
+        "ms": 402.52467400000023,
+        "depth": 2,
+        "capped": false,
+        "move": "h8-h7",
+        "score": 277
+      },
+      "same": true
+    },
+    {
+      "name": "seed 4 ply 152",
+      "plies": 152,
+      "legal": 68,
+      "search": {
+        "nodes": 884,
+        "ms": 417.73631100000057,
+        "depth": 2,
+        "capped": false,
+        "move": "f5xe4",
+        "score": 341
+      },
+      "reference": {
+        "nodes": 888,
+        "ms": 395.75861299999815,
+        "depth": 2,
+        "capped": false,
+        "move": "f5xe4",
+        "score": 341
+      },
+      "same": true
+    },
+    {
+      "name": "seed 4 ply 176",
+      "plies": 176,
+      "legal": 57,
+      "search": {
+        "nodes": 1462,
+        "ms": 653.2411509999947,
+        "depth": 2,
+        "capped": false,
+        "move": "g4-e6",
+        "score": -1495
+      },
+      "reference": {
+        "nodes": 1462,
+        "ms": 693.1600990000006,
+        "depth": 2,
+        "capped": false,
+        "move": "g4-e6",
+        "score": -1495
+      },
+      "same": true
+    },
+    {
+      "name": "seed 4 ply 200",
+      "plies": 200,
+      "legal": 58,
+      "search": {
+        "nodes": 997,
+        "ms": 427.951681999999,
+        "depth": 2,
+        "capped": false,
+        "move": "a8-a7",
+        "score": -910
+      },
+      "reference": {
+        "nodes": 1707,
+        "ms": 773.4913059999963,
+        "depth": 2,
+        "capped": false,
+        "move": "a8-a7",
+        "score": -910
+      },
+      "same": true
+    },
+    {
+      "name": "seed 4 ply 224",
+      "plies": 224,
+      "legal": 35,
+      "search": {
+        "nodes": 409,
+        "ms": 137.10425799999211,
+        "depth": 2,
+        "capped": false,
+        "move": "h9xg9",
+        "score": -1154
+      },
+      "reference": {
+        "nodes": 409,
+        "ms": 130.22541500000807,
+        "depth": 2,
+        "capped": false,
+        "move": "h9xg9",
+        "score": -1154
+      },
+      "same": true
+    },
+    {
+      "name": "seed 4 ply 248",
+      "plies": 248,
+      "legal": 42,
+      "search": {
+        "nodes": 487,
+        "ms": 167.32034399999247,
+        "depth": 2,
+        "capped": false,
+        "move": "c4-f7",
+        "score": -3367
+      },
+      "reference": {
+        "nodes": 487,
+        "ms": 119.73245199999656,
+        "depth": 2,
+        "capped": false,
+        "move": "c4-f7",
+        "score": -3367
+      },
+      "same": true
+    },
+    {
+      "name": "seed 4 ply 272",
+      "plies": 272,
+      "legal": 40,
+      "search": {
+        "nodes": 317,
+        "ms": 95.58177099999739,
+        "depth": 2,
+        "capped": false,
+        "move": "g8xg7",
+        "score": -2829
+      },
+      "reference": {
+        "nodes": 317,
+        "ms": 107.01710099999036,
+        "depth": 2,
+        "capped": false,
+        "move": "g8xg7",
+        "score": -2829
+      },
+      "same": true
+    },
+    {
+      "name": "seed 4 ply 296",
+      "plies": 296,
+      "legal": 53,
+      "search": {
+        "nodes": 533,
+        "ms": 149.67087299999548,
+        "depth": 2,
+        "capped": false,
+        "move": "a5-e5",
+        "score": -2649
+      },
+      "reference": {
+        "nodes": 730,
+        "ms": 214.19573000000673,
+        "depth": 2,
+        "capped": false,
+        "move": "a5-e5",
+        "score": -2649
+      },
+      "same": true
+    },
+    {
+      "name": "seed 4 ply 320",
+      "plies": 320,
+      "legal": 8,
+      "search": {
+        "nodes": 279,
+        "ms": 67.9053899999999,
+        "depth": 2,
+        "capped": false,
+        "move": "g8xg9",
+        "score": -2058
+      },
+      "reference": {
+        "nodes": 301,
+        "ms": 68.01536499999929,
+        "depth": 2,
+        "capped": false,
+        "move": "g8xg9",
+        "score": -2058
+      },
+      "same": true
+    },
+    {
+      "name": "seed 4 ply 344",
+      "plies": 344,
+      "legal": 50,
+      "search": {
+        "nodes": 612,
+        "ms": 144.41303399999742,
+        "depth": 2,
+        "capped": false,
+        "move": "f5-d4",
+        "score": -1868
+      },
+      "reference": {
+        "nodes": 833,
+        "ms": 194.77522000001045,
+        "depth": 2,
+        "capped": false,
+        "move": "f5-d4",
+        "score": -1868
+      },
+      "same": true
+    },
+    {
+      "name": "seed 4 ply 368",
+      "plies": 368,
+      "legal": 40,
+      "search": {
+        "nodes": 640,
+        "ms": 191.70033199999307,
+        "depth": 2,
+        "capped": false,
+        "move": "h5-g5",
+        "score": -1679
+      },
+      "reference": {
+        "nodes": 864,
+        "ms": 235.3286209999933,
+        "depth": 2,
+        "capped": false,
+        "move": "h5-g5",
+        "score": -1679
+      },
+      "same": true
+    },
+    {
+      "name": "seed 4 ply 392",
+      "plies": 392,
+      "legal": 43,
+      "search": {
+        "nodes": 425,
+        "ms": 130.72417800000403,
+        "depth": 2,
+        "capped": false,
+        "move": "g8-f7",
+        "score": -1307
+      },
+      "reference": {
+        "nodes": 760,
+        "ms": 179.57319100000313,
+        "depth": 2,
+        "capped": false,
+        "move": "g8-f7",
+        "score": -1307
+      },
+      "same": true
+    },
+    {
+      "name": "seed 4 ply 416",
+      "plies": 416,
+      "legal": 46,
+      "search": {
+        "nodes": 459,
+        "ms": 110.2191800000146,
+        "depth": 2,
+        "capped": false,
+        "move": "h6-h5",
+        "score": -1287
+      },
+      "reference": {
+        "nodes": 924,
+        "ms": 218.11393500000122,
+        "depth": 2,
+        "capped": false,
+        "move": "h6-h5",
+        "score": -1287
+      },
+      "same": true
+    },
+    {
+      "name": "seed 4 ply 440",
+      "plies": 440,
+      "legal": 54,
+      "search": {
+        "nodes": 321,
+        "ms": 65.48187099999632,
+        "depth": 2,
+        "capped": false,
+        "move": "f3-f1",
+        "score": -1237
+      },
+      "reference": {
+        "nodes": 400,
+        "ms": 78.4694169999857,
+        "depth": 2,
+        "capped": false,
+        "move": "f3-f1",
+        "score": -1237
+      },
+      "same": true
+    },
+    {
+      "name": "seed 4 ply 464",
+      "plies": 464,
+      "legal": 48,
+      "search": {
+        "nodes": 370,
+        "ms": 92.77978399998392,
+        "depth": 2,
+        "capped": false,
+        "move": "d7-e6",
+        "score": -1247
+      },
+      "reference": {
+        "nodes": 371,
+        "ms": 103.59416099998634,
+        "depth": 2,
+        "capped": false,
+        "move": "d7-e6",
+        "score": -1247
+      },
+      "same": true
+    },
+    {
+      "name": "seed 4 ply 488",
+      "plies": 488,
+      "legal": 20,
+      "search": {
+        "nodes": 432,
+        "ms": 99.72424599999795,
+        "depth": 2,
+        "capped": false,
+        "move": "g5-g7",
+        "score": -4630
+      },
+      "reference": {
+        "nodes": 477,
+        "ms": 113.0971590000263,
+        "depth": 2,
+        "capped": false,
+        "move": "g5-g7",
+        "score": -4630
+      },
+      "same": true
+    },
+    {
+      "name": "seed 4 ply 512",
+      "plies": 512,
+      "legal": 20,
+      "search": {
+        "nodes": 346,
+        "ms": 77.45209900001646,
+        "depth": 2,
+        "capped": false,
+        "move": "e5-a5",
+        "score": -4680
+      },
+      "reference": {
+        "nodes": 686,
+        "ms": 143.47323000000324,
+        "depth": 2,
+        "capped": false,
+        "move": "e5-a5",
+        "score": -4680
+      },
+      "same": true
+    },
+    {
+      "name": "seed 4 ply 536",
+      "plies": 536,
+      "legal": 8,
+      "search": {
+        "nodes": 500,
+        "ms": 120.4700910000247,
+        "depth": 2,
+        "capped": false,
+        "move": "f7-g8",
+        "score": -5456
+      },
+      "reference": {
+        "nodes": 499,
+        "ms": 92.20610999999917,
+        "depth": 2,
+        "capped": false,
+        "move": "f7-g8",
+        "score": -5456
+      },
+      "same": true
+    },
+    {
+      "name": "seed 4 ply 560",
+      "plies": 560,
+      "legal": 7,
+      "search": {
+        "nodes": 438,
+        "ms": 69.3013070000161,
+        "depth": 2,
+        "capped": false,
+        "move": "h3-h2",
+        "score": -5456
+      },
+      "reference": {
+        "nodes": 437,
+        "ms": 70.56648400000995,
+        "depth": 2,
+        "capped": false,
+        "move": "h3-h2",
+        "score": -5456
+      },
+      "same": true
+    },
+    {
+      "name": "seed 4 ply 584",
+      "plies": 584,
+      "legal": 4,
+      "search": {
+        "nodes": 314,
+        "ms": 83.6185070000065,
+        "depth": 2,
+        "capped": false,
+        "move": "h2-i1",
+        "score": -5466
+      },
+      "reference": {
+        "nodes": 314,
+        "ms": 58.69028499998967,
+        "depth": 2,
+        "capped": false,
+        "move": "h2-i1",
+        "score": -5466
+      },
+      "same": true
+    },
+    {
+      "name": "seed 5 ply 8",
+      "plies": 8,
+      "legal": 38,
+      "search": {
+        "nodes": 352,
+        "ms": 140.74204300000565,
+        "depth": 2,
+        "capped": false,
+        "move": "i8-i6",
+        "score": 195
+      },
+      "reference": {
+        "nodes": 593,
+        "ms": 239.26541299998644,
+        "depth": 2,
+        "capped": false,
+        "move": "i8-i6",
+        "score": 195
+      },
+      "same": true
+    },
+    {
+      "name": "seed 5 ply 32",
+      "plies": 32,
+      "legal": 46,
+      "search": {
+        "nodes": 1086,
+        "ms": 424.1653140000126,
+        "depth": 2,
+        "capped": false,
+        "move": "d9-g6",
+        "score": 946
+      },
+      "reference": {
+        "nodes": 1662,
+        "ms": 665.6033180000086,
+        "depth": 2,
+        "capped": false,
+        "move": "d9-g6",
+        "score": 946
+      },
+      "same": true
+    },
+    {
+      "name": "seed 5 ply 56",
+      "plies": 56,
+      "legal": 65,
+      "search": {
+        "nodes": 708,
+        "ms": 270.1733570000215,
+        "depth": 2,
+        "capped": false,
+        "move": "e4-d5",
+        "score": 1026
+      },
+      "reference": {
+        "nodes": 708,
+        "ms": 275.98209599999245,
+        "depth": 2,
+        "capped": false,
+        "move": "e4-d5",
+        "score": 1026
+      },
+      "same": true
+    },
+    {
+      "name": "seed 5 ply 80",
+      "plies": 80,
+      "legal": 57,
+      "search": {
+        "nodes": 1737,
+        "ms": 788.3790139999765,
+        "depth": 2,
+        "capped": false,
+        "move": "e7-g7",
+        "score": -924
+      },
+      "reference": {
+        "nodes": 2072,
+        "ms": 839.839496999979,
+        "depth": 2,
+        "capped": false,
+        "move": "e7-g7",
+        "score": -924
+      },
+      "same": true
+    },
+    {
+      "name": "seed 5 ply 104",
+      "plies": 104,
+      "legal": 61,
+      "search": {
+        "nodes": 924,
+        "ms": 341.7559070000134,
+        "depth": 2,
+        "capped": false,
+        "move": "e5-d6",
+        "score": -939
+      },
+      "reference": {
+        "nodes": 927,
+        "ms": 316.2754540000169,
+        "depth": 2,
+        "capped": false,
+        "move": "e5-d6",
+        "score": -939
+      },
+      "same": true
+    },
+    {
+      "name": "seed 5 ply 128",
+      "plies": 128,
+      "legal": 64,
+      "search": {
+        "nodes": 1354,
+        "ms": 544.4227200000023,
+        "depth": 2,
+        "capped": false,
+        "move": "a3-b4",
+        "score": -1016
+      },
+      "reference": {
+        "nodes": 1354,
+        "ms": 545.768968999997,
+        "depth": 2,
+        "capped": false,
+        "move": "a3-b4",
+        "score": -1016
+      },
+      "same": true
+    },
+    {
+      "name": "seed 5 ply 152",
+      "plies": 152,
+      "legal": 39,
+      "search": {
+        "nodes": 539,
+        "ms": 188.16070599999512,
+        "depth": 2,
+        "capped": false,
+        "move": "a5-e5",
+        "score": -722
+      },
+      "reference": {
+        "nodes": 609,
+        "ms": 254.38741299998946,
+        "depth": 2,
+        "capped": false,
+        "move": "a5-e5",
+        "score": -722
+      },
+      "same": true
+    },
+    {
+      "name": "seed 5 ply 176",
+      "plies": 176,
+      "legal": 40,
+      "search": {
+        "nodes": 719,
+        "ms": 182.32116099999985,
+        "depth": 2,
+        "capped": false,
+        "move": "c9-a9",
+        "score": -1098
+      },
+      "reference": {
+        "nodes": 726,
+        "ms": 196.86839200000395,
+        "depth": 2,
+        "capped": false,
+        "move": "c9-a9",
+        "score": -1098
+      },
+      "same": true
+    },
+    {
+      "name": "seed 5 ply 200",
+      "plies": 200,
+      "legal": 29,
+      "search": {
+        "nodes": 598,
+        "ms": 172.93397500002175,
+        "depth": 2,
+        "capped": false,
+        "move": "b6-b7",
+        "score": -1477
+      },
+      "reference": {
+        "nodes": 759,
+        "ms": 207.68743699998595,
+        "depth": 2,
+        "capped": false,
+        "move": "b6-b7",
+        "score": -1477
+      },
+      "same": true
+    },
+    {
+      "name": "seed 5 ply 224",
+      "plies": 224,
+      "legal": 14,
+      "search": {
+        "nodes": 340,
+        "ms": 56.42947600001935,
+        "depth": 2,
+        "capped": false,
+        "move": "c7-e7",
+        "score": -1870
+      },
+      "reference": {
+        "nodes": 339,
+        "ms": 54.45813799998723,
+        "depth": 2,
+        "capped": false,
+        "move": "c7-e7",
+        "score": -1870
+      },
+      "same": true
+    },
+    {
+      "name": "seed 5 ply 248",
+      "plies": 248,
+      "legal": 9,
+      "search": {
+        "nodes": 353,
+        "ms": 64.41514800000004,
+        "depth": 2,
+        "capped": false,
+        "move": "f7-e7",
+        "score": -1880
+      },
+      "reference": {
+        "nodes": 381,
+        "ms": 66.2590429999982,
+        "depth": 2,
+        "capped": false,
+        "move": "f7-e7",
+        "score": -1880
+      },
+      "same": true
+    },
+    {
+      "name": "seed 5 ply 272",
+      "plies": 272,
+      "legal": 9,
+      "search": {
+        "nodes": 182,
+        "ms": 30.816122999996878,
+        "depth": 2,
+        "capped": false,
+        "move": "g8-g7",
+        "score": -1875
+      },
+      "reference": {
+        "nodes": 203,
+        "ms": 33.333436999993864,
+        "depth": 2,
+        "capped": false,
+        "move": "g8-g7",
+        "score": -1875
+      },
+      "same": true
+    },
+    {
+      "name": "seed 5 ply 296",
+      "plies": 296,
+      "legal": 11,
+      "search": {
+        "nodes": 278,
+        "ms": 51.76732600000105,
+        "depth": 2,
+        "capped": false,
+        "move": "e4-e3",
+        "score": -2929
+      },
+      "reference": {
+        "nodes": 295,
+        "ms": 49.439973000000464,
+        "depth": 2,
+        "capped": false,
+        "move": "e4-e3",
+        "score": -2929
+      },
+      "same": true
+    },
+    {
+      "name": "seed 5 ply 320",
+      "plies": 320,
+      "legal": 7,
+      "search": {
+        "nodes": 63,
+        "ms": 9.247804000013275,
+        "depth": 2,
+        "capped": false,
+        "move": "f1-g2",
+        "score": -2223
+      },
+      "reference": {
+        "nodes": 63,
+        "ms": 8.197104999999283,
+        "depth": 2,
+        "capped": false,
+        "move": "f1-g2",
+        "score": -2223
+      },
+      "same": true
+    },
+    {
+      "name": "seed 5 ply 344",
+      "plies": 344,
+      "legal": 13,
+      "search": {
+        "nodes": 281,
+        "ms": 41.997357999993255,
+        "depth": 2,
+        "capped": false,
+        "move": "h5-g4",
+        "score": -3824
+      },
+      "reference": {
+        "nodes": 308,
+        "ms": 45.994899999990594,
+        "depth": 2,
+        "capped": false,
+        "move": "h5-g4",
+        "score": -3824
+      },
+      "same": true
+    },
+    {
+      "name": "seed 5 ply 368",
+      "plies": 368,
+      "legal": 11,
+      "search": {
+        "nodes": 267,
+        "ms": 45.576923999993596,
+        "depth": 2,
+        "capped": false,
+        "move": "h5-g4",
+        "score": -3809
+      },
+      "reference": {
+        "nodes": 267,
+        "ms": 44.45291300001554,
+        "depth": 2,
+        "capped": false,
+        "move": "h5-g4",
+        "score": -3809
+      },
+      "same": true
+    },
+    {
+      "name": "seed 5 ply 392",
+      "plies": 392,
+      "legal": 14,
+      "search": {
+        "nodes": 455,
+        "ms": 77.31934399998863,
+        "depth": 2,
+        "capped": false,
+        "move": "f5-h5",
+        "score": -4023
+      },
+      "reference": {
+        "nodes": 533,
+        "ms": 79.50215799998841,
+        "depth": 2,
+        "capped": false,
+        "move": "f5-h5",
+        "score": -4023
+      },
+      "same": true
+    },
+    {
+      "name": "seed 5 ply 416",
+      "plies": 416,
+      "legal": 7,
+      "search": {
+        "nodes": 144,
+        "ms": 22.215231000009226,
+        "depth": 2,
+        "capped": false,
+        "move": "g6-g4",
+        "score": -4018
+      },
+      "reference": {
+        "nodes": 145,
+        "ms": 23.25306799999089,
+        "depth": 2,
+        "capped": false,
+        "move": "g6-g4",
+        "score": -4018
+      },
+      "same": true
+    },
+    {
+      "name": "seed 5 ply 440",
+      "plies": 440,
+      "legal": 12,
+      "search": {
+        "nodes": 544,
+        "ms": 84.44382799998857,
+        "depth": 2,
+        "capped": false,
+        "move": "f5-h5",
+        "score": -4023
+      },
+      "reference": {
+        "nodes": 544,
+        "ms": 79.91935899999226,
+        "depth": 2,
+        "capped": false,
+        "move": "f5-h5",
+        "score": -4023
+      },
+      "same": true
+    },
+    {
+      "name": "seed 5 ply 464",
+      "plies": 464,
+      "legal": 10,
+      "search": {
+        "nodes": 221,
+        "ms": 35.15518199998769,
+        "depth": 2,
+        "capped": false,
+        "move": "h7-g6",
+        "score": -4023
+      },
+      "reference": {
+        "nodes": 229,
+        "ms": 34.20397900001262,
+        "depth": 2,
+        "capped": false,
+        "move": "h7-g6",
+        "score": -4023
+      },
+      "same": true
+    },
+    {
+      "name": "seed 6 ply 8",
+      "plies": 8,
+      "legal": 45,
+      "search": {
+        "nodes": 918,
+        "ms": 375.0457400000014,
+        "depth": 2,
+        "capped": false,
+        "move": "a8-b7",
+        "score": 260
+      },
+      "reference": {
+        "nodes": 933,
+        "ms": 434.61851000000024,
+        "depth": 2,
+        "capped": false,
+        "move": "a8-b7",
+        "score": 260
+      },
+      "same": true
+    },
+    {
+      "name": "seed 6 ply 32",
+      "plies": 32,
+      "legal": 49,
+      "search": {
+        "nodes": 949,
+        "ms": 328.32084900001064,
+        "depth": 2,
+        "capped": false,
+        "move": "f9-h7",
+        "score": 852
+      },
+      "reference": {
+        "nodes": 959,
+        "ms": 358.84579200000735,
+        "depth": 2,
+        "capped": false,
+        "move": "f9-h7",
+        "score": 852
+      },
+      "same": true
+    },
+    {
+      "name": "seed 6 ply 56",
+      "plies": 56,
+      "legal": 62,
+      "search": {
+        "nodes": 1604,
+        "ms": 708.4503869999899,
+        "depth": 2,
+        "capped": false,
+        "move": "a8-b7",
+        "score": 914
+      },
+      "reference": {
+        "nodes": 1626,
+        "ms": 643.4666140000045,
+        "depth": 2,
+        "capped": false,
+        "move": "a8-b7",
+        "score": 914
+      },
+      "same": true
+    },
+    {
+      "name": "seed 6 ply 80",
+      "plies": 80,
+      "legal": 62,
+      "search": {
+        "nodes": 1988,
+        "ms": 814.7004900000175,
+        "depth": 2,
+        "capped": false,
+        "move": "a6-a7",
+        "score": 904
+      },
+      "reference": {
+        "nodes": 1943,
+        "ms": 743.0645990000048,
+        "depth": 2,
+        "capped": false,
+        "move": "a6-a7",
+        "score": 904
+      },
+      "same": true
+    },
+    {
+      "name": "seed 6 ply 104",
+      "plies": 104,
+      "legal": 70,
+      "search": {
+        "nodes": 788,
+        "ms": 306.12982900001225,
+        "depth": 2,
+        "capped": false,
+        "move": "f7-d6",
+        "score": 765
+      },
+      "reference": {
+        "nodes": 788,
+        "ms": 266.1610470000014,
+        "depth": 2,
+        "capped": false,
+        "move": "f7-d6",
+        "score": 765
+      },
+      "same": true
+    },
+    {
+      "name": "seed 6 ply 128",
+      "plies": 128,
+      "legal": 59,
+      "search": {
+        "nodes": 528,
+        "ms": 175.06868799999938,
+        "depth": 2,
+        "capped": false,
+        "move": "c4-c3",
+        "score": 1520
+      },
+      "reference": {
+        "nodes": 538,
+        "ms": 159.80643500000588,
+        "depth": 2,
+        "capped": false,
+        "move": "c4-c3",
+        "score": 1520
+      },
+      "same": true
+    },
+    {
+      "name": "seed 6 ply 152",
+      "plies": 152,
+      "legal": 71,
+      "search": {
+        "nodes": 1425,
+        "ms": 413.16245699999854,
+        "depth": 2,
+        "capped": false,
+        "move": "g7-g8",
+        "score": 1849
+      },
+      "reference": {
+        "nodes": 1916,
+        "ms": 554.2432989999943,
+        "depth": 2,
+        "capped": false,
+        "move": "g7-g8",
+        "score": 1849
+      },
+      "same": true
+    },
+    {
+      "name": "seed 6 ply 176",
+      "plies": 176,
+      "legal": 40,
+      "search": {
+        "nodes": 712,
+        "ms": 235.85129300001427,
+        "depth": 2,
+        "capped": false,
+        "move": "c8-a6",
+        "score": -581
+      },
+      "reference": {
+        "nodes": 828,
+        "ms": 303.5217160000175,
+        "depth": 2,
+        "capped": false,
+        "move": "c8-a6",
+        "score": -581
+      },
+      "same": true
+    },
+    {
+      "name": "seed 6 ply 200",
+      "plies": 200,
+      "legal": 40,
+      "search": {
+        "nodes": 506,
+        "ms": 119.60648499999661,
+        "depth": 2,
+        "capped": false,
+        "move": "c6-c8",
+        "score": -556
+      },
+      "reference": {
+        "nodes": 511,
+        "ms": 117.80262599998969,
+        "depth": 2,
+        "capped": false,
+        "move": "c6-c8",
+        "score": -556
+      },
+      "same": true
+    },
+    {
+      "name": "seed 6 ply 224",
+      "plies": 224,
+      "legal": 46,
+      "search": {
+        "nodes": 333,
+        "ms": 80.8092679999827,
+        "depth": 2,
+        "capped": false,
+        "move": "d6-b6",
+        "score": -252
+      },
+      "reference": {
+        "nodes": 337,
+        "ms": 72.42588200001046,
+        "depth": 2,
+        "capped": false,
+        "move": "d6-b6",
+        "score": -252
+      },
+      "same": true
+    },
+    {
+      "name": "seed 6 ply 248",
+      "plies": 248,
+      "legal": 44,
+      "search": {
+        "nodes": 463,
+        "ms": 114.03442900002119,
+        "depth": 2,
+        "capped": false,
+        "move": "c6-c7",
+        "score": -212
+      },
+      "reference": {
+        "nodes": 486,
+        "ms": 122.99323400002322,
+        "depth": 2,
+        "capped": false,
+        "move": "c6-c7",
+        "score": -212
+      },
+      "same": true
+    },
+    {
+      "name": "seed 6 ply 272",
+      "plies": 272,
+      "legal": 37,
+      "search": {
+        "nodes": 240,
+        "ms": 40.04429900000105,
+        "depth": 2,
+        "capped": false,
+        "move": "e7-c5",
+        "score": 608
+      },
+      "reference": {
+        "nodes": 523,
+        "ms": 78.9628789999988,
+        "depth": 2,
+        "capped": false,
+        "move": "e7-c5",
+        "score": 608
+      },
+      "same": true
+    },
+    {
+      "name": "seed 6 ply 296",
+      "plies": 296,
+      "legal": 36,
+      "search": {
+        "nodes": 299,
+        "ms": 50.94682899999316,
+        "depth": 2,
+        "capped": false,
+        "move": "f2-i2",
+        "score": 572
+      },
+      "reference": {
+        "nodes": 305,
+        "ms": 50.24588999999105,
+        "depth": 2,
+        "capped": false,
+        "move": "f2-i2",
+        "score": 572
+      },
+      "same": true
+    },
+    {
+      "name": "seed 6 ply 320",
+      "plies": 320,
+      "legal": 27,
+      "search": {
+        "nodes": 152,
+        "ms": 21.446778999990784,
+        "depth": 2,
+        "capped": false,
+        "move": "f3-g4",
+        "score": 339
+      },
+      "reference": {
+        "nodes": 207,
+        "ms": 26.91995399998268,
+        "depth": 2,
+        "capped": false,
+        "move": "f3-g4",
+        "score": 339
+      },
+      "same": true
+    },
+    {
+      "name": "seed 6 ply 344",
+      "plies": 344,
+      "legal": 27,
+      "search": {
+        "nodes": 173,
+        "ms": 23.057165000005625,
+        "depth": 2,
+        "capped": false,
+        "move": "c7-c3",
+        "score": 344
+      },
+      "reference": {
+        "nodes": 227,
+        "ms": 27.704444000002695,
+        "depth": 2,
+        "capped": false,
+        "move": "c7-c3",
+        "score": 344
+      },
+      "same": true
+    },
+    {
+      "name": "seed 6 ply 368",
+      "plies": 368,
+      "legal": 29,
+      "search": {
+        "nodes": 340,
+        "ms": 42.49059099997976,
+        "depth": 2,
+        "capped": false,
+        "move": "c3-c4",
+        "score": 558
+      },
+      "reference": {
+        "nodes": 420,
+        "ms": 48.10051200000453,
+        "depth": 2,
+        "capped": false,
+        "move": "c3-c4",
+        "score": 558
+      },
+      "same": true
+    },
+    {
+      "name": "seed 6 ply 392",
+      "plies": 392,
+      "legal": 26,
+      "search": {
+        "nodes": 322,
+        "ms": 47.48792699998012,
+        "depth": 2,
+        "capped": false,
+        "move": "c9-c4",
+        "score": 558
+      },
+      "reference": {
+        "nodes": 315,
+        "ms": 42.846664000011515,
+        "depth": 2,
+        "capped": false,
+        "move": "c9-c4",
+        "score": 558
+      },
+      "same": true
+    },
+    {
+      "name": "seed 6 ply 416",
+      "plies": 416,
+      "legal": 33,
+      "search": {
+        "nodes": 293,
+        "ms": 39.62923300001421,
+        "depth": 2,
+        "capped": false,
+        "move": "d1-b1",
+        "score": 578
+      },
+      "reference": {
+        "nodes": 314,
+        "ms": 50.620458999997936,
+        "depth": 2,
+        "capped": false,
+        "move": "d1-b1",
+        "score": 578
+      },
+      "same": true
+    },
+    {
+      "name": "seed 6 ply 440",
+      "plies": 440,
+      "legal": 40,
+      "search": {
+        "nodes": 128,
+        "ms": 15.204230000003008,
+        "depth": 2,
+        "capped": false,
+        "move": "c2-c1=queen",
+        "score": 3592
+      },
+      "reference": {
+        "nodes": 128,
+        "ms": 14.14076800001203,
+        "depth": 2,
+        "capped": false,
+        "move": "c2-c1=queen",
+        "score": 3592
+      },
+      "same": true
+    },
+    {
+      "name": "seed 6 ply 464",
+      "plies": 464,
+      "legal": 68,
+      "search": {
+        "nodes": 251,
+        "ms": 39.58302099999855,
+        "depth": 2,
+        "capped": false,
+        "move": "a9-e9",
+        "score": 5577
+      },
+      "reference": {
+        "nodes": 314,
+        "ms": 56.44335799998953,
+        "depth": 2,
+        "capped": false,
+        "move": "a9-e9",
+        "score": 5577
+      },
+      "same": true
+    },
+    {
+      "name": "seed 6 ply 488",
+      "plies": 488,
+      "legal": 74,
+      "search": {
+        "nodes": 238,
+        "ms": 42.52435900000273,
+        "depth": 2,
+        "capped": false,
+        "move": "e6-e4",
+        "score": 5582
+      },
+      "reference": {
+        "nodes": 235,
+        "ms": 39.35270300001139,
+        "depth": 2,
+        "capped": false,
+        "move": "e6-e4",
+        "score": 5582
+      },
+      "same": true
+    },
+    {
+      "name": "seed 6 ply 512",
+      "plies": 512,
+      "legal": 74,
+      "search": {
+        "nodes": 239,
+        "ms": 38.759651000000304,
+        "depth": 2,
+        "capped": false,
+        "move": "d6-b6",
+        "score": 5592
+      },
+      "reference": {
+        "nodes": 238,
+        "ms": 39.60338899999624,
+        "depth": 2,
+        "capped": false,
+        "move": "d6-b6",
+        "score": 5592
+      },
+      "same": true
+    },
+    {
+      "name": "seed 6 ply 536",
+      "plies": 536,
+      "legal": 76,
+      "search": {
+        "nodes": 329,
+        "ms": 70.17885600001318,
+        "depth": 2,
+        "capped": false,
+        "move": "e6-e9",
+        "score": 5582
+      },
+      "reference": {
+        "nodes": 334,
+        "ms": 62.4075620000076,
+        "depth": 2,
+        "capped": false,
+        "move": "e6-e9",
+        "score": 5582
+      },
+      "same": true
+    },
+    {
+      "name": "seed 7 ply 8",
+      "plies": 8,
+      "legal": 42,
+      "search": {
+        "nodes": 815,
+        "ms": 388.4050629999838,
+        "depth": 2,
+        "capped": false,
+        "move": "e9-g7",
+        "score": 225
+      },
+      "reference": {
+        "nodes": 960,
+        "ms": 503.04837599999155,
+        "depth": 2,
+        "capped": false,
+        "move": "e9-g7",
+        "score": 225
+      },
+      "same": true
+    },
+    {
+      "name": "seed 7 ply 32",
+      "plies": 32,
+      "legal": 41,
+      "search": {
+        "nodes": 496,
+        "ms": 215.80738400001428,
+        "depth": 2,
+        "capped": false,
+        "move": "c9-b7",
+        "score": 1160
+      },
+      "reference": {
+        "nodes": 496,
+        "ms": 212.37937899999088,
+        "depth": 2,
+        "capped": false,
+        "move": "c9-b7",
+        "score": 1160
+      },
+      "same": true
+    },
+    {
+      "name": "seed 7 ply 56",
+      "plies": 56,
+      "legal": 10,
+      "search": {
+        "nodes": 170,
+        "ms": 112.76711400001659,
+        "depth": 2,
+        "capped": false,
+        "move": "d7xd8",
+        "score": 2623
+      },
+      "reference": {
+        "nodes": 170,
+        "ms": 113.30277800001204,
+        "depth": 2,
+        "capped": false,
+        "move": "d7xd8",
+        "score": 2623
+      },
+      "same": true
+    },
+    {
+      "name": "seed 7 ply 80",
+      "plies": 80,
+      "legal": 2,
+      "search": {
+        "nodes": 117,
+        "ms": 54.691010000009555,
+        "depth": 2,
+        "capped": false,
+        "move": "f8-e7",
+        "score": 3836
+      },
+      "reference": {
+        "nodes": 117,
+        "ms": 46.78024699998787,
+        "depth": 2,
+        "capped": false,
+        "move": "f8-e7",
+        "score": 3836
+      },
+      "same": true
+    },
+    {
+      "name": "seed 7 ply 104",
+      "plies": 104,
+      "legal": 65,
+      "search": {
+        "nodes": 462,
+        "ms": 145.0040319999971,
+        "depth": 2,
+        "capped": false,
+        "move": "d4xd3",
+        "score": 4105
+      },
+      "reference": {
+        "nodes": 562,
+        "ms": 168.39985800001887,
+        "depth": 2,
+        "capped": false,
+        "move": "d4xd3",
+        "score": 4105
+      },
+      "same": true
+    },
+    {
+      "name": "seed 7 ply 128",
+      "plies": 128,
+      "legal": 73,
+      "search": {
+        "nodes": 954,
+        "ms": 279.68658300000243,
+        "depth": 2,
+        "capped": false,
+        "move": "g8-f6",
+        "score": 4085
+      },
+      "reference": {
+        "nodes": 962,
+        "ms": 255.7426919999998,
+        "depth": 2,
+        "capped": false,
+        "move": "g8-f6",
+        "score": 4085
+      },
+      "same": true
+    },
+    {
+      "name": "seed 7 ply 152",
+      "plies": 152,
+      "legal": 75,
+      "search": {
+        "nodes": 317,
+        "ms": 66.16986300001736,
+        "depth": 2,
+        "capped": false,
+        "move": "e8-f6",
+        "score": 5957
+      },
+      "reference": {
+        "nodes": 433,
+        "ms": 94.03319799999008,
+        "depth": 2,
+        "capped": false,
+        "move": "e8-f6",
+        "score": 5957
+      },
+      "same": true
+    },
+    {
+      "name": "seed 7 ply 176",
+      "plies": 176,
+      "legal": 83,
+      "search": {
+        "nodes": 262,
+        "ms": 48.75523000000976,
+        "depth": 2,
+        "capped": false,
+        "move": "b6-b5",
+        "score": 6425
+      },
+      "reference": {
+        "nodes": 267,
+        "ms": 47.90100299997721,
+        "depth": 2,
+        "capped": false,
+        "move": "b6-b5",
+        "score": 6425
+      },
+      "same": true
+    },
+    {
+      "name": "seed 8 ply 8",
+      "plies": 8,
+      "legal": 39,
+      "search": {
+        "nodes": 515,
+        "ms": 300.21522700000787,
+        "depth": 2,
+        "capped": false,
+        "move": "a5-e5",
+        "score": 205
+      },
+      "reference": {
+        "nodes": 556,
+        "ms": 221.02281700001913,
+        "depth": 2,
+        "capped": false,
+        "move": "a5-e5",
+        "score": 205
+      },
+      "same": true
+    },
+    {
+      "name": "seed 8 ply 32",
+      "plies": 32,
+      "legal": 60,
+      "search": {
+        "nodes": 1367,
+        "ms": 762.9824059999955,
+        "depth": 2,
+        "capped": false,
+        "move": "g9-f8",
+        "score": 1446
+      },
+      "reference": {
+        "nodes": 1434,
+        "ms": 693.5451580000226,
+        "depth": 2,
+        "capped": false,
+        "move": "g9-f8",
+        "score": 1446
+      },
+      "same": true
+    },
+    {
+      "name": "seed 8 ply 56",
+      "plies": 56,
+      "legal": 60,
+      "search": {
+        "nodes": 2456,
+        "ms": 1063.6739229999948,
+        "depth": 2,
+        "capped": false,
+        "move": "g7-h5",
+        "score": -361
+      },
+      "reference": {
+        "nodes": 2541,
+        "ms": 1031.0115680000163,
+        "depth": 2,
+        "capped": false,
+        "move": "g7-h5",
+        "score": -361
+      },
+      "same": true
+    },
+    {
+      "name": "seed 8 ply 80",
+      "plies": 80,
+      "legal": 69,
+      "search": {
+        "nodes": 1634,
+        "ms": 765.5507170000055,
+        "depth": 2,
+        "capped": false,
+        "move": "d5-d4",
+        "score": -321
+      },
+      "reference": {
+        "nodes": 1593,
+        "ms": 745.5473050000146,
+        "depth": 2,
+        "capped": false,
+        "move": "d5-d4",
+        "score": -321
+      },
+      "same": true
+    },
+    {
+      "name": "seed 8 ply 104",
+      "plies": 104,
+      "legal": 64,
+      "search": {
+        "nodes": 1087,
+        "ms": 347.08325099997455,
+        "depth": 2,
+        "capped": false,
+        "move": "a7-a6",
+        "score": 2012
+      },
+      "reference": {
+        "nodes": 1099,
+        "ms": 359.84821699999156,
+        "depth": 2,
+        "capped": false,
+        "move": "a7-a6",
+        "score": 2012
+      },
+      "same": true
+    },
+    {
+      "name": "seed 8 ply 128",
+      "plies": 128,
+      "legal": 63,
+      "search": {
+        "nodes": 904,
+        "ms": 245.54155500000343,
+        "depth": 2,
+        "capped": false,
+        "move": "a5-i5",
+        "score": 2216
+      },
+      "reference": {
+        "nodes": 1450,
+        "ms": 387.2507100000221,
+        "depth": 2,
+        "capped": false,
+        "move": "a5-i5",
+        "score": 2216
+      },
+      "same": true
+    },
+    {
+      "name": "seed 8 ply 152",
+      "plies": 152,
+      "legal": 58,
+      "search": {
+        "nodes": 1215,
+        "ms": 346.1043269999791,
+        "depth": 2,
+        "capped": false,
+        "move": "a8-a7",
+        "score": 2201
+      },
+      "reference": {
+        "nodes": 1687,
+        "ms": 437.9458149999846,
+        "depth": 2,
+        "capped": false,
+        "move": "a8-a7",
+        "score": 2201
+      },
+      "same": true
+    },
+    {
+      "name": "seed 8 ply 176",
+      "plies": 176,
+      "legal": 61,
+      "search": {
+        "nodes": 663,
+        "ms": 187.20079900001292,
+        "depth": 2,
+        "capped": false,
+        "move": "e9-d8",
+        "score": 2201
+      },
+      "reference": {
+        "nodes": 669,
+        "ms": 184.1226580000075,
+        "depth": 2,
+        "capped": false,
+        "move": "e9-d8",
+        "score": 2201
+      },
+      "same": true
+    },
+    {
+      "name": "seed 8 ply 200",
+      "plies": 200,
+      "legal": 62,
+      "search": {
+        "nodes": 1188,
+        "ms": 383.67175100001623,
+        "depth": 2,
+        "capped": false,
+        "move": "d9-e7",
+        "score": 2216
+      },
+      "reference": {
+        "nodes": 1268,
+        "ms": 377.76149200001964,
+        "depth": 2,
+        "capped": false,
+        "move": "d9-e7",
+        "score": 2216
+      },
+      "same": true
+    },
+    {
+      "name": "seed 8 ply 224",
+      "plies": 224,
+      "legal": 55,
+      "search": {
+        "nodes": 307,
+        "ms": 66.40519499999937,
+        "depth": 2,
+        "capped": false,
+        "move": "h3-h2",
+        "score": 2797
+      },
+      "reference": {
+        "nodes": 332,
+        "ms": 69.93640599999344,
+        "depth": 2,
+        "capped": false,
+        "move": "h3-h2",
+        "score": 2797
+      },
+      "same": true
+    },
+    {
+      "name": "seed 8 ply 248",
+      "plies": 248,
+      "legal": 59,
+      "search": {
+        "nodes": 511,
+        "ms": 113.09356000000844,
+        "depth": 2,
+        "capped": false,
+        "move": "c7-h7",
+        "score": 2441
+      },
+      "reference": {
+        "nodes": 511,
+        "ms": 107.65435000002617,
+        "depth": 2,
+        "capped": false,
+        "move": "c7-h7",
+        "score": 2441
+      },
+      "same": true
+    },
+    {
+      "name": "seed 8 ply 272",
+      "plies": 272,
+      "legal": 56,
+      "search": {
+        "nodes": 419,
+        "ms": 96.67931500001578,
+        "depth": 2,
+        "capped": false,
+        "move": "h2-h1",
+        "score": 2055
+      },
+      "reference": {
+        "nodes": 539,
+        "ms": 122.1688359999971,
+        "depth": 2,
+        "capped": false,
+        "move": "h2-h1",
+        "score": 2055
+      },
+      "same": true
+    },
+    {
+      "name": "seed 8 ply 296",
+      "plies": 296,
+      "legal": 51,
+      "search": {
+        "nodes": 271,
+        "ms": 57.53342699998757,
+        "depth": 2,
+        "capped": false,
+        "move": "f5xe4",
+        "score": 2782
+      },
+      "reference": {
+        "nodes": 270,
+        "ms": 62.151172999991104,
+        "depth": 2,
+        "capped": false,
+        "move": "f5xe4",
+        "score": 2782
+      },
+      "same": true
+    },
+    {
+      "name": "seed 8 ply 320",
+      "plies": 320,
+      "legal": 61,
+      "search": {
+        "nodes": 659,
+        "ms": 133.42304100000183,
+        "depth": 2,
+        "capped": false,
+        "move": "c6-b7",
+        "score": 2832
+      },
+      "reference": {
+        "nodes": 853,
+        "ms": 162.07033900002716,
+        "depth": 2,
+        "capped": false,
+        "move": "c6-b7",
+        "score": 2832
+      },
+      "same": true
+    },
+    {
+      "name": "seed 8 ply 344",
+      "plies": 344,
+      "legal": 63,
+      "search": {
+        "nodes": 470,
+        "ms": 86.51323700000648,
+        "depth": 2,
+        "capped": false,
+        "move": "c7-c6",
+        "score": 3056
+      },
+      "reference": {
+        "nodes": 669,
+        "ms": 117.3537639999995,
+        "depth": 2,
+        "capped": false,
+        "move": "c7-c6",
+        "score": 3056
+      },
+      "same": true
+    },
+    {
+      "name": "seed 8 ply 368",
+      "plies": 368,
+      "legal": 57,
+      "search": {
+        "nodes": 321,
+        "ms": 49.527518999995664,
+        "depth": 2,
+        "capped": false,
+        "move": "i9-i1",
+        "score": 3442
+      },
+      "reference": {
+        "nodes": 325,
+        "ms": 48.93629400001373,
+        "depth": 2,
+        "capped": false,
+        "move": "i9-i1",
+        "score": 3442
+      },
+      "same": true
+    },
+    {
+      "name": "seed 8 ply 392",
+      "plies": 392,
+      "legal": 57,
+      "search": {
+        "nodes": 244,
+        "ms": 36.90831700002309,
+        "depth": 2,
+        "capped": false,
+        "move": "c9-c7",
+        "score": 3792
+      },
+      "reference": {
+        "nodes": 244,
+        "ms": 33.93348700000206,
+        "depth": 2,
+        "capped": false,
+        "move": "c9-c7",
+        "score": 3792
+      },
+      "same": true
+    },
+    {
+      "name": "seed 8 ply 416",
+      "plies": 416,
+      "legal": 57,
+      "search": {
+        "nodes": 270,
+        "ms": 47.34632400004193,
+        "depth": 2,
+        "capped": false,
+        "move": "f1-d1",
+        "score": 3792
+      },
+      "reference": {
+        "nodes": 284,
+        "ms": 45.17809899995336,
+        "depth": 2,
+        "capped": false,
+        "move": "f1-d1",
+        "score": 3792
+      },
+      "same": true
+    },
+    {
+      "name": "seed 8 ply 440",
+      "plies": 440,
+      "legal": 59,
+      "search": {
+        "nodes": 269,
+        "ms": 44.49772200000007,
+        "depth": 2,
+        "capped": false,
+        "move": "b2-c2",
+        "score": 3797
+      },
+      "reference": {
+        "nodes": 295,
+        "ms": 44.33312799996929,
+        "depth": 2,
+        "capped": false,
+        "move": "b2-c2",
+        "score": 3797
+      },
+      "same": true
+    },
+    {
+      "name": "seed 8 ply 464",
+      "plies": 464,
+      "legal": 53,
+      "search": {
+        "nodes": 181,
+        "ms": 41.95089899998857,
+        "depth": 2,
+        "capped": false,
+        "move": "c7-c8",
+        "score": 3777
+      },
+      "reference": {
+        "nodes": 193,
+        "ms": 26.52883899997687,
+        "depth": 2,
+        "capped": false,
+        "move": "c7-c8",
+        "score": 3777
+      },
+      "same": true
+    },
+    {
+      "name": "seed 8 ply 488",
+      "plies": 488,
+      "legal": 80,
+      "search": {
+        "nodes": 286,
+        "ms": 52.61799699999392,
+        "depth": 2,
+        "capped": false,
+        "move": "d7-d4",
+        "score": 5717
+      },
+      "reference": {
+        "nodes": 286,
+        "ms": 49.36526900000172,
+        "depth": 2,
+        "capped": false,
+        "move": "d7-d4",
+        "score": 5717
+      },
+      "same": true
+    },
+    {
+      "name": "seed 8 ply 512",
+      "plies": 512,
+      "legal": 79,
+      "search": {
+        "nodes": 273,
+        "ms": 54.24295000004349,
+        "depth": 2,
+        "capped": false,
+        "move": "c4-b4",
+        "score": 5717
+      },
+      "reference": {
+        "nodes": 273,
+        "ms": 44.35964799998328,
+        "depth": 2,
+        "capped": false,
+        "move": "c4-b4",
+        "score": 5717
+      },
+      "same": true
+    },
+    {
+      "name": "seed 8 ply 536",
+      "plies": 536,
+      "legal": 79,
+      "search": {
+        "nodes": 327,
+        "ms": 57.32355000003008,
+        "depth": 2,
+        "capped": false,
+        "move": "d4-c4",
+        "score": 5717
+      },
+      "reference": {
+        "nodes": 326,
+        "ms": 58.63187000004109,
+        "depth": 2,
+        "capped": false,
+        "move": "d4-c4",
+        "score": 5717
+      },
+      "same": true
+    },
+    {
+      "name": "seed 8 ply 560",
+      "plies": 560,
+      "legal": 82,
+      "search": {
+        "nodes": 282,
+        "ms": 50.41620500001591,
+        "depth": 2,
+        "capped": false,
+        "move": "c8-b8",
+        "score": 5727
+      },
+      "reference": {
+        "nodes": 284,
+        "ms": 44.77707399998326,
+        "depth": 2,
+        "capped": false,
+        "move": "c8-b8",
+        "score": 5727
+      },
+      "same": true
+    }
+  ]
+}
