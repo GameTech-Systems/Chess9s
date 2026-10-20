@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { unbuiltFeatures } from '@chess9s/engine';
 import { RulesScreen } from './Rules';
 import { formatElapsed, play, soundsFor } from './game/aids';
-import { computerMove } from './game/bot';
+import { searchMove, type BotSearch } from './game/botClient';
 import { clearGuest, loadGuest, saveGuest, type Mode, type Store } from './game/guest';
 import { Board } from './board/Board';
 import { boardData, pieceLetters } from './board/data';
@@ -95,12 +95,17 @@ export function Game({
   const botTurn = botSide !== undefined && game.turn === botSide && !over;
   useEffect(() => {
     if (!botTurn) return;
+    let search: BotSearch | undefined;
     const id = setTimeout(() => {
-      // Search once, outside the state update, and play the move only on the game it was found for.
-      const move = computerMove(game);
-      setModel((m) => (move && m.game === game ? playFor(m, move) : m));
+      // Search off-thread, and play the move only on the game it was found for.
+      search = searchMove(game, (move) =>
+        setModel((m) => (move && m.game === game ? playFor(m, move) : m)),
+      );
     }, BOT_DELAY_MS);
-    return () => clearTimeout(id);
+    return () => {
+      clearTimeout(id);
+      search?.cancel();
+    };
   }, [botTurn, game.moves.length]);
   // Keep the game in the browser.
   useEffect(() => {

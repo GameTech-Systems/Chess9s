@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { newGame, playMove, toNotation, type Position } from '@chess9s/engine';
-import { computerMove } from './bot';
+import { computerMove, computerReply } from './bot';
 import { createRules, ruleset } from './rules';
 import { newModel } from './session';
 
@@ -37,5 +37,20 @@ describe('the search computer opponent', () => {
       game = playMove(game, computerMove(game, Math.random, 100)!);
     }
     expect(game.moves.length).toBeGreaterThan(0);
+  });
+});
+
+describe('computerReply (what the Web Worker runs)', () => {
+  it('replays the moves by notation and answers with a legal notation', () => {
+    let { game } = newModel();
+    game = playMove(game, game.legal[0]!);
+    const notations = game.moves.map((m) => m.notation);
+    const reply = computerReply(ruleset.id, notations, () => 0, 100);
+    expect(game.legal.map(toNotation)).toContain(reply);
+  });
+
+  it('gives nothing for a ruleset it does not know or moves that do not replay', () => {
+    expect(computerReply('no-such-ruleset', [])).toBeUndefined();
+    expect(computerReply(ruleset.id, ['a1-a9'])).toBeUndefined();
   });
 });

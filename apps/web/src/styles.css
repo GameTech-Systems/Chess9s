@@ -243,9 +243,109 @@ body {
   stroke-width: 5;
 }
 
-@media (max-width: 520px) {
+/* Touch: taps act at once (no double-tap zoom delay) and nothing flashes or selects. */
+.board,
+.board [data-hit],
+button {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Phones: the status line and any promotion choice sit above the board, the board fills the width,
+   and every control is at least 44px tall. The panel's other parts follow below. */
+@media (max-width: 700px) {
   .page {
-    padding-inline: 8px;
+    gap: 0.6rem;
+    padding: max(0.6rem, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right))
+      max(1.5rem, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  }
+
+  .masthead p {
+    display: none;
+  }
+
+  .table {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+
+  .panel {
+    display: contents;
+  }
+
+  .panel > * {
+    order: 3;
+  }
+
+  .panel > .status,
+  .panel > .promotion {
+    order: 0;
+  }
+
+  .table-board {
+    order: 1;
+    flex: none;
+    max-width: none;
+    width: 100%;
+  }
+
+  .board {
+    width: 100%;
+    min-width: 0;
+    max-width: min(100%, 100svh - 9rem);
+    margin-inline: auto;
+  }
+
+  .panel > .facts,
+  .panel > .segmented,
+  .panel > .moves,
+  .panel > .again,
+  .panel > details {
+    max-width: 36rem;
+    width: 100%;
+    margin-inline: auto;
+  }
+
+  .panel .status {
+    font-size: 1.05rem;
+    text-align: center;
+    background: var(--bg);
+  }
+
+  .segmented {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .segmented button {
+    flex: 1 1 auto;
+    min-height: 44px;
+    padding: 0 0.8rem;
+  }
+
+  .panel button:not(.segmented button),
+  .promotion button {
+    min-height: 44px;
+  }
+
+  .panel .help {
+    width: 44px;
+    height: 44px;
+    margin-left: 0.5rem;
+  }
+
+  .promotion {
+    justify-content: center;
+  }
+
+  .moves {
+    max-height: 8rem;
+  }
+
+  .rules-screen {
+    inset: 0.5rem;
   }
 }
 
