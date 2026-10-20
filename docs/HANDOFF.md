@@ -1,34 +1,39 @@
 # Handoff
 
-Updated 2026-10-20 by S24 (Opus 5.5 · high). `/end-session` rewrites this file; keep it under 40 lines.
+Updated 2026-10-20 by S35 (Opus 5.5 · high). `/end-session` rewrites this file; keep it under 40 lines.
 
 ## State
-- Phase 2. `packages/sim` plays the engine search against itself on worker threads and writes fairness reports (JSON and Markdown) to `docs/fairness/`: `pnpm sim [--games --depths --sweep --set id=value --report file]`. The measures are decision 0008 (D12), committed before any run.
-- draft-2p at depth 1 **passes**: first player (Dark) 49.0% over 2,000 games (95% interval 46.8–51.2%), 40.6% draws (mostly repetition), 123 plies on average. Depth 2 has only 29 games (56.9%, interval 39–73%), so the verdict is `incomplete`.
-- A 40-game depth-1 sweep of 59 one-parameter changes flags nothing (2 skipped: unbuilt). 40 games only catch an imbalance of about 15 points. 1202 tests pass.
+- Phase 2. Depth 2 never needed the 100,000-position budget: on 137 positions from the S24 depth-2 games the search used at most 2,541 (0% capped), and 0 of about 10,600 moves in 24 full games ran out. S24's "shallowest depth 1" came from searches that stop on a forced mate (decision 0008 corrected, decision 0009 added).
+- The search's last iteration is faster (transposition table, killers, history), and so is the move generator (`access` cached): about 30% less time per move. Results are identical wherever the S23 search finishes (`referenceBestMove`, the equivalence test, `pnpm bench`: 137/137).
+- `pnpm sim --shard K/N`, `pnpm sim:merge <shards> --with <report>` and the manual **Sim depth 2** workflow are ready (merging the shards equals an unsharded run, tested). 1238 tests pass.
+
+## Depth-2 run (owner, after merge)
+- Actions tab → **Sim depth 2** → Run workflow (defaults: 20 shards, 2000 games, draft-2p). Estimate: 119 s of worker time per game here, so about 66 core-hours in all; one shard (100 games on 4 vCPUs) takes about 50 minutes, or about 1 h 45 min if runners are twice as slow. 20 shards fit easily under 6 hours each; the whole run takes about 1 to 2 hours of wall time.
+- The `fairness-report-draft-2p` artifact is the full report (the depth-1 run kept from `docs/fairness/draft-2p.json`). Commit it to `docs/fairness/` in S26 or a small follow-up.
 
 ## Next session
 **S25 — Mobile layout** · Sonnet 5.5 · effort medium
-Why: the harness is done. S26 (Candidate) waits on the depth-2 run below, which needs compute rather than a session.
+Why: the depth-2 run now needs only a click from the owner; S26 waits on its report.
 Start with: `/start-session S25`
 
-## Proposed Phase 2 changes
-- **Before S26:** 2,000 depth-2 games take about 32 hours on 4 cores (230 s each, about 410 plies). Run `pnpm sim --depths 2` on a many-core machine, or first add a step to speed up the search (transposition table, move ordering).
-- **S25 or S27:** move the search to a Web Worker (the page is blocked about 0.4 s per computer move).
-- **S27:** the web bundle includes Ajv (130 kB gzip), which uses `new Function`; a strict CSP needs a pre-resolved ruleset.
-
 ## Decisions in effect for the next step
-- D12 → decision 0008 v2 (default; depths 1 and 2, 100,000 positions per move, 4 random opening plies, provisional). D1: pieces are unverified seeds.
+- D12 → decision 0008 v2 (unchanged); decision 0009 (search speed, sharded runs). D1: pieces are unverified seeds.
 
 ## Open questions for the owner
-- Depth-2 run: who runs 32 core-hours of games, and where? Default: the owner runs `pnpm sim --depths 2` on a bigger machine before S26.
-- 0008 v2 (S24): a screening sweep run is flagged only when its 95% interval misses 47–53%. Default: as built.
-- The 100,000-position budget doesn't always let depth 2 finish (shallowest search: depth 1). Raise it? Default: no.
-- Ting Yang art (two images shared in S24 chat: silver and gold, and red and blue): the owner says they are free to use (made with their own generator). They arrived only as chat images, so nothing is committed. Which is the 2-player one, and should they be released into `assets/` (All Rights Reserved) for the board? Default: a placeholder until the owner commits the files.
+- Start the Sim depth 2 workflow after this PR merges. Default: 20 shards, 2000 games.
+- Ting Yang art (from S24): which image is the 2-player one, and should it go in `assets/`? Default: a placeholder until the owner commits the files.
 - Provisional from S22a: insufficient material, automatic repetition and fifty-move draws, en passant always on, `pawn.safeZones` meaning, Coast-only `coast.2p.exit/capturable`.
-- Earlier, still open: the computer's heuristics and 800 nodes (S23); Dark against the computer (S22); danger indicator off, undo unlimited (S20); keep `tail.2p.canCapture`; a closed Coast and Kings and Queens; the opener's Tail exception; 3-player check from A5; the Sun and Moon promotion targets, the Tetrahedron and the 3-player Tail.
+- Earlier, still open:
+  - The computer's heuristics and 800 nodes (S23).
+  - Dark against the computer (S22).
+  - Danger indicator off, undo unlimited (S20).
+  - Keep `tail.2p.canCapture`.
+  - A closed Coast and Kings and Queens; the opener's Tail exception.
+  - 3-player check from A5.
+  - The Sun and Moon promotion targets, the Tetrahedron and the 3-player Tail.
 
 ## Notes for Claude
 - `scripts/claude/ship.sh` opens and merges PRs (`gh pr` fails in cloud sessions).
-- `pnpm sim` bundles with Vite and runs `packages/sim/dist/cli.js`. Run the bundle from inside the repo, since `ajv` resolves from `node_modules`. Ctrl-C (SIGINT to the node process) writes the games played so far. Don't `pkill -f` a pattern that matches your own shell.
-- `newGame` with only Kings (plus the Tail) is drawn at once. Tests that need such positions set `draw.insufficientMaterial: false`.
+- Run the sim bundle (`packages/sim/dist/*.js`) from inside the repo: `ajv` resolves from `node_modules`. `pnpm bench` checks any later search change (0 capped at depth 2, same results as S23).
+- The web search still blocks the page about 0.3 s per move: a Web Worker (S25 or S27). The web bundle includes Ajv (130 kB gzip, `new Function`): a strict CSP needs a pre-resolved ruleset (S27).
+- `ci.yml` still uses v4 actions. The new workflow uses checkout v7, setup-node v7, upload-artifact v7, download-artifact v8 and pnpm/action-setup v6.
