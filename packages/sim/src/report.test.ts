@@ -22,7 +22,11 @@ const summary = (over: Partial<RunSummary> = {}): RunSummary => ({
   ...over,
 });
 
-const run = (depth: number, over: Partial<RunSummary> = {}, combination = 'default'): RunReport => ({
+const run = (
+  depth: number,
+  over: Partial<RunSummary> = {},
+  combination = 'default',
+): RunReport => ({
   combination,
   overrides: {},
   depth,
@@ -39,7 +43,12 @@ describe('verdict', () => {
   });
 
   it('fails when a full run is outside the band', () => {
-    const r = buildReport(ruleset, '2026-10-20', [run(1), run(2, { score: 0.56, pass: false, flags: ['score outside 47–53%'] })], []);
+    const r = buildReport(
+      ruleset,
+      '2026-10-20',
+      [run(1), run(2, { score: 0.56, pass: false, flags: ['score outside 47–53%'] })],
+      [],
+    );
     expect(r.verdict).toBe('fail');
   });
 
@@ -50,7 +59,11 @@ describe('verdict', () => {
   });
 
   it('ignores sweep combinations for the verdict but lists their flags', () => {
-    const flagged = run(1, { score: 0.6, pass: false, flags: ['score outside 47–53%'] }, 'king.range=1');
+    const flagged = run(
+      1,
+      { score: 0.6, pass: false, flags: ['score outside 47–53%'] },
+      'king.range=1',
+    );
     const r = buildReport(ruleset, '2026-10-20', [run(1), run(2), flagged], []);
     expect(r.verdict).toBe('pass');
     expect(r.flagged).toEqual(['king.range=1 at depth 1: score outside 47–53%']);
@@ -59,9 +72,12 @@ describe('verdict', () => {
 
 describe('toMarkdown', () => {
   it('states the verdict, the measures and every run', () => {
-    const r = buildReport(ruleset, '2026-10-20', [run(1), run(1, { score: 0.6, pass: false, flags: ['too few games'] }, 'king.range=1')], [
-      { combination: 'queen.pawnSwap=true', reason: 'not built yet: queen.pawnSwap' },
-    ]);
+    const r = buildReport(
+      ruleset,
+      '2026-10-20',
+      [run(1), run(1, { score: 0.6, pass: false, flags: ['too few games'] }, 'king.range=1')],
+      [{ combination: 'queen.pawnSwap=true', reason: 'not built yet: queen.pawnSwap' }],
+    );
     const md = toMarkdown(r);
     expect(md).toContain('# Fairness report: draft-2p 0.2.0');
     expect(md).toContain('Verdict: **incomplete**');

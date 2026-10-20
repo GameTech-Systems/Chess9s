@@ -39,7 +39,8 @@ export interface Options {
 }
 
 const whole = (flag: string, text: string): number => {
-  if (!/^\d+$/.test(text)) throw new Error(`${flag} needs a whole number, not ${JSON.stringify(text)}`);
+  if (!/^\d+$/.test(text))
+    throw new Error(`${flag} needs a whole number, not ${JSON.stringify(text)}`);
   return Number(text);
 };
 
@@ -120,7 +121,12 @@ async function main(): Promise<void> {
         depth,
         rulesetId: o.ruleset,
         overrides,
-        options: { depth, nodes: o.nodes, openingPlies: MEASURES.openingPlies, maxPlies: MEASURES.maxPlies },
+        options: {
+          depth,
+          nodes: o.nodes,
+          openingPlies: MEASURES.openingPlies,
+          maxPlies: MEASURES.maxPlies,
+        },
         seeds: Array.from({ length: o.games }, (_, i) => o.seed + i),
       });
     }
@@ -151,18 +157,28 @@ async function main(): Promise<void> {
   const total = jobs.reduce((n, j) => n + j.seeds.length, 0);
   let finished = 0;
   const started = Date.now();
-  console.error(`${total} games: ${jobs.length} runs on ${o.workers} workers; ${skipped.length} combinations skipped`);
-  const { done, stop } = runPool(new URL('./worker.js', import.meta.url), root, jobs, o.workers, (p) => {
-    games[p.job]!.push(p.game);
-    ms[p.job]! += p.ms;
-    finished++;
-    if (finished % 50 === 0 || finished === total) {
-      write();
-      const elapsed = (Date.now() - started) / 1000;
-      const left = (elapsed / finished) * (total - finished);
-      console.error(`${finished}/${total} games, ${elapsed.toFixed(0)} s, about ${left.toFixed(0)} s left`);
-    }
-  });
+  console.error(
+    `${total} games: ${jobs.length} runs on ${o.workers} workers; ${skipped.length} combinations skipped`,
+  );
+  const { done, stop } = runPool(
+    new URL('./worker.js', import.meta.url),
+    root,
+    jobs,
+    o.workers,
+    (p) => {
+      games[p.job]!.push(p.game);
+      ms[p.job]! += p.ms;
+      finished++;
+      if (finished % 50 === 0 || finished === total) {
+        write();
+        const elapsed = (Date.now() - started) / 1000;
+        const left = (elapsed / finished) * (total - finished);
+        console.error(
+          `${finished}/${total} games, ${elapsed.toFixed(0)} s, about ${left.toFixed(0)} s left`,
+        );
+      }
+    },
+  );
   process.once('SIGINT', () => {
     console.error('Stopping: writing the games played so far');
     void stop();

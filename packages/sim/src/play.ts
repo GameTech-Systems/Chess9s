@@ -92,6 +92,7 @@ export function playGame(
     const outcome = result.winner === first ? 'first' : 'second';
     return { ...base, outcome, reason: result.reason, winner: result.winner };
   }
-  if (result.status === 'draw') return { ...base, outcome: 'draw', reason: result.reason, winner: null };
+  if (result.status === 'draw')
+    return { ...base, outcome: 'draw', reason: result.reason, winner: null };
   return { ...base, outcome: 'draw', reason: 'unfinished', winner: null };
 }

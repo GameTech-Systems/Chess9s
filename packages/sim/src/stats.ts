@@ -57,13 +57,15 @@ export function summarize(games: GameSummary[], measures: Measures = MEASURES): 
   const score = n === 0 ? 0 : (firstWins + draws / 2) / n;
   const lengths = games.map((g) => g.plies).sort((a, b) => a - b);
   const mid = Math.floor(n / 2);
-  const median = n === 0 ? 0 : n % 2 === 1 ? lengths[mid]! : (lengths[mid - 1]! + lengths[mid]!) / 2;
+  const median =
+    n === 0 ? 0 : n % 2 === 1 ? lengths[mid]! : (lengths[mid - 1]! + lengths[mid]!) / 2;
   const unfinished = results['unfinished'] ?? 0;
 
   // Rounded to a hundredth of a percent first, so 47.00% computed as 0.46999… still passes.
   const rounded = Math.round(score * 10000) / 10000;
   const flags: string[] = [];
-  if (rounded < measures.band.min || rounded > measures.band.max) flags.push(`score outside ${bandLabel(measures)}`);
+  if (rounded < measures.band.min || rounded > measures.band.max)
+    flags.push(`score outside ${bandLabel(measures)}`);
   if (n < measures.minGames) flags.push('too few games');
   if (unfinished > 0) flags.push('unfinished games');
 
