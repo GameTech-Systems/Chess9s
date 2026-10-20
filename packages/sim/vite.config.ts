@@ -9,7 +9,11 @@ export default defineConfig({
     outDir: 'dist',
     emptyOutDir: true,
     rollupOptions: {
-      input: { cli: 'src/cli.ts', worker: 'src/worker.ts' },
+      input: {
+        cli: 'src/cli.ts',
+        worker: 'src/worker.ts',
+        bench: 'src/bench-cli.ts',
+      },
       output: { entryFileNames: '[name].js', format: 'es' },
     },
   },
