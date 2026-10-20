@@ -119,7 +119,7 @@ Inserted before S23 by the owner (plan review, 2026-10-19), so bot self-play can
 ### S23 — Computer opponent v1 · Opus 5.5 · high · `done`
 A search AI built on our own engine (for example negamax with alpha-beta and a ruleset-aware evaluation), so it respects whichever ruleset is selected. No GPL engines.
 
-### S24 — Simulation harness and fairness report · Opus 5.5 · high · `todo`
+### S24 — Simulation harness and fairness report · Opus 5.5 · high · `done`
 `packages/sim`: bot self-play from both sides, reports in JSON and Markdown (side scores, draw rate, game length, flagged parameter combinations). The measures and thresholds from D12 are committed as a decision record before any run.
 Decisions: D12.
 
@@ -171,7 +171,7 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D8 | Merge method | Default: rebase | S7 |
 | D10 | Default model | Default (applied): Sonnet 5.5 pinned in `.claude/settings.json`; Opus per step | S7 |
 | D11 | Discussions timing | Default: enable now | S5 |
-| D12 | Fairness measures | Default: first-player score between 47% and 53% over at least 2,000 bot games at two search depths; draw rate and game length reported | S24 |
+| D12 | Fairness measures | Default: first-player score between 47% and 53% over at least 2,000 bot games at two search depths; draw rate and game length reported. Applied as decision 0008 v2 (depths 1 and 2) | S24 |
 | D13 | "Chess9s" wording in TRADEMARKS | Default: describe Chess9s as the domain and repository name | S4 |
 | D14 | Public wording of 3-player features | Decided: the owner published the full 3-player rules in rule set v0.2 | S4 |
 | D15 | Hosting | Default: Cloudflare (Workers with Static Assets); confirm terms at signup | S27 |
