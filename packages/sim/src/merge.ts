@@ -5,7 +5,7 @@
 import type { Options, Plan } from './cli';
 import { MEASURES } from './measures';
 import type { GameSummary } from './play';
-import { buildReport, type FairnessReport, type Skipped } from './report';
+import { buildReport, type FairnessReport, type RunReport, type Skipped } from './report';
 import { summarize } from './stats';
 
 export interface ShardResult {
@@ -83,8 +83,14 @@ const runOf = (s: ShardResult) =>
  * The fairness report of all the shards' games, and the shards that are missing. Missing shards
  * leave their games out, so the runs count fewer games and are flagged as such; the measures
  * and their thresholds are decision 0008's, unchanged. The report's date is the latest shard's.
+ * With an `earlier` report of the same ruleset and measures, its runs that the shards did not
+ * play are kept (such as the depth-1 run when the shards play depth 2), so the verdict covers
+ * every depth.
  */
-export function mergeShards(shards: ShardResult[]): { report: FairnessReport; missing: number[] } {
+export function mergeShards(
+  shards: ShardResult[],
+  earlier?: FairnessReport,
+): { report: FairnessReport; missing: number[] } {
   const first = shards[0];
   if (!first) throw new Error('No shard to merge');
   if (first.decision !== MEASURES.decision || first.version !== MEASURES.version) {
@@ -105,7 +111,7 @@ export function mergeShards(shards: ShardResult[]): { report: FairnessReport; mi
   }
   const count = first.shard.count;
   const missing = Array.from({ length: count }, (_, i) => i + 1).filter((k) => !seen.has(k));
-  const runs = first.runs.map((r, i) => {
+  const runs: RunReport[] = first.runs.map((r, i) => {
     const games = shards.flatMap((s) => s.runs[i]!.games).sort((a, b) => a.seed - b.seed);
     return {
       combination: r.combination,
@@ -117,12 +123,27 @@ export function mergeShards(shards: ShardResult[]): { report: FairnessReport; mi
       summary: summarize(games),
     };
   });
+  let all: RunReport[] = runs;
+  if (earlier) {
+    const same = (r: FairnessReport | ShardResult) =>
+      JSON.stringify([r.ruleset, r.overrides, r.decision]);
+    if (same(earlier) !== same(first) || earlier.measures.version !== first.version) {
+      throw new Error('The earlier report is of a different ruleset or measures');
+    }
+    const key = (r: RunReport) => `${r.combination}@${r.depth}`;
+    const fresh = new Map(runs.map((r) => [key(r), r]));
+    const before = new Set(earlier.runs.map(key));
+    all = [
+      ...earlier.runs.map((r) => fresh.get(key(r)) ?? r),
+      ...runs.filter((r) => !before.has(key(r))),
+    ];
+  }
   const date = shards
     .map((s) => s.date)
     .sort()
     .at(-1)!;
   return {
-    report: buildReport(first.ruleset, date, runs, first.skipped, first.overrides),
+    report: buildReport(first.ruleset, date, all, first.skipped, first.overrides),
     missing,
   };
 }

@@ -1,13 +1,18 @@
-// pnpm sim:merge <shard files or directories> [--out dir] [--name name]: builds the fairness
-// report (decision 0008) from the shards of a sharded run (`pnpm sim --shard K/N`), as
-// <out>/<name>.json and .md, the same files an unsharded run writes. Directories are searched for
-// *.shard-*-of-*.json. Missing shards are named and their games left out.
+// pnpm sim:merge <shard files or directories> [options]: builds the fairness report (decision
+// 0008) from the shards of a sharded run (`pnpm sim --shard K/N`), as <out>/<name>.json and .md,
+// the same files an unsharded run writes. Directories are searched for *.shard-*-of-*.json.
+// Missing shards are named and their games left out.
+//
+//   --with <report>   keep the runs of this earlier report that the shards did not play (such
+//                     as docs/fairness/draft-2p.json's depth-1 run), so the verdict covers both depths
+//   --out <dir>       report directory, from where pnpm was run (docs/fairness)
+//   --name <name>     report file name (the ruleset id)
 import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 import { mergeShards, type ShardResult } from './merge';
-import { toMarkdown } from './report';
+import { toMarkdown, type FairnessReport } from './report';
 
 const SHARD = /\.shard-\d+-of-\d+\.json$/;
 
@@ -29,12 +34,17 @@ function main(): void {
     options: {
       out: { type: 'string', default: 'docs/fairness' },
       name: { type: 'string' },
+      with: { type: 'string' },
     },
   });
   const cwd = process.env['INIT_CWD'] ?? process.cwd();
   const files = shardFiles(positionals.map((p) => resolve(cwd, p)));
   const shards = files.map((f) => JSON.parse(readFileSync(f, 'utf8')) as ShardResult);
-  const { report, missing } = mergeShards(shards);
+  const earlier =
+    v.with === undefined
+      ? undefined
+      : (JSON.parse(readFileSync(resolve(cwd, v.with), 'utf8')) as FairnessReport);
+  const { report, missing } = mergeShards(shards, earlier);
   const name = v.name ?? report.ruleset.id;
   const outDir = resolve(cwd, v.out);
   mkdirSync(outDir, { recursive: true });

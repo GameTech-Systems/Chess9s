@@ -88,6 +88,35 @@ describe('sharded runs', { timeout: 30_000 }, () => {
     void b;
   });
 
+  it('keep the runs of an earlier report that the shards did not play', () => {
+    const merged = mergeShards(shards(3)).report;
+    const earlier = buildReport(
+      merged.ruleset,
+      '2026-10-01',
+      [
+        { ...merged.runs[0]!, depth: 2, seed: 99 },
+        { ...merged.runs[0]!, seed: 99 },
+      ],
+      [],
+      merged.overrides,
+    );
+    const { report } = mergeShards(shards(3), earlier);
+    expect(report.runs.map((r) => [r.depth, r.seed])).toEqual([
+      [2, 99],
+      [1, 11],
+    ]);
+    expect(report.date).toBe(DATE);
+    expect(() => mergeShards(shards(3), { ...earlier, overrides: { 'king.range': 1 } })).toThrow(
+      /different ruleset or measures/,
+    );
+    expect(() =>
+      mergeShards(shards(3), {
+        ...earlier,
+        measures: { ...earlier.measures, version: 1 } as unknown as typeof earlier.measures,
+      }),
+    ).toThrow(/different ruleset or measures/);
+  });
+
   it('refuse a shard twice, and shards of different runs', () => {
     const [a, b] = shards(2);
     expect(() => mergeShards([a!, a!])).toThrow(/shard 1 of 2 twice/);
