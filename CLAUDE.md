@@ -43,7 +43,9 @@ Node 22, pnpm 10 (pinned in `package.json`).
 - `pnpm lint`: ESLint and Prettier check.
 - `pnpm typecheck`: `tsc --noEmit` in every workspace.
 - `pnpm validate:rules`: Ajv-validate `rules/` against `rules/schema/`.
-- `pnpm sim [--games n --depths 1,2 --sweep --set id=value]`: bot self-play; writes a fairness report to `docs/fairness/` (decision 0008).
+- `pnpm sim [--games n --depths 1,2 --sweep --set id=value --shard K/N]`: bot self-play; writes a fairness report to `docs/fairness/` (decision 0008).
+- `pnpm sim:merge <shards> [--with report]`: builds the fairness report from shard files (decision 0009). The `Sim depth 2` workflow runs the shards on GitHub.
+- `pnpm bench [--depth 2]`: search benchmark: positions per move, moves that hit the cap, same results as the S23 search (decision 0009).
 
 ## Where things live
 - `docs/HANDOFF.md`: current state and the next session (rewritten every session). `docs/sessions/LOG.md`: one line per session.
