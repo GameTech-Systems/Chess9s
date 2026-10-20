@@ -9,12 +9,12 @@ Measured as decision 0008 sets out (ledger D12): the first player's score, count
 | Combination | Depth | Games | First-player score | 95% interval | Draw rate | First wins | Second wins | Plies: mean / median / range | Distinct games | Flags |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | default | 1 | 2000 | 49.0% | 46.8–51.2% | 40.6% | 574 | 614 | 123 / 111 / 5–459 | 2000 | none |
-| default | 2 | 0 | 0.0% | 0.0–100.0% | 0.0% | 0 | 0 | 0 / 0 / 0–0 | 0 | score outside 47–53%, too few games |
+| default | 2 | 29 | 56.9% | 39.1–73.0% | 37.9% | 11 | 7 | 410 / 378 / 148–1098 | 29 | score outside 47–53%, too few games |
 
 ## How the games ended
 
 - Depth 1: checkmate 1188, fifty-move 25, insufficient-material 5, repetition 782. Wins by color: dark 574, light 614. Shallowest search finished: depth 1; 3.7 s per game.
-- Depth 2: no games. Wins by color: none. Shallowest search finished: depth 0; 0.0 s per game.
+- Depth 2: checkmate 18, fifty-move 11. Wins by color: dark 11, light 7. Shallowest search finished: depth 1; 233.8 s per game.
 
 ## Flagged combinations
 
