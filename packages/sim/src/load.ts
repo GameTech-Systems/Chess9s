@@ -25,7 +25,11 @@ export function loadSource(root: string): RulesSource {
       .filter((f) => f.endsWith('.json'))
       .map((f) => read(`${dir}/${f}`));
   const registry = read('rules/parameters.json') as Registry;
-  const set = validateBoardAndPieces(read('rules/boards/standard-9x9.json'), json('rules/pieces'), registry);
+  const set = validateBoardAndPieces(
+    read('rules/boards/standard-9x9.json'),
+    json('rules/pieces'),
+    registry,
+  );
   const rulesets: Record<string, Ruleset> = {};
   for (const rs of json('rules/rulesets') as Ruleset[]) rulesets[rs.id] = rs;
   return { registry, set, rulesets };
@@ -44,5 +48,8 @@ export function rulesFor(
     { ...base, overrides: { ...base.overrides, ...overrides } },
     source.rulesets,
   );
-  return { rules: { ...source.set, values, players: base.players }, ruleset: { id, version: base.version } };
+  return {
+    rules: { ...source.set, values, players: base.players },
+    ruleset: { id, version: base.version },
+  };
 }

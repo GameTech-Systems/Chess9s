@@ -20,9 +20,29 @@ describe('options', () => {
 
   it('reads every option', () => {
     const o = options(
-      ['--ruleset', 'draft-2p', '--games', '50', '--depths', '1', '--nodes', '300', '--seed', '7',
-        '--workers', '2', '--sweep', '--set', 'king.range=1', '--set', 'pawn.safeZones="off"',
-        '--out', 'x', '--name', 'y'],
+      [
+        '--ruleset',
+        'draft-2p',
+        '--games',
+        '50',
+        '--depths',
+        '1',
+        '--nodes',
+        '300',
+        '--seed',
+        '7',
+        '--workers',
+        '2',
+        '--sweep',
+        '--set',
+        'king.range=1',
+        '--set',
+        'pawn.safeZones="off"',
+        '--out',
+        'x',
+        '--name',
+        'y',
+      ],
       4,
     );
     expect(o).toEqual({
@@ -40,7 +60,9 @@ describe('options', () => {
   });
 
   it('reads a bare word as a string value', () => {
-    expect(options(['--set', 'pawn.safeZones=off'], 1).overrides).toEqual({ 'pawn.safeZones': 'off' });
+    expect(options(['--set', 'pawn.safeZones=off'], 1).overrides).toEqual({
+      'pawn.safeZones': 'off',
+    });
   });
 
   it('refuses a malformed number', () => {

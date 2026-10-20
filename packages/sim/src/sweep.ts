@@ -17,7 +17,10 @@ export interface Combination {
 }
 
 /** `values` are the ruleset's resolved values; only parameters in it are varied. */
-export function combinations(registry: Registry, values: Record<string, ParamValue>): Combination[] {
+export function combinations(
+  registry: Registry,
+  values: Record<string, ParamValue>,
+): Combination[] {
   const all: Combination[] = [{ id: 'default', overrides: {} }];
   for (const p of registry.parameters) {
     if (p.status === 'deprecated' || !p.players.includes(2) || !(p.id in values)) continue;
@@ -26,13 +29,16 @@ export function combinations(registry: Registry, values: Record<string, ParamVal
       const set = Array.isArray(current) ? current : [];
       for (const option of p.options) {
         const has = set.includes(option);
-        const next = has ? set.filter((x) => x !== option) : p.options.filter((x) => x === option || set.includes(x));
+        const next = has
+          ? set.filter((x) => x !== option)
+          : p.options.filter((x) => x === option || set.includes(x));
         all.push({ id: `${p.id}${has ? '-' : '+'}${String(option)}`, overrides: { [p.id]: next } });
       }
       continue;
     }
     for (const option of p.options) {
-      if (option !== current) all.push({ id: `${p.id}=${String(option)}`, overrides: { [p.id]: option } });
+      if (option !== current)
+        all.push({ id: `${p.id}=${String(option)}`, overrides: { [p.id]: option } });
     }
   }
   return all;

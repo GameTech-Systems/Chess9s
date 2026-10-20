@@ -115,7 +115,10 @@ export function toMarkdown(report: FairnessReport): string {
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([k, v]) => `${k} ${v}`)
       .join(', ');
-    const time = r.seconds === undefined ? '' : `; ${(r.seconds / Math.max(1, s.games)).toFixed(1)} s per game`;
+    const time =
+      r.seconds === undefined
+        ? ''
+        : `; ${(r.seconds / Math.max(1, s.games)).toFixed(1)} s per game`;
     lines.push(
       `- Depth ${r.depth}: ${endings || 'no games'}. Wins by color: ${sides || 'none'}. Shallowest search finished: depth ${s.minDepth}${time}.`,
     );
@@ -124,7 +127,9 @@ export function toMarkdown(report: FairnessReport): string {
   lines.push(...(report.flagged.length ? report.flagged.map((f) => `- ${f}`) : ['None.']));
   lines.push('', '## Skipped combinations', '');
   lines.push(
-    ...(report.skipped.length ? report.skipped.map((s) => `- ${s.combination}: ${s.reason}`) : ['None.']),
+    ...(report.skipped.length
+      ? report.skipped.map((s) => `- ${s.combination}: ${s.reason}`)
+      : ['None.']),
   );
   return lines.join('\n') + '\n';
 }
