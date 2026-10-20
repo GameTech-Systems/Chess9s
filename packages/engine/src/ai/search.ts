@@ -4,11 +4,12 @@
 // under the resolved ruleset, so parameters that change how a piece moves change what it is
 // worth. These are playing heuristics, not rules. Deterministic: the search stops on a node
 // budget (no clock), and ties are broken only by the random source passed in.
-import { playMove, type GameState } from '../game/game';
+import { playMove, stateKey, type GameState } from '../game/game';
 import {
   attacksFrom,
   movesFrom,
   squareTypes,
+  toNotation,
   type GeneratedMove,
   type MoveRules,
 } from '../moves/generate';
@@ -34,6 +35,8 @@ export interface SearchResult {
   /** Deepest search completed. */
   depth: number;
   nodes: number;
+  /** The node budget ran out before the search reached its depth (or a forced mate). */
+  capped: boolean;
 }
 
 const valueCache = new WeakMap<MoveRules, Record<string, number>>();
@@ -103,11 +106,45 @@ function terminal(state: GameState, ply: number): number {
 
 const OUT_OF_NODES = Symbol('out of nodes');
 
+/** How a transposition-table score relates to the true one: equal, at least, or at most. */
+const EXACT = 0;
+const LOWER = 1;
+const UPPER = 2;
+
+interface Entry {
+  score: number;
+  bound: typeof EXACT | typeof LOWER | typeof UPPER;
+  /** The move that scored best, tried first when the position comes back. */
+  move?: string;
+}
+
+const moveId = (m: GeneratedMove) => `${m.piece}:${toNotation(m)}`;
+
+const valuesKey = new WeakMap<MoveRules, string>();
+
+/**
+ * What a transposition-table key starts with: the ruleset's id and version and every resolved
+ * parameter value (a superset of those that change how pieces move), so a key never matches a
+ * position played under other rules.
+ */
+export function rulesKey(state: Pick<GameState, 'ruleset' | 'rules'>): string {
+  let values = valuesKey.get(state.rules);
+  if (values === undefined) {
+    const v = state.rules.values;
+    values = Object.keys(v)
+      .sort()
+      .map((id) => `${id}=${JSON.stringify(v[id])}`)
+      .join(';');
+    valuesKey.set(state.rules, values);
+  }
+  return `${state.ruleset.id}@${state.ruleset.version}|${state.rules.players}|${values}`;
+}
+
 /** The move the search rates best for the side to move, or none when the game is over. */
 export function bestMove(state: GameState, options: SearchOptions = {}): SearchResult {
   const { nodes: budget = 2000, depth: maxDepth = 6, random } = options;
   if (state.result.status !== 'ongoing' || state.legal.length === 0) {
-    return { move: undefined, score: 0, depth: 0, nodes: 0 };
+    return { move: undefined, score: 0, depth: 0, nodes: 0, capped: false };
   }
   const values = pieceValues(state.rules);
   let nodes = 0;
@@ -127,31 +164,114 @@ export function bestMove(state: GameState, options: SearchOptions = {}): SearchR
       .sort((a, b) => b[1] - a[1] || a[2] - b[2])
       .map(([m]) => m);
 
+  // The last iteration searches faster (S35, decision 0009): a transposition table, killer moves
+  // and a history table. They change only the order moves are tried in and which subtrees are
+  // skipped, so the exact scores at the root don't change. Earlier iterations search as S23 did,
+  // because their scores, bounds included, set the root order that ties are listed in.
+  let last = false;
+  const table = new Map<string, Entry>();
+  const killers: string[][] = [];
+  const history = new Map<string, number>();
+  const prefix = rulesKey(state);
+  // Only a state reached by a capture or an irreversible move has no earlier position that could
+  // repeat and no quiet moves counted, so only its key says everything about how it plays out.
+  const keyOf = (s: GameState, ply: number, left: string) =>
+    last && s.quiet === 0 ? `${prefix}\n${stateKey(s)}\n${ply}:${left}` : undefined;
+  const probe = (key: string | undefined, alpha: number, beta: number) => {
+    const e = key === undefined ? undefined : table.get(key);
+    if (!e) return { hint: undefined, score: undefined };
+    const fits =
+      e.bound === EXACT ||
+      (e.bound === LOWER && e.score >= beta) ||
+      (e.bound === UPPER && e.score <= alpha);
+    return { hint: e.move, score: fits ? e.score : undefined };
+  };
+  const store = (
+    key: string | undefined,
+    score: number,
+    alpha: number,
+    beta: number,
+    move?: string,
+  ) => {
+    if (key === undefined) return;
+    const bound = score <= alpha ? UPPER : score >= beta ? LOWER : EXACT;
+    table.set(key, { score, bound, ...(move !== undefined && { move }) });
+  };
+  // The table's move first, then captures and promotions by gain, then killer moves, then the
+  // other moves by how often they cut the search off, then in notation order.
+  const orderedLast = (moves: GeneratedMove[], hint: string | undefined, ply: number) => {
+    const killing = killers[ply] ?? [];
+    return moves
+      .map((m, i) => {
+        const id = moveId(m);
+        const tactical = m.capture !== undefined || m.promotion !== undefined;
+        const k = killing.indexOf(id);
+        const [group, within] =
+          id === hint
+            ? [3, 0]
+            : tactical
+              ? [2, gain(m)]
+              : k >= 0
+                ? [1, -k]
+                : [0, history.get(id) ?? 0];
+        return [m, group, within, i] as const;
+      })
+      .sort((a, b) => b[1] - a[1] || b[2] - a[2] || a[3] - b[3])
+      .map(([m]) => m);
+  };
+
   function quiesce(s: GameState, alpha: number, beta: number, ply: number, left: number): number {
     if (s.result.status !== 'ongoing') return terminal(s, ply);
     const stand = evaluate(s, values);
     if (left === 0 || stand >= beta) return stand;
+    const key = keyOf(s, ply, `q${left}`);
+    const found = probe(key, alpha, beta);
+    if (found.score !== undefined) return found.score;
+    const from = alpha;
     let best = stand;
+    let bestMove: string | undefined;
     if (best > alpha) alpha = best;
-    for (const m of ordered(s.legal.filter((x) => x.capture !== undefined))) {
+    const captures = s.legal.filter((x) => x.capture !== undefined);
+    for (const m of last ? orderedLast(captures, found.hint, ply) : ordered(captures)) {
       const score = -quiesce(play(s, m), -beta, -alpha, ply + 1, left - 1);
-      if (score > best) best = score;
+      if (score > best) {
+        best = score;
+        bestMove = moveId(m);
+      }
       if (best > alpha) alpha = best;
       if (alpha >= beta) break;
     }
+    store(key, best, from, beta, bestMove);
     return best;
   }
 
   function negamax(s: GameState, depth: number, alpha: number, beta: number, ply: number): number {
     if (s.result.status !== 'ongoing') return terminal(s, ply);
     if (depth <= 0) return quiesce(s, alpha, beta, ply, QUIESCENCE_PLIES);
+    const key = keyOf(s, ply, `d${depth}`);
+    const found = probe(key, alpha, beta);
+    if (found.score !== undefined) return found.score;
+    const from = alpha;
     let best = -Infinity;
-    for (const m of ordered(s.legal)) {
+    let bestMove: string | undefined;
+    for (const m of last ? orderedLast(s.legal, found.hint, ply) : ordered(s.legal)) {
       const score = -negamax(play(s, m), depth - 1, -beta, -alpha, ply + 1);
-      if (score > best) best = score;
+      if (score > best) {
+        best = score;
+        bestMove = moveId(m);
+      }
       if (best > alpha) alpha = best;
-      if (alpha >= beta) break;
+      if (alpha >= beta) {
+        if (last && m.capture === undefined && m.promotion === undefined) {
+          const id = moveId(m);
+          const k = (killers[ply] ??= []);
+          if (k[0] !== id) killers[ply] = [id, ...k.filter((x) => x !== id)].slice(0, 2);
+          history.set(id, (history.get(id) ?? 0) + depth * depth);
+        }
+        break;
+      }
     }
+    store(key, best, from, beta, bestMove);
     return best;
   }
 
@@ -161,7 +281,9 @@ export function bestMove(state: GameState, options: SearchOptions = {}): SearchR
   let ties: GeneratedMove[] = [ranked[0]!];
   let score = 0;
   let depth = 0;
+  let capped = false;
   for (let d = 1; d <= maxDepth; d++) {
+    last = d === maxDepth;
     const scored: [GeneratedMove, number][] = [];
     let complete = true;
     try {
@@ -175,6 +297,7 @@ export function bestMove(state: GameState, options: SearchOptions = {}): SearchR
     } catch (e) {
       if (e !== OUT_OF_NODES) throw e;
       complete = false;
+      capped = true;
     }
     if (!complete && (d > 1 || scored.length === 0)) break;
     const top = Math.max(...scored.map(([, s]) => s));
@@ -189,5 +312,5 @@ export function bestMove(state: GameState, options: SearchOptions = {}): SearchR
   const move = random
     ? ties[Math.min(ties.length - 1, Math.floor(random() * ties.length))]
     : ties[0];
-  return { move, score, depth, nodes };
+  return { move, score, depth, nodes, capped };
 }

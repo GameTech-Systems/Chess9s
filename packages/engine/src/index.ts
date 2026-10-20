@@ -6,3 +6,4 @@ export * from './game/turns';
 export * from './game/game';
 export * from './rules/interactions';
 export * from './ai/search';
+export * from './ai/search-reference';

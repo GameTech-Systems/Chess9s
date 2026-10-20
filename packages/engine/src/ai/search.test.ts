@@ -137,6 +137,13 @@ describe('the search', () => {
     const result = bestMove(game, { nodes: 50 });
     expect(result.nodes).toBeLessThanOrEqual(60);
     expect(game.legal).toContain(result.move);
+    expect(result.capped).toBe(true);
+  });
+
+  it('is not capped when it reaches its depth within the budget', () => {
+    const game = newGame(rulesWith(), ID);
+    const result = bestMove(game, { depth: 1, nodes: 100_000 });
+    expect(result).toMatchObject({ depth: 1, capped: false });
   });
 
   it('plays legal moves from both sides through a capped game', () => {
