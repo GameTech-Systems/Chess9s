@@ -1,0 +1,41 @@
+{
+  "description": "S24: short games for the simulation harness on the real board (rules/boards/standard-9x9.json) under the draft 2-player ruleset with the case's overrides. The Coast is open and there is no Tail. Games start with no random plies. 'outcome' is from the first mover's seat in the turn order (turn.firstMove), not from the side that moves first in the position.",
+  "cases": [
+    {
+      "name": "the first mover mates in one",
+      "overrides": { "turn.firstMove": "light" },
+      "turn": "light",
+      "pieces": {
+        "c1": { "piece": "king", "side": "light", "moved": true },
+        "g2": { "piece": "rook", "side": "light", "moved": true },
+        "h3": { "piece": "rook", "side": "light", "moved": true },
+        "b4": { "piece": "rook", "side": "light", "moved": true },
+        "i9": { "piece": "king", "side": "dark", "moved": true }
+      },
+      "expect": { "outcome": "first", "reason": "checkmate", "winner": "light", "plies": 1 }
+    },
+    {
+      "name": "the second seat mates in one (dark moves first by default; light is to move here)",
+      "overrides": {},
+      "turn": "light",
+      "pieces": {
+        "c1": { "piece": "king", "side": "light", "moved": true },
+        "g2": { "piece": "rook", "side": "light", "moved": true },
+        "h3": { "piece": "rook", "side": "light", "moved": true },
+        "b4": { "piece": "rook", "side": "light", "moved": true },
+        "i9": { "piece": "king", "side": "dark", "moved": true }
+      },
+      "expect": { "outcome": "second", "reason": "checkmate", "winner": "light", "plies": 1 }
+    },
+    {
+      "name": "Kings alone are drawn at once",
+      "overrides": {},
+      "turn": "dark",
+      "pieces": {
+        "c1": { "piece": "king", "side": "light", "moved": true },
+        "i9": { "piece": "king", "side": "dark", "moved": true }
+      },
+      "expect": { "outcome": "draw", "reason": "insufficient-material", "winner": null, "plies": 0 }
+    }
+  ]
+}
