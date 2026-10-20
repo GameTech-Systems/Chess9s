@@ -127,7 +127,7 @@ Decisions: D12.
 Added before S26 at the owner's request. A search benchmark (positions per move, share that hit the 100,000 cap), a faster search with the same results wherever the S23 search finishes, `pnpm sim --shard K/N` and `pnpm sim:merge`, and a manual `Sim depth 2` workflow on GitHub-hosted runners. The D12 thresholds don't change.
 Decisions: D12 (decision 0008), decision 0009.
 
-### S25 — Mobile layout · Sonnet 5.5 · medium · `todo`
+### S25 — Mobile layout · Sonnet 5.5 · medium · `done`
 Responsive layout and touch input. Done when a full game against the computer works in a phone browser.
 
 ### S26 — Candidate 2-player ruleset · Owner with Claude in chat · `todo`
