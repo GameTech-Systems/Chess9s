@@ -25,3 +25,7 @@ Decision [0004](0004-two-player-fairness-and-tournament-rules.md) requires the d
 - `packages/sim` implements these measures (`src/measures.ts` holds the numbers) and writes each report as JSON and Markdown to `docs/fairness/`.
 - A ruleset is published as a Candidate only with a passing report at both depths; the report is published with it.
 - Changing a threshold, a depth or the variety rule needs a new version of this record, and earlier reports stay labeled with the version they used.
+
+## S24 notes (after the first runs; the measures above are unchanged)
+- The 100,000-position budget does not always let depth 2 complete: in the first depth-2 games the shallowest finished search was depth 1. Depth 2 games also run much longer (about 410 plies on average, against 123 at depth 1) and took about 230 s each, so 2,000 of them take about 32 hours on 4 cores.
+- The first report is `docs/fairness/draft-2p.md`; the screening sweep is `docs/fairness/draft-2p-sweep.md`.
