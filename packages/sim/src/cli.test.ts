@@ -63,6 +63,14 @@ describe('options', () => {
     });
   });
 
+  it('reads a shard as K/N', () => {
+    expect(options(['--shard', '3/20'], 1).shard).toEqual({ index: 3, count: 20 });
+    expect(options([], 1).shard).toBeUndefined();
+    for (const bad of ['0/4', '5/4', '1', 'a/b', '1/0']) {
+      expect(() => options(['--shard', bad], 1)).toThrow(/--shard/);
+    }
+  });
+
   it('reads a bare word as a string value', () => {
     expect(options(['--set', 'pawn.safeZones=off'], 1).overrides).toEqual({
       'pawn.safeZones': 'off',

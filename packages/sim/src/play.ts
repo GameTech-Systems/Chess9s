@@ -38,6 +38,8 @@ export interface GameSummary {
   plies: number;
   /** Shallowest depth the search finished on any of its moves (0 if it never searched). */
   minDepth: number;
+  /** Moves on which the node budget ran out before the search reached its depth. */
+  capped: number;
   /** A hash of the moves, to count distinct games. */
   key: string;
 }
@@ -70,6 +72,7 @@ export function playGame(
   let state = newGame(rules, ruleset, options.init);
   const [first, second] = state.order as [string, string];
   let minDepth = Infinity;
+  let capped = 0;
   while (state.result.status === 'ongoing' && state.moves.length < options.maxPlies) {
     if (state.moves.length < options.openingPlies) {
       state = playMove(state, state.legal[Math.floor(random() * state.legal.length)]!);
@@ -77,6 +80,7 @@ export function playGame(
     }
     const found = bestMove(state, { depth: options.depth, nodes: options.nodes, random });
     minDepth = Math.min(minDepth, found.depth);
+    if (found.capped) capped++;
     state = playMove(state, found.move!);
   }
   const { result } = state;
@@ -86,6 +90,7 @@ export function playGame(
     second,
     plies: state.moves.length,
     minDepth: minDepth === Infinity ? 0 : minDepth,
+    capped,
     key: hash(state.moves.map(toNotation).join(' ')),
   };
   if (result.status === 'win') {

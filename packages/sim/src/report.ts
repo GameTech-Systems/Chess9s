@@ -137,7 +137,7 @@ export function toMarkdown(report: FairnessReport): string {
         ? ''
         : `; ${(r.seconds / Math.max(1, s.games)).toFixed(1)} s per game`;
     lines.push(
-      `- Depth ${r.depth}: ${endings || 'no games'}. Wins by color: ${sides || 'none'}. Shallowest search finished: depth ${s.minDepth}${time}.`,
+      `- Depth ${r.depth}: ${endings || 'no games'}. Wins by color: ${sides || 'none'}. Shallowest search finished: depth ${s.minDepth} (a search stops early once it finds a forced mate)${time}. Moves the node budget cut short: ${s.capped ?? 'not counted'}.`,
     );
   }
   lines.push('', '## Flagged combinations', '');

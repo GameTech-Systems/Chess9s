@@ -13,13 +13,16 @@
 //   --out <dir>        report directory, from where pnpm was run (docs/fairness)
 //   --name <name>      report file name (the ruleset id)
 //   --report <file>    play nothing: rebuild that report's .json and .md from its runs
+//   --shard <K/N>      play only shard K of N (game i of each run goes to shard i mod N + 1)
+//                      and write its games to <name>.shard-K-of-N.json for `pnpm sim:merge`
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { availableParallelism } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
-import { loadSource, rulesFor } from './load';
+import { loadSource, rulesFor, type RulesSource } from './load';
 import { MEASURES } from './measures';
+import { shardResult } from './merge';
 import type { GameSummary } from './play';
 import { runPool, type Job } from './pool';
 import {
@@ -44,6 +47,24 @@ export interface Options {
   out: string;
   name: string;
   report?: string;
+  /** Play only this slice of each run's games (1-based index). */
+  shard?: Shard;
+}
+
+export interface Shard {
+  index: number;
+  count: number;
+}
+
+/** `K/N` with 1 ≤ K ≤ N. */
+function shardOf(text: string): Shard {
+  const m = /^(\d+)\/(\d+)$/.exec(text);
+  const index = Number(m?.[1]);
+  const count = Number(m?.[2]);
+  if (!m || count < 1 || index < 1 || index > count) {
+    throw new Error(`--shard needs K/N with 1 ≤ K ≤ N, not ${JSON.stringify(text)}`);
+  }
+  return { index, count };
 }
 
 const whole = (flag: string, text: string): number => {
@@ -67,6 +88,7 @@ export function options(argv: string[], cores: number): Options {
       out: { type: 'string', default: 'docs/fairness' },
       name: { type: 'string' },
       report: { type: 'string' },
+      shard: { type: 'string' },
     },
   });
   const overrides: Record<string, unknown> = {};
@@ -94,11 +116,12 @@ export function options(argv: string[], cores: number): Options {
     out: v.out,
     name: v.name ?? v.ruleset,
     ...(v.report === undefined ? {} : { report: v.report }),
+    ...(v.shard === undefined ? {} : { shard: shardOf(v.shard) }),
   };
 }
 
 /** The repository root: the nearest directory up from `from` that holds rules/parameters.json. */
-function repoRoot(from: string): string {
+export function repoRoot(from: string): string {
   for (let dir = from; ; dir = dirname(dir)) {
     if (existsSync(join(dir, 'rules/parameters.json'))) return dir;
     if (dirname(dir) === dir) throw new Error(`No rules/parameters.json above ${from}`);
@@ -114,19 +137,33 @@ function rebuild(file: string): void {
   console.error(`Verdict: ${report.verdict}. Rebuilt ${file} and its .md`);
 }
 
-async function main(): Promise<void> {
-  const o = options(process.argv.slice(2), availableParallelism());
-  const cwd = process.env['INIT_CWD'] ?? process.cwd();
-  if (o.report !== undefined) return rebuild(resolve(cwd, o.report));
-  const root = repoRoot(cwd);
-  const source = loadSource(root);
-  const { rules, ruleset } = rulesFor(source, o.ruleset, o.overrides);
+export type PlannedJob = Job & {
+  combination: string;
+  own: Record<string, unknown>;
+  depth: number;
+};
 
+export interface Plan {
+  ruleset: { id: string; version: string };
+  jobs: PlannedJob[];
+  skipped: Skipped[];
+}
+
+/**
+ * The runs to play: one per combination (the ruleset as it is, or the sweep) and depth, each with
+ * its seeds, base seed + i for game i. A shard keeps game i when i mod N is K − 1, so long and
+ * short games spread evenly and the N shards together play every game once.
+ */
+export function planJobs(o: Options, source: RulesSource): Plan {
+  const { rules, ruleset } = rulesFor(source, o.ruleset, o.overrides);
   const combos: Combination[] = o.sweep
     ? combinations(source.registry, rules.values)
     : [{ id: 'default', overrides: {} }];
   const skipped: Skipped[] = [];
-  const jobs: (Job & { combination: string; own: Record<string, unknown>; depth: number })[] = [];
+  const jobs: PlannedJob[] = [];
+  const seeds = Array.from({ length: o.games }, (_, i) => o.seed + i).filter(
+    (_, i) => !o.shard || i % o.shard.count === o.shard.index - 1,
+  );
   for (const c of combos) {
     const overrides = { ...o.overrides, ...c.overrides };
     const why = playable(source, o.ruleset, overrides);
@@ -147,29 +184,62 @@ async function main(): Promise<void> {
           openingPlies: MEASURES.openingPlies,
           maxPlies: MEASURES.maxPlies,
         },
-        seeds: Array.from({ length: o.games }, (_, i) => o.seed + i),
+        seeds,
       });
     }
   }
+  return { ruleset, jobs, skipped };
+}
+
+/** Each run's summary of the games played so far, in seed order. */
+export function runReports(
+  o: Pick<Options, 'nodes' | 'seed'>,
+  plan: Plan,
+  games: GameSummary[][],
+  ms: number[],
+): RunReport[] {
+  return plan.jobs.map((j, i) => ({
+    combination: j.combination,
+    overrides: j.own,
+    depth: j.depth,
+    nodes: o.nodes,
+    seed: o.seed,
+    seconds: Math.round(ms[i]! / 1000),
+    // Seed order, so a stopped run's summary doesn't depend on which worker finished first.
+    summary: summarize([...games[i]!].sort((a, b) => a.seed - b.seed)),
+  }));
+}
+
+async function main(): Promise<void> {
+  const o = options(process.argv.slice(2), availableParallelism());
+  const cwd = process.env['INIT_CWD'] ?? process.cwd();
+  if (o.report !== undefined) return rebuild(resolve(cwd, o.report));
+  const root = repoRoot(cwd);
+  const plan = planJobs(o, loadSource(root));
+  const { jobs, skipped } = plan;
 
   const games: GameSummary[][] = jobs.map(() => []);
   const ms: number[] = jobs.map(() => 0);
   const date = new Date().toISOString().slice(0, 10);
   const outDir = resolve(cwd, o.out);
   mkdirSync(outDir, { recursive: true });
+  const file = o.shard
+    ? `${o.name}.shard-${o.shard.index}-of-${o.shard.count}.json`
+    : `${o.name}.json`;
   const write = () => {
-    const runs: RunReport[] = jobs.map((j, i) => ({
-      combination: j.combination,
-      overrides: j.own,
-      depth: j.depth,
-      nodes: o.nodes,
-      seed: o.seed,
-      seconds: Math.round(ms[i]! / 1000),
-      // Seed order, so a stopped run's summary doesn't depend on which worker finished first.
-      summary: summarize([...games[i]!].sort((a, b) => a.seed - b.seed)),
-    }));
-    const report = buildReport(ruleset, date, runs, skipped, o.overrides);
-    writeFileSync(join(outDir, `${o.name}.json`), JSON.stringify(report, null, 2) + '\n');
+    if (o.shard) {
+      const shard = shardResult(o, plan, games, ms, date);
+      writeFileSync(join(outDir, file), JSON.stringify(shard, null, 2) + '\n');
+      return undefined;
+    }
+    const report = buildReport(
+      plan.ruleset,
+      date,
+      runReports(o, plan, games, ms),
+      skipped,
+      o.overrides,
+    );
+    writeFileSync(join(outDir, file), JSON.stringify(report, null, 2) + '\n');
     writeFileSync(join(outDir, `${o.name}.md`), toMarkdown(report));
     return report;
   };
@@ -178,7 +248,7 @@ async function main(): Promise<void> {
   let finished = 0;
   const started = Date.now();
   console.error(
-    `${total} games: ${jobs.length} runs on ${o.workers} workers; ${skipped.length} combinations skipped`,
+    `${total} games${o.shard ? ` (shard ${o.shard.index} of ${o.shard.count})` : ''}: ${jobs.length} runs on ${o.workers} workers; ${skipped.length} combinations skipped`,
   );
   const { done, stop } = runPool(
     new URL('./worker.js', import.meta.url),
@@ -189,7 +259,7 @@ async function main(): Promise<void> {
       games[p.job]!.push(p.game);
       ms[p.job]! += p.ms;
       finished++;
-      if (finished % 50 === 0 || finished === total) {
+      if (finished % 50 === 0 || finished === total || o.shard) {
         write();
         const elapsed = (Date.now() - started) / 1000;
         const left = (elapsed / finished) * (total - finished);
@@ -199,13 +269,20 @@ async function main(): Promise<void> {
       }
     },
   );
-  process.once('SIGINT', () => {
-    console.error('Stopping: writing the games played so far');
-    void stop();
-  });
+  // Ctrl-C, or a time limit (SIGTERM, or SIGINT from `timeout -s INT`), keeps the games played.
+  for (const signal of ['SIGINT', 'SIGTERM'] as const) {
+    process.once(signal, () => {
+      console.error('Stopping: writing the games played so far');
+      void stop();
+    });
+  }
   await done;
   const report = write();
-  console.error(`Verdict: ${report.verdict}. Wrote ${join(o.out, o.name)}.json and .md`);
+  console.error(
+    report
+      ? `Verdict: ${report.verdict}. Wrote ${join(o.out, o.name)}.json and .md`
+      : `Wrote ${join(o.out, file)} (${finished} games)`,
+  );
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

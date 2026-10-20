@@ -54,6 +54,12 @@ describe('from the start position', () => {
   it('reports the shallowest depth the search finished when the node budget runs out', () => {
     const game = playGame(rules, ruleset, { ...quick, depth: 3, nodes: 40, maxPlies: 2, seed: 9 });
     expect(game.minDepth).toBeLessThan(3);
+    expect(game.capped).toBe(2);
+  });
+
+  it('counts no move cut short when the budget is enough', () => {
+    const game = playGame(rules, ruleset, { ...quick, openingPlies: 2, maxPlies: 4, seed: 9 });
+    expect(game.capped).toBe(0);
   });
 });
 

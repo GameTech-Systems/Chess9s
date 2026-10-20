@@ -17,6 +17,7 @@ const summary = (over: Partial<RunSummary> = {}): RunSummary => ({
   distinct: 2000,
   unfinished: 0,
   minDepth: 1,
+  capped: 0,
   flags: [],
   pass: true,
   ...over,
@@ -101,5 +102,13 @@ describe('toMarkdown', () => {
     expect(md).toContain('| king.range=1 | 1 | 2000 | 60.0% |');
     expect(md).toContain('queen.pawnSwap=true');
     expect(md).toContain('not built yet: queen.pawnSwap');
+    expect(md).toContain('Moves the node budget cut short: 0.');
+  });
+
+  it('says when a report from before S35 did not count moves cut short', () => {
+    const { capped: _, ...old } = summary();
+    void _;
+    const r = buildReport(ruleset, '2026-10-20', [{ ...run(1), summary: old as RunSummary }], []);
+    expect(toMarkdown(r)).toContain('Moves the node budget cut short: not counted.');
   });
 });

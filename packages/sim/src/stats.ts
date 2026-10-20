@@ -20,6 +20,8 @@ export interface RunSummary {
   distinct: number;
   unfinished: number;
   minDepth: number;
+  /** Moves on which the node budget ran out (not counted in reports before S35). */
+  capped?: number;
   flags: string[];
   pass: boolean;
 }
@@ -88,6 +90,7 @@ export function summarize(games: GameSummary[], measures: Measures = MEASURES): 
     distinct: new Set(games.map((g) => g.key)).size,
     unfinished,
     minDepth: n === 0 ? 0 : Math.min(...games.map((g) => g.minDepth)),
+    capped: games.reduce((a, g) => a + g.capped, 0),
     flags,
     pass: flags.length === 0,
   };
