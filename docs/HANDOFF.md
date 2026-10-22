@@ -1,35 +1,30 @@
 # Handoff
 
-Updated 2026-10-20 by S25 (Sonnet 5.5 · medium). `/end-session` rewrites this file; keep it under 40 lines.
+Updated 2026-10-22 by S27 (Sonnet 5.5 · medium). `/end-session` rewrites this file; keep it under 40 lines.
 
 ## State
-- Phase 2. The web app has a phone layout (at 700px and narrower): status line and promotion choice above a full-width board, controls 44px tall, `touch-action: manipulation`, safe-area padding. Checked in Chromium with Pixel 7 emulation: touch play against the computer, no horizontal scroll, no errors.
-- The computer's search runs in a Web Worker (`bot.worker.ts`, `botClient.ts`; `computerReply` replays move notations). Without a Worker it searches on the page's thread. A reply took about 1 s on this machine. 1240 tests pass.
-- Not checked: a real phone, landscape phones (board is height-limited there), pinch zoom.
+- Phase 3. Repo side of the deploy is done, not live: `wrangler.jsonc` (Workers Static Assets, SPA fallback), `apps/web/public/_headers` (strict CSP, no unsafe-eval, `worker-src 'self'`, HSTS and others), `/privacy` page, error screen (boundary plus window fallback), "Suggest a variant" footer link, real title and description.
+- The web build has no Ajv: Vite swaps `schema-check.ts` for `schema-check.static.ts`; `pnpm build` runs `validate:rules` first. Web bundles: 94 kB gzip page, 71 kB worker. CI now runs `pnpm build` and `scripts/check-dist.mjs`.
+- Checked with `wrangler dev` on the built dist in Chromium, desktop and Pixel 7: a full game to checkmate against the computer through the Worker, no console or CSP errors, deep links return the app. 1248 tests pass.
 
-## Depth-2 run (owner)
-- Actions tab → **Sim depth 2** → Run workflow (defaults: 20 shards, 2000 games, draft-2p). About 1 to 2 hours of wall time. S26 waits on its `fairness-report-draft-2p` artifact; commit it to `docs/fairness/`.
+## Owner: connect Cloudflare (D41, provisional)
+- Workers & Pages → Create → Import a repository → GameTech-Systems/Chess9s, branch `main`. Project name `chess9s` (must match `wrangler.jsonc`).
+- Root directory: `/`. Build command: `pnpm install --frozen-lockfile && pnpm build`. Deploy command: `npx wrangler deploy`. Non-production branches: `npx wrangler versions upload`.
+- Then add chess9s.com as a custom domain on the Worker. Don't announce: S26 and S29 come first.
 
 ## Next session
-**S27 — Deploy** · Sonnet 5.5 · effort medium
-Why: S26 is an owner chat that needs the depth-2 report; S27 does not depend on it.
-Start with: `/start-session S27`
+S26 is an owner chat step. After the owner connects the repo and domain, the next Claude Code step is S28/S29 prep, only if the owner says so.
 
 ## Decisions in effect for the next step
-- D15: Cloudflare Workers with Static Assets (default). Decision 0009 (search, sharded runs). D1: pieces are unverified seeds.
+- D15 (applied) and D41 (provisional): see BUILD-PLAN. Decision 0009 (search, sharded runs).
 
 ## Open questions for the owner
-- Start the Sim depth 2 workflow. Default: 20 shards, 2000 games.
-- Ting Yang art (from S24): which image is the 2-player one, and should it go in `assets/`? Default: a placeholder.
-- Provisional from S22a: insufficient material, automatic repetition and fifty-move draws, en passant always on, `pawn.safeZones` meaning, Coast-only `coast.2p.exit/capturable`.
-- Earlier, still open:
-  - The computer's heuristics and 800 nodes (S23). Dark against the computer (S22).
-  - Danger indicator off, undo unlimited (S20). Keep `tail.2p.canCapture`.
-  - A closed Coast and Kings and Queens; the opener's Tail exception.
-  - 3-player check from A5; the Sun and Moon promotion targets, the Tetrahedron and the 3-player Tail.
+- Project contact address for the privacy page. Default: the placeholder `PROJECT_CONTACT_ADDRESS` (in `apps/web/src/links.ts`) stays.
+- TRADEMARKS.md and NOTICE name a person ("Duke Johnson") as rights holder. Left as is; confirm that is intended given the pen-name rule.
+- SECURITY.md claims and repo settings (S2, I1) were not touched; they are still off.
+- The favicon is still the empty `data:,` placeholder (no art was created). Which image?
+- Still open: Sim depth 2 run for S26; Ting Yang art; provisional S22a rules; earlier items in the S25 handoff (computer heuristics, undo, Coast, 3-player).
 
 ## Notes for Claude
-- `scripts/claude/ship.sh` opens and merges PRs (`gh pr` fails in cloud sessions).
-- The web bundle includes Ajv (130 kB gzip, `new Function`) and the worker bundle too (230 kB): a strict CSP needs a pre-resolved ruleset (S27), and the CSP must allow `worker-src 'self'`.
-- Playwright is at `/opt/node-tools/node_modules/playwright-core`, not in the repo; Chromium at `/opt/pw-browsers/chromium`.
-- `ci.yml` still uses v4 actions.
+- `scripts/claude/ship.sh` opens and merges PRs. Playwright: `/opt/node-tools/node_modules/playwright-core`; Chromium `/opt/pw-browsers/chromium`. `npx wrangler dev` serves the dist with `_headers` applied.
+- Wrangler is a root devDependency (MIT OR Apache-2.0). `ci.yml` still uses v4 actions.

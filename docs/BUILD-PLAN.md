@@ -135,8 +135,8 @@ Review the fairness evidence, settle the draft defaults, and publish the default
 
 ## Phase 3: Public launch
 
-### S27 — Deploy · Sonnet 5.5 · medium · `todo`
-Deploy the static app per D15 at chess9s.com, add a privacy policy page, an error screen instead of blank pages, and a "Suggest a variant" link to Discussions.
+### S27 — Deploy · Sonnet 5.5 · medium · `done`
+Deploy the static app per D15 at chess9s.com, add a privacy policy page, an error screen instead of blank pages, and a "Suggest a variant" link to Discussions. Built as the repo side only (`wrangler.jsonc`, `_headers`, strict CSP); the owner connects the repo and domain in the Cloudflare dashboard (settings in `docs/HANDOFF.md`). Not announced: S26 and S29 come first.
 
 ### S28 — Owner task (tracked privately) · `todo`
 
@@ -178,7 +178,8 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D12 | Fairness measures | Default: first-player score between 47% and 53% over at least 2,000 bot games at two search depths; draw rate and game length reported. Applied as decision 0008 v2 (depths 1 and 2) | S24 |
 | D13 | "Chess9s" wording in TRADEMARKS | Default: describe Chess9s as the domain and repository name | S4 |
 | D14 | Public wording of 3-player features | Decided: the owner published the full 3-player rules in rule set v0.2 | S4 |
-| D15 | Hosting | Default: Cloudflare (Workers with Static Assets); confirm terms at signup | S27 |
+| D15 | Hosting | Default, applied in S27: Cloudflare Workers with Static Assets (`wrangler.jsonc`); confirm terms at signup | S27 |
+| D41 | Deploys | Provisional: Cloudflare's Git connection (Workers Builds) deploys `main`; no Cloudflare token in GitHub and no deploy workflow | S27 |
 | D17 | ChessNines repo and site | Default: story, lore, and company information | S4 |
 | D18 | Multiplayer backend | Default: Cloudflare Durable Objects | S31 |
 | D20 | Discussion period before ratification | Default: 21 days | S30 |

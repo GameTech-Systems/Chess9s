@@ -1,10 +1,7 @@
 // Rules loader: validates the parameter registry and a ruleset against the
 // JSON Schemas in rules/schema/, then resolves every parameter for the
 // ruleset's player count. Pure: callers pass parsed JSON, nothing is read here.
-import Ajv2020 from 'ajv/dist/2020.js';
-import addFormats from 'ajv-formats';
-import parametersSchema from '../../../../rules/schema/parameters.schema.json';
-import rulesetSchema from '../../../../rules/schema/ruleset.schema.json';
+import { checkRegistrySchema, checkRulesetSchema, type SchemaCheck } from './schema-check';
 
 export type ParamValue = string | number | boolean | null | readonly (string | number | boolean)[];
 export type Status = 'proposed' | 'experimental' | 'candidate' | 'official' | 'deprecated';
@@ -61,12 +58,7 @@ export class RulesError extends Error {
   }
 }
 
-const ajv = new Ajv2020({ allErrors: true, strict: false });
-addFormats(ajv);
-const checkRegistrySchema = ajv.compile(parametersSchema);
-const checkRulesetSchema = ajv.compile(rulesetSchema);
-
-const schemaIssues = (errors: typeof checkRegistrySchema.errors): string[] =>
+const schemaIssues = (errors: SchemaCheck['errors']): string[] =>
   (errors ?? []).map((e) => `${e.instancePath || '/'} ${e.message ?? 'is invalid'}`);
 
 const isScalar = (v: unknown): v is string | number | boolean =>

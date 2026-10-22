@@ -1,6 +1,6 @@
 # Trademarks
 
-"Chess Nines" (and the shorthand "Chess9s") identifies this game and its official sites, **chess9s.com** and **chessnines.com**. The name and any logos are claimed as trademarks of Duke Johnson and successors and assigns. They are not yet registered, and registration may be sought later. The software license (see LICENSE) does **not** grant any right to use these marks.
+"Chess Nines" (and "Chess9s", the domain and repository name) identifies this game and its official sites, **chess9s.com** and **chessnines.com**. The name and any logos are claimed as trademarks of Duke Johnson and successors and assigns. They are not yet registered, and registration may be sought later. The software license (see LICENSE) does **not** grant any right to use these marks.
 
 ## You may
 
