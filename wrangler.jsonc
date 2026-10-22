@@ -1,0 +1,11 @@
+// Cloudflare Workers with Static Assets (decision 0003, D15). No Worker script: the built web app
+// is served as static files, and unknown paths (such as /privacy) fall back to index.html.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "chess9s",
+  "compatibility_date": "2026-10-22",
+  "assets": {
+    "directory": "./apps/web/dist",
+    "not_found_handling": "single-page-application",
+  },
+}

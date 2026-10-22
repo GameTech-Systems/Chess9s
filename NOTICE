@@ -26,7 +26,7 @@ are added.
 
 Development dependencies (MIT unless noted): TypeScript (Apache-2.0), Vite, Vitest,
 ESLint, typescript-eslint, Prettier, Ajv, ajv-formats, React, React DOM,
-@vitejs/plugin-react, and the @types packages for node, react, and react-dom.
+@vitejs/plugin-react, Wrangler (MIT OR Apache-2.0, deploy tooling only), and the @types packages for node, react, and react-dom.
 
 Sounds: the move knock and turn chime are generated in the browser with Web Audio
 (apps/web/src/game/aids.ts). They use no audio files and no third-party sound assets.

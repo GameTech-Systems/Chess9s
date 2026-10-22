@@ -3,10 +3,7 @@
 // declared square types and sides, parameter references, and setups that only
 // place known pieces. Pure: callers pass parsed JSON, nothing is read here.
 // Format: docs/decisions/0007-board-and-piece-formats.md.
-import Ajv2020 from 'ajv/dist/2020.js';
-import addFormats from 'ajv-formats';
-import boardSchema from '../../../../rules/schema/board.schema.json';
-import pieceSchema from '../../../../rules/schema/piece.schema.json';
+import { checkBoardSchema, checkPieceSchema, type SchemaCheck } from './schema-check';
 import { RulesError, validateRegistry, type Parameter, type Registry } from './loader';
 
 /** Setup key for pieces that belong to no side. */
@@ -152,12 +149,7 @@ export interface BoardAndPieces {
   pieces: Record<string, Piece>;
 }
 
-const ajv = new Ajv2020({ allErrors: true, strict: false });
-addFormats(ajv);
-const checkBoardSchema = ajv.compile(boardSchema);
-const checkPieceSchema = ajv.compile(pieceSchema);
-
-const schemaIssues = (errors: typeof checkBoardSchema.errors): string[] =>
+const schemaIssues = (errors: SchemaCheck['errors']): string[] =>
   (errors ?? []).map((e) => `${e.instancePath || '/'} ${e.message ?? 'is invalid'}`);
 
 const isRef = (v: unknown): v is ParamRef => typeof v === 'object' && v !== null && 'param' in v;
