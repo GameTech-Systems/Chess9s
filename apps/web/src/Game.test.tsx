@@ -74,7 +74,7 @@ describe('Rule picker', () => {
     const html = renderToStaticMarkup(<App />);
     expect(html).toContain('Choose a ruleset');
     expect(html).toContain('Draft 2-Player');
-    expect(html).toContain('data-status="proposed"');
+    expect(html).toContain('data-status="candidate"');
     expect(html).toContain('data-status="experimental"');
     expect(html).toMatch(/Not playable yet/);
     expect(html).toMatch(/<button[^>]*>Play<\/button>/);

@@ -1,7 +1,7 @@
 # rules/
 
 - `parameters.json`: the registry of every rule variable, with defaults and options.
-- `rulesets/`: named, versioned bundles of overrides. `draft-2p.json` is the working 2-player draft and `draft-3p.json` the experimental 3-player Dragon mode.
+- `rulesets/`: named, versioned bundles of overrides. `draft-2p.json` is the 2-player Candidate and `draft-3p.json` the experimental 3-player Dragon mode.
 - `boards/`: the board layout (`standard-9x9.json`). `pieces/`: one file per piece. Both are unverified seeds entered in S10.
 - `schema/`: JSON Schemas that validate all of them.
 

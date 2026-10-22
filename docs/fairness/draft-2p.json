@@ -22,7 +22,7 @@
     "openingPlies": 4,
     "maxPlies": 2000
   },
-  "verdict": "incomplete",
+  "verdict": "pass",
   "runs": [
     {
       "combination": "default",
@@ -71,40 +71,40 @@
       "depth": 2,
       "nodes": 100000,
       "seed": 1,
-      "seconds": 6781,
+      "seconds": 280101,
       "summary": {
-        "games": 29,
-        "firstWins": 11,
-        "secondWins": 7,
-        "draws": 11,
-        "score": 0.5689655172413793,
+        "games": 2000,
+        "firstWins": 648,
+        "secondWins": 678,
+        "draws": 674,
+        "score": 0.4925,
         "interval": [
-          0.3913338639897517,
-          0.7304628816012062
+          0.47062438594251055,
+          0.5144043708214971
         ],
-        "drawRate": 0.3793103448275862,
+        "drawRate": 0.337,
         "winsBySide": {
-          "dark": 11,
-          "light": 7
+          "dark": 648,
+          "light": 678
         },
         "results": {
-          "checkmate": 18,
-          "fifty-move": 11
+          "checkmate": 1326,
+          "fifty-move": 652,
+          "repetition": 16,
+          "insufficient-material": 6
         },
         "plies": {
-          "mean": 409.9655172413793,
-          "median": 378,
-          "min": 148,
-          "max": 1098
+          "mean": 389.2225,
+          "median": 360,
+          "min": 5,
+          "max": 1247
         },
-        "distinct": 29,
+        "distinct": 2000,
         "unfinished": 0,
         "minDepth": 1,
-        "flags": [
-          "score outside 47–53%",
-          "too few games"
-        ],
-        "pass": false
+        "capped": 0,
+        "flags": [],
+        "pass": true
       }
     }
   ],
