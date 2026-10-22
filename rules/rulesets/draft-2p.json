@@ -1,10 +1,10 @@
 {
   "$schema": "../schema/ruleset.schema.json",
   "id": "draft-2p",
-  "name": "Draft 2-Player (unratified)",
+  "name": "Draft 2-Player (Candidate)",
   "version": "0.2.0",
-  "status": "proposed",
+  "status": "candidate",
   "players": 2,
-  "description": "The owner's suggested default 2-player rules, draft v0.2 (docs/RULES.md). Plays every 2-player parameter at its default. Not yet fairness-checked, so not a Candidate and not official.",
+  "description": "The owner's suggested default 2-player rules, draft v0.2 (docs/RULES.md). Plays every 2-player parameter at its default. Fairness-checked (docs/fairness/draft-2p.md, decision 0010) and published as a Candidate for public discussion. Not official.",
   "overrides": {}
 }

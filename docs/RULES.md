@@ -1,6 +1,6 @@
 # Chess Nines rules (draft v0.2)
 
-This is the suggested default rule set for 2-player games (draft, ruleset `draft-2p` 0.2.0) and the experimental 3-player Dragon mode (ruleset `draft-3p` 0.2.0). It is **not official**. 2-player defaults become a Candidate only after the fairness check, and official tournament rules come only after public discussion and ratification ([Governance](GOVERNANCE.md)).
+This is the default rule set for 2-player games (ruleset `draft-2p` 0.2.0, a **Candidate** since the fairness check passed: [report](fairness/draft-2p.md), [decision 0010](decisions/0010-draft-2p-candidate.md)) and the experimental 3-player Dragon mode (ruleset `draft-3p` 0.2.0). It is **not official**. Official tournament rules come only after public discussion and ratification ([Governance](GOVERNANCE.md)).
 
 Every rule here is a parameter with a default and a list of options, so players can experiment. The data in [`rules/parameters.json`](../rules/parameters.json) and [`rules/rulesets/`](../rules/rulesets/) is what the engine reads; this page explains it. Where the two disagree, the data is a bug to report.
 
@@ -152,7 +152,7 @@ After a King checkmates the other King, the Dragon may play on against the winni
 
 ## Fairness testing
 
-The 2-player start is a mirror image across the void, so the only built-in edge is moving first. Bot self-play will check these risks before the default becomes a Candidate:
+The 2-player start is a mirror image across the void, so the only built-in edge is moving first. Bot self-play checked these risks before the default became a Candidate (first-player score 49.0% at depth 1 and 49.3% at depth 2, 2,000 games each):
 
 | Risk | Why it matters | Plan |
 |---|---|---|
