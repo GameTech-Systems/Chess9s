@@ -1,0 +1,73 @@
+{
+  "ruleset": {
+    "id": "easy-2p",
+    "version": "0.1.0"
+  },
+  "overrides": {},
+  "date": "2026-10-25",
+  "decision": "0008",
+  "measures": {
+    "decision": "0008",
+    "version": 2,
+    "band": {
+      "min": 0.47,
+      "max": 0.53
+    },
+    "minGames": 2000,
+    "depths": [
+      1,
+      2
+    ],
+    "nodes": 100000,
+    "openingPlies": 4,
+    "maxPlies": 2000
+  },
+  "verdict": "incomplete",
+  "runs": [
+    {
+      "combination": "default",
+      "overrides": {},
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 192,
+      "summary": {
+        "games": 100,
+        "firstWins": 44,
+        "secondWins": 22,
+        "draws": 34,
+        "score": 0.61,
+        "interval": [
+          0.5120283616749817,
+          0.699832780680298
+        ],
+        "drawRate": 0.34,
+        "winsBySide": {
+          "dark": 22,
+          "light": 44
+        },
+        "results": {
+          "repetition": 34,
+          "checkmate": 66
+        },
+        "plies": {
+          "mean": 130.84,
+          "median": 113,
+          "min": 7,
+          "max": 389
+        },
+        "distinct": 100,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    }
+  ],
+  "flagged": [],
+  "skipped": []
+}
