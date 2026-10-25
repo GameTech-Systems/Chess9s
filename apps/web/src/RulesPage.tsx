@@ -1,6 +1,5 @@
 import { boardData } from './board/data';
 import { pawnColor } from './board/view';
-import { formatValue } from './game/format';
 import {
   findRuleset,
   listRulesets,
@@ -11,29 +10,28 @@ import {
 import { HOW_TO_PLAY } from './Rules';
 import { RULES_DOC_URL, rulesPath, rulesetDataUrl } from './links';
 
-/** Settings grouped by what they are about, from the parameter id's first part. */
-const GROUPS: { title: string; prefixes: string[] }[] = [
-  { title: 'King', prefixes: ['king', 'castling'] },
-  { title: 'Queen', prefixes: ['queen'] },
-  { title: 'Pawns', prefixes: ['pawn'] },
-  { title: 'Center square (e5)', prefixes: ['center'] },
-  { title: 'Coast', prefixes: ['coast', 'coastPieces'] },
-  { title: 'Dragon Tail', prefixes: ['tail'] },
-  { title: 'Dragon Heads', prefixes: ['dragonHead', 'dragon'] },
-  { title: 'Sun and Moon', prefixes: ['sunMoon'] },
-  { title: 'Turns and draws', prefixes: ['turn', 'draw'] },
-  { title: 'Setup and other', prefixes: [] },
+/** The registry's groups, in the order the page lists them. */
+const GROUP_ORDER = [
+  'King',
+  'Queen',
+  'Pawns',
+  'Center',
+  'Coast',
+  'Dragon Tail',
+  'Dragon Heads',
+  'Sun and Moon',
+  'Turns and draws',
+  'Setup',
 ];
 
+/** Settings grouped by the registry's `group`, registry order inside each group. */
 function grouped(settings: Setting[]): { title: string; settings: Setting[] }[] {
-  const prefixOf = (id: string) => id.split('.')[0]!;
-  const known = new Set(GROUPS.flatMap((g) => g.prefixes));
-  return GROUPS.map((g) => ({
-    title: g.title,
-    settings: settings.filter((s) =>
-      g.prefixes.length > 0 ? g.prefixes.includes(prefixOf(s.id)) : !known.has(prefixOf(s.id)),
-    ),
-  })).filter((g) => g.settings.length > 0);
+  const titles = [...GROUP_ORDER, ...new Set(settings.map((s) => s.group))].filter(
+    (t, i, all) => all.indexOf(t) === i,
+  );
+  return titles
+    .map((title) => ({ title, settings: settings.filter((s) => s.group === title) }))
+    .filter((g) => g.settings.length > 0);
 }
 
 function Swatch({ color }: { color?: string | undefined }) {
@@ -182,8 +180,8 @@ export function RulesPage({
           <ul>
             {changed.map((s) => (
               <li key={s.id}>
-                <strong>{s.label}</strong>: {formatValue(s.value)}{' '}
-                <span className="meta">(default {formatValue(s.defaultValue)})</span>
+                <strong>{s.label}</strong>: {s.valueLabel}{' '}
+                <span className="meta">(default {s.defaultLabel})</span>
               </li>
             ))}
           </ul>
@@ -220,11 +218,9 @@ export function RulesPage({
                 >
                   <dt>{s.label}</dt>
                   <dd className="value">
-                    <code>{formatValue(s.value)}</code>
+                    <span className="value-label">{s.valueLabel}</span>
                     {s.changed && (
-                      <span className="changed-tag">
-                        changed · default {formatValue(s.defaultValue)}
-                      </span>
+                      <span className="changed-tag">changed · default {s.defaultLabel}</span>
                     )}
                   </dd>
                   {s.description && <dd className="desc">{s.description}</dd>}

@@ -30,6 +30,24 @@
         "type": { "enum": ["integer", "boolean", "enum", "enumSet"] },
         "default": {},
         "options": { "type": "array", "minItems": 1 },
+        "group": {
+          "enum": [
+            "King",
+            "Queen",
+            "Pawns",
+            "Center",
+            "Coast",
+            "Dragon Tail",
+            "Dragon Heads",
+            "Sun and Moon",
+            "Turns and draws",
+            "Setup"
+          ]
+        },
+        "optionLabels": {
+          "type": "object",
+          "additionalProperties": { "type": "string", "minLength": 1 }
+        },
         "status": { "enum": ["proposed", "experimental", "candidate", "official", "deprecated"] },
         "affects": { "type": "array", "items": { "type": "string" } },
         "needsDecision": { "type": "boolean" },

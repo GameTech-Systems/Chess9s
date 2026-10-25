@@ -90,9 +90,23 @@ export interface Setting {
   /** The registry's default (rules/parameters.json). */
   defaultValue: ParamValue;
   options: (string | number | boolean)[];
+  /** The registry group it is listed under. */
+  group: string;
+  /** The value as players read it, from the registry's option labels. */
+  valueLabel: string;
+  /** The default as players read it. */
+  defaultLabel: string;
   /** The ruleset sets a value other than the registry default. */
   changed: boolean;
   notes?: string | undefined;
+}
+
+/** One value as players read it: its option label, a list for sets, "Not set" for null. */
+function labelOf(p: Registry['parameters'][number], value: ParamValue | undefined): string {
+  if (value === null || value === undefined) return 'Not set';
+  const name = (v: string | number | boolean) => p.optionLabels?.[String(v)] ?? String(v);
+  if (Array.isArray(value)) return value.length === 0 ? 'None' : value.map(name).join(', ');
+  return name(value as string | number | boolean);
 }
 
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
@@ -115,6 +129,9 @@ export function rulesetSettings(id: string): Setting[] {
       value: values[p.id] ?? null,
       defaultValue: p.default,
       options: p.options,
+      group: p.group ?? 'Other',
+      valueLabel: labelOf(p, values[p.id]),
+      defaultLabel: labelOf(p, p.default),
       changed: !same(values[p.id], p.default),
       notes: p.notes,
     }));

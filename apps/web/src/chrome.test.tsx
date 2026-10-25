@@ -56,6 +56,17 @@ describe('pages', () => {
     expect(html).toContain('>Play Standard<');
   });
 
+  it('the rules page shows option labels, not raw values, under the registry groups', () => {
+    const html = renderToStaticMarkup(<App path="/rules/standard-2p" />);
+    expect(html).toContain('>1 square<');
+    expect(html).toContain('default 2 squares');
+    expect(html).toContain('A5, E5 and I5');
+    expect(html).not.toContain('<code>a5-e5-i5</code>');
+    for (const g of ['King', 'Queen', 'Pawns', 'Center', 'Coast', 'Dragon Tail', 'Setup']) {
+      expect(html).toContain(`<h4>${g}</h4>`);
+    }
+  });
+
   it('the rules page for an unknown ruleset says so and lists the real ones', () => {
     const html = renderToStaticMarkup(<App path="/rules/nope" />);
     expect(html).toContain('No ruleset called');

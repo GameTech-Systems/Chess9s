@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { formatValue } from './game/format';
 import { rulesetSettings, type RulesetInfo } from './game/rules';
 import { RULES_DOC_URL, rulesPath } from './links';
 
@@ -98,8 +97,8 @@ export function RulesScreen({
           <ul>
             {changed.map((s) => (
               <li key={s.id}>
-                <strong>{s.label}</strong>: {formatValue(s.value)}{' '}
-                <span className="meta">(default {formatValue(s.defaultValue)})</span>
+                <strong>{s.label}</strong>: {s.valueLabel}{' '}
+                <span className="meta">(default {s.defaultLabel})</span>
               </li>
             ))}
           </ul>

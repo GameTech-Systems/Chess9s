@@ -15,6 +15,10 @@ export interface Parameter {
   type: 'integer' | 'boolean' | 'enum' | 'enumSet';
   default: ParamValue;
   options: (string | number | boolean)[];
+  /** Where players find it (presentation only). */
+  group?: string;
+  /** A short player-facing label per option, keyed by String(option) (presentation only). */
+  optionLabels?: Record<string, string>;
   status: Status;
   affects?: string[];
   needsDecision?: boolean;
