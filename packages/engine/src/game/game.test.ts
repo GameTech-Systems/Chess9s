@@ -108,6 +108,26 @@ describe('the Coast', () => {
     expect(g.legal.some((m) => m.from === 'a8')).toBe(true);
   });
 
+  it('is open from the start with coast.openToAll = true (D44): Coast pieces move on the first turn', () => {
+    const g = newGame(rulesFor(2, { 'coast.openToAll': true }), ID);
+    expect(g.coastOpen).toBe(true);
+    expect(g.legal.some((m) => m.from === 'a8')).toBe(true);
+  });
+
+  it('keeps a pawn off a closed Coast under pawn.canEnterCoast, and lets it capture there once open (D45)', () => {
+    const position: Position = {
+      f9: king('dark'),
+      f1: king('light'),
+      b3: { piece: 'pawn', side: 'light', moved: true },
+      a4: { piece: 'rook', side: 'dark', moved: true },
+    };
+    const rules = rulesFor(2, { 'pawn.canEnterCoast': true });
+    const closed = newGame(rules, ID, { position, turn: 'light' });
+    expect(notations(closed)).not.toContain('b3xa4');
+    const open = newGame(rules, ID, { position, turn: 'light', coastOpen: true });
+    expect(notations(open)).toContain('b3xa4');
+  });
+
   it('gives no check from the Coast while closed (owner, 19 Oct 2026)', () => {
     const position: Position = {
       f9: king('dark'),

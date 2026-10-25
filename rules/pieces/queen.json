@@ -29,11 +29,12 @@
     {
       "type": "void",
       "stop": {
-        "param": "queen.canEnterVoid"
+        "param": "queen.canStandOnVoid"
       },
       "pass": {
-        "param": "queen.canEnterVoid"
-      }
+        "param": "queen.canCrossVoid"
+      },
+      "notes": "queen.canStandOnVoid and queen.canCrossVoid replace queen.canEnterVoid (S40)."
     },
     {
       "type": "coast",
@@ -42,7 +43,12 @@
       },
       "pass": {
         "param": "queen.canEnterCoast"
-      }
+      },
+      "when": {
+        "param": "coast.openToAll",
+        "is": false
+      },
+      "notes": "coast.openToAll lifts this bar (S40)."
     },
     {
       "type": "center",
@@ -92,6 +98,6 @@
       }
     }
   ],
-  "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026. S14 (19 Oct 2026): split the moves so that rank 5 does not cross e5, as docs/RULES.md says.",
+  "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026. S14 (19 Oct 2026): split the moves so that rank 5 does not cross e5, as docs/RULES.md says. S40 (24 Oct 2026): the void rule reads queen.canStandOnVoid and queen.canCrossVoid; coast.openToAll lifts her Coast setting.",
   "notes": "Not expressed yet (engine features): the swap with her green pawn (queen.pawnSwap). Reading of queen.voidCrossings e5-only and none: a5 and i5 are closed to her, for stopping and crossing."
 }

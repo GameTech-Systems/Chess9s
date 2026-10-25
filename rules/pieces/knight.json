@@ -19,7 +19,12 @@
     {
       "type": "coast",
       "stop": false,
-      "pass": false
+      "pass": false,
+      "when": {
+        "param": "coast.openToAll",
+        "is": false
+      },
+      "notes": "coast.openToAll lifts this bar (S40)."
     },
     {
       "type": "center",
@@ -33,6 +38,6 @@
       }
     }
   ],
-  "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026.",
+  "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026. S40 (24 Oct 2026): coast.openToAll lifts the Coast bar.",
   "notes": "A Knight's jump crosses no squares, so center.passThrough has no effect on it (decision 0007)."
 }

@@ -664,6 +664,113 @@
       "expected": ["c3-b1", "c3-b5", "c3-d1", "c3-d5", "c3-e2", "c3-e4"]
     },
     {
+      "name": "coast.openToAll true: king enters the Coast even with king.canEnterCoast false",
+      "players": 2,
+      "side": "light",
+      "from": "c3",
+      "pieces": {
+        "c3": {
+          "piece": "king",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "king.canEnterCoast": false,
+        "coast.openToAll": true
+      },
+      "expected": [
+        "c3-a1",
+        "c3-a3",
+        "c3-a5",
+        "c3-b2",
+        "c3-b3",
+        "c3-b4",
+        "c3-c1",
+        "c3-c2",
+        "c3-c4",
+        "c3-c5",
+        "c3-d2",
+        "c3-d3",
+        "c3-d4",
+        "c3-e1",
+        "c3-e3"
+      ]
+    },
+    {
+      "name": "coast.openToAll true: rook captures a piece on the Coast",
+      "players": 2,
+      "side": "light",
+      "from": "c3",
+      "pieces": {
+        "c3": {
+          "piece": "rook",
+          "side": "light",
+          "moved": true
+        },
+        "a3": {
+          "piece": "queen",
+          "side": "dark",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "coast.openToAll": true
+      },
+      "expected": [
+        "c3-b3",
+        "c3-c1",
+        "c3-c2",
+        "c3-c4",
+        "c3-c5",
+        "c3-c6",
+        "c3-c7",
+        "c3-c8",
+        "c3-c9",
+        "c3-d3",
+        "c3-e3",
+        "c3-f3",
+        "c3-g3",
+        "c3-h3",
+        "c3-i3",
+        "c3xa3"
+      ]
+    },
+    {
+      "name": "coast.openToAll true: bishop reaches a1 and a5",
+      "players": 2,
+      "side": "light",
+      "from": "c3",
+      "pieces": {
+        "c3": {
+          "piece": "bishop",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "coast.openToAll": true
+      },
+      "expected": ["c3-a1", "c3-a5", "c3-b2", "c3-b4", "c3-d2", "c3-d4", "c3-e1"]
+    },
+    {
+      "name": "coast.openToAll true: knight lands on a2 and a4",
+      "players": 2,
+      "side": "light",
+      "from": "c3",
+      "pieces": {
+        "c3": {
+          "piece": "knight",
+          "side": "light",
+          "moved": true
+        }
+      },
+      "overrides": {
+        "coast.openToAll": true
+      },
+      "expected": ["c3-a2", "c3-a4", "c3-b1", "c3-b5", "c3-d1", "c3-d5", "c3-e2", "c3-e4"]
+    },
+    {
       "name": "knight in a corner region",
       "players": 2,
       "side": "light",

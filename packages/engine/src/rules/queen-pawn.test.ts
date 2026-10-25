@@ -89,10 +89,13 @@ describe('promotion to a lost piece (pawn.promotion.targets captured-piece)', ()
 
 describe('fixture coverage', () => {
   const read = [
-    'queen.canEnterVoid',
+    'queen.canCrossVoid',
+    'queen.canStandOnVoid',
     'queen.canEnterCoast',
     'queen.voidCrossings',
     'pawn.canEnterCenter',
+    'pawn.canEnterCoast',
+    'coast.openToAll',
     'pawn.initialDoubleStep',
     'pawn.promotion.targets',
     'center.occupants',
@@ -192,11 +195,14 @@ describe('every parameter of this batch, at every option, from the start positio
   it.each([2, 3] as const)('generates for %i players', (players) => {
     const sides = players === 2 ? ['light', 'dark'] : ['light', 'dark', 'dragon'];
     for (const [id, option] of [
-      ['queen.canEnterVoid', true],
+      ['queen.canCrossVoid', true],
+      ['queen.canStandOnVoid', true],
       ['queen.canEnterCoast', false],
       ['queen.voidCrossings', 'e5-only'],
       ['queen.voidCrossings', 'none'],
       ['pawn.canEnterCenter', true],
+      ['pawn.canEnterCoast', true],
+      ['coast.openToAll', true],
       ['pawn.initialDoubleStep', false],
       ['pawn.promotion.targets', ['captured-piece']],
       ['pawn.promotion.targets', ['queen', 'captured-piece']],

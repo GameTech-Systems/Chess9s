@@ -52,7 +52,20 @@
     {
       "type": "coast",
       "stop": false,
-      "pass": false
+      "pass": false,
+      "when": {
+        "all": [
+          {
+            "param": "pawn.canEnterCoast",
+            "is": false
+          },
+          {
+            "param": "coast.openToAll",
+            "is": false
+          }
+        ]
+      },
+      "notes": "pawn.canEnterCoast and coast.openToAll lift this bar (S40). A pawn moves straight forward, so it reaches file A only by capturing onto it (D45); a closed Coast is game state."
     },
     {
       "type": "center",
@@ -103,6 +116,6 @@
       "notes": "Provisional (S22a): any colored square on the opponent's half, after crossing the void as in the default."
     }
   ],
-  "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026.",
+  "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026. S40 (24 Oct 2026): pawn.canEnterCoast and coast.openToAll lift the Coast bar.",
   "notes": "Each pawn is named by its starting file's color (docs/RULES.md); the engine keeps the square each piece started on (home), so there is one pawn piece. En passant is always on, as in chess (no parameter yet: S22a question). irreversible: a pawn move restarts the fifty-move count, as in chess."
 }

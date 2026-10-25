@@ -47,7 +47,9 @@ describe('the rules the game plays', () => {
     expect(easy['king.range']).toBe(1);
     expect(easy['castling.enabled']).toBe(true);
     expect(easy['pawn.safeZones']).toBe('off');
-    expect(easy['queen.canEnterVoid']).toBe(true);
+    expect(easy['queen.canCrossVoid']).toBe(true);
+    expect(easy['queen.canStandOnVoid']).toBe(true);
+    expect(easy['queen.canEnterVoid']).toBeUndefined();
     const info = listRulesets().find((r) => r.id === 'easy-2p')!;
     const { game } = newModel(createRules('easy-2p'), info);
     expect(game.turn).toBe('light');

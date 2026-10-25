@@ -90,6 +90,22 @@ describe('playable', () => {
     expect(playable(source, 'draft-2p', { 'king.range': 9 })).toMatch(/king\.range/);
   });
 
+  it('sweeps the S40 piece options, each playable, and no longer queen.canEnterVoid', () => {
+    const { values } = rulesFor(source, 'standard-2p').rules;
+    const ids = combinations(source.registry, values).map((c) => c.id);
+    const added = [
+      'queen.canCrossVoid=true',
+      'queen.canStandOnVoid=true',
+      'pawn.canEnterCoast=true',
+      'coast.openToAll=true',
+    ];
+    for (const id of added) expect(ids).toContain(id);
+    expect(ids.filter((id) => id.startsWith('queen.canEnterVoid'))).toEqual([]);
+    for (const c of combinations(source.registry, values).filter((x) => added.includes(x.id))) {
+      expect(playable(source, 'standard-2p', c.overrides), c.id).toBeUndefined();
+    }
+  });
+
   it('every real combination is either playable or skipped with a reason', () => {
     const { values } = rulesFor(source, 'draft-2p').rules;
     const all = combinations(source.registry, values);
