@@ -71,10 +71,28 @@ describe('pages', () => {
       'no network requests',
       'chess9s.guest',
       'Cloudflare',
+      'children',
+      'Do Not Track',
+      'Last updated',
     ]) {
       expect(html).toContain(fact);
     }
-    expect(html).toContain(CONTACT_ADDRESS);
+  });
+
+  it('privacy page gives a working way to ask, never a placeholder', () => {
+    const html = renderToStaticMarkup(<App path="/privacy" />);
+    expect(html).not.toContain('PROJECT_CONTACT_ADDRESS');
+    if (CONTACT_ADDRESS) expect(html).toContain(`href="mailto:${CONTACT_ADDRESS}"`);
+    else expect(html).toMatch(new RegExp(`Questions:[\\s\\S]*?href="${DISCUSSIONS_URL}"`));
+  });
+
+  it('every page carries the copyright and trademark notice and links to the licenses', () => {
+    for (const path of ['/', '/privacy', '/rules/standard-2p']) {
+      const html = renderToStaticMarkup(<App path={path} />);
+      expect(html).toContain('Chess Nines™');
+      expect(html).toMatch(/© 2026 Duke Johnson/);
+      expect(html).toContain('href="/third-party-licenses.txt"');
+    }
   });
 
   it('every page links to Suggest a variant', () => {

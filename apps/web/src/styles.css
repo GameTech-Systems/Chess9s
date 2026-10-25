@@ -659,8 +659,24 @@ a:hover {
 }
 
 .site-footer {
+  max-width: 40rem;
   font-size: 0.85rem;
+  text-align: center;
   opacity: 0.8;
+}
+
+.site-footer .legal {
+  display: block;
+  margin-top: 0.4rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.masthead .tm {
+  margin-left: 0.08em;
+  font-size: 0.38em;
+  letter-spacing: 0;
+  vertical-align: super;
 }
 
 .prose {
