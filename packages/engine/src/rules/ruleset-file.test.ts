@@ -37,7 +37,8 @@ describe('readRulesetFile', () => {
   });
 
   it('reads a file with no version as 1.0.0', () => {
-    const { version: _, ...rest } = good;
+    const rest: Partial<typeof good> = { ...good };
+    delete rest.version;
     const r = read(rest);
     expect(r.ok && r.version).toBe('1.0.0');
   });
