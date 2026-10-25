@@ -45,9 +45,10 @@ export const fromGame = (game: GameState): Model => ({
 
 export function newModel(
   rules: MoveRules = createRules(),
-  info: Pick<RulesetInfo, 'id' | 'version'> = ruleset,
+  info: Pick<RulesetInfo, 'id' | 'version' | 'overrides'> = ruleset,
 ): Model {
-  return fromGame(newGame(rules, { id: info.id, version: info.version }));
+  const { id, version, overrides } = info;
+  return fromGame(newGame(rules, { id, version, ...(overrides && { overrides }) }));
 }
 
 const movesFrom = (game: GameState, from: string): GeneratedMove[] =>

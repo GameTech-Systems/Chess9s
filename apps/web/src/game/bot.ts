@@ -5,7 +5,7 @@ import {
   type GameState,
   type GeneratedMove,
 } from '@chess9s/engine';
-import { createRules, listRulesets } from './rules';
+import { createRulesFor, listRulesets, type RulesetInfo } from './rules';
 import { newModel } from './session';
 
 /** Positions the computer plays out per move: about half a second in a desktop browser. */
@@ -24,19 +24,22 @@ export function computerMove(
 }
 
 /**
- * The computer's reply from a ruleset id and the moves played so far (notations), as the Web Worker
- * gets them: a game state does not travel between threads, so the worker replays the moves itself.
- * Undefined when the ruleset is unknown, a move does not replay, or the game has no move.
+ * The computer's reply from a ruleset reference and the moves played so far (notations), as the Web
+ * Worker gets them: a game state does not travel between threads, so the worker replays the moves
+ * itself. A custom ruleset arrives with its overrides; a bundled one is found by id. Undefined when
+ * the ruleset is unknown, a move does not replay, or the game has no move.
  */
 export function computerReply(
-  rulesetId: string,
+  ref: Pick<RulesetInfo, 'id' | 'version' | 'overrides'>,
   notations: string[],
   random: () => number = Math.random,
   nodes: number = BOT_NODES,
 ): string | undefined {
-  const info = listRulesets().find((r) => r.id === rulesetId);
+  const info = ref.overrides
+    ? { ...ref, name: ref.id }
+    : listRulesets().find((r) => r.id === ref.id);
   if (!info) return undefined;
-  let { game } = newModel(createRules(info.id), info);
+  let { game } = newModel(createRulesFor(info), info);
   for (const notation of notations) {
     const move = game.legal.find((m) => toNotation(m) === notation);
     if (!move) return undefined;

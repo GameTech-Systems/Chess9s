@@ -36,7 +36,40 @@ export interface RulesetInfo {
   playable: boolean;
   /** The ruleset a new game starts on. */
   isDefault: boolean;
+  /** A ruleset a player built, kept in their browser (not in rules/rulesets/). */
+  custom?: true;
+  /** A custom ruleset's full overrides: every value that differs from the registry default. */
+  overrides?: Record<string, ParamValue>;
 }
+
+/** What is saved of a player's custom ruleset (S41). Its status is always `proposed`. */
+export interface CustomRuleset {
+  id: string;
+  name: string;
+  /** The preset it was started from (for the "what differs" list only). */
+  base: string;
+  overrides: Record<string, ParamValue>;
+}
+
+/** Custom rulesets have no versions of their own: a changed ruleset has different overrides. */
+export const CUSTOM_VERSION = '1.0.0';
+
+const customFile = (c: Pick<CustomRuleset, 'id' | 'name' | 'overrides'>): Ruleset => ({
+  id: c.id,
+  name: c.name,
+  version: CUSTOM_VERSION,
+  status: 'proposed',
+  players: 2,
+  description: 'A ruleset built by the player. Not fairness-checked; not a tournament ruleset.',
+  overrides: c.overrides,
+});
+
+/** The picker's and the game's view of a custom ruleset. */
+export const customInfo = (c: Pick<CustomRuleset, 'id' | 'name' | 'overrides'>): RulesetInfo => ({
+  ...infoOf(customFile(c)),
+  custom: true,
+  overrides: { ...c.overrides },
+});
 
 const infoOf = (r: Ruleset): RulesetInfo => ({
   id: r.id,
@@ -71,13 +104,43 @@ export function findRuleset(id: string): RulesetInfo | undefined {
 /** The default ruleset, as recorded with a game. */
 export const ruleset: RulesetInfo = infoOf(files.find((r) => r.id === DEFAULT_RULESET_ID)!);
 
+function rulesOf(file: Ruleset): MoveRules {
+  const resolved = resolveRuleset(registry, file);
+  const set = validateBoardAndPieces(board, Object.values(pieceFiles), registry as Registry);
+  return { ...set, values: resolved.values, players: 2 };
+}
+
 export function createRules(id: string = DEFAULT_RULESET_ID): MoveRules {
   const file = files.find((r) => r.id === id);
   if (!file) throw new Error(`Unknown ruleset: ${id}`);
   if (!infoOf(file).playable) throw new Error(`Ruleset ${id} is not playable yet`);
-  const resolved = resolveRuleset(registry, file);
-  const set = validateBoardAndPieces(board, Object.values(pieceFiles), registry as Registry);
-  return { ...set, values: resolved.values, players: 2 };
+  return rulesOf(file);
+}
+
+/** The rules of a ruleset as the game records it: a bundled id, or a custom ruleset's overrides. */
+export function createRulesFor(ref: Pick<RulesetInfo, 'id' | 'name' | 'overrides'>): MoveRules {
+  return ref.overrides ? rulesOf(customFile({ ...ref, overrides: ref.overrides })) : createRules(ref.id);
+}
+
+/** Every value of a bundled ruleset, resolved. */
+export function rulesetValues(id: string): Record<string, ParamValue> {
+  const file = files.find((r) => r.id === id);
+  if (!file) throw new Error(`Unknown ruleset: ${id}`);
+  return resolveRuleset(registry, file).values;
+}
+
+/** The values a custom ruleset plays: the registry defaults with its overrides. */
+export const customValues = (c: Pick<CustomRuleset, 'id' | 'name' | 'overrides'>) =>
+  resolveRuleset(registry, customFile(c)).values;
+
+/** The registry defaults that the given values differ from: a custom ruleset's overrides. */
+export function overridesOf(values: Record<string, ParamValue>): Record<string, ParamValue> {
+  const out: Record<string, ParamValue> = {};
+  for (const p of (registry as Registry).parameters) {
+    if (p.status === 'deprecated' || !p.players.includes(2) || !(p.id in values)) continue;
+    if (!same(values[p.id], p.default)) out[p.id] = values[p.id]!;
+  }
+  return out;
 }
 
 /** One parameter as a ruleset plays it, for the rules screen and page. */
@@ -98,6 +161,10 @@ export interface Setting {
   defaultLabel: string;
   /** The ruleset sets a value other than the registry default. */
   changed: boolean;
+  /** The parameter's option labels, keyed by String(option). */
+  optionLabels: Record<string, string>;
+  /** The systems it affects (docs/RULES-FRAMEWORK.md). */
+  affects: string[];
   notes?: string | undefined;
 }
 
@@ -109,18 +176,12 @@ function labelOf(p: Registry['parameters'][number], value: ParamValue | undefine
   return name(value as string | number | boolean);
 }
 
-const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
+export const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 
-/**
- * Every live parameter for the ruleset's player count, in registry order, with the value the
- * ruleset plays. Read from the data only.
- */
-export function rulesetSettings(id: string): Setting[] {
-  const file = files.find((r) => r.id === id);
-  if (!file) throw new Error(`Unknown ruleset: ${id}`);
-  const { values } = resolveRuleset(registry, file);
+/** Every live parameter for a player count, in registry order, with the given values. */
+export function settingsFor(values: Record<string, ParamValue>, players: 2 | 3 = 2): Setting[] {
   return (registry as Registry).parameters
-    .filter((p) => p.status !== 'deprecated' && p.players.includes(file.players))
+    .filter((p) => p.status !== 'deprecated' && p.players.includes(players))
     .map((p) => ({
       id: p.id,
       label: p.label,
@@ -133,6 +194,20 @@ export function rulesetSettings(id: string): Setting[] {
       valueLabel: labelOf(p, values[p.id]),
       defaultLabel: labelOf(p, p.default),
       changed: !same(values[p.id], p.default),
+      optionLabels: p.optionLabels ?? {},
+      affects: p.affects ?? [],
       notes: p.notes,
     }));
+}
+
+/**
+ * Every live parameter for the ruleset's player count, in registry order, with the value the
+ * ruleset plays. Read from the data only. A custom ruleset is given as its info.
+ */
+export function rulesetSettings(id: string | Pick<RulesetInfo, 'id' | 'name' | 'overrides'>): Setting[] {
+  if (typeof id !== 'string' && id.overrides) return settingsFor(customValues({ ...id, overrides: id.overrides }));
+  const key = typeof id === 'string' ? id : id.id;
+  const file = files.find((r) => r.id === key);
+  if (!file) throw new Error(`Unknown ruleset: ${key}`);
+  return settingsFor(resolveRuleset(registry, file).values, file.players);
 }

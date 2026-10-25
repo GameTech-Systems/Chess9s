@@ -1,9 +1,9 @@
 // Guest play: the game in progress is kept in the browser (no account). Only the ruleset id and
-// version, the mode and the moves are stored; a load replays them through the engine, so a saved
+// version (and a custom ruleset's full overrides), the mode and the moves are stored; a load replays them through the engine, so a saved
 // game can never hold an illegal position.
 import { playMove, toNotation, type GameState, type MoveRules } from '@chess9s/engine';
 import { newModel } from './session';
-import type { RulesetInfo } from './rules';
+import { same, type RulesetInfo } from './rules';
 
 export type Mode = 'hot-seat' | 'computer';
 
@@ -23,9 +23,12 @@ const KEY = 'chess9s.guest';
 
 export function saveGuest(store: Store, { game, mode }: Guest): void {
   try {
-    const { id, version } = game.ruleset;
+    const { id, version, overrides } = game.ruleset;
     const moves = game.moves.map((m) => m.notation);
-    store.setItem(KEY, JSON.stringify({ v: 1, ruleset: id, version, mode, moves }));
+    store.setItem(
+      KEY,
+      JSON.stringify({ v: 1, ruleset: id, version, ...(overrides && { overrides }), mode, moves }),
+    );
   } catch {
     // Storage blocked or full: the game goes on, just not kept.
   }
@@ -39,11 +42,14 @@ export function clearGuest(store: Store): void {
   }
 }
 
-/** The saved game for this exact ruleset version, or null when none or it does not replay. */
+/**
+ * The saved game for this exact ruleset version (and, for a custom ruleset, these exact
+ * overrides), or null when none or it does not replay.
+ */
 export function loadGuest(
   store: Store,
   rules: MoveRules,
-  info: Pick<RulesetInfo, 'id' | 'version'>,
+  info: Pick<RulesetInfo, 'id' | 'version' | 'overrides'>,
 ): Guest | null {
   try {
     const raw = store.getItem(KEY);
@@ -53,6 +59,7 @@ export function loadGuest(
       saved.v !== 1 ||
       saved.ruleset !== info.id ||
       saved.version !== info.version ||
+      !same(saved.overrides ?? null, info.overrides ?? null) ||
       (saved.mode !== 'hot-seat' && saved.mode !== 'computer') ||
       !Array.isArray(saved.moves)
     ) {
