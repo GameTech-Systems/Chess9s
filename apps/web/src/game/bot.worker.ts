@@ -1,9 +1,10 @@
 // Runs the computer's search off the page's thread, so the board stays responsive on a phone.
 import { computerReply } from './bot';
+import type { RulesetInfo } from './rules';
 
 export interface BotRequest {
   id: number;
-  ruleset: string;
+  ruleset: Pick<RulesetInfo, 'id' | 'version' | 'overrides'>;
   moves: string[];
 }
 
