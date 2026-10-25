@@ -1,6 +1,16 @@
 # Chess Nines rules (draft v0.2)
 
-This is the default rule set for 2-player games (ruleset `draft-2p` 0.2.0, a **Candidate** since the fairness check passed: [report](fairness/draft-2p.md), [decision 0010](decisions/0010-draft-2p-candidate.md)) and the experimental 3-player Dragon mode (ruleset `draft-3p` 0.2.0). It is **not official**. Official tournament rules come only after public discussion and ratification ([Governance](GOVERNANCE.md)).
+This page explains the Chess Nines rules at their defaults (rule set v0.2): the 2-player ruleset `draft-2p` 0.2.0, shown in the game as **Good Practice** (a **Candidate** since the fairness check passed: [report](fairness/draft-2p.md), [decision 0010](decisions/0010-draft-2p-candidate.md)), and the experimental 3-player Dragon mode (ruleset `draft-3p` 0.2.0). None of it is **official**. Official tournament rules come only after public discussion and ratification ([Governance](GOVERNANCE.md)).
+
+## Presets
+
+The game offers these 2-player presets ([decision 0011](decisions/0011-presets.md)). Each has its own rules page in the game, at `chess9s.com/rules/<id>`, listing every setting it plays.
+
+| Preset | Ruleset | Status | Differs from this page |
+|---|---|---|---|
+| **Standard** (the default) | `standard-2p` | Experimental until its fairness check passes ([report](fairness/standard-2p.md)) | The King moves one square in any direction, as in regular chess (`king.range` = 1) |
+| **Good Practice** | `draft-2p` | Candidate | Nothing: every setting at its default. The 2-square King makes checkmate harder to force, which is good practice |
+| **Easy Start** | `easy-2p` | Experimental, casual play | Closest to regular chess: light moves first, a 1-square King that may castle, the Queen may cross the void anywhere, e5 is an ordinary square for every piece but the Queen, and no pawn-safe zones |
 
 Every rule here is a parameter with a default and a list of options, so players can experiment. The data in [`rules/parameters.json`](../rules/parameters.json) and [`rules/rulesets/`](../rules/rulesets/) is what the engine reads; this page explains it. Where the two disagree, the data is a bug to report.
 
@@ -45,7 +55,7 @@ Rooks, Knights and Bishops move exactly as in regular chess, except that Rooks a
 
 ### King
 
-- The King moves up to 2 squares in any one straight direction (`king.range` = 2). It slides, so it can't jump a piece on the first square (`king.canJump` = false).
+- The King moves up to 2 squares in any one straight direction (`king.range` = 2). It slides, so it can't jump a piece on the first square (`king.canJump` = false). In the Standard and Easy Start presets it moves one square, as in regular chess.
 - It attacks every square it could move to, so it gives check from 2 squares away, and two Kings can never stand within 2 open squares of each other.
 - No castling by default (`castling.enabled` = false). As an option, castling works as in chess: the King moves 2 squares toward an unmoved Rook, and the Rook lands on the square the King crossed (light short: King F1 to H1, Rook I1 to G1; light long: King F1 to D1, Rook B1 to E1). The usual chess conditions apply.
 - Kings may enter the Coast and may pass over an empty E5.
@@ -63,7 +73,7 @@ Rooks, Knights and Bishops move exactly as in regular chess, except that Rooks a
 
 - Pawns move, take their initial double step, capture, take en passant and promote as in chess, and may stand on void squares. Light pawns promote on rank 9 and dark pawns on rank 1, to a Queen, Rook, Bishop or Knight. Option, off by default (`pawn.promotion.targets` = captured-piece): a pawn may instead promote to a piece its side has lost (Queen, Rook, Bishop, Knight or Coast piece). If its side has lost none, the pawn stays a pawn.
 - No pawn may enter E5, so an E-file pawn is blocked at E4 or E6 until it captures off the file.
-- **Pawn-safe zones** (`pawn.safeZones`). Each pawn is named by the color of its starting file. After it crosses the void, it can't be captured while it stands on the opponent's colored square in its own starting file. A pawn on its own side's colored squares gets no protection. A safe pawn can still move, capture and give check; only capturing it is blocked.
+- **Pawn-safe zones** (`pawn.safeZones`). Each pawn is named by the color of its starting file, and the game draws that color as a ring on its token. After it crosses the void, it can't be captured while it stands on the opponent's colored square in its own starting file. A pawn on its own side's colored squares gets no protection. A safe pawn can still move, capture and give check; only capturing it is blocked.
 
 | Starting file | Light pawn | Safe on | Dark pawn | Safe on |
 |---|---|---|---|---|
