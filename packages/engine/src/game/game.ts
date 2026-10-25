@@ -47,9 +47,19 @@ export interface PlayedMove extends GeneratedMove {
   notation: string;
 }
 
+/**
+ * The ruleset a game is played under. A custom ruleset (one that is not in rules/rulesets/) also
+ * carries its full overrides, so the game can be replayed without the ruleset being on file.
+ */
+export interface RulesetRef {
+  id: string;
+  version: string;
+  overrides?: Readonly<Record<string, ParamValue>>;
+}
+
 export interface GameState {
   /** The ruleset the game is played under, kept with the game. */
-  ruleset: { id: string; version: string };
+  ruleset: RulesetRef;
   rules: MoveRules;
   /** The seats in order of play, starting with the first mover. */
   order: string[];
@@ -88,7 +98,7 @@ export interface GameInit {
 }
 
 export interface GameRecord {
-  ruleset: { id: string; version: string };
+  ruleset: RulesetRef;
   players: number;
   turnOrder: string[];
   moves: string[];
@@ -252,13 +262,18 @@ function settle(rules: MoveRules, base: Settled, prev: Seen | null): GameState {
   };
 }
 
+const copyRef = (r: RulesetRef): RulesetRef => ({
+  ...r,
+  ...(r.overrides && { overrides: { ...r.overrides } }),
+});
+
 /**
  * Start a game. Refuses a ruleset with an undecided value and any player count but 2. The Coast
  * starts open only under `coast.2p.initiation = open-at-start` or `coast.openToAll` (D44).
  */
 export function newGame(
   rules: MoveRules,
-  ruleset: { id: string; version: string },
+  ruleset: RulesetRef,
   init: GameInit = {},
 ): GameState {
   if (rules.players !== 2) {
@@ -278,7 +293,7 @@ export function newGame(
   return settle(
     rules,
     {
-      ruleset: { ...ruleset },
+      ruleset: copyRef(ruleset),
       rules,
       order,
       turn,
@@ -363,7 +378,7 @@ export function playMove(state: GameState, move: GeneratedMove): GameState {
 /** What is kept with a game: the ruleset id and version, the moves and the result. */
 export function gameRecord(state: GameState): GameRecord {
   return {
-    ruleset: { ...state.ruleset },
+    ruleset: copyRef(state.ruleset),
     players: state.rules.players,
     turnOrder: [...state.order],
     moves: state.moves.map((m) => m.notation),

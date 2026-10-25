@@ -386,6 +386,17 @@ describe('finding and recording moves', () => {
     });
   });
 
+  it('a custom ruleset keeps its full overrides with the game, so the game can be replayed', () => {
+    const overrides = { 'king.range': 1, 'queen.canCrossVoid': true };
+    const ref = { id: 'custom-x', version: '1.0.0', overrides };
+    const g = playAll(newGame(rulesFor(2), ref), 'b8-b6', 'b2-b4');
+    expect(g.ruleset.overrides).toEqual(overrides);
+    expect(gameRecord(g).ruleset).toEqual(ref);
+    // The record is a copy: changing the caller's object later does not change the game.
+    overrides['king.range'] = 3;
+    expect(gameRecord(g).ruleset.overrides).toEqual({ 'king.range': 1, 'queen.canCrossVoid': true });
+  });
+
   it('plays are pure: the earlier state is not changed', () => {
     const g = newGame(rulesFor(2), ID);
     const before = JSON.stringify(g.position);
