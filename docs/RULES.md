@@ -8,7 +8,7 @@ The game offers these 2-player presets ([decision 0011](decisions/0011-presets.m
 
 | Preset | Ruleset | Status | Differs from this page |
 |---|---|---|---|
-| **Standard** (the default) | `standard-2p` | Experimental until its fairness check passes ([report](fairness/standard-2p.md)) | The King moves one square in any direction, as in regular chess (`king.range` = 1) |
+| **Standard** (the default) | `standard-2p` | Candidate, since its fairness check passed ([report](fairness/standard-2p.md), [decision 0012](decisions/0012-standard-2p-candidate.md)) | The King moves one square in any direction, as in regular chess (`king.range` = 1) |
 | **Good Practice** | `draft-2p` | Candidate | Nothing: every setting at its default. The 2-square King makes checkmate harder to force, which is good practice |
 | **Easy Start** | `easy-2p` | Experimental, casual play | Closest to regular chess: light moves first, a 1-square King that may castle, the Queen may cross the void anywhere, e5 is an ordinary square for every piece but the Queen, and no pawn-safe zones |
 

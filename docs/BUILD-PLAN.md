@@ -153,7 +153,7 @@ Readable rules dialog (dark panel, focus, Escape), color rings on pawns by start
 ### S37 — Depth-2 fairness run for Standard · Owner · `todo`
 Actions → **Sim depth 2** → Run workflow, with ruleset `standard-2p` (shards 20, games 2000). It takes about one hour per shard, run in parallel. When it finishes, start S38.
 
-### S38 — Publish Standard as a Candidate · Sonnet 5.5 · medium · `todo`
+### S38 — Publish Standard as a Candidate · Sonnet 5.5 · medium · `done`
 Commit the merged depth-2 report (the run's artifact) to `docs/fairness/standard-2p.md` and `.json`, keeping the depth-1 run. If both depths pass decision 0008, change `standard-2p` to `candidate` (version unchanged, as 0010 did for `draft-2p`) and write decision record 0012; if not, leave it experimental and report the numbers. Decisions: D12, D43.
 Done when: the report shows both depths and the status matches the verdict.
 
