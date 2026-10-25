@@ -190,7 +190,7 @@ Planned in S30 (2026-10-25). Standard (`standard-2p` 0.1.0) is the Candidate und
 ### S30 — Phase 4 planning · Opus 5.5 · high · `done`
 Wrote the steps below. Found two gaps that the Official ruleset needs closed: a ruleset stores only its overrides, so editing a registry default silently changes a Candidate or Official ruleset; and `rules/rulesets/` keeps one version per id, so an old version can't be replayed once a new one ships.
 
-### S44 — Announce the discussion for Standard · Owner · `todo`
+### S44 — Announce the discussion for Standard · Owner · `done`
 Post the Standard discussion in Discussions (link the rules page `/rules/standard-2p`, the fairness report and decision 0012) and set its end date, at least 21 days later (D20). Put the link and both dates in the ledger brief for S46, or in any later session's brief.
 
 ### S45 — Ruleset locks and kept versions · Sonnet 5.5 · high · `done`
@@ -199,7 +199,7 @@ Post the Standard discussion in Discussions (link the rules page `/rules/standar
 - The fairness report's ruleset id and version must name an existing lock (a test).
 Done when: editing `king.range`'s registry default fails a test that names `standard-2p` 0.1.0; a game recorded under an archived version replays move for move; every parameter keeps its default-and-options tests.
 
-### S46 — Tournament rules page and game record · Sonnet 5.5 · medium · `todo`
+### S46 — Tournament rules page and game record · Sonnet 5.5 · medium · `done`
 - **`/tournament`**, linked from the footer, the rules page, the builder's tournament note and the tournament invitation mail. It says: tournaments use Official rulesets only, never custom ones (D46); which ruleset that is (until ratification: "Standard is a Candidate under public discussion", with the S44 link and dates, or "starts when announced"); how a ruleset becomes Official (a summary of GOVERNANCE, with a link); games are hot-seat or over the board until online play (Phase 5); conduct rules per D47.
 - **Save game record**: a button that downloads the game as JSON (ruleset id, version and any overrides, turn order, moves in notation, result, date; no names). It loads back for replay with the S45 lookup. Nothing is sent or stored; the privacy page says so and its date changes.
 - The discussion link and dates live in one web module (`apps/web/src/tournament.ts`), empty until S44 is done. Ruleset files stay unchanged.
@@ -264,9 +264,9 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D44 | "Every piece may enter the Coast at any time" | Default (applied as `coast.openToAll`, S40): the Coast is open to every piece from the start; each piece's own Coast setting no longer bars it; Coast pieces may move from the first turn | S40 |
 | D45 | Pawns on the Coast | Default (applied as `pawn.canEnterCoast`, S40): a pawn enters the Coast only by capturing onto it once it is open, then moves forward along file A and promotes on its last rank as usual | S40 |
 | D46 | Custom rulesets in tournaments | Default: never directly; a submitted ruleset becomes Official only through the S43 checklist (fairness at both depths, discussion, ratification) | S43 |
-| D47 | Tournament conduct rules (clock, draw offers, touch-move, disputes) | Default: the project publishes none yet; `/tournament` says the organizer announces them with the invitation | S46 |
-| D48 | Version of the ratified ruleset | Default: keep the version that was fairness-checked (Standard 0.1.0), as 0010 and 0012 kept versions on status changes | S50 |
-| D49 | New discussion after a change | Default: none; a ruleset changed by the discussion is re-checked at both depths and then ratified, with the change named in the decision record (GOVERNANCE, 2-player rules, step 3) | S50 |
+| D47 | Tournament conduct rules (clock, draw offers, touch-move, disputes) | Decided (ledger brief 25 Oct 2026, default kept): the project publishes none yet; `/tournament` says the organizer announces them with the invitation | S46 |
+| D48 | Version of the ratified ruleset | Decided (ledger brief 25 Oct 2026, default kept): keep the version that was fairness-checked (Standard 0.1.0), as 0010 and 0012 kept versions on status changes | S50 |
+| D49 | New discussion after a change | Decided (ledger brief 25 Oct 2026, default kept): none; a ruleset changed by the discussion is re-checked at both depths and then ratified, with the change named in the decision record (GOVERNANCE, 2-player rules, step 3) | S50 |
 
 ## Ledger sync format
 
