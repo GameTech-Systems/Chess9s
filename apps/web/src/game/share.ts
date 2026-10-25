@@ -4,8 +4,10 @@
 // sent anywhere: an invitation is a `mailto:` link the player's own mail app opens.
 import { MAX_RULESET_FILE_BYTES, readRulesetFile, resolveFileOverrides } from '@chess9s/engine';
 import registry from '../../../../rules/parameters.json';
+import { REPO_URL } from '../links';
 import {
   MAX_NAME,
+  customFrom,
   differences,
   nameProblem,
   presets,
@@ -158,6 +160,9 @@ export function inviteMailto(kind: InviteKind, state: BuilderState, origin: stri
     ...(kind === 'tournament' && !open
       ? ['It is not a tournament ruleset: custom rulesets are not used in official tournaments.']
       : []),
+    ...(kind === 'tournament'
+      ? ['Tournaments are not played online yet: play hot-seat or over the board with the link.']
+      : []),
     '',
     'Differs from Standard:',
     settingsText(state.values) || '- None',
@@ -168,4 +173,53 @@ export function inviteMailto(kind: InviteKind, state: BuilderState, origin: stri
   // Mail apps cut very long links; keep the draft well under the usual limit.
   if (body.length > 1700) body = `${body.slice(0, 1690)}\n…`;
   return `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+/** The Rule proposals Discussion form (.github/DISCUSSION_TEMPLATE/rule-proposals.yml). */
+export const SUBMIT_FORM_URL = `${REPO_URL}/discussions/new`;
+/** GitHub refuses very long addresses; a prefilled form stays well under its limit. */
+export const SUBMIT_URL_MAX = 6_000;
+
+/**
+ * "Submit for consideration" (S43, decision D46): the Rule proposals Discussion form, prefilled
+ * with the settings summary, the share link and the ruleset file (the export, byte for byte).
+ * The poster writes why it is fair and ticks the contribution terms themselves. When the file
+ * would make the address too long it is left out, and the summary asks for the export instead.
+ */
+export function submitUrl(
+  state: BuilderState,
+  origin: string,
+  max: number = SUBMIT_URL_MAX,
+): string {
+  const name = state.name.trim().slice(0, MAX_NAME) || 'my ruleset';
+  const file = exportFile(customFrom(state, 'submitted'));
+  const idea = (fileNote: string) =>
+    [
+      `Ruleset “${name}”, submitted for tournament consideration (GOVERNANCE.md, submitted rulesets).`,
+      '',
+      `Open it: ${origin}${shareLink(state)}`,
+      fileNote,
+      'Fairness check: save the file as a .json and run `pnpm sim --ruleset-file <file>`.',
+      '',
+      'Differs from Standard:',
+      settingsText(state.values) || '- None',
+    ].join('\n');
+  const url = (fields: Record<string, string>) =>
+    `${SUBMIT_FORM_URL}?${new URLSearchParams({
+      category: 'rule-proposals',
+      title: `[Ruleset] ${name}`,
+      ...fields,
+    }).toString()}`;
+  const full = url({ idea: idea('The ruleset file is below.'), ruleset: file });
+  if (full.length <= max) return full;
+  const note =
+    'The file is too long for this link: paste the exported file (Export as file) below.';
+  let text = idea(note);
+  let short = url({ idea: text });
+  // Very long summaries are cut, keeping the link and the note at the top.
+  while (short.length > max && text.length > 0) {
+    text = `${text.slice(0, Math.floor(text.length * 0.9))}\n…`;
+    short = url({ idea: text });
+  }
+  return short;
 }

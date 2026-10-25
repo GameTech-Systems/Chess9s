@@ -4,6 +4,9 @@ export const REPO_URL = 'https://github.com/GameTech-Systems/Chess9s';
 /** Where players suggest a variant or report a problem. */
 export const DISCUSSIONS_URL = `${REPO_URL}/discussions`;
 
+/** How a ruleset becomes a Candidate and then Official, with the checklist for submissions. */
+export const GOVERNANCE_URL = `${REPO_URL}/blob/main/docs/GOVERNANCE.md#submitted-rulesets`;
+
 /** The long-form rules guide (docs/RULES.md), which explains the Chess Nines defaults. */
 export const RULES_DOC_URL = `${REPO_URL}/blob/main/docs/RULES.md`;
 

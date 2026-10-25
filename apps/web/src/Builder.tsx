@@ -27,8 +27,9 @@ import {
   matchingOfficial,
   parseRulesetFile,
   shareLink,
+  submitUrl,
 } from './game/share';
-import { DISCUSSIONS_URL } from './links';
+import { DISCUSSIONS_URL, GOVERNANCE_URL } from './links';
 
 const SITE = 'https://chess9s.com';
 const originNow = () => (typeof window === 'undefined' ? SITE : window.location.origin);
@@ -445,10 +446,27 @@ export function Builder({
         <div className="builder-actions">
           {invite('game', 'Invite to a game')}
           {invite('tournament', 'Invite to a tournament')}
+          <a
+            className="again"
+            target="_blank"
+            rel="noopener noreferrer"
+            {...(problem === null
+              ? { href: submitUrl(state, originNow()) }
+              : { 'aria-disabled': true })}
+          >
+            Submit for consideration
+          </a>
         </div>
-        {problem && <p className="meta">Name the ruleset to export it or invite someone.</p>}
+        {problem && (
+          <p className="meta">Name the ruleset to export it, invite someone or submit it.</p>
+        )}
         <p className="meta">
           A custom ruleset is never a tournament ruleset: the tournament invitation says so.
+          Tournaments are not played online yet, so an invitation carries the link for a hot-seat or
+          over-the-board game. To have a ruleset considered for tournaments, submit it: that opens a
+          Rule proposals discussion on GitHub with your settings filled in, and it goes through the{' '}
+          <a href={GOVERNANCE_URL}>review checklist</a> (a fairness check at both depths, 21 days of
+          discussion, and ratification).
         </p>
       </section>
 

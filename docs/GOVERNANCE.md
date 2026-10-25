@@ -29,6 +29,18 @@ Only Official rulesets are used in tournaments. The measures and acceptance thre
 
 Other 2-player variants can be offered as Experimental options. They are labeled as such and are not tournament rules.
 
+### Submitted rulesets
+
+Anyone can submit a 2-player ruleset they built at chess9s.com/build. **Submit for consideration** opens a Rule proposals discussion with the ruleset file and its settings filled in; the poster explains why it is fair and accepts the contribution terms. A custom ruleset never goes straight into tournaments (decision D46). It becomes a Candidate, and then Official, only through this checklist:
+
+1. **The file loads.** `pnpm sim --ruleset-file <file>` reads it with the same checks the builder uses (2 players, known settings only, no `extends`). A file that is refused, or that switches on a feature that is not built yet, stops here.
+2. **Fairness at both depths.** The same command, at the published measures (decision 0008: 2,000 games at each of depths 1 and 2), passes. The report is committed to `docs/fairness/`.
+3. **Candidate.** The ruleset is added to `rules/rulesets/` as a new ruleset with its own id and version, status Candidate, and its fairness report linked.
+4. **Public discussion.** Discussion runs for at least 21 days from the date the project owner announces.
+5. **Ratification.** The project owner may ratify it as **Official** and publishes the reasoning in a decision record in `docs/decisions/`. If the ratified ruleset differs from the one checked, it is checked again first.
+
+Online tournament play comes later. Until then a tournament invitation carries the ruleset link, for hot-seat or over-the-board games.
+
 ## 3-player rules
 
 3-player rules stay **Experimental** until bot self-play shows the seats are balanced. Several Dragon-role variants can be tested in parallel, with results published as balance reports.
