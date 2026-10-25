@@ -8,7 +8,7 @@ After playing the game, the owner found that with the King moving up to 2 square
 ## Decision
 | Preset | Ruleset | Status | What it plays |
 | --- | --- | --- | --- |
-| **Standard** (default) | `standard-2p` 0.1.0 | experimental, until its fairness check passes | Good Practice, except `king.range` = 1: the King moves one square in any direction, as in regular chess |
+| **Standard** (default) | `standard-2p` 0.1.0 | candidate (since S38, [0012](0012-standard-2p-candidate.md)) | Good Practice, except `king.range` = 1: the King moves one square in any direction, as in regular chess |
 | **Good Practice** | `draft-2p` 0.2.0 | candidate (unchanged) | Every 2-player parameter at its registry default (rule set v0.2), King range 2 |
 | **Easy Start** | `easy-2p` 0.1.0 | experimental, casual play only | The closest Chess Nines gets to regular chess, chosen only among existing options (below) |
 

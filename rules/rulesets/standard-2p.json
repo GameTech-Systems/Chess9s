@@ -3,9 +3,9 @@
   "id": "standard-2p",
   "name": "Standard",
   "version": "0.1.0",
-  "status": "experimental",
+  "status": "candidate",
   "players": 2,
-  "description": "The default 2-player game: the Good Practice rules, except the King moves one square in any direction, as in regular chess (owner, 24 Oct 2026). Experimental until the fairness check (decision 0008) passes at both depths.",
+  "description": "The default 2-player game: the Good Practice rules, except the King moves one square in any direction, as in regular chess (owner, 24 Oct 2026). A Candidate since the fairness check (decision 0008) passed at both depths (decision 0012).",
   "overrides": {
     "king.range": 1
   }
