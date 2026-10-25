@@ -15,25 +15,54 @@ import {
   undo,
   type Model,
 } from './session';
-import { createRules, listRulesets, ruleset } from './rules';
+import { createRules, listRulesets, ruleset, rulesetSettings } from './rules';
 
 const clicks = (m: Model, ...squares: string[]) => squares.reduce(click, m);
 const king = (side: string) => ({ piece: 'king', side });
 
 describe('the rules the game plays', () => {
-  it('are draft-2p, resolved from the data in rules/ with no undecided value', () => {
+  it('are Standard by default, resolved from the data in rules/ with no undecided value', () => {
     const rules = createRules();
     expect(rules.players).toBe(2);
-    expect(ruleset.id).toBe('draft-2p');
+    expect(ruleset.id).toBe('standard-2p');
+    expect(ruleset.name).toBe('Standard');
     expect(ruleset.version).toMatch(/^\d+\.\d+\.\d+$/);
     expect(Object.values(rules.values)).not.toContain(null);
+  });
+
+  it('Standard is Good Practice with a one-square King (owner, 24 Oct 2026)', () => {
+    const standard = createRules('standard-2p').values;
+    const practice = createRules('draft-2p').values;
+    expect(standard['king.range']).toBe(1);
+    expect(practice['king.range']).toBe(2);
+    const differ = Object.keys(practice).filter(
+      (id) => JSON.stringify(practice[id]) !== JSON.stringify(standard[id]),
+    );
+    expect(differ).toEqual(['king.range']);
+  });
+
+  it('Easy Start sets the chess-like options: light first, one-square King, castling', () => {
+    const easy = createRules('easy-2p').values;
+    expect(easy['turn.firstMove']).toBe('light');
+    expect(easy['king.range']).toBe(1);
+    expect(easy['castling.enabled']).toBe(true);
+    expect(easy['pawn.safeZones']).toBe('off');
+    expect(easy['queen.canEnterVoid']).toBe(true);
   });
 });
 
 describe('the ruleset list', () => {
   it('has every ruleset in rules/rulesets/, with a status and a player count', () => {
     const list = listRulesets();
-    expect(list.map((r) => r.id)).toEqual(['draft-2p', 'draft-3p']);
+    // The default first, then the other 2-player presets by name, then 3-player.
+    expect(list.map((r) => r.id)).toEqual(['standard-2p', 'easy-2p', 'draft-2p', 'draft-3p']);
+    expect(list.map((r) => r.name)).toEqual([
+      'Standard',
+      'Easy Start',
+      'Good Practice',
+      'Draft 3-Player Dragon Mode (experimental)',
+    ]);
+    expect(list.filter((r) => r.isDefault).map((r) => r.id)).toEqual(['standard-2p']);
     for (const r of list) {
       expect(['proposed', 'experimental', 'candidate', 'official']).toContain(r.status);
       expect(r.name).not.toBe('');
@@ -49,8 +78,20 @@ describe('the ruleset list', () => {
 
   it('builds the rules and the game record for the chosen ruleset', () => {
     expect(createRules('draft-2p').players).toBe(2);
-    const m = newModel(createRules('draft-2p'), listRulesets()[0]);
-    expect(m.game.ruleset).toEqual({ id: 'draft-2p', version: ruleset.version });
+    const practice = listRulesets().find((r) => r.id === 'draft-2p')!;
+    const m = newModel(createRules('draft-2p'), practice);
+    expect(m.game.ruleset).toEqual({ id: 'draft-2p', version: practice.version });
+  });
+
+  it('lists every setting of a ruleset with its value, marking those off the default', () => {
+    const settings = rulesetSettings('standard-2p');
+    const king = settings.find((x) => x.id === 'king.range')!;
+    expect(king).toMatchObject({ label: 'King range', value: 1, defaultValue: 2, changed: true });
+    expect(settings.filter((x) => x.changed).map((x) => x.id)).toEqual(['king.range']);
+    // Only parameters that apply to 2-player games, none deprecated.
+    expect(settings.some((x) => x.id === 'coast.3p.exit')).toBe(false);
+    expect(settings.some((x) => x.id === 'dragons.2p.mode')).toBe(false);
+    expect(rulesetSettings('draft-2p').filter((x) => x.changed)).toEqual([]);
   });
 
   it('refuses a ruleset that is unknown or not playable yet', () => {
@@ -255,14 +296,16 @@ describe('status line and move list', () => {
   });
 
   it('castles when the King is clicked, then its Rook; the King’s own square stays a plain move', () => {
-    const r = createRules();
+    // Good Practice (draft-2p): a 2-square King can also step onto h1 without castling.
+    const r = createRules('draft-2p');
     const rules = { ...r, values: { ...r.values, 'castling.enabled': true } };
     const position: Position = {
       f1: king('light'),
       i1: { piece: 'rook', side: 'light' },
       f9: king('dark'),
     };
-    const m = fromGame(newGame(rules, ruleset, { position, turn: 'light' }));
+    const practice = listRulesets().find((x) => x.id === 'draft-2p')!;
+    const m = fromGame(newGame(rules, practice, { position, turn: 'light' }));
     expect(highlights(click(m, 'f1')).targets).toContainEqual({ at: 'i1', capture: false });
     const castled = clicks(m, 'f1', 'i1').game;
     expect(castled.position.h1).toMatchObject({ piece: 'king' });

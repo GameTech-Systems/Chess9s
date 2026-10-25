@@ -53,7 +53,7 @@ function browserStore(): Store | null {
 const BOT_DELAY_MS = 500;
 
 /**
- * `ruleset` is the one being played (default draft-2p). `initial` starts the screen from a given
+ * `ruleset` is the one being played (default: Standard, standard-2p). `initial` starts the screen from a given
  * game (tests); otherwise a new game. `onChangeRuleset` returns to the picker.
  */
 export function Game({

@@ -1,0 +1,28 @@
+{
+  "$schema": "../schema/ruleset.schema.json",
+  "id": "easy-2p",
+  "name": "Easy Start",
+  "version": "0.1.0",
+  "status": "experimental",
+  "players": 2,
+  "description": "The closest Chess Nines gets to regular chess, for learning the board: light moves first, the King moves one square and may castle, the Queen may cross the void anywhere, e5 is an ordinary square for every piece except the Queen, and pawns have no safe zones. The Coast stays closed until someone moves the Dragon Tail onto e5. Casual play only; not fairness-checked.",
+  "overrides": {
+    "king.range": 1,
+    "castling.enabled": true,
+    "queen.canEnterVoid": true,
+    "pawn.safeZones": "off",
+    "pawn.canEnterCenter": true,
+    "center.occupants": "any",
+    "center.passThrough": [
+      "dragon-head",
+      "queen",
+      "king",
+      "sun-moon-pawn",
+      "knight",
+      "rook",
+      "bishop",
+      "pawn"
+    ],
+    "turn.firstMove": "light"
+  }
+}
