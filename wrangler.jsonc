@@ -8,4 +8,6 @@
     "directory": "./apps/web/dist",
     "not_found_handling": "single-page-application",
   },
+  // Pull-request builds run `wrangler preview`, which needs this block (it may stay empty).
+  "previews": {},
 }
