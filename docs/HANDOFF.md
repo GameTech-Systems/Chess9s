@@ -23,3 +23,4 @@ Owner first (S37): Actions → **Sim depth 2** → Run workflow with ruleset `st
 - Engine and sim tests still use `draft-2p` (Good Practice); web tests that replay the hot-seat fixture or castle by stepping 2 squares pin `draft-2p` too.
 - `RulesScreen` reads `onClose` through a ref: the game re-renders every second.
 - `npx wrangler dev` leaves `.wrangler/` (now ignored by ESLint too).
+- Deploys: Cloudflare Workers Builds builds `main` on each merge (check "Workers Builds" on the commit). If none appears, the owner starts one from a Deploy Hook.
