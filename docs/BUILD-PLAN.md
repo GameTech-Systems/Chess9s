@@ -261,12 +261,70 @@ Decisions: D34, D46, D51, D52, D53.
 ### S54 — Go live with rooms · Owner · `todo`
 After S53 merges and Workers Builds deploys it: confirm in the Cloudflare dashboard that the Worker shows the `Room` Durable Object, add the free rate-limiting rule for `POST /api/rooms` with the setting from the S52 handoff, confirm Cloudflare's terms for Durable Objects on the free plan (decision 0003 is still provisional), and play one game between two devices on chess9s.com, with a reload in the middle. Phase 5 exit when that game finishes.
 
+## Phase 6: 3-player Dragon mode (experimental)
+
+Planned in S32 (2026-10-25). Three people play hot-seat or against the computer: dark, light and the Dragon, who plays all 5 Coast pieces (`draft-3p`, rule set v0.2, `docs/RULES.md`). Bot self-play then measures the seats across the 3-player options. Phase 6 does not wait for Phases 4 or 5. Exit: a 3-player game reaches every end in the "How 3-player games end" table in the browser and against the computer, and the balance report at both depths is published with the owner's decision on the 3-player default.
+
+Already built: 3-player movement is data. The pieces read `coast.3p.exit`, `coast.3p.capturable`, `tail.3p.movement`, `tail.3p.captures`, `sunMoon.3p.range` and `dragon.3p.givesCheck`, the board has the 3-player setup and turn order (dark, light, Dragon), and `nextSide` skips seats that are out. Not built: `newGame` refuses 3 players, and nothing reads `draw.3p.stalemate`. There are no stones, no King capture, no Tail checkmate, no 3-player results, and no 3-player search (S23's negamax is 2-player). The web picker and the ruleset file (S42) are 2-player only.
+
+Found in planning: the rules leave cases open that the engine must decide. They are listed under S55 (D55 to D57) and are the owner's to settle; they get no defaults (never invent rules). No timer rule exists anywhere in the rules or the registry (D58).
+
+### S32 — Phase 6 planning · Opus 5.5 · high · `done`
+Wrote the steps below and D55 to D61.
+
+### S55 — Settle the 3-player rule gaps · Owner with Claude in chat · Opus 5.5 · high · `todo`
+The owner answers these in the ledger. Each answer is a fixed rule, or a new parameter with a default and options. Claude adds no options of its own.
+- **D55, check and the Dragon's win.** (a) With `dragon.3p.givesCheck` off, may a Kinged player move into a square a Dragon piece attacks, or leave the King there? (b) "The Dragon captures one King, then checkmates the other": with Dragon pieces not giving check, does the Dragon win by capturing the second King, or when that King is attacked and has no move that ends the attack? Does the answer change once only one King is left? (c) Must the Dragon end an attack on the Tail when it can, as a King must end check?
+- **D56, Tail checkmate and stones.** (a) When is the Tail checkmated: right after the attacking move, or at the start of the Dragon's turn? Light moves between dark and the Dragon, so light could end dark's attack. (b) If two pieces attack the Tail, which one swaps with it? (c) What happens when the swap would put that piece where it may not stand (a Rook or pawn on the Coast, a pawn on its last rank, a Queen on a void square)? (d) Do stone pieces still attack: does a stone piece give check or guard a square?
+- **D57, draws and stalls.** (a) Do threefold repetition, the 50-move rule and insufficient material apply in 3-player games, and between which players? (b) What happens when the Dragon has no legal move? (c) What happens when the last King, alone against the Dragon, is stalemated? `draw.3p.stalemate` covers only a draw between two Kinged players.
+- **D58, the timer.** The roadmap lists a timer for Phase 6, but no rule defines one. Is it a clock per seat, a time limit per move, or something else, and what happens when it runs out?
+- **Rule set v0.3.** If the answers change `docs/RULES.md`, S56 ships them as `draft-3p` 0.3.0. 0.2.0 goes to the archive (S45). It has no lock: it is experimental, so the archive keeps it only for replay.
+Output: the owner's answers for the S56 brief. A question left open stays open; S56 handles it as its row in the defaults table says.
+
+### S56 — 3-player game state and game end · Opus 5.5 · high · `todo`
+Needs S55's answers in the brief.
+- **Game.** `newGame` plays 3 players. Each seat has a status: a Kinged seat is active or out (its King was captured); the Dragon is active, Tail in stone, or out. `stateKey`, undo and the record cover the seat statuses and the stones.
+- **Stones.** A piece flag in the position. A stone blocks, never moves, and can't be captured (public ledger, 2026-10-19); whether it attacks follows D56. A captured King's side turns to stone, and its turn is skipped (`nextSide`). A checkmated Tail swaps with the checkmating piece and turns to stone, except on E5, where it turns to stone in place.
+- **Check.** Kings check each other as usual. Dragon pieces give check only under `dragon.3p.givesCheck`; when it is off, the Dragon may capture an attacked King, and what Kings may do follows D55. A checkmate between Kinged players ends the game before the Dragon moves.
+- **Results.** `GameResult` gains each row of the "How 3-player games end" table: the winning seat and the reason, the draw between Kinged players (`draw.3p.stalemate`), and the Dragon out with the Kinged players playing on. A case S55 left open ends the game as `unresolved`, naming the decision. That is never a win or a draw, and it is marked provisional. Game records (S46) carry 3-player games and replay them. The record format stays `v: 1`.
+- Tests first: one position fixture per row of the end table, and one per D55 to D57 case. A King captured while the Tail is in stone. A Dragon out, after which the Kinged players play on with turns skipped. Tail checkmated on E5 and off it. Every 3-player parameter at its default and each option, in a game that ends. A 3-player record round trip.
+Done when: `draft-3p` plays from the start to every end in the table; every 3-player parameter is tested at its default and each option; `RULES.md` and the registry match the answers (0.3.0 if they changed); the 2-player tests and locks are unchanged.
+Decisions: D55, D56, D57.
+
+### S57 — 3-player hot-seat in the browser · Sonnet 5.5 · high · `todo`
+- **Picker.** `draft-3p` can be picked, with its Experimental badge and its rules page (`/rules/draft-3p`, which lists every 3-player setting). Builder, export, share and submit stay 2-player (D61).
+- **Board.** It turns to the side to move, using each side's `view` from the board data (D34 for dark; the Dragon's view is the board's own). It shows whose turn it is among the three, stones drawn as stone, a side that is out, and the Tail in stone. The danger aid shows a King that a Dragon piece attacks even when that isn't check (D55). The legal-move aid, last move and undo work as in 2-player.
+- **End.** A result screen for every 3-player result, including `unresolved`, which names the open question. Save game record works for 3-player games.
+- **Timer.** Per D58. Until the owner defines one, each seat's elapsed time is shown (display only, as in Phase 2).
+- Tests first: the board and its turn indicator for each seat; a stone and an out side; each result screen; the rules page for `draft-3p`; the 3-player record download.
+Done when: Playwright plays a hot-seat game that ends with the Dragon capturing a King and then winning (per D55), and another that ends with one Kinged player checkmating the other, at desktop size and at Pixel 7 width with no sideways scroll; all checks pass.
+Decisions: D34, D55, D58, D61.
+
+### S58 — 3-player computer opponent · Opus 5.5 · high · `todo`
+- **Search** (D59): paranoid search over S23's evaluation and S35's speedups (transposition table, killer moves, the position cap). Each seat searches as if the other two play against it, so alpha-beta still prunes. It is deterministic for a seed, as decision 0008 needs. The evaluation counts a seat's own material and its win conditions (Kings for the Kinged players; the Tail, Heads, Sun and Moon for the Dragon), with weights noted as provisional in a code comment.
+- **Play.** On the game screen the computer can play any one or two seats, at the same levels as in 2-player.
+- **Bench.** `pnpm bench --players 3` reports positions per move and capped moves for 3-player positions. A test keeps the 2-player bench results unchanged.
+- Tests first: each seat takes a mate in one and a free capture; the Dragon takes a King it may capture; the same seed gives the same moves; depth 2 stays under the cap on the bench positions.
+Done when: bots finish 3-player games from the start at depths 1 and 2, the browser plays one or two computer seats, and the 2-player search equivalence tests still pass.
+Decisions: D59.
+
+### S59 — 3-player balance simulations · Opus 5.5 · high · `todo`
+- **Sim.** `pnpm sim --ruleset draft-3p` (and `--players 3` wherever the CLI assumes 2) reports each seat's score (dark, light, Dragon), wins by reason (each row of the end table), draws, `unresolved` games, games stopped at the move cap, and game length. Shards and `pnpm sim:merge` work as in decision 0009, and the `Sim depth 2` workflow takes the 3-player ruleset.
+- **Variants.** `--sweep` runs every 3-player parameter at each option, plus `dragonHead.range` at 3 and 4 (the RULES.md fairness risk), and reports the seat scores for each.
+- **Measures** (D60): decision record 0015 sets the 3-player balance measure. It is provisional until the owner confirms it.
+- Run in the session: depth 1 at 2,000 games and a 40-game sweep. Commit the report to `docs/fairness/draft-3p.md`, as S36 did. `draft-3p` stays experimental whatever the numbers show.
+Done when: the report is committed, the sweep covers every 3-player option, and the 2-player report tests are unchanged. If more than 5% of games end `unresolved` or at the move cap, report it to the owner rather than tuning the rules.
+Decisions: D60.
+
+### S60 — Depth-2 run for 3 players · Owner · `todo`
+Actions → **Sim depth 2** → Run workflow, ruleset `draft-3p` (shards 20, games 2000), as in S37.
+
+### S61 — 3-player balance review · Owner with Claude in chat · Opus 5.5 · high · `todo`
+The owner reads both depths and the sweep, then chooses: keep `draft-3p` experimental as it is; change its defaults using options already in `rules/parameters.json`, which means a new version and a re-run of S59 and S60; or publish a 3-player Candidate, which a later Sonnet step carries out as S38 did. The owner also confirms or changes D60 and decides whether 3-player rooms follow online play (D61). Phase 6 exit.
+
 ## Later phases
 
 Each later phase opens with an Opus 5.5 · high planning session that replaces its placeholder with detailed steps.
-
-### S32 — Phase 6: 3-player Dragon mode (experimental) · `todo`
-Dragon role, win conditions, timer, balance simulations across variants. Decisions: D4, D5.
 
 ### S33 — Phase 7: Growth · `todo`
 Mobile apps (Capacitor), accounts and stats, tournaments.
@@ -311,6 +369,13 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D52 | Seats | Default: the room's creator chooses light, dark or random (random preselected); two seats; no spectators in Phase 5 | S51 |
 | D53 | Room retention | Default: a room and its moves are deleted 24 hours after the game ends, or after 7 days with no move; the server keeps no other copy | S52 |
 | D54 | Room codes | Default: 6 characters from 31 letters and digits without look-alikes (no 0, O, 1, I, L); a code lets anyone see the ruleset and take an open seat, the seat token is the secret | S51 |
+| D55 | 3-player check and the Dragon's win (questions in S55) | Open, a rule: no default. Until it is answered, S56 ends such a game as `unresolved` | S56 |
+| D56 | Tail checkmate and stones (questions in S55) | Open, a rule: no default. Until it is answered, S56 ends such a game as `unresolved` | S56 |
+| D57 | 3-player draws and stalls (questions in S55) | Open, a rule: no default. Until it is answered, S56 ends such a game as `unresolved`; the sim's move cap still stops long games | S56 |
+| D58 | 3-player timer | Open, a rule: no default. Until the owner defines one, each seat's elapsed time is shown, for display only | S57 |
+| D59 | 3-player search | Default: paranoid search (each seat assumes the other two play against it) on S23's evaluation and S35's speedups; deterministic for a seed | S58 |
+| D60 | 3-player balance measure | Default: each seat scores between 28% and 38% (a third, plus or minus 5 points) over at least 2,000 bot games at depths 1 and 2. A win scores 1, and a draw between the Kinged players scores ½ to each of them and 0 to the Dragon. `unresolved` and capped games are reported, not scored. Decision 0015 | S59 |
+| D61 | 3-player scope in Phase 6 | Default: hot-seat and computer play only; online rooms stay 2 seats (D52); the builder, ruleset file, share and submit stay 2-player | S57 |
 
 ## Ledger sync format
 
