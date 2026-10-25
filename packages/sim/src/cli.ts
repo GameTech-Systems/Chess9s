@@ -3,6 +3,9 @@
 // so a long run that is stopped still leaves its games counted (flagged as too few).
 //
 //   --ruleset <id>     ruleset in rules/rulesets (draft-2p)
+//   --ruleset-file <f> a ruleset file instead (one exported from the builder or submitted for
+//                      tournament consideration), checked as strictly as the builder loads it;
+//                      the report is named submitted-<its name>
 //   --games <n>        games per combination and depth (2000)
 //   --depths <a,b>     search depths (1,2)
 //   --nodes <n>        positions per move (100000)
@@ -20,6 +23,7 @@ import { availableParallelism } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
+import { readRulesetFile, type Ruleset } from '@chess9s/engine';
 import { loadSource, rulesFor, type RulesSource } from './load';
 import { MEASURES } from './measures';
 import { shardResult } from './merge';
@@ -37,6 +41,8 @@ import { combinations, playable, type Combination } from './sweep';
 
 export interface Options {
   ruleset: string;
+  /** A ruleset file to play instead of a bundled ruleset; see `addRulesetFile`. */
+  rulesetFile?: string;
   games: number;
   depths: number[];
   nodes: number;
@@ -77,7 +83,8 @@ export function options(argv: string[], cores: number): Options {
   const { values: v } = parseArgs({
     args: argv,
     options: {
-      ruleset: { type: 'string', default: 'draft-2p' },
+      ruleset: { type: 'string' },
+      'ruleset-file': { type: 'string' },
       games: { type: 'string', default: String(MEASURES.minGames) },
       depths: { type: 'string', default: MEASURES.depths.join(',') },
       nodes: { type: 'string', default: String(MEASURES.nodes) },
@@ -91,6 +98,11 @@ export function options(argv: string[], cores: number): Options {
       shard: { type: 'string' },
     },
   });
+  const file = v['ruleset-file'];
+  if (file !== undefined && v.ruleset !== undefined) {
+    throw new Error('Use --ruleset or --ruleset-file, not both');
+  }
+  const ruleset = file === undefined ? (v.ruleset ?? 'draft-2p') : '';
   const overrides: Record<string, unknown> = {};
   for (const pair of v.set) {
     const at = pair.indexOf('=');
@@ -105,7 +117,8 @@ export function options(argv: string[], cores: number): Options {
     overrides[pair.slice(0, at)] = value;
   }
   return {
-    ruleset: v.ruleset,
+    ruleset,
+    ...(file === undefined ? {} : { rulesetFile: file }),
     games: whole('--games', v.games),
     depths: v.depths.split(',').map((d) => whole('--depths', d)),
     nodes: whole('--nodes', v.nodes),
@@ -114,7 +127,7 @@ export function options(argv: string[], cores: number): Options {
     sweep: v.sweep,
     overrides,
     out: v.out,
-    name: v.name ?? v.ruleset,
+    name: v.name ?? ruleset,
     ...(v.report === undefined ? {} : { report: v.report }),
     ...(v.shard === undefined ? {} : { shard: shardOf(v.shard) }),
   };
@@ -126,6 +139,34 @@ export function repoRoot(from: string): string {
     if (existsSync(join(dir, 'rules/parameters.json'))) return dir;
     if (dirname(dir) === dir) throw new Error(`No rules/parameters.json above ${from}`);
   }
+}
+
+/**
+ * Add a ruleset file's ruleset to `source` and point the options at it. The file is read by the
+ * engine's `readRulesetFile`, the check the builder uses to load a file, so the sim accepts
+ * exactly what a player can load. It plays as `proposed` under the id submitted-<its name>, so it
+ * can never stand in for a bundled ruleset; a file the engine cannot play yet is refused here.
+ */
+export function addRulesetFile(o: Options, source: RulesSource, text: string): Options {
+  const file = readRulesetFile(text, source.registry);
+  if (!file.ok) throw new Error(`${o.rulesetFile ?? 'The ruleset file'}: ${file.problem}`);
+  const slug = file.name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+  const id = `submitted${slug ? `-${slug}` : ''}`;
+  source.rulesets[id] = {
+    id,
+    name: file.name,
+    version: file.version,
+    status: 'proposed',
+    players: 2,
+    description: `Submitted ruleset file ${o.rulesetFile ?? ''}`.trim(),
+    overrides: file.overrides,
+  };
+  const why = playable(source, id, o.overrides);
+  if (why !== undefined) throw new Error(`${o.rulesetFile ?? id}: cannot be played: ${why}`);
+  return { ...o, ruleset: id, name: o.name || id };
 }
 
 /** Rebuild a report from its runs, so a change to flags or wording needs no new games. */
@@ -156,6 +197,8 @@ export interface Plan {
  */
 export function planJobs(o: Options, source: RulesSource): Plan {
   const { rules, ruleset } = rulesFor(source, o.ruleset, o.overrides);
+  // A ruleset file is not in rules/rulesets, where workers load from: each job carries it.
+  const file: Ruleset | undefined = o.rulesetFile ? source.rulesets[o.ruleset] : undefined;
   const combos: Combination[] = o.sweep
     ? combinations(source.registry, rules.values)
     : [{ id: 'default', overrides: {} }];
@@ -177,6 +220,7 @@ export function planJobs(o: Options, source: RulesSource): Plan {
         own: c.overrides,
         depth,
         rulesetId: o.ruleset,
+        ...(file ? { ruleset: file } : {}),
         overrides,
         options: {
           depth,
@@ -211,11 +255,16 @@ export function runReports(
 }
 
 async function main(): Promise<void> {
-  const o = options(process.argv.slice(2), availableParallelism());
+  const given = options(process.argv.slice(2), availableParallelism());
   const cwd = process.env['INIT_CWD'] ?? process.cwd();
-  if (o.report !== undefined) return rebuild(resolve(cwd, o.report));
+  if (given.report !== undefined) return rebuild(resolve(cwd, given.report));
   const root = repoRoot(cwd);
-  const plan = planJobs(o, loadSource(root));
+  const source = loadSource(root);
+  const o =
+    given.rulesetFile === undefined
+      ? given
+      : addRulesetFile(given, source, readFileSync(resolve(cwd, given.rulesetFile), 'utf8'));
+  const plan = planJobs(o, source);
   const { jobs, skipped } = plan;
 
   const games: GameSummary[][] = jobs.map(() => []);

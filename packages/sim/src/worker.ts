@@ -13,7 +13,10 @@ parentPort!.on('message', ({ job, seed }: ToWorker) => {
   const j = jobs[job]!;
   let r = resolved.get(job);
   if (!r) {
-    r = rulesFor(source, j.rulesetId, j.overrides);
+    const own = j.ruleset
+      ? { ...source, rulesets: { ...source.rulesets, [j.rulesetId]: j.ruleset } }
+      : source;
+    r = rulesFor(own, j.rulesetId, j.overrides);
     resolved.set(job, r);
   }
   const start = performance.now();

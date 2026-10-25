@@ -1,10 +1,13 @@
 // Plays many games on worker threads. Each game is one task, handed out as workers free up, so
 // results don't depend on how many workers there are (each game has its own seed).
 import { Worker } from 'node:worker_threads';
+import type { Ruleset } from '@chess9s/engine';
 import type { GameSummary, PlayOptions } from './play';
 
 export interface Job {
   rulesetId: string;
+  /** The ruleset itself, when it is not in rules/rulesets (`--ruleset-file`). */
+  ruleset?: Ruleset;
   overrides: Record<string, unknown>;
   options: Omit<PlayOptions, 'seed' | 'init'>;
   seeds: number[];
