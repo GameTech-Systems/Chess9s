@@ -15,7 +15,7 @@ Chess Nines is a platform for testing rule variants in the open. Anyone can prop
 2. **Experimental:** implemented as a selectable option so people can try it. Casual play only.
 3. **Candidate:** a ruleset that has been checked for fairness and published for public discussion. The default 2-player ruleset is published here.
 4. **Official:** ratified for tournament play after public discussion, and immutable.
-5. **Deprecated:** kept for replays, no longer recommended.
+5. **Deprecated:** kept for replays, no longer recommended. A Candidate or Official ruleset is locked (`rules/locks/`) so its values cannot change silently; when it gets a new version the old one moves to `rules/rulesets/archive/` as Deprecated and still plays from its lock.
 
 ## 2-player rules
 

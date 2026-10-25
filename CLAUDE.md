@@ -45,6 +45,7 @@ Node 22, pnpm 10 (pinned in `package.json`).
 - `pnpm validate:rules`: Ajv-validate `rules/` against `rules/schema/`.
 - `pnpm sim [--games n --depths 1,2 --sweep --set id=value --shard K/N --ruleset-file f]`: bot self-play; writes a fairness report to `docs/fairness/` (decision 0008). `--ruleset-file` checks a submitted ruleset file (GOVERNANCE, Submitted rulesets).
 - `pnpm sim:merge <shards> [--with report]`: builds the fairness report from shard files (decision 0009). The `Sim depth 2` workflow runs the shards on GitHub.
+- `pnpm lock write|add-keys|archive <ruleset id>`: ruleset locks and kept versions (RULES-FRAMEWORK, Locks and kept versions). Never overwrites a lock.
 - `pnpm bench [--depth 2]`: search benchmark: positions per move, moves that hit the cap, same results as the S23 search (decision 0009).
 
 ## Where things live

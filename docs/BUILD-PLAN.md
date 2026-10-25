@@ -193,7 +193,7 @@ Wrote the steps below. Found two gaps that the Official ruleset needs closed: a 
 ### S44 — Announce the discussion for Standard · Owner · `todo`
 Post the Standard discussion in Discussions (link the rules page `/rules/standard-2p`, the fairness report and decision 0012) and set its end date, at least 21 days later (D20). Put the link and both dates in the ledger brief for S46, or in any later session's brief.
 
-### S45 — Ruleset locks and kept versions · Sonnet 5.5 · high · `todo`
+### S45 — Ruleset locks and kept versions · Sonnet 5.5 · high · `done`
 - **Locks.** `rules/locks/<id>@<version>.json` holds every resolved value of a Candidate or Official ruleset (today `draft-2p` 0.2.0 and `standard-2p` 0.1.0), with a schema in `rules/schema/`. A test fails when a locked ruleset resolves to a changed value or loses a key (for example, from a registry default edit or a deprecation). It also fails on a new key until the lock records it at its current value; recording a new key never changes a locked value. A script writes a lock for a new version and refuses to overwrite one that exists.
 - **Kept versions.** When a Candidate or Official ruleset gets a new version, the old file moves to `rules/rulesets/archive/<id>@<version>.json` (status `deprecated`, per the GOVERNANCE ladder). Engine, web and sim find a ruleset by id and version. An archived version plays from its lock's values, not from today's registry, so a game record of it replays exactly. The picker lists only current versions; saved games and game records may name an archived one.
 - The fairness report's ruleset id and version must name an existing lock (a test).
