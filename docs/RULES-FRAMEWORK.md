@@ -40,6 +40,18 @@ Rulesets live in [`rules/rulesets/`](../rules/rulesets/) and are validated by [`
 
 An **Official** ruleset is immutable. Any change is a new version, and the old one stays available for replays.
 
+### Locks and kept versions (S45)
+
+A ruleset stores only its overrides, so editing a registry default would silently change a Candidate or Official ruleset. A **lock** prevents that: `rules/locks/<id>@<version>.json` (schema `rules/schema/lock.schema.json`) holds every resolved value of one version of a Candidate or Official ruleset. A test (`packages/sim/src/locks.test.ts`) resolves each locked ruleset and fails, naming the ruleset, version and key, when a value **changed**, a key was **lost** (a parameter deprecated or removed), or a key is **new** and the lock does not record it yet. A registry default only moves the rulesets that inherit it; a ruleset that overrides the key keeps its value.
+
+`pnpm lock` is the script (it never overwrites a lock or an archived file):
+
+- `pnpm lock write <id>` locks the current version of a Candidate or Official ruleset.
+- `pnpm lock add-keys <id>` records parameters added since the lock was written, at their current value; it refuses while any locked value differs, so recording a key never changes a locked value.
+- `pnpm lock archive <id>` copies the current file to `rules/rulesets/archive/<id>@<version>.json` with status `deprecated`.
+
+To release a new version of a Candidate or Official ruleset: run `pnpm lock archive <id>`, edit `rules/rulesets/<id>.json` (new version, new status), then `pnpm lock write <id>`. An archived version plays from its lock's values, not from today's registry, so a game recorded under it replays exactly. Engine (`resolveVersion`), sim (`rulesFor(source, id, overrides, version)`) and web (`findRuleset(id, version)`, `createRules(id, version)`) find a ruleset by id and version. The picker lists current versions only; saved games and game records may name an archived one. Every fairness report must name a ruleset version that exists in `rules/`, and a Candidate, Official or archived one must also have a lock.
+
 ## Boards
 
 Boards live in `rules/boards/` (the Chess Nines board is `standard-9x9.json`) and are validated by [`rules/schema/board.schema.json`](../rules/schema/board.schema.json). The format is recorded in [decision 0007](decisions/0007-board-and-piece-formats.md).
