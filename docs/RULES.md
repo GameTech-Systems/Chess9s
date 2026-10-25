@@ -62,7 +62,7 @@ Rooks, Knights and Bishops move exactly as in regular chess, except that Rooks a
 
 ### Queen
 
-- The Queen moves as in chess, but she can never land on or pass through the void squares B5, C5, D5, F5, G5 and H5 (`queen.canEnterVoid` = false).
+- The Queen moves as in chess, but she can never land on or pass through the void squares B5, C5, D5, F5, G5 and H5. Two options, off by default: she may pass over empty void squares (`queen.canCrossVoid`), and she may stop on one (`queen.canStandOnVoid`). They replace `queen.canEnterVoid`, which turned both on at once.
 - She has three ways across the void: A5 on the Coast, the center E5, and the Ting Yang square I5. Each is open only when empty (`queen.voidCrossings`).
 - At E5 she may only pass over, in a straight line, and continue on the far side. She can never stop on E5, and if a dragon is on E5 that crossing is closed. Lines through E5: the E-file and the two diagonals D4 to F6 and F4 to D6.
 - She may enter the Coast and may stop on A5 or I5, crossing along the A-file through A5 or the I-file through I5.
@@ -71,7 +71,7 @@ Rooks, Knights and Bishops move exactly as in regular chess, except that Rooks a
 
 ### Pawns
 
-- Pawns move, take their initial double step, capture, take en passant and promote as in chess, and may stand on void squares. Light pawns promote on rank 9 and dark pawns on rank 1, to a Queen, Rook, Bishop or Knight. Option, off by default (`pawn.promotion.targets` = captured-piece): a pawn may instead promote to a piece its side has lost (Queen, Rook, Bishop, Knight or Coast piece). If its side has lost none, the pawn stays a pawn.
+- Pawns move, take their initial double step, capture, take en passant and promote as in chess, and may stand on void squares. Option, off by default (`pawn.canEnterCoast`): once the Coast is open, a pawn may enter it. It gets there only by capturing onto file A, then moves forward along file A and promotes on its last rank as usual. Light pawns promote on rank 9 and dark pawns on rank 1, to a Queen, Rook, Bishop or Knight. Option, off by default (`pawn.promotion.targets` = captured-piece): a pawn may instead promote to a piece its side has lost (Queen, Rook, Bishop, Knight or Coast piece). If its side has lost none, the pawn stays a pawn.
 - No pawn may enter E5, so an E-file pawn is blocked at E4 or E6 until it captures off the file.
 - **Pawn-safe zones** (`pawn.safeZones`). Each pawn is named by the color of its starting file, and the game draws that color as a ring on its token. After it crosses the void, it can't be captured while it stands on the opponent's colored square in its own starting file. A pawn on its own side's colored squares gets no protection. A safe pawn can still move, capture and give check; only capturing it is blocked.
 
@@ -108,7 +108,7 @@ All Coast pieces move in straight lines and stop when blocked; none may turn a c
 ### Leaving the Coast: 2-player
 
 1. Once the Coast is open, Coast pieces leave and return with any legal move. Example: the Light Dragon Head may go from A1 diagonally to B2 if the way is clear.
-2. Kings and Queens may enter the Coast; Rooks, Knights, Bishops and pawns may not.
+2. Kings and Queens may enter the Coast; Rooks, Knights, Bishops and pawns may not. Option, off by default (`coast.openToAll`): every piece may enter the Coast at any time. The Coast is then open from the start, Coast pieces may move from the first turn, and no piece's own Coast setting keeps it off file A.
 3. Coast pieces standing on the Coast can be captured like any piece, except the Tail.
 4. Dragon Heads may stand on E5 and cross the void freely. Dragon Heads and the Sun and Moon give check and count toward checkmate like any piece.
 
