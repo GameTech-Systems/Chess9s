@@ -5,6 +5,7 @@ import { Builder } from './Builder';
 import { RulesPage } from './RulesPage';
 import { Privacy } from './Privacy';
 import { DISCUSSIONS_URL, LICENSES_PATH, RIGHTS_HOLDER } from './links';
+import { parseShareLink } from './game/share';
 import { loadCustoms, saveCustoms } from './game/custom';
 import { customInfo, type CustomRuleset, type RulesetInfo } from './game/rules';
 import type { Store } from './game/guest';
@@ -39,7 +40,20 @@ export const pageOf = (pathname: string): 'privacy' | 'rules' | 'build' | 'game'
         : 'game';
 };
 
-export function App({ path, store = browserStore() }: { path?: string; store?: Store | null }) {
+export function App({
+  path,
+  hash,
+  store = browserStore(),
+}: {
+  path?: string;
+  /** The URL hash (a share link carries its ruleset there). */
+  hash?: string;
+  store?: Store | null;
+}) {
+  // A share link opens the builder with its ruleset; it is read once, on load.
+  const [shared, setShared] = useState(() =>
+    parseShareLink(hash ?? (typeof window === 'undefined' ? '' : window.location.hash)),
+  );
   const [here, setHere] = useState(
     path ?? (typeof window === 'undefined' ? '/' : window.location.pathname),
   );
@@ -95,8 +109,9 @@ export function App({ path, store = browserStore() }: { path?: string; store?: S
         <Privacy />
       ) : page === 'build' ? (
         <Builder
-          key={editing ?? 'new'}
+          key={editing ?? (shared ? 'shared' : 'new')}
           {...(editing && { saved: customs.find((c) => c.id === editing) })}
+          {...(!editing && shared && { draft: shared })}
           taken={customs.map((c) => c.id)}
           onSave={keepCustom}
           onPlay={(c) => {
@@ -123,6 +138,7 @@ export function App({ path, store = browserStore() }: { path?: string; store?: S
           customs={customs.map(customInfo)}
           onBuild={() => {
             setEditing(undefined);
+            setShared(undefined);
             navigate(BUILD_PATH);
           }}
           onEdit={(id) => {

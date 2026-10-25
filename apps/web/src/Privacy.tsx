@@ -21,7 +21,10 @@ export function Privacy() {
           A ruleset you build with Change ruleset is kept the same way, under the key{' '}
           <code>chess9s.rulesets</code>: its name and settings, on your device only. It is never
           sent anywhere, and clearing your site data deletes it. A game played on it also keeps
-          those settings with the saved game.
+          those settings with the saved game. Exporting a ruleset saves a file on your device. A
+          share link carries the ruleset after a <code>#</code>, which your browser does not send to
+          the site. An invitation only opens your own mail app: we never see the address or the
+          message.
         </li>
         <li>
           The site is hosted by Cloudflare, which keeps standard request logs (such as IP address,
