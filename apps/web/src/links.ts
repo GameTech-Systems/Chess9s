@@ -13,5 +13,14 @@ export const rulesetDataUrl = (id: string) => `${REPO_URL}/blob/main/rules/rules
 /** The in-app rules page of a ruleset: a live link that always matches the ruleset's data. */
 export const rulesPath = (id: string) => `/rules/${id}`;
 
-/** The project's contact address for privacy questions. Placeholder until the owner supplies it. */
-export const CONTACT_ADDRESS = 'PROJECT_CONTACT_ADDRESS';
+/**
+ * The project's public contact address (a project address, never a personal one). Empty until
+ * the owner supplies it (ledger I34); until then the privacy page points to Discussions.
+ */
+export const CONTACT_ADDRESS: string = '';
+
+/** The licenses of the third-party code in the app, written by the build (vite build.license). */
+export const LICENSES_PATH = '/third-party-licenses.txt';
+
+/** The rights holder named in NOTICE and TRADEMARKS.md. */
+export const RIGHTS_HOLDER = 'Duke Johnson';

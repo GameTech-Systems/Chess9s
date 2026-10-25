@@ -3,10 +3,13 @@ import { Game } from './Game';
 import { RulePicker } from './RulePicker';
 import { RulesPage } from './RulesPage';
 import { Privacy } from './Privacy';
-import { DISCUSSIONS_URL } from './links';
+import { DISCUSSIONS_URL, LICENSES_PATH, RIGHTS_HOLDER } from './links';
 import type { RulesetInfo } from './game/rules';
 
 export const PRIVACY_PATH = '/privacy';
+
+/** The year in the copyright line (NOTICE: Copyright 2026). */
+const COPYRIGHT_YEAR = 2026;
 
 /** The ruleset id of a rules page path such as /rules/standard-2p, else undefined. */
 export const rulesIdOf = (pathname: string): string | undefined =>
@@ -50,7 +53,9 @@ export function App({ path }: { path?: string }) {
   return (
     <main className="page">
       <header className="masthead">
-        <h1>Chess Nines</h1>
+        <h1>
+          Chess Nines<span className="tm">™</span>
+        </h1>
         <p>{subtitle}</p>
       </header>
       {page === 'privacy' ? (
@@ -81,6 +86,12 @@ export function App({ path }: { path?: string }) {
         )}
         {' · '}
         <a href={DISCUSSIONS_URL}>Suggest a variant</a>
+        {' · '}
+        <a href={LICENSES_PATH}>Licenses</a>
+        <span className="legal">
+          © {COPYRIGHT_YEAR} {RIGHTS_HOLDER}. Chess Nines™ is a trademark of {RIGHTS_HOLDER}.
+          Rulesets other than Official ones are not tournament rules.
+        </span>
       </footer>
     </main>
   );
