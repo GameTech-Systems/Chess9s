@@ -48,6 +48,10 @@ describe('the rules the game plays', () => {
     expect(easy['castling.enabled']).toBe(true);
     expect(easy['pawn.safeZones']).toBe('off');
     expect(easy['queen.canEnterVoid']).toBe(true);
+    const info = listRulesets().find((r) => r.id === 'easy-2p')!;
+    const { game } = newModel(createRules('easy-2p'), info);
+    expect(game.turn).toBe('light');
+    expect(game.legal.length).toBeGreaterThan(0);
   });
 });
 

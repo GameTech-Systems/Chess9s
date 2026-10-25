@@ -1,0 +1,72 @@
+{
+  "ruleset": {
+    "id": "standard-2p",
+    "version": "0.1.0"
+  },
+  "overrides": {},
+  "date": "2026-10-25",
+  "decision": "0008",
+  "measures": {
+    "decision": "0008",
+    "version": 2,
+    "band": {
+      "min": 0.47,
+      "max": 0.53
+    },
+    "minGames": 2000,
+    "depths": [
+      1,
+      2
+    ],
+    "nodes": 100000,
+    "openingPlies": 4,
+    "maxPlies": 2000
+  },
+  "verdict": "incomplete",
+  "runs": [
+    {
+      "combination": "default",
+      "overrides": {},
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 4089,
+      "summary": {
+        "games": 2000,
+        "firstWins": 545,
+        "secondWins": 536,
+        "draws": 919,
+        "score": 0.50225,
+        "interval": [
+          0.4803534569660742,
+          0.5241379160047235
+        ],
+        "drawRate": 0.4595,
+        "winsBySide": {
+          "light": 536,
+          "dark": 545
+        },
+        "results": {
+          "repetition": 884,
+          "checkmate": 1081,
+          "fifty-move": 33,
+          "insufficient-material": 2
+        },
+        "plies": {
+          "mean": 137.3875,
+          "median": 127,
+          "min": 5,
+          "max": 493
+        },
+        "distinct": 2000,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [],
+        "pass": true
+      }
+    }
+  ],
+  "flagged": [],
+  "skipped": []
+}
