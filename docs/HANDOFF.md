@@ -1,30 +1,27 @@
 # Handoff
 
-Updated 2026-10-25 by S45 (Sonnet 5.5 · high). `/end-session` rewrites this file; keep it under 40 lines.
+Updated 2026-10-25 by S46 (Sonnet 5.5 · medium). `/end-session` rewrites this file; keep it under 40 lines.
 
 ## State
-- Phase 4. S45 is done: `rules/locks/` holds locks for `draft-2p` 0.2.0 and `standard-2p` 0.1.0; a test (`packages/sim/src/locks.test.ts`) fails on a changed, lost or new key and names the ruleset, version and key. 1443 tests pass.
-- `pnpm lock write|add-keys|archive <id>` writes locks, records new keys without changing locked values, and keeps the current file in `rules/rulesets/archive/` as `deprecated`. Nothing is archived yet (no new version exists).
-- Engine `resolveVersion`/`findRulesetVersion`, sim `rulesFor(source, id, overrides, version)` and web `findRuleset(id, version)`/`createRules(id, version)` find a ruleset by id and version; an archived one plays from its lock. The picker lists current versions only.
-- Standard (`standard-2p` 0.1.0) is a Candidate; its 21-day discussion starts when the owner announces it (S44).
+- Phase 4. S44 and S46 are done. Standard's discussion: GitHub Discussions #39, opened 2026-10-25, closes 2026-11-15 (D20). It lives in `apps/web/src/tournament.ts`.
+- `/tournament` (`Tournament.tsx`) says: Official rulesets only (D46); Standard is a Candidate under discussion (link and both dates); how a ruleset becomes Official; hot-seat or over the board until Phase 5; no conduct rules, the organizer announces them (D47). It shows the Official ruleset instead once one exists. Linked from every footer, the rules page, the builder note and the tournament invitation mail.
+- Save game record / Open game record (Game panel, `game/record.ts`): JSON with ruleset id and version, overrides, turn order, moves, result, date; no names. Opening replays through the engine (S45 lookup) and refuses an illegal move or a mismatched result. Privacy page updated. 1460 tests pass.
 
 ## Next session
-**S46 — Tournament rules page and game record** · Sonnet 5.5 · effort medium
-Why: it is the next step in the plan and uses the S45 lookup to replay a downloaded game record.
-Start with: `/start-session S46`
+**S47 — Close the discussion** · Opus 5.5 · effort high · owner with Claude in chat
+Why: the discussion closes 2026-11-15; S47 is the next step and cannot start before then.
+Start with: `/start-session S47`
 
 ## Decisions in effect for the next step
-- D47 (default): no conduct rules published; `/tournament` says the organizer announces them with the invitation.
-- D46 (default): custom rulesets reach tournaments only through the GOVERNANCE checklist.
-- Provisional (S45): the fairness-report test holds a report to a lock only when its ruleset version is in `rules/` as a Candidate, Official or archived version; `easy-2p` 0.1.0's report (an older Experimental version, not in `rules/`) is exempt.
+- D47, D48, D49: decided in the ledger (defaults kept). D48: the ratified version stays 0.1.0. D49: no new discussion if Standard changes; re-check at both depths, then ratify.
+- S50 (ratification) has no default; it stays blocked until the owner decides after the close.
 
 ## Open questions for the owner
-- S44: post the Standard discussion and set its end date (at least 21 days later); put the link and dates in a brief. S46 shows "starts when announced" until then.
-- S45's done-when says editing `king.range`'s registry default fails a test naming `standard-2p` 0.1.0. It can't: Standard sets `king.range: 1` itself, so only `draft-2p` 0.2.0 inherits that default. The tests show this and show a default Standard inherits (`king.canJump`) failing for it. No action needed unless you wanted Standard to inherit.
-- D47 to D49 ids (renumber if the ledger uses them); ratification (S50) has no default.
+- Nothing blocks S47 beyond the date. Option: S47 gives the owner the choice to ratify, change (S48), or extend.
 - Carried over: Discussion form prefill check, the flag rule (decision 0013), `coast.openToAll` reading, I34 contact address, favicon and Ting Yang art.
 
 ## Notes for Claude
-- A lock is never edited by hand. New version: `pnpm lock archive <id>`, edit the file (version, status), `pnpm lock write <id>`. New registry key: `pnpm lock add-keys <id>` for each locked ruleset.
-- Web tests have no real archived version; replay from a lock is tested in `packages/engine/src/rules/locks.test.ts` and `packages/sim/src/locks.test.ts`. Game records carry `ruleset: {id, version}`; load them with `findRuleset(id, version)` and `createRules(id, version)`.
+- When Standard becomes Official (S50): `Tournament.tsx` already names an Official 2-player ruleset when one exists; update its tests and the discussion copy then.
+- A game record's custom ruleset is named by its id (the name is not stored). Records do not carry the opponent mode.
+- A lock is never edited by hand. New version: `pnpm lock archive <id>`, edit the file, `pnpm lock write <id>`.
 - Playwright works against `vite preview` on port 4173. Cloudflare Workers Builds deploys `main`.
