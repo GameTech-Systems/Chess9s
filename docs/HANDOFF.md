@@ -1,32 +1,32 @@
 # Handoff
 
-Updated 2026-10-25 by S42 (Sonnet 5.5 · medium). `/end-session` rewrites this file; keep it under 40 lines.
+Updated 2026-10-25 by S43 (Opus 5.5 · medium). `/end-session` rewrites this file; keep it under 40 lines.
 
 ## State
-- Phase 3, testers playing (S29). S42: **Export, load and share** on `/build`. Export writes a `.json` in the ruleset format (proposed, 2 players); load takes a file (20 KB cap, strict keys, no `extends`, 2-player only, every override resolved by `resolveRuleset`, no new parameters; id and status are ignored). Share link is `/build#ruleset=<base64url {n, o}>` (hash, so no server sees it); the builder says "Unofficial" until values equal an Official ruleset (none yet). "Invite to a game/tournament" are `mailto:` drafts with no address. Checked in a real browser. 1384 tests pass. Privacy page updated.
-- Standard (`standard-2p` 0.1.0) is a Candidate (S38); its 21-day discussion starts when the owner announces it.
+- Phase 3 is complete; testers are playing (S29). S43: **Submit for consideration** on `/build` opens the Rule proposals Discussion form (`discussions/new?category=rule-proposals`). It is prefilled with the title, a settings summary, the share link and the exported file (new `ruleset` field in the template, `render: json`). The poster writes why the ruleset is fair and ticks the terms. If the address would be over 6,000 characters, the file is left out and the poster is asked to paste the export instead.
+- `pnpm sim --ruleset-file <f>` runs the fairness check on a submitted file. It uses the engine's `readRulesetFile`, the same check the builder uses to load a file (now in `packages/engine/src/rules/ruleset-file.ts`). The file plays as `proposed` under the id `submitted-<name>` and can never stand in for a bundled ruleset. A file that switches on an unbuilt feature is refused.
+- GOVERNANCE has a "Submitted rulesets" checklist: the file loads, it passes at both depths, it is added as a Candidate, 21 days of discussion, then ratification (D46). Tournament invitations now say to play hot-seat or over the board. 1399 tests pass. Checked in a real browser.
+- Standard (`standard-2p` 0.1.0) is a Candidate; its 21-day discussion starts when the owner announces it.
 
 ## Next session
-**S43 — Submit a ruleset for tournament consideration** · Opus 5.5 · effort medium
-Why: it adds a `pnpm sim --ruleset-file` path and a governance checklist, which need design care.
-Start with: `/start-session S43`
+**S30 — Phase 4 planning: Official tournament rules** · Opus 5.5 · effort high
+Why: the plan says each later phase opens with an Opus · high planning session that writes its detailed steps.
+Start with: `/start-session S30`
 
 ## Decisions in effect for the next step
-- D43, D46 (default): custom rulesets never go straight to tournaments; Official only via the S43 checklist.
+- D20 (default): 21-day discussion before ratification.
+- D43 (default): Standard is the ruleset for the tournament discussion.
+- D46 (default): custom rulesets reach tournaments only through the GOVERNANCE checklist.
 
 ## Open questions for the owner
-- Flag rule for "not fairness-checked" (decision 0013, provisional): a pair is flagged when both settings are off the registry default, share an `affects` system, and at least one differs from the starting preset. Default: keep it.
-- `coast.openToAll` reading (S40): it lifts the bars on entering the Coast, not the Coast pieces' own `coast.2p.exit` and `coast.returnAllowed`, or `queen.voidCrossings`. Default: keep it.
-- I34: a project contact address. Default: the privacy page points to Discussions.
-- Favicon is still the empty `data:,` placeholder. Ting Yang art still open.
-- Discussion for Standard: the owner announces it (Discussions post) and sets the 21-day end date.
+- Discussion for Standard: the owner announces it (Discussions post) and sets the 21-day end date. S30 needs it to plan ratification.
+- Discussion form prefill: GitHub fills form fields from query parameters named after the field ids (`idea`, `ruleset`). Check once on the live repository that the Rule proposals form opens filled in. Default: keep it; if it does not, the summary still lands in the title and the poster pastes the file.
+- Carried over: the flag rule (decision 0013) and the `coast.openToAll` reading (default for both: keep them), I34 contact address, favicon and Ting Yang art.
 
 ## Notes for Claude
-- S43: `game/share.ts` has `exportFile`, `parseRulesetFile` (returns a draft) and `shareLink`; reuse them for the Discussion prefill. The sim must read a file with the same strictness.
-- Share link deviates from the plan's `/play?ruleset=`: it is `/build#ruleset=` (provisional: hash is private, `/build` is where the builder lives). Default: keep it.
-- `queen.pawnSwap` is still unbuilt (D45). The builder lists unbuilt features it switches on.
-- Web tests have no DOM (static markup only); interactions go through `builderReducer`. Playwright is installed for a real-browser check (`vite preview`, port 4173).
-- Engine and sim tests still use `draft-2p`; some web tests pin `draft-2p` too.
-- Labels are presentation only. A new option needs a label entry; `GROUP_ORDER` in `RulesPage.tsx` lists the groups.
+- Ruleset files are read in one place: `readRulesetFile` / `resolveFileOverrides` in the engine. Web `parseRulesetFile` adds only the name-length check.
+- Sim jobs can carry a `ruleset` (pool `Job.ruleset`), because workers load `rules/rulesets` themselves.
+- Share link is `/build#ruleset=` (provisional). `queen.pawnSwap` is still unbuilt (D45).
+- Web tests have no DOM; Playwright works against `vite preview` on port 4173.
 - A Candidate ruleset's default must not change without a new version and a new fairness run.
 - Deploys: Cloudflare Workers Builds builds `main` on each merge.
