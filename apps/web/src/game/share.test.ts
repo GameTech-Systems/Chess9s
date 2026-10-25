@@ -10,6 +10,8 @@ import {
   parseRulesetFile,
   parseShareLink,
   shareLink,
+  submitUrl,
+  SUBMIT_URL_MAX,
 } from './share';
 import { rulesetValues } from './rules';
 
@@ -137,5 +139,57 @@ describe('invitation mail', () => {
     const q = new URLSearchParams(inviteMailto('tournament', mine(), origin).slice(8));
     expect(q.get('subject')).toMatch(/tournament/i);
     expect(q.get('body')).toMatch(/not a tournament ruleset/i);
+  });
+
+  it('a tournament invitation says to play hot-seat or over the board until online play', () => {
+    const q = new URLSearchParams(inviteMailto('tournament', mine(), origin).slice(8));
+    expect(q.get('body')).toMatch(/hot-seat or over the board/i);
+  });
+});
+
+describe('submit for tournament consideration (S43)', () => {
+  const origin = 'https://chess9s.com';
+  const form = (state: BuilderState) => {
+    const url = new URL(submitUrl(state, origin));
+    return { url, q: url.searchParams };
+  };
+
+  it('opens the Rule proposals Discussion form, prefilled', () => {
+    const { url, q } = form(mine());
+    expect(`${url.origin}${url.pathname}`).toBe(
+      'https://github.com/GameTech-Systems/Chess9s/discussions/new',
+    );
+    expect(q.get('category')).toBe('rule-proposals');
+    expect(q.get('title')).toBe('[Ruleset] Mine');
+    expect(q.get('idea')).toContain('King range');
+    expect(q.get('idea')).toContain(`${origin}${shareLink(mine())}`);
+    expect(q.get('idea')).toContain('pnpm sim --ruleset-file');
+  });
+
+  it('carries the ruleset file, exactly as an export, which loads back', () => {
+    const { q } = form(mine());
+    const json = q.get('ruleset')!;
+    expect(json).toBe(exportFile(customFrom(mine(), 'submitted')));
+    const back = parseRulesetFile(json);
+    expect(back.ok && back.state.values).toEqual(mine().values);
+  });
+
+  it('leaves the reasons and the contribution terms to the poster', () => {
+    const { q } = form(mine());
+    expect(q.get('why')).toBeNull();
+    expect(q.get('terms')).toBeNull();
+  });
+
+  it('stays under the URL limit, dropping the file (export it instead) when too long', () => {
+    let s = mine();
+    for (const opt of ['knight', 'rook', 'pawn', 'queen', 'king']) {
+      s = builderReducer(s, { type: 'toggle', id: 'center.passThrough', option: opt });
+    }
+    expect(submitUrl(s, origin).length).toBeLessThanOrEqual(SUBMIT_URL_MAX);
+    const long = { ...s, name: 'x'.repeat(40) };
+    expect(submitUrl(long, origin, 1500).length).toBeLessThanOrEqual(1500);
+    const q = new URL(submitUrl(long, origin, 1500)).searchParams;
+    expect(q.get('ruleset')).toBeNull();
+    expect(q.get('idea')).toMatch(/paste the exported file/i);
   });
 });

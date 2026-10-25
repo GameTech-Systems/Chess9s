@@ -225,6 +225,10 @@ describe('sharing a ruleset', () => {
     expect(html).toContain('Invite to a tournament');
     expect(html).toMatch(/href="mailto:\?subject=/);
     expect(html).toContain('/build#ruleset=');
+    expect(html).toContain('Submit for consideration');
+    expect(html).toMatch(
+      /href="https:\/\/github\.com\/[^"]*discussions\/new\?category=rule-proposals/,
+    );
   });
 
   it('opens a shared link preloaded', () => {
@@ -242,6 +246,7 @@ describe('sharing a ruleset', () => {
   it('keeps the invitation buttons off until the ruleset has a name', () => {
     const html = render();
     expect(html).toMatch(/aria-disabled="true"[^>]*>Invite to a game/);
+    expect(html).toMatch(/aria-disabled="true"[^>]*>Submit for consideration/);
   });
 });
 
