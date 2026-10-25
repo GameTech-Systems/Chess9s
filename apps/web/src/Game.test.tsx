@@ -4,11 +4,13 @@ import { newGame, playMove, toNotation, type Position } from '@chess9s/engine';
 import hotSeatMate from '../../../packages/engine/test/fixtures/games/hot-seat-mate.json';
 import { Game } from './Game';
 import { App } from './App';
-import { createRules, ruleset } from './game/rules';
+import { createRules, listRulesets, ruleset } from './game/rules';
 import { fromGame, newModel } from './game/session';
 import { saveGuest } from './game/guest';
 
-const render = (initial = newModel()) => renderToStaticMarkup(<Game initial={initial} />);
+const render = (initial = newModel(), info = ruleset) =>
+  renderToStaticMarkup(<Game initial={initial} ruleset={info} />);
+const practice = listRulesets().find((r) => r.id === 'draft-2p')!;
 
 describe('Game screen', () => {
   it('starts a game: dark to move, Coast closed, the ruleset id and version shown', () => {
@@ -25,14 +27,15 @@ describe('Game screen', () => {
   });
 
   it('shows the end of a full game: checkmate, the winner, the moves, an open Coast', () => {
-    let game = newGame(createRules(), ruleset);
+    // The fixture was played under draft-2p (Good Practice), where the King moves 2 squares.
+    let game = newGame(createRules('draft-2p'), practice);
     for (const notation of hotSeatMate.moves) {
       game = playMove(
         game,
         game.legal.find((m) => toNotation(m) === notation)!,
       );
     }
-    const html = render(fromGame(game));
+    const html = render(fromGame(game), practice);
     expect(html).toContain('Checkmate · Light wins');
     expect(html).toContain('data-result="win"');
     expect(html).toMatch(/Coast: <strong>open<\/strong>/);
@@ -73,7 +76,14 @@ describe('Rule picker', () => {
   it('opens on the picker: every ruleset with its status badge, 3-player not playable yet', () => {
     const html = renderToStaticMarkup(<App />);
     expect(html).toContain('Choose a ruleset');
-    expect(html).toContain('Draft 2-Player');
+    for (const name of ['Standard', 'Easy Start', 'Good Practice', 'Draft 3-Player']) {
+      expect(html).toContain(name);
+    }
+    // Standard comes first and is marked as the default.
+    expect(html.indexOf('Standard')).toBeLessThan(html.indexOf('Good Practice'));
+    expect(html).toMatch(/Standard<\/strong>[\s\S]*?class="default-tag"[^>]*>Default</);
+    expect(html).toContain('href="/rules/standard-2p"');
+    expect(html).toContain('href="/rules/draft-2p"');
     expect(html).toContain('data-status="candidate"');
     expect(html).toContain('data-status="experimental"');
     expect(html).toMatch(/Not playable yet/);
@@ -113,6 +123,22 @@ describe('play aids, part 2', () => {
     expect(html).toContain(`${ruleset.id} v${ruleset.version}`);
     expect(html).toContain('En passant');
     expect(html).toContain('>Close<');
+  });
+
+  it('the rules screen links to the full rules of the ruleset in play', async () => {
+    const { RulesScreen } = await import('./Rules');
+    const { RULES_DOC_URL } = await import('./links');
+    const html = renderToStaticMarkup(
+      <RulesScreen ruleset={practice} missing={[]} onClose={() => {}} />,
+    );
+    expect(html).toMatch(/href="\/rules\/draft-2p"[^>]*>Full rules for Good Practice</);
+    expect(html).toContain(`href="${RULES_DOC_URL}"`);
+    // What sets this ruleset apart from the others is named.
+    expect(html).toContain('Every setting at its default');
+    const standard = renderToStaticMarkup(
+      <RulesScreen ruleset={ruleset} missing={[]} onClose={() => {}} />,
+    );
+    expect(standard).toMatch(/King range[\s\S]*?1/);
   });
 });
 
