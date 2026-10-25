@@ -179,7 +179,7 @@ Done when: a player builds a ruleset from Standard, plays it against the compute
 - **Email**: "Invite to a game" and "Invite to a tournament" open the player's own mail app (`mailto:`) with a subject, the link and the settings in plain text. The app sends nothing and stores no address.
 Done when: export → load round-trips exactly, a broken or hostile file is refused with a clear message, and the mail draft opens with the link.
 
-### S43 — Submit a ruleset for tournament consideration · Opus 5.5 · medium · `todo`
+### S43 — Submit a ruleset for tournament consideration · Opus 5.5 · medium · `done`
 "Submit for consideration" opens the Rule proposals Discussion form prefilled with the ruleset JSON and its settings summary (the poster ticks the contribution terms). `pnpm sim --ruleset-file <path>` checks a submitted file; a short review checklist in GOVERNANCE (fairness run at both depths, 21-day discussion, owner ratification) says how a submission can become a Candidate and then Official. Tournament play online waits for Phase 5 (S31); until then invitations carry the ruleset link for hot-seat or over-the-board games.
 Decisions: D43, D46.
 
