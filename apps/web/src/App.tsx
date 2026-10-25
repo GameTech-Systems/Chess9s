@@ -4,14 +4,18 @@ import { RulePicker } from './RulePicker';
 import { Builder } from './Builder';
 import { RulesPage } from './RulesPage';
 import { Privacy } from './Privacy';
+import { Tournament } from './Tournament';
 import { DISCUSSIONS_URL, LICENSES_PATH, RIGHTS_HOLDER } from './links';
 import { parseShareLink } from './game/share';
 import { loadCustoms, saveCustoms } from './game/custom';
 import { customInfo, type CustomRuleset, type RulesetInfo } from './game/rules';
 import type { Store } from './game/guest';
+import { fromGame } from './game/session';
+import type { Opened } from './game/record';
 
 export const PRIVACY_PATH = '/privacy';
 export const BUILD_PATH = '/build';
+export const TOURNAMENT_PATH = '/tournament';
 
 function browserStore(): Store | null {
   try {
@@ -29,15 +33,17 @@ export const rulesIdOf = (pathname: string): string | undefined =>
   /^\/rules\/([a-z0-9]+(?:-[a-z0-9]+)*)\/?$/.exec(pathname)?.[1];
 
 /** Which page a URL path shows. Anything unknown is the game: the host falls back to index.html. */
-export const pageOf = (pathname: string): 'privacy' | 'rules' | 'build' | 'game' => {
+export const pageOf = (pathname: string): 'privacy' | 'rules' | 'build' | 'tournament' | 'game' => {
   const bare = pathname.replace(/\/+$/, '');
   return bare === PRIVACY_PATH
     ? 'privacy'
     : bare === BUILD_PATH
       ? 'build'
-      : rulesIdOf(pathname) !== undefined
-        ? 'rules'
-        : 'game';
+      : bare === TOURNAMENT_PATH
+        ? 'tournament'
+        : rulesIdOf(pathname) !== undefined
+          ? 'rules'
+          : 'game';
 };
 
 export function App({
@@ -58,6 +64,8 @@ export function App({
     path ?? (typeof window === 'undefined' ? '/' : window.location.pathname),
   );
   const [picked, setPicked] = useState<RulesetInfo | null>(null);
+  // A game record opened for replay (S46): the game it replays to, played on from there.
+  const [opened, setOpened] = useState<(Opened & { ok: true }) | null>(null);
   // The player's own rulesets live in this browser only (privacy page).
   const [customs, setCustoms] = useState<CustomRuleset[]>(() => loadCustoms(store));
   const [editing, setEditing] = useState<string | undefined>(undefined);
@@ -94,9 +102,11 @@ export function App({
       ? 'Rules'
       : page === 'build'
         ? 'Change ruleset'
-        : picked && page === 'game'
-          ? `Hot-seat · ${picked.players} players`
-          : 'Hot-seat';
+        : page === 'tournament'
+          ? 'Tournaments'
+          : picked && page === 'game'
+            ? `Hot-seat · ${picked.players} players`
+            : 'Hot-seat';
   return (
     <main className="page">
       <header className="masthead">
@@ -107,6 +117,8 @@ export function App({
       </header>
       {page === 'privacy' ? (
         <Privacy />
+      ) : page === 'tournament' ? (
+        <Tournament />
       ) : page === 'build' ? (
         <Builder
           key={editing ?? (shared ? 'shared' : 'new')}
@@ -130,7 +142,19 @@ export function App({
           }}
         />
       ) : picked ? (
-        <Game key={picked.id} ruleset={picked} onChangeRuleset={() => setPicked(null)} />
+        <Game
+          key={opened ? `record-${opened.date}-${picked.id}` : picked.id}
+          ruleset={picked}
+          {...(opened && { initial: fromGame(opened.game) })}
+          onChangeRuleset={() => {
+            setOpened(null);
+            setPicked(null);
+          }}
+          onOpenRecord={(r) => {
+            setOpened(r);
+            setPicked(r.info);
+          }}
+        />
       ) : (
         <RulePicker
           onPick={setPicked}
@@ -158,6 +182,10 @@ export function App({
             Privacy
           </a>
         )}
+        {' · '}
+        <a href={TOURNAMENT_PATH} onClick={go(TOURNAMENT_PATH)}>
+          Tournaments
+        </a>
         {' · '}
         <a href={DISCUSSIONS_URL}>Suggest a variant</a>
         {' · '}

@@ -27,6 +27,11 @@ export function Privacy() {
           message.
         </li>
         <li>
+          Save game record downloads the game as a file on your device: the ruleset, the moves, the
+          result and the date, with no names. Open game record reads a file you pick, on your
+          device. Nothing is sent or stored by us.
+        </li>
+        <li>
           The site is hosted by Cloudflare, which keeps standard request logs (such as IP address,
           time and page requested) under its own policies. We do not receive or use them for
           tracking.

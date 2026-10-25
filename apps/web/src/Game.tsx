@@ -4,6 +4,7 @@ import { RulesScreen } from './Rules';
 import { formatElapsed, play, soundsFor } from './game/aids';
 import { searchMove, type BotSearch } from './game/botClient';
 import { clearGuest, loadGuest, saveGuest, type Mode, type Store } from './game/guest';
+import { openRecord, recordFile, recordJson, type Opened } from './game/record';
 import { Board } from './board/Board';
 import { boardData, pieceLetters } from './board/data';
 import { DEFAULT_RULESET_ID, createRulesFor, listRulesets, type RulesetInfo } from './game/rules';
@@ -60,6 +61,7 @@ export function Game({
   initial,
   ruleset = listRulesets().find((r) => r.id === DEFAULT_RULESET_ID)!,
   onChangeRuleset,
+  onOpenRecord,
   store = browserStore(),
 }: {
   initial?: Model;
@@ -67,6 +69,8 @@ export function Game({
   store?: Store | null;
   ruleset?: RulesetInfo;
   onChangeRuleset?: () => void;
+  /** A game record was opened; the app shows its game, on the ruleset it names. */
+  onOpenRecord?: (record: Opened & { ok: true }) => void;
 }) {
   const rules = useMemo(
     () => createRulesFor(ruleset),
@@ -114,6 +118,28 @@ export function Game({
   useEffect(() => {
     if (store) saveGuest(store, { game, mode });
   }, [game.moves.length, mode]);
+  const picker = useRef<HTMLInputElement>(null);
+  const [recordProblem, setRecordProblem] = useState<string | null>(null);
+  // Save game record: a download from this page; nothing is sent anywhere.
+  const saveRecord = () => {
+    const date = new Date().toISOString().slice(0, 10);
+    const url = URL.createObjectURL(
+      new Blob([recordJson(game, date)], { type: 'application/json' }),
+    );
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = recordFile(ruleset, date);
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+  const openFile = async (file: File | undefined) => {
+    if (!file) return;
+    const opened = openRecord(await file.text());
+    if (opened.ok) {
+      setRecordProblem(null);
+      onOpenRecord?.(opened);
+    } else setRecordProblem(opened.problem);
+  };
   const restart = () => {
     if (store) clearGuest(store);
     setModel(newModel(rules, ruleset));
@@ -263,6 +289,31 @@ export function Game({
         <button type="button" className="again" onClick={restart} data-over={over ? '' : undefined}>
           New game
         </button>
+
+        <div className="segmented" role="group" aria-label="Game record">
+          <button type="button" disabled={game.moves.length === 0} onClick={saveRecord}>
+            Save game record
+          </button>
+          <button type="button" onClick={() => picker.current?.click()}>
+            Open game record
+          </button>
+          <input
+            ref={picker}
+            type="file"
+            hidden
+            aria-label="Game record file"
+            accept=".json,application/json"
+            onChange={(e) => {
+              void openFile(e.target.files?.[0]);
+              e.target.value = '';
+            }}
+          />
+        </div>
+        {recordProblem && (
+          <p className="facts" role="alert">
+            {recordProblem}
+          </p>
+        )}
 
         <button type="button" className="again" onClick={onChangeRuleset}>
           Change ruleset

@@ -94,6 +94,13 @@ describe('Rule picker', () => {
   it('the game screen offers a way back to the picker', () => {
     expect(render()).toContain('Change ruleset');
   });
+
+  it('the game screen offers to save and open a game record (S46)', () => {
+    const html = render();
+    expect(html).toContain('Save game record');
+    expect(html).toContain('Open game record');
+    expect(html).toMatch(/<button[^>]*disabled=""[^>]*>Save game record/);
+  });
 });
 
 describe('play aids on the screen', () => {

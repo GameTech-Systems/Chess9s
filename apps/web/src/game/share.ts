@@ -161,7 +161,10 @@ export function inviteMailto(kind: InviteKind, state: BuilderState, origin: stri
       ? ['It is not a tournament ruleset: custom rulesets are not used in official tournaments.']
       : []),
     ...(kind === 'tournament'
-      ? ['Tournaments are not played online yet: play hot-seat or over the board with the link.']
+      ? [
+          'Tournaments are not played online yet: play hot-seat or over the board with the link.',
+          `Tournament rules: ${origin}/tournament`,
+        ]
       : []),
     '',
     'Differs from Standard:',

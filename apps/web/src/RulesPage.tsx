@@ -243,7 +243,8 @@ export function RulesPage({
             rules guide
           </a>{' '}
           explains every piece and square at the Chess Nines defaults; where it differs from this
-          page, the settings here are the rules of {info.name}.
+          page, the settings here are the rules of {info.name}. For tournaments, see the{' '}
+          <a href="/tournament">tournament rules</a>.
           {!info.custom && (
             <>
               {' '}

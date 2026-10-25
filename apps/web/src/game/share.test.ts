@@ -147,6 +147,16 @@ describe('invitation mail', () => {
   });
 });
 
+describe('tournament invitation links the tournament rules (S46)', () => {
+  const origin = 'https://chess9s.com';
+  it('names the /tournament page on this site, and a game invitation does not', () => {
+    const t = new URLSearchParams(inviteMailto('tournament', mine(), origin).slice(8));
+    expect(t.get('body')).toContain(`Tournament rules: ${origin}/tournament`);
+    const g = new URLSearchParams(inviteMailto('game', mine(), origin).slice(8));
+    expect(g.get('body')).not.toContain('/tournament');
+  });
+});
+
 describe('submit for tournament consideration (S43)', () => {
   const origin = 'https://chess9s.com';
   const form = (state: BuilderState) => {
