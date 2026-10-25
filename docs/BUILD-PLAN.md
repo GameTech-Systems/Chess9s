@@ -183,12 +183,45 @@ Done when: export → load round-trips exactly, a broken or hostile file is refu
 "Submit for consideration" opens the Rule proposals Discussion form prefilled with the ruleset JSON and its settings summary (the poster ticks the contribution terms). `pnpm sim --ruleset-file <path>` checks a submitted file; a short review checklist in GOVERNANCE (fairness run at both depths, 21-day discussion, owner ratification) says how a submission can become a Candidate and then Official. Tournament play online waits for Phase 5 (S31); until then invitations carry the ruleset link for hot-seat or over-the-board games.
 Decisions: D43, D46.
 
+## Phase 4: Official tournament rules
+
+Planned in S30 (2026-10-25). Standard (`standard-2p` 0.1.0) is the Candidate under discussion (D43). The phase ends with an immutable Official 2-player ruleset (ROADMAP exit). S44 starts the 21-day clock and can happen at any time; S45 and S46 run during the discussion; S48 and S49 run only if the discussion changes Standard.
+
+### S30 — Phase 4 planning · Opus 5.5 · high · `done`
+Wrote the steps below. Found two gaps that the Official ruleset needs closed: a ruleset stores only its overrides, so editing a registry default silently changes a Candidate or Official ruleset; and `rules/rulesets/` keeps one version per id, so an old version can't be replayed once a new one ships.
+
+### S44 — Announce the discussion for Standard · Owner · `todo`
+Post the Standard discussion in Discussions (link the rules page `/rules/standard-2p`, the fairness report and decision 0012) and set its end date, at least 21 days later (D20). Put the link and both dates in the ledger brief for S46, or in any later session's brief.
+
+### S45 — Ruleset locks and kept versions · Sonnet 5.5 · high · `todo`
+- **Locks.** `rules/locks/<id>@<version>.json` holds every resolved value of a Candidate or Official ruleset (today `draft-2p` 0.2.0 and `standard-2p` 0.1.0), with a schema in `rules/schema/`. A test fails when a locked ruleset resolves to a changed value or loses a key (for example, from a registry default edit or a deprecation). It also fails on a new key until the lock records it at its current value; recording a new key never changes a locked value. A script writes a lock for a new version and refuses to overwrite one that exists.
+- **Kept versions.** When a Candidate or Official ruleset gets a new version, the old file moves to `rules/rulesets/archive/<id>@<version>.json` (status `deprecated`, per the GOVERNANCE ladder). Engine, web and sim find a ruleset by id and version. An archived version plays from its lock's values, not from today's registry, so a game record of it replays exactly. The picker lists only current versions; saved games and game records may name an archived one.
+- The fairness report's ruleset id and version must name an existing lock (a test).
+Done when: editing `king.range`'s registry default fails a test that names `standard-2p` 0.1.0; a game recorded under an archived version replays move for move; every parameter keeps its default-and-options tests.
+
+### S46 — Tournament rules page and game record · Sonnet 5.5 · medium · `todo`
+- **`/tournament`**, linked from the footer, the rules page, the builder's tournament note and the tournament invitation mail. It says: tournaments use Official rulesets only, never custom ones (D46); which ruleset that is (until ratification: "Standard is a Candidate under public discussion", with the S44 link and dates, or "starts when announced"); how a ruleset becomes Official (a summary of GOVERNANCE, with a link); games are hot-seat or over the board until online play (Phase 5); conduct rules per D47.
+- **Save game record**: a button that downloads the game as JSON (ruleset id, version and any overrides, turn order, moves in notation, result, date; no names). It loads back for replay with the S45 lookup. Nothing is sent or stored; the privacy page says so and its date changes.
+- The discussion link and dates live in one web module (`apps/web/src/tournament.ts`), empty until S44 is done. Ruleset files stay unchanged.
+Done when: the page renders in both states (no discussion yet, discussion open), a saved record loads and replays to the same result, and the tests cover the page and the record round trip.
+
+### S47 — Close the discussion · Owner with Claude in chat · Opus 5.5 · high · `todo`
+After the S44 end date: go through the discussion, playtest feedback and balance reports for Standard (no commenter names in the repo). The owner chooses: ratify 0.1.0 as it is (go to S50); change it, using only options already in `rules/parameters.json` (go to S48); or extend the discussion. The owner also settles D47 to D49 in the ledger. Output: the owner's decision for the brief, plus a short public summary of what was raised, for the S50 decision record.
+
+### S48 — Re-check a changed Standard · Sonnet 5.5 · medium · `todo`
+Only if S47 changes Standard. A new version of `standard-2p` with the owner's changes (semver per RULES-FRAMEWORK; 0.1.0 goes to the archive as S45 set out), status `experimental`, a new lock, a depth-1 run of 2,000 games and a 40-game sweep. It is committed with the report, as S36 did.
+Done when: the report is committed, the new lock passes, and 0.1.0 still replays. If depth 1 fails, stop and report the numbers to the owner.
+
+### S49 — Depth-2 run for the changed Standard · Owner · `todo`
+Only if S48 ran and passed. Actions → **Sim depth 2** → Run workflow, ruleset `standard-2p` (shards 20, games 2000), as S37.
+
+### S50 — Ratify the Official ruleset · Sonnet 5.5 · medium · `todo`
+Needs the owner's ratification decision in the brief. It has no default; without the decision the step is `blocked`. If S48 ran: commit the depth-2 report (both depths must pass decision 0008, or stop). Set the ruleset to `official` with `ratification` (decision record and date) at the version D48 gives. Write decision record 0014 with the owner's reasoning, the S47 summary and the evidence. Its lock becomes permanent: a test fails if an Official ruleset's file or lock changes at all. Update GOVERNANCE (the 21-day minimum is confirmed, no longer "proposed"; status no longer draft if the owner says so), RULES.md, the rules page and picker badges, `/tournament`, and the share text (`matchingOfficial` now finds Standard).
+Done when: the real data has one Official 2-player ruleset; a share link with its values says "This is the Official ruleset Standard"; `/tournament` names it and its version; all checks pass. This is the Phase 4 exit.
+
 ## Later phases
 
 Each later phase opens with an Opus 5.5 · high planning session that replaces its placeholder with detailed steps.
-
-### S30 — Phase 4: Official tournament rules · `todo`
-Public discussion period (D20), fairness re-check if the ruleset changed, ratification, tournament rules page.
 
 ### S31 — Phase 5: Online multiplayer · `todo`
 Room codes, guest play, reconnection, ruleset locked per game. Backend per D18.
@@ -222,7 +255,7 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D41 | Deploys | Provisional: Cloudflare's Git connection (Workers Builds) deploys `main`; no Cloudflare token in GitHub and no deploy workflow | S27 |
 | D17 | ChessNines repo and site | Default: story, lore, and company information | S4 |
 | D18 | Multiplayer backend | Default: Cloudflare Durable Objects | S31 |
-| D20 | Discussion period before ratification | Default: 21 days | S30 |
+| D20 | Discussion period before ratification | Default: 21 days from the owner's announcement (S44) | S47 |
 | D21 | Phase 1 dependencies | Default: the S7 pre-approved list | S7 |
 | D22 | DCO check alongside the CLA | Default: keep it; Claude signs off every commit with `git commit -s` | S7 |
 | D34 | Dark's seat view | Decided: turned 180° (rank 9 at the bottom, Coast on the right) | S12 |
@@ -231,6 +264,9 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D44 | "Every piece may enter the Coast at any time" | Default (applied as `coast.openToAll`, S40): the Coast is open to every piece from the start; each piece's own Coast setting no longer bars it; Coast pieces may move from the first turn | S40 |
 | D45 | Pawns on the Coast | Default (applied as `pawn.canEnterCoast`, S40): a pawn enters the Coast only by capturing onto it once it is open, then moves forward along file A and promotes on its last rank as usual | S40 |
 | D46 | Custom rulesets in tournaments | Default: never directly; a submitted ruleset becomes Official only through the S43 checklist (fairness at both depths, discussion, ratification) | S43 |
+| D47 | Tournament conduct rules (clock, draw offers, touch-move, disputes) | Default: the project publishes none yet; `/tournament` says the organizer announces them with the invitation | S46 |
+| D48 | Version of the ratified ruleset | Default: keep the version that was fairness-checked (Standard 0.1.0), as 0010 and 0012 kept versions on status changes | S50 |
+| D49 | New discussion after a change | Default: none; a ruleset changed by the discussion is re-checked at both depths and then ratified, with the change named in the decision record (GOVERNANCE, 2-player rules, step 3) | S50 |
 
 ## Ledger sync format
 
