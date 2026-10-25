@@ -68,7 +68,10 @@ export function Game({
   ruleset?: RulesetInfo;
   onChangeRuleset?: () => void;
 }) {
-  const rules = useMemo(() => createRulesFor(ruleset), [ruleset.id, ruleset.overrides]);
+  const rules = useMemo(
+    () => createRulesFor(ruleset),
+    [ruleset.id, ruleset.version, ruleset.overrides],
+  );
   const saved = useMemo(
     () => (initial || !store ? null : loadGuest(store, rules, ruleset)),
     // Read once, when the screen opens.

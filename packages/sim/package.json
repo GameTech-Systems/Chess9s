@@ -9,7 +9,8 @@
     "sim": "vite build --logLevel warn && node dist/cli.js",
     "typecheck": "tsc --noEmit",
     "bench": "vite build --logLevel warn && node dist/bench.js",
-    "merge": "vite build --logLevel warn && node dist/merge.js"
+    "merge": "vite build --logLevel warn && node dist/merge.js",
+    "lock": "vite build --logLevel warn && node dist/lock.js"
   },
   "dependencies": {
     "@chess9s/engine": "workspace:*"

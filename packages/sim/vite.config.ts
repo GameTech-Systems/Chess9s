@@ -14,6 +14,7 @@ export default defineConfig({
         worker: 'src/worker.ts',
         bench: 'src/bench-cli.ts',
         merge: 'src/merge-cli.ts',
+        lock: 'src/lock-cli.ts',
       },
       output: { entryFileNames: '[name].js', format: 'es' },
     },

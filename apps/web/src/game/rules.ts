@@ -1,8 +1,11 @@
 // The rules a hot-seat game plays: the real board, pieces and a ruleset from rules/, validated
 // and resolved by the engine when the game starts. Nothing is read from here but data.
 import {
+  findRulesetVersion,
   resolveRuleset,
+  resolveVersion,
   validateBoardAndPieces,
+  type Lock,
   type MoveRules,
   type ParamValue,
   type Registry,
@@ -17,6 +20,17 @@ const pieceFiles = import.meta.glob<unknown>('../../../../rules/pieces/*.json', 
 });
 
 const rulesetFiles = import.meta.glob<Ruleset>('../../../../rules/rulesets/*.json', {
+  eager: true,
+  import: 'default',
+});
+
+// Earlier versions of a Candidate or Official ruleset (deprecated) and the locks they play from.
+const archiveFiles = import.meta.glob<Ruleset>('../../../../rules/rulesets/archive/*.json', {
+  eager: true,
+  import: 'default',
+});
+
+const lockFiles = import.meta.glob<Lock>('../../../../rules/locks/*.json', {
   eager: true,
   import: 'default',
 });
@@ -36,6 +50,8 @@ export interface RulesetInfo {
   playable: boolean;
   /** The ruleset a new game starts on. */
   isDefault: boolean;
+  /** An earlier version, kept so games recorded under it replay; it plays from its lock's values. */
+  archived?: true;
   /** A ruleset a player built, kept in their browser (not in rules/rulesets/). */
   custom?: true;
   /** A custom ruleset's full overrides: every value that differs from the registry default. */
@@ -90,15 +106,25 @@ const files = Object.values(rulesetFiles).sort(
     a.name.localeCompare(b.name),
 );
 
-/** Every ruleset in rules/rulesets/: the default first, then 2-player, then 3-player. */
+const library = {
+  current: files,
+  archived: Object.values(archiveFiles),
+  locks: Object.values(lockFiles),
+};
+
+/** The current version of every ruleset in rules/rulesets/: the default first, then 2-player, then 3-player. */
 export function listRulesets(): RulesetInfo[] {
   return files.map(infoOf);
 }
 
-/** The ruleset with this id, or undefined. */
-export function findRuleset(id: string): RulesetInfo | undefined {
-  const file = files.find((r) => r.id === id);
-  return file && infoOf(file);
+/**
+ * The ruleset with this id, or undefined. Without a version, the current one; with one, that
+ * exact version, which may be an archived one (not listed in the picker).
+ */
+export function findRuleset(id: string, version?: string): RulesetInfo | undefined {
+  const file = findRulesetVersion(library, id, version);
+  if (!file) return undefined;
+  return library.archived.includes(file) ? { ...infoOf(file), archived: true } : infoOf(file);
 }
 
 /** The default ruleset, as recorded with a game. */
@@ -106,29 +132,39 @@ export const ruleset: RulesetInfo = infoOf(files.find((r) => r.id === DEFAULT_RU
 
 function rulesOf(file: Ruleset): MoveRules {
   const resolved = resolveRuleset(registry, file);
-  const set = validateBoardAndPieces(board, Object.values(pieceFiles), registry as Registry);
-  return { ...set, values: resolved.values, players: 2 };
+  return rulesWith(resolved.values);
 }
 
-export function createRules(id: string = DEFAULT_RULESET_ID): MoveRules {
-  const file = files.find((r) => r.id === id);
-  if (!file) throw new Error(`Unknown ruleset: ${id}`);
+function rulesWith(values: Record<string, ParamValue>): MoveRules {
+  const set = validateBoardAndPieces(board, Object.values(pieceFiles), registry as Registry);
+  return { ...set, values, players: 2 };
+}
+
+/** The rules of a bundled ruleset: the current version, or an archived one from its lock. */
+export function createRules(id: string = DEFAULT_RULESET_ID, version?: string): MoveRules {
+  const file = findRulesetVersion(library, id, version);
+  if (!file) throw new Error(`Unknown ruleset: ${id}${version === undefined ? '' : ` ${version}`}`);
   if (!infoOf(file).playable) throw new Error(`Ruleset ${id} is not playable yet`);
+  if (library.archived.includes(file))
+    return rulesWith(resolveVersion(registry as Registry, library, id, version).values);
   return rulesOf(file);
 }
 
 /** The rules of a ruleset as the game records it: a bundled id, or a custom ruleset's overrides. */
-export function createRulesFor(ref: Pick<RulesetInfo, 'id' | 'name' | 'overrides'>): MoveRules {
+export function createRulesFor(
+  ref: Pick<RulesetInfo, 'id' | 'name' | 'overrides'> & { version?: string },
+): MoveRules {
   return ref.overrides
     ? rulesOf(customFile({ ...ref, overrides: ref.overrides }))
-    : createRules(ref.id);
+    : createRules(ref.id, ref.version);
 }
 
-/** Every value of a bundled ruleset, resolved. */
-export function rulesetValues(id: string): Record<string, ParamValue> {
-  const file = files.find((r) => r.id === id);
-  if (!file) throw new Error(`Unknown ruleset: ${id}`);
-  return resolveRuleset(registry, file).values;
+/** Every value of a bundled ruleset, resolved (an archived version from its lock). */
+export function rulesetValues(id: string, version?: string): Record<string, ParamValue> {
+  if (!findRulesetVersion(library, id, version)) {
+    throw new Error(`Unknown ruleset: ${id}${version === undefined ? '' : ` ${version}`}`);
+  }
+  return resolveVersion(registry as Registry, library, id, version).values;
 }
 
 /** The values a custom ruleset plays: the registry defaults with its overrides. */
@@ -207,12 +243,14 @@ export function settingsFor(values: Record<string, ParamValue>, players: 2 | 3 =
  * ruleset plays. Read from the data only. A custom ruleset is given as its info.
  */
 export function rulesetSettings(
-  id: string | Pick<RulesetInfo, 'id' | 'name' | 'overrides'>,
+  id: string | (Pick<RulesetInfo, 'id' | 'name' | 'overrides'> & { version?: string }),
 ): Setting[] {
   if (typeof id !== 'string' && id.overrides)
     return settingsFor(customValues({ ...id, overrides: id.overrides }));
   const key = typeof id === 'string' ? id : id.id;
-  const file = files.find((r) => r.id === key);
-  if (!file) throw new Error(`Unknown ruleset: ${key}`);
-  return settingsFor(resolveRuleset(registry, file).values, file.players);
+  const version = typeof id === 'string' ? undefined : id.version;
+  const file = findRulesetVersion(library, key, version);
+  if (!file)
+    throw new Error(`Unknown ruleset: ${key}${version === undefined ? '' : ` ${version}`}`);
+  return settingsFor(rulesetValues(key, version), file.players);
 }

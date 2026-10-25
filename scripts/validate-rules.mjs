@@ -20,6 +20,7 @@ const ajv = new Ajv2020({ allErrors: true, strict: false });
 addFormats(ajv);
 const validateRegistry = ajv.compile(read('rules/schema/parameters.schema.json'));
 const validateRuleset = ajv.compile(read('rules/schema/ruleset.schema.json'));
+const validateLock = ajv.compile(read('rules/schema/lock.schema.json'));
 const validateBoard = ajv.compile(read('rules/schema/board.schema.json'));
 const validatePiece = ajv.compile(read('rules/schema/piece.schema.json'));
 
@@ -42,6 +43,8 @@ const jsonFiles = (dir) =>
 const targets = [
   [registryPath, validateRegistry],
   ...jsonFiles('rules/rulesets').map((f) => [f, validateRuleset]),
+  ...jsonFiles('rules/rulesets/archive').map((f) => [f, validateRuleset]),
+  ...jsonFiles('rules/locks').map((f) => [f, validateLock]),
   ...jsonFiles(boardsDir).map((f) => [f, validateBoard]),
   ...jsonFiles(piecesDir).map((f) => [f, validatePiece]),
 ];

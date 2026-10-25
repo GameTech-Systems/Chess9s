@@ -9,3 +9,4 @@ export const checkRegistrySchema = passed;
 export const checkRulesetSchema = passed;
 export const checkBoardSchema = passed;
 export const checkPieceSchema = passed;
+export const checkLockSchema = passed;

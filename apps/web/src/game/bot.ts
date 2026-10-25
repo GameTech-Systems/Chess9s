@@ -5,7 +5,7 @@ import {
   type GameState,
   type GeneratedMove,
 } from '@chess9s/engine';
-import { createRulesFor, listRulesets, type RulesetInfo } from './rules';
+import { createRulesFor, findRuleset, type RulesetInfo } from './rules';
 import { newModel } from './session';
 
 /** Positions the computer plays out per move: about half a second in a desktop browser. */
@@ -35,9 +35,7 @@ export function computerReply(
   random: () => number = Math.random,
   nodes: number = BOT_NODES,
 ): string | undefined {
-  const info = ref.overrides
-    ? { ...ref, name: ref.id }
-    : listRulesets().find((r) => r.id === ref.id);
+  const info = ref.overrides ? { ...ref, name: ref.id } : findRuleset(ref.id, ref.version);
   if (!info) return undefined;
   let { game } = newModel(createRulesFor(info), info);
   for (const notation of notations) {
