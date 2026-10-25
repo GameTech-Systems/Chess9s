@@ -419,3 +419,12 @@ describe('saved games of a custom ruleset replay', () => {
     expect(JSON.parse(store.getItem('chess9s.guest')!)).not.toHaveProperty('overrides');
   });
 });
+
+describe('replacing the draft', () => {
+  it('swaps in a loaded draft', () => {
+    const loaded = { ...startBuilder('draft-2p'), name: 'Loaded' };
+    expect(builderReducer(startBuilder('standard-2p'), { type: 'replace', state: loaded })).toBe(
+      loaded,
+    );
+  });
+});

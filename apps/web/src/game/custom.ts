@@ -39,7 +39,9 @@ export type BuilderAction =
   | { type: 'name'; name: string }
   | { type: 'set'; id: string; value: ParamValue }
   | { type: 'step'; id: string; by: 1 | -1 }
-  | { type: 'toggle'; id: string; option: Option };
+  | { type: 'toggle'; id: string; option: Option }
+  /** A draft that was loaded from a file or a link, already checked. */
+  | { type: 'replace'; state: BuilderState };
 
 /** The presets a draft can start from: the playable 2-player rulesets in rules/rulesets/. */
 export const presets = () => listRulesets().filter((r) => r.playable && r.players === 2);
@@ -93,6 +95,8 @@ export const stepOptions = (s: Setting): number[] =>
 
 export function builderReducer(state: BuilderState, action: BuilderAction): BuilderState {
   switch (action.type) {
+    case 'replace':
+      return action.state;
     case 'base':
       if (!isPreset(action.base)) return state;
       return { ...state, base: action.base, values: { ...rulesetValues(action.base) } };
