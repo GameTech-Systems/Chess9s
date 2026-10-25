@@ -161,7 +161,7 @@ Done when: the report shows both depths and the status matches the verdict.
 Add `group` (King, Queen, Pawns, Center, Coast, Dragon Tail, Dragon Heads, Sun and Moon, Turns and draws, Setup) and `optionLabels` (a short player-facing label for every option, such as `a5-e5-i5` → "A5, E5 and I5") to `rules/schema/parameters.schema.json` and every live parameter in `rules/parameters.json`. Labels are presentation only; no rule changes. The rules page and the dialog show labels instead of raw values, and group by `group` instead of id prefixes.
 Done when: a test fails for any live parameter without a group or without a label for each option, and `/rules/<id>` shows labels.
 
-### S40 — The owner's new piece options (24 Oct 2026) · Opus 5.5 · high · `todo`
+### S40 — The owner's new piece options (24 Oct 2026) · Opus 5.5 · high · `done`
 New parameters from the owner, each defaulting to today's behavior and tested at its default and every option, with a 40-game sweep entry:
 - **Queen crosses the void** and **Queen may stand on a void square**, as two switches. They replace `queen.canEnterVoid`, which becomes deprecated (kept so old games replay); rulesets that set it get a new version with the two new ones.
 - **Pawns may enter the Coast once it is open** (`pawn.canEnterCoast`, default off).
@@ -228,8 +228,8 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D34 | Dark's seat view | Decided: turned 180° (rank 9 at the bottom, Coast on the right) | S12 |
 | D36 | e5 arrow | Decided: a tetrahedron symbol, not a rule (see decision 0007, S12 additions) | S12 |
 | D43 | Ruleset for the tournament discussion | Default: Standard (`standard-2p`) once it passes at both depths; Good Practice stays a Candidate for practice play | S38 |
-| D44 | "Every piece may enter the Coast at any time" | Default: the Coast is open to every piece from the start; each piece's own Coast setting no longer bars it; Coast pieces may move from the first turn | S40 |
-| D45 | Pawns on the Coast | Default: a pawn enters the Coast only by capturing onto it once it is open, then moves forward along file A and promotes on its last rank as usual | S40 |
+| D44 | "Every piece may enter the Coast at any time" | Default (applied as `coast.openToAll`, S40): the Coast is open to every piece from the start; each piece's own Coast setting no longer bars it; Coast pieces may move from the first turn | S40 |
+| D45 | Pawns on the Coast | Default (applied as `pawn.canEnterCoast`, S40): a pawn enters the Coast only by capturing onto it once it is open, then moves forward along file A and promotes on its last rank as usual | S40 |
 | D46 | Custom rulesets in tournaments | Default: never directly; a submitted ruleset becomes Official only through the S43 checklist (fairness at both depths, discussion, ratification) | S43 |
 
 ## Ledger sync format
