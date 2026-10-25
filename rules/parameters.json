@@ -131,17 +131,69 @@
         false,
         true
       ],
+      "status": "deprecated",
+      "affects": [
+        "movement",
+        "check-detection"
+      ],
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)",
+      "notes": "Replaced in S40 by queen.canCrossVoid and queen.canStandOnVoid (owner, 24 Oct 2026); true is both of them on. Kept so the registry still names it; rulesets that set it moved to the two new switches in a new version (easy-2p 0.2.0)."
+    },
+    {
+      "id": "queen.canCrossVoid",
+      "label": "Queen crosses the void",
+      "description": "Whether the Queen may pass over the empty void squares B5, C5, D5, F5, G5 and H5 on her way to a square beyond them. It doesn't let her stop on one (queen.canStandOnVoid).",
+      "piece": "queen",
+      "players": [
+        2,
+        3
+      ],
+      "type": "boolean",
+      "default": false,
+      "options": [
+        false,
+        true
+      ],
       "group": "Queen",
       "optionLabels": {
-        "false": "Off",
-        "true": "On"
+        "false": "Never over a void square",
+        "true": "Over empty void squares"
       },
       "status": "proposed",
       "affects": [
         "movement",
         "check-detection"
       ],
-      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+      "source": "owner, 24 Oct 2026 (build plan S40)",
+      "notes": "Default false is today's behavior (queen.canEnterVoid false). With queen.canStandOnVoid it replaces queen.canEnterVoid. Rank 5 still never crosses e5 sideways (her piece data)."
+    },
+    {
+      "id": "queen.canStandOnVoid",
+      "label": "Queen may stand on a void square",
+      "description": "Whether the Queen may stop on, or capture on, a void square B5, C5, D5, F5, G5 or H5. It doesn't let her pass over one (queen.canCrossVoid).",
+      "piece": "queen",
+      "players": [
+        2,
+        3
+      ],
+      "type": "boolean",
+      "default": false,
+      "options": [
+        false,
+        true
+      ],
+      "group": "Queen",
+      "optionLabels": {
+        "false": "Never stops on a void square",
+        "true": "May stop on a void square"
+      },
+      "status": "proposed",
+      "affects": [
+        "movement",
+        "check-detection"
+      ],
+      "source": "owner, 24 Oct 2026 (build plan S40)",
+      "notes": "Default false is today's behavior (queen.canEnterVoid false). With queen.canCrossVoid it replaces queen.canEnterVoid."
     },
     {
       "id": "queen.voidCrossings",
@@ -325,6 +377,35 @@
       "notes": "Board data for the colored squares arrives with S10. E-file and I-file pawns have no safe zone."
     },
     {
+      "id": "pawn.canEnterCoast",
+      "label": "Pawns may enter the Coast",
+      "description": "Whether a pawn may enter the Coast (file A) once it is open. It gets there only by capturing onto file A, then moves forward along file A and promotes on its last rank as usual.",
+      "piece": "pawn",
+      "players": [
+        2,
+        3
+      ],
+      "type": "boolean",
+      "default": false,
+      "options": [
+        false,
+        true
+      ],
+      "group": "Pawns",
+      "optionLabels": {
+        "false": "Not allowed",
+        "true": "Once the Coast is open"
+      },
+      "status": "proposed",
+      "affects": [
+        "movement",
+        "promotion",
+        "board-state"
+      ],
+      "source": "owner, 24 Oct 2026 (build plan S40)",
+      "notes": "Default false is today's behavior. Reading from decision default D45 (provisional): a pawn moves straight forward, so its only way onto file A is a diagonal capture from file B; on file A it steps forward (A5 when empty) and captures diagonally back onto file B. While the Coast is closed nothing but the Tail moves to or from it (game state)."
+    },
+    {
       "id": "pawn.canEnterCenter",
       "label": "Pawns may enter E5",
       "description": "Whether a pawn may move onto the center square E5.",
@@ -503,6 +584,35 @@
       ],
       "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)",
       "notes": "While on the Coast, the Sun and Moon move one square at a time."
+    },
+    {
+      "id": "coast.openToAll",
+      "label": "Every piece may enter the Coast",
+      "description": "Whether every piece may enter the Coast at any time: the Coast is open from the start, so Coast pieces may move from the first turn, and no piece's own Coast setting (Kings, Queens, pawns) or Coast bar (Rooks, Bishops, Knights) keeps it off file A.",
+      "piece": null,
+      "players": [
+        2,
+        3
+      ],
+      "type": "boolean",
+      "default": false,
+      "options": [
+        false,
+        true
+      ],
+      "group": "Coast",
+      "optionLabels": {
+        "false": "As each piece's rules say",
+        "true": "Every piece, from the first turn"
+      },
+      "status": "proposed",
+      "affects": [
+        "movement",
+        "board-state",
+        "check-detection"
+      ],
+      "source": "owner, 24 Oct 2026 (build plan S40)",
+      "notes": "Default false is today's behavior. Meaning from decision default D44 (provisional). Provisional reading (S40): it lifts the rules that keep a piece from entering the Coast, not the Coast pieces' own ways off and back (coast.2p.exit, coast.returnAllowed) or the Queen's void crossings (queen.voidCrossings closes a5 to her). 3-player Coast opening is not built."
     },
     {
       "id": "coast.returnAllowed",

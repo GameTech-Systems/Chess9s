@@ -26,7 +26,12 @@
       },
       "pass": {
         "param": "king.canEnterCoast"
-      }
+      },
+      "when": {
+        "param": "coast.openToAll",
+        "is": false
+      },
+      "notes": "coast.openToAll lifts this bar (S40)."
     },
     {
       "type": "center",
@@ -58,6 +63,6 @@
       "is": true
     }
   },
-  "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026.",
+  "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026. S40 (24 Oct 2026): coast.openToAll lifts his Coast setting.",
   "notes": "castle: as in chess, the King moves 2 squares toward an unmoved Rook, which lands on the square the King crossed (castling.enabled, off by default). Not expressed yet (engine features): a King captured by the Dragon in 3-player games."
 }

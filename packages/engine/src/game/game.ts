@@ -254,7 +254,7 @@ function settle(rules: MoveRules, base: Settled, prev: Seen | null): GameState {
 
 /**
  * Start a game. Refuses a ruleset with an undecided value and any player count but 2. The Coast
- * starts open only under `coast.2p.initiation = open-at-start`.
+ * starts open only under `coast.2p.initiation = open-at-start` or `coast.openToAll` (D44).
  */
 export function newGame(
   rules: MoveRules,
@@ -271,7 +271,10 @@ export function newGame(
   const order = turnOrder(rules);
   const turn = init.turn ?? order[0]!;
   if (!order.includes(turn)) throw new RulesError(`${turn} has no seat in this game`);
-  const coastOpen = init.coastOpen ?? param(rules, 'coast.2p.initiation') === 'open-at-start';
+  const coastOpen =
+    init.coastOpen ??
+    (param(rules, 'coast.2p.initiation') === 'open-at-start' ||
+      param(rules, 'coast.openToAll') === true);
   return settle(
     rules,
     {

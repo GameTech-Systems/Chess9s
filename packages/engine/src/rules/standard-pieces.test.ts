@@ -53,7 +53,14 @@ describe('fixture positions: King, Rook, Bishop, Knight', () => {
 });
 
 describe('fixture coverage', () => {
-  const read = ['king.range', 'king.canJump', 'king.canEnterCoast', 'center.occupants', 'center.passThrough'];
+  const read = [
+    'king.range',
+    'king.canJump',
+    'king.canEnterCoast',
+    'coast.openToAll',
+    'center.occupants',
+    'center.passThrough',
+  ];
   // Read by these pieces and covered at every option elsewhere.
   const elsewhere = ['castling.enabled']; // special-rules.test.ts (S22a)
 
@@ -127,6 +134,7 @@ describe('every parameter of this batch, at every option, from the start positio
       ['king.range', 4],
       ['king.canJump', true],
       ['king.canEnterCoast', false],
+      ['coast.openToAll', true],
       ['center.occupants', 'any'],
       ['center.passThrough', ['rook', 'bishop']],
     ] as const) {

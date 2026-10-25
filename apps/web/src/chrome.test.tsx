@@ -51,7 +51,7 @@ describe('pages', () => {
     expect(html).toContain('Standard');
     expect(html).toContain('King range');
     expect(html).toMatch(/data-setting="king.range" data-changed=""/);
-    expect(html).not.toMatch(/data-setting="queen.canEnterVoid" data-changed=""/);
+    expect(html).not.toMatch(/data-setting="queen.canCrossVoid" data-changed=""/);
     expect(html).toContain('Pawn colors and safe zones');
     expect(html).toContain('>Play Standard<');
   });
