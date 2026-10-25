@@ -10,6 +10,10 @@ const engineRules = (file: string) =>
 // data is bundled as static JSON and `pnpm build` validates it against its schemas first.
 export default defineConfig({
   plugins: [react()],
+  // MIT and the other permissive licenses ask that their notices travel with the code, and the
+  // bundles carry no comments, so the build writes every bundled package's license to this file.
+  // The footer links to it (/third-party-licenses.txt).
+  build: { license: { fileName: 'third-party-licenses.txt' } },
   resolve: {
     alias: [{ find: /^.*\/schema-check$/, replacement: engineRules('schema-check.static.ts') }],
   },
