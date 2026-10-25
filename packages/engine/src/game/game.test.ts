@@ -394,7 +394,10 @@ describe('finding and recording moves', () => {
     expect(gameRecord(g).ruleset).toEqual(ref);
     // The record is a copy: changing the caller's object later does not change the game.
     overrides['king.range'] = 3;
-    expect(gameRecord(g).ruleset.overrides).toEqual({ 'king.range': 1, 'queen.canCrossVoid': true });
+    expect(gameRecord(g).ruleset.overrides).toEqual({
+      'king.range': 1,
+      'queen.canCrossVoid': true,
+    });
   });
 
   it('plays are pure: the earlier state is not changed', () => {

@@ -25,7 +25,7 @@ const GROUP_ORDER = [
 ];
 
 /** Settings grouped by the registry's `group`, registry order inside each group. */
-function grouped(settings: Setting[]): { title: string; settings: Setting[] }[] {
+export function grouped(settings: Setting[]): { title: string; settings: Setting[] }[] {
   const titles = [...GROUP_ORDER, ...new Set(settings.map((s) => s.group))].filter(
     (t, i, all) => all.indexOf(t) === i,
   );
@@ -107,14 +107,17 @@ export function RulesPage({
   id,
   onPlay,
   linkTo,
+  customs = [],
 }: {
   id: string;
+  /** The player's own rulesets, kept in this browser: their rules pages work here only. */
+  customs?: RulesetInfo[];
   /** Start a game on this ruleset. */
   onPlay?: (ruleset: RulesetInfo) => void;
   /** In-app navigation for links to other rules pages. */
   linkTo?: (to: string) => (e: React.MouseEvent) => void;
 }) {
-  const info = findRuleset(id);
+  const info = findRuleset(id) ?? customs.find((r) => r.id === id);
   if (!info) {
     return (
       <article className="prose rules-page" aria-labelledby="rules-page-title">
@@ -134,7 +137,7 @@ export function RulesPage({
       </article>
     );
   }
-  const settings = rulesetSettings(info.id);
+  const settings = rulesetSettings(info);
   const changed = settings.filter((s) => s.changed);
   const safeZones = settings.find((s) => s.id === 'pawn.safeZones')?.value;
   return (
@@ -154,6 +157,7 @@ export function RulesPage({
         {info.status !== 'official' && (
           <p className="meta">
             Not an official tournament ruleset (see Governance in the repository).
+            {info.custom && ' Your own ruleset: it is kept in this browser only.'}
           </p>
         )}
         {info.playable && onPlay && (
@@ -239,11 +243,17 @@ export function RulesPage({
             rules guide
           </a>{' '}
           explains every piece and square at the Chess Nines defaults; where it differs from this
-          page, the settings here are the rules of {info.name}. The ruleset&apos;s data:{' '}
-          <a href={rulesetDataUrl(info.id)} target="_blank" rel="noopener noreferrer">
-            rules/rulesets/{info.id}.json
-          </a>
-          .
+          page, the settings here are the rules of {info.name}.
+          {!info.custom && (
+            <>
+              {' '}
+              The ruleset&apos;s data:{' '}
+              <a href={rulesetDataUrl(info.id)} target="_blank" rel="noopener noreferrer">
+                rules/rulesets/{info.id}.json
+              </a>
+              .
+            </>
+          )}
         </p>
       </section>
     </article>

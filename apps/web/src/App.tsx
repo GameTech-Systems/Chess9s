@@ -1,12 +1,24 @@
 import { useEffect, useState } from 'react';
 import { Game } from './Game';
 import { RulePicker } from './RulePicker';
+import { Builder } from './Builder';
 import { RulesPage } from './RulesPage';
 import { Privacy } from './Privacy';
 import { DISCUSSIONS_URL, LICENSES_PATH, RIGHTS_HOLDER } from './links';
-import type { RulesetInfo } from './game/rules';
+import { loadCustoms, saveCustoms } from './game/custom';
+import { customInfo, type CustomRuleset, type RulesetInfo } from './game/rules';
+import type { Store } from './game/guest';
 
 export const PRIVACY_PATH = '/privacy';
+export const BUILD_PATH = '/build';
+
+function browserStore(): Store | null {
+  try {
+    return typeof window === 'undefined' ? null : window.localStorage;
+  } catch {
+    return null;
+  }
+}
 
 /** The year in the copyright line (NOTICE: Copyright 2026). */
 const COPYRIGHT_YEAR = 2026;
@@ -16,18 +28,37 @@ export const rulesIdOf = (pathname: string): string | undefined =>
   /^\/rules\/([a-z0-9]+(?:-[a-z0-9]+)*)\/?$/.exec(pathname)?.[1];
 
 /** Which page a URL path shows. Anything unknown is the game: the host falls back to index.html. */
-export const pageOf = (pathname: string): 'privacy' | 'rules' | 'game' =>
-  pathname.replace(/\/+$/, '') === PRIVACY_PATH
+export const pageOf = (pathname: string): 'privacy' | 'rules' | 'build' | 'game' => {
+  const bare = pathname.replace(/\/+$/, '');
+  return bare === PRIVACY_PATH
     ? 'privacy'
-    : rulesIdOf(pathname) !== undefined
-      ? 'rules'
-      : 'game';
+    : bare === BUILD_PATH
+      ? 'build'
+      : rulesIdOf(pathname) !== undefined
+        ? 'rules'
+        : 'game';
+};
 
-export function App({ path }: { path?: string }) {
+export function App({ path, store = browserStore() }: { path?: string; store?: Store | null }) {
   const [here, setHere] = useState(
     path ?? (typeof window === 'undefined' ? '/' : window.location.pathname),
   );
   const [picked, setPicked] = useState<RulesetInfo | null>(null);
+  // The player's own rulesets live in this browser only (privacy page).
+  const [customs, setCustoms] = useState<CustomRuleset[]>(() => loadCustoms(store));
+  const [editing, setEditing] = useState<string | undefined>(undefined);
+  const keepCustom = (c: CustomRuleset) => {
+    const next = customs.some((o) => o.id === c.id)
+      ? customs.map((o) => (o.id === c.id ? c : o))
+      : [...customs, c];
+    setCustoms(next);
+    saveCustoms(store, next);
+  };
+  const dropCustom = (id: string) => {
+    const next = customs.filter((c) => c.id !== id);
+    setCustoms(next);
+    saveCustoms(store, next);
+  };
   useEffect(() => {
     const onPop = () => setHere(window.location.pathname);
     window.addEventListener('popstate', onPop);
@@ -47,9 +78,11 @@ export function App({ path }: { path?: string }) {
   const subtitle =
     page === 'rules'
       ? 'Rules'
-      : picked && page === 'game'
-        ? `Hot-seat · ${picked.players} players`
-        : 'Hot-seat';
+      : page === 'build'
+        ? 'Change ruleset'
+        : picked && page === 'game'
+          ? `Hot-seat · ${picked.players} players`
+          : 'Hot-seat';
   return (
     <main className="page">
       <header className="masthead">
@@ -60,9 +93,21 @@ export function App({ path }: { path?: string }) {
       </header>
       {page === 'privacy' ? (
         <Privacy />
+      ) : page === 'build' ? (
+        <Builder
+          key={editing ?? 'new'}
+          {...(editing && { saved: customs.find((c) => c.id === editing) })}
+          taken={customs.map((c) => c.id)}
+          onSave={keepCustom}
+          onPlay={(c) => {
+            setPicked(customInfo(c));
+            navigate('/');
+          }}
+        />
       ) : page === 'rules' ? (
         <RulesPage
           id={rulesIdOf(here)!}
+          customs={customs.map(customInfo)}
           linkTo={go}
           onPlay={(r) => {
             setPicked(r);
@@ -72,7 +117,20 @@ export function App({ path }: { path?: string }) {
       ) : picked ? (
         <Game key={picked.id} ruleset={picked} onChangeRuleset={() => setPicked(null)} />
       ) : (
-        <RulePicker onPick={setPicked} linkTo={go} />
+        <RulePicker
+          onPick={setPicked}
+          linkTo={go}
+          customs={customs.map(customInfo)}
+          onBuild={() => {
+            setEditing(undefined);
+            navigate(BUILD_PATH);
+          }}
+          onEdit={(id) => {
+            setEditing(id);
+            navigate(BUILD_PATH);
+          }}
+          onDelete={dropCustom}
+        />
       )}
       <footer className="site-footer">
         {page !== 'game' ? (

@@ -271,11 +271,7 @@ const copyRef = (r: RulesetRef): RulesetRef => ({
  * Start a game. Refuses a ruleset with an undecided value and any player count but 2. The Coast
  * starts open only under `coast.2p.initiation = open-at-start` or `coast.openToAll` (D44).
  */
-export function newGame(
-  rules: MoveRules,
-  ruleset: RulesetRef,
-  init: GameInit = {},
-): GameState {
+export function newGame(rules: MoveRules, ruleset: RulesetRef, init: GameInit = {}): GameState {
   if (rules.players !== 2) {
     throw new RulesError('Only 2-player games can be played yet (3-player game end is not built)');
   }

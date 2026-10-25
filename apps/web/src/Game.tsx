@@ -6,7 +6,7 @@ import { searchMove, type BotSearch } from './game/botClient';
 import { clearGuest, loadGuest, saveGuest, type Mode, type Store } from './game/guest';
 import { Board } from './board/Board';
 import { boardData, pieceLetters } from './board/data';
-import { DEFAULT_RULESET_ID, createRules, listRulesets, type RulesetInfo } from './game/rules';
+import { DEFAULT_RULESET_ID, createRulesFor, listRulesets, type RulesetInfo } from './game/rules';
 import {
   canUndo,
   cancelPromotion,
@@ -68,7 +68,7 @@ export function Game({
   ruleset?: RulesetInfo;
   onChangeRuleset?: () => void;
 }) {
-  const rules = useMemo(() => createRules(ruleset.id), [ruleset.id]);
+  const rules = useMemo(() => createRulesFor(ruleset), [ruleset.id, ruleset.overrides]);
   const saved = useMemo(
     () => (initial || !store ? null : loadGuest(store, rules, ruleset)),
     // Read once, when the screen opens.
@@ -267,6 +267,7 @@ export function Game({
 
         <p className="facts small">
           {ruleset.name} · {ruleset.id} v{ruleset.version} · {ruleset.status}
+          {ruleset.custom && ' · your own, kept in this browser'}
         </p>
 
         {missing.length > 0 && (

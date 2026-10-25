@@ -119,7 +119,9 @@ export function createRules(id: string = DEFAULT_RULESET_ID): MoveRules {
 
 /** The rules of a ruleset as the game records it: a bundled id, or a custom ruleset's overrides. */
 export function createRulesFor(ref: Pick<RulesetInfo, 'id' | 'name' | 'overrides'>): MoveRules {
-  return ref.overrides ? rulesOf(customFile({ ...ref, overrides: ref.overrides })) : createRules(ref.id);
+  return ref.overrides
+    ? rulesOf(customFile({ ...ref, overrides: ref.overrides }))
+    : createRules(ref.id);
 }
 
 /** Every value of a bundled ruleset, resolved. */
@@ -204,8 +206,11 @@ export function settingsFor(values: Record<string, ParamValue>, players: 2 | 3 =
  * Every live parameter for the ruleset's player count, in registry order, with the value the
  * ruleset plays. Read from the data only. A custom ruleset is given as its info.
  */
-export function rulesetSettings(id: string | Pick<RulesetInfo, 'id' | 'name' | 'overrides'>): Setting[] {
-  if (typeof id !== 'string' && id.overrides) return settingsFor(customValues({ ...id, overrides: id.overrides }));
+export function rulesetSettings(
+  id: string | Pick<RulesetInfo, 'id' | 'name' | 'overrides'>,
+): Setting[] {
+  if (typeof id !== 'string' && id.overrides)
+    return settingsFor(customValues({ ...id, overrides: id.overrides }));
   const key = typeof id === 'string' ? id : id.id;
   const file = files.find((r) => r.id === key);
   if (!file) throw new Error(`Unknown ruleset: ${key}`);

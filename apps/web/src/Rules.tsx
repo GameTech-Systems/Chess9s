@@ -38,7 +38,10 @@ export function RulesScreen({
   missing,
   onClose,
 }: {
-  ruleset: Pick<RulesetInfo, 'name' | 'id' | 'version' | 'status' | 'description'>;
+  ruleset: Pick<
+    RulesetInfo,
+    'name' | 'id' | 'version' | 'status' | 'description' | 'custom' | 'overrides'
+  >;
   missing: string[];
   onClose: () => void;
 }) {
@@ -64,7 +67,7 @@ export function RulesScreen({
       opener?.focus?.();
     };
   }, []);
-  const changed = rulesetSettings(ruleset.id).filter((s) => s.changed);
+  const changed = rulesetSettings(ruleset).filter((s) => s.changed);
   return (
     <>
       <div className="rules-backdrop" aria-hidden="true" onClick={onClose} />
@@ -104,9 +107,12 @@ export function RulesScreen({
           </ul>
         )}
         <p className="rules-links">
-          <a href={rulesPath(ruleset.id)} target="_blank" rel="noopener">
-            Full rules for {ruleset.name}
-          </a>
+          {/* A custom ruleset lives in this browser's storage; its page opens in the app only. */}
+          {!ruleset.custom && (
+            <a href={rulesPath(ruleset.id)} target="_blank" rel="noopener">
+              Full rules for {ruleset.name}
+            </a>
+          )}
           <a href={RULES_DOC_URL} target="_blank" rel="noopener noreferrer">
             Rules guide on GitHub
           </a>
