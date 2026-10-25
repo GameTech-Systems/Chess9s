@@ -169,7 +169,7 @@ New parameters from the owner, each defaulting to today's behavior and tested at
 Already parameters, no new work: Queen may enter the Coast once it is open (`queen.canEnterCoast`), and pawn-safe zones on the like-colored square or on any colored square (`pawn.safeZones`; the builder shows its options as two switches).
 Decisions: D44, D45.
 
-### S41 — Change Ruleset page · Sonnet 5.5 · high · `todo`
+### S41 — Change Ruleset page · Sonnet 5.5 · high · `done`
 "Change ruleset" opens a builder: start from a preset, then a section per piece (King, Queen, Pawns, Coast and the Coast pieces, Center, Turns and draws) with a control per parameter (switches for on/off, choices for options, steppers for ranges). It shows what differs from the starting preset, flags combinations that share `affects` systems and have not been fairness-checked (`parameterInteractions`), and plays the result. A custom ruleset is status `proposed`, named by the player, never official, and its game record carries the full overrides so saved games replay. Custom rulesets are saved in the player's browser only; update the privacy page and its date.
 Done when: a player builds a ruleset from Standard, plays it against the computer, reloads and finds it saved; tests cover every control type.
 
