@@ -5,6 +5,7 @@
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import boardSchema from '../../../../rules/schema/board.schema.json';
+import lockSchema from '../../../../rules/schema/lock.schema.json';
 import parametersSchema from '../../../../rules/schema/parameters.schema.json';
 import pieceSchema from '../../../../rules/schema/piece.schema.json';
 import rulesetSchema from '../../../../rules/schema/ruleset.schema.json';
@@ -27,3 +28,4 @@ export const checkRegistrySchema: SchemaCheck = ajv.compile(parametersSchema);
 export const checkRulesetSchema: SchemaCheck = ajv.compile(rulesetSchema);
 export const checkBoardSchema: SchemaCheck = ajv.compile(boardSchema);
 export const checkPieceSchema: SchemaCheck = ajv.compile(pieceSchema);
+export const checkLockSchema: SchemaCheck = ajv.compile(lockSchema);

@@ -18,7 +18,8 @@
     "validate:rules": "node scripts/validate-rules.mjs",
     "sim": "pnpm --filter @chess9s/sim run sim",
     "bench": "pnpm --filter @chess9s/sim run bench",
-    "sim:merge": "pnpm --filter @chess9s/sim run merge"
+    "sim:merge": "pnpm --filter @chess9s/sim run merge",
+    "lock": "pnpm --filter @chess9s/sim run lock"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",

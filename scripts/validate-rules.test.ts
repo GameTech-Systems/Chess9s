@@ -12,6 +12,12 @@ describe('validate-rules', () => {
     expect(() => run()).not.toThrow();
   });
 
+  it('validates the locks in rules/locks', () => {
+    const out = run();
+    expect(out).toContain('ok   rules/locks/standard-2p@0.1.0.json');
+    expect(out).toContain('ok   rules/locks/draft-2p@0.2.0.json');
+  });
+
   it('fails on a registry with a parameter missing its default', () => {
     expect(() => run('--registry', 'scripts/test-fixtures/invalid-parameters.json')).toThrow();
   });
