@@ -1,28 +1,29 @@
 # Handoff
 
-Updated 2026-10-25 by S31 (Opus 5.5 · high). `/end-session` rewrites this file; keep it under 40 lines.
+Updated 2026-10-25 by S32 (Opus 5.5 · high). `/end-session` rewrites this file; keep it under 40 lines.
 
 ## State
-- Phase 4 is on hold by the owner's choice (S47 to S50, 25 Oct 2026). Standard's discussion: GitHub Discussions #39, closes 2026-11-15 (D20); link and dates in `apps/web/src/tournament.ts`.
-- Phase 5 is planned (S31, docs only): S51 room logic and protocol (`packages/online`), S52 rooms on a Cloudflare Worker with a Durable Object, S53 play online in the browser, S54 the owner's go-live. New defaults D50 to D54. 1460 tests pass.
+- Phase 4 is on hold by the owner's choice (S47 to S50). Standard's discussion: GitHub Discussions #39, closes 2026-11-15 (D20); link and dates in `apps/web/src/tournament.ts`.
+- Phase 5 is planned (S51 to S54, defaults D50 to D54). Phase 6 is planned (S32, docs only): S55 the owner settles the 3-player rule gaps, S56 3-player game state and game end, S57 hot-seat in the browser, S58 computer opponent (paranoid search), S59 balance sims and sweep, S60 the owner's depth-2 run, S61 the owner's balance review. New entries D55 to D61. 1460 tests pass.
 
 ## Next session
-**S32 — Phase 6 planning (3-player Dragon mode)** · Opus 5.5 · effort high
-Why: the owner asked for S32 in its own session; it replaces the Phase 6 placeholder with detailed steps, as S30 and S31 did.
-Start with: `/start-session S32`
+**S51 — Room logic and protocol** · Opus 5.5 · effort high
+Why: it is the first buildable step. S55 (Owner with Claude in chat) has to come before S56, and it can run at any time alongside Phase 5.
+Start with: `/start-session S51`
 
 ## Decisions in effect for the next step
-- D4: straight-line squares for all 5 Coast pieces, no corner option (decided, rule set v0.2).
-- D5: superseded; Coast piece parameters are tagged per mode (rule set v0.2).
-- D14: the full 3-player rules are public in rule set v0.2 (`docs/RULES.md`, `draft-3p`).
+- D51: resign and draw by agreement; no clock, no takebacks, no forfeit for a disconnection (default).
+- D52: the creator picks light, dark or random (random preselected); two seats; no spectators (default).
+- D54: 6-character room codes without look-alikes; the seat token is the secret (default).
 
 ## Open questions for the owner
-- D50 to D54 (Phase 5 defaults) are provisional until the ledger confirms them; none blocks S32 or S51.
-- Carried over: Discussion form prefill check, the flag rule (decision 0013), `coast.openToAll` reading, I34 contact address, favicon and Ting Yang art.
+- D55 to D58 (the 3-player rule gaps and the timer) are rules, so they get no defaults. The questions are listed under S55 in `docs/BUILD-PLAN.md`. They block S56, not S51.
+- D50 to D54 and D59 to D61 are provisional until the ledger confirms them.
+- Carried over: the Discussion form prefill check, the flag rule (decision 0013), how to read `coast.openToAll`, the I34 contact address, the favicon and the Ting Yang art.
 
 ## Notes for Claude
-- Phase 5 gaps found in planning: the web reads `rules/` through Vite's `import.meta.glob` (no Worker equivalent); Workers forbid `eval`, so no Ajv on the server; the engine has no resign or agreed-draw result. S51 handles all three.
-- Cloudflare: legacy version preview URLs skip Workers with a Durable Object; the newer Worker Previews (`wrangler preview`, beta since Sep 2026) reportedly give each preview its own namespace. S52 checks this first (D50).
-- When Standard becomes Official (S50): `Tournament.tsx` already names an Official 2-player ruleset when one exists; update its tests and the discussion copy then.
-- A lock is never edited by hand. New version: `pnpm lock archive <id>`, edit the file, `pnpm lock write <id>`.
+- Phase 5 gaps found in planning: the web reads `rules/` through Vite's `import.meta.glob`, which a Worker lacks; Workers forbid `eval`, so the server can't use Ajv; the engine has no resign or agreed-draw result. S51 handles all three.
+- Phase 6: 3-player movement is already data. `newGame` refuses 3 players, `draw.3p.stalemate` is read by nothing, and S23's search is 2-player negamax. Decision record 0014 is reserved for S50, so the 3-player balance measure is 0015 (S59).
+- Cloudflare: legacy version preview URLs skip a Worker with a Durable Object. Worker Previews (`wrangler preview`) reportedly give each preview its own namespace. S52 checks this first (D50).
+- A lock is never edited by hand. For a new version: `pnpm lock archive <id>`, edit the file, then `pnpm lock write <id>`.
 - Playwright works against `vite preview` on port 4173. Cloudflare Workers Builds deploys `main`.
