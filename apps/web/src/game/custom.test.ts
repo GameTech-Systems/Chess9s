@@ -143,7 +143,9 @@ describe('one control per parameter type', () => {
     const options = new Set(
       [false, true].flatMap((on) => [false, true].map((any) => safeZonesValue({ on, any }))),
     );
-    expect(options).toEqual(new Set(setting(rulesetValues('standard-2p'), 'pawn.safeZones').options));
+    expect(options).toEqual(
+      new Set(setting(rulesetValues('standard-2p'), 'pawn.safeZones').options),
+    );
   });
 });
 
@@ -155,7 +157,10 @@ describe('what differs from the starting preset', () => {
     const diff = differences(rulesetValues('standard-2p'), s.values);
     expect(diff.map((d) => d.id)).toEqual(['king.range', 'queen.canCrossVoid']);
     expect(diff[0]).toMatchObject({ label: 'King range', from: '1 square', to: '2 squares' });
-    expect(diff[1]).toMatchObject({ from: 'Never over a void square', to: 'Over empty void squares' });
+    expect(diff[1]).toMatchObject({
+      from: 'Never over a void square',
+      to: 'Over empty void squares',
+    });
     // Setting a value back removes it from the list.
     s = builderReducer(s, { type: 'step', id: 'king.range', by: -1 });
     expect(differences(rulesetValues('standard-2p'), s.values).map((d) => d.id)).toEqual([
@@ -305,7 +310,9 @@ describe('custom rulesets kept in the browser', () => {
     expect(store.data.has(CUSTOMS_KEY)).toBe(true);
     expect(loadCustoms(store)).toEqual(list);
     // The same data, loaded as a different ruleset, is the same game rules.
-    expect(createRulesFor(customInfo(loadCustoms(store)[0]!)).values['castling.enabled']).toBe(true);
+    expect(createRulesFor(customInfo(loadCustoms(store)[0]!)).values['castling.enabled']).toBe(
+      true,
+    );
   });
 
   it('has an empty list when nothing is saved, the store is missing or it throws', () => {
@@ -334,7 +341,12 @@ describe('custom rulesets kept in the browser', () => {
         v: 1,
         rulesets: [
           good,
-          { id: 'custom-2', name: 'Bad value', base: 'standard-2p', overrides: { 'king.range': 9 } },
+          {
+            id: 'custom-2',
+            name: 'Bad value',
+            base: 'standard-2p',
+            overrides: { 'king.range': 9 },
+          },
           { id: 'custom-3', name: 'Unknown', base: 'standard-2p', overrides: { 'no.such': 1 } },
           { id: 'Not An Id', name: 'x', base: 'standard-2p', overrides: {} },
           { id: 'custom-4', name: '', base: 'standard-2p', overrides: {} },

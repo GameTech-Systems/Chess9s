@@ -47,7 +47,10 @@ export const presets = () => listRulesets().filter((r) => r.playable && r.player
 const isPreset = (id: string) => presets().some((r) => r.id === id);
 
 /** A new draft from a preset, or the saved ruleset being edited. */
-export function startBuilder(base: string = DEFAULT_RULESET_ID, saved?: CustomRuleset): BuilderState {
+export function startBuilder(
+  base: string = DEFAULT_RULESET_ID,
+  saved?: CustomRuleset,
+): BuilderState {
   if (saved) {
     return { base: saved.base, name: saved.name, values: customValues(saved), id: saved.id };
   }

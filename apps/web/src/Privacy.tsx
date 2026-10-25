@@ -1,7 +1,7 @@
 import { CONTACT_ADDRESS, DISCUSSIONS_URL } from './links';
 
 /** When this page last changed. Update it with any change to what the app does with data. */
-export const PRIVACY_UPDATED = '24 October 2026';
+export const PRIVACY_UPDATED = '25 October 2026';
 
 /** What Chess Nines does and does not do with a visitor's data. Keep in step with the app. */
 export function Privacy() {
@@ -16,6 +16,12 @@ export function Privacy() {
           A guest game lives only in your own browser, in local storage under the key{' '}
           <code>chess9s.guest</code>. It never leaves your device. Clearing your site data deletes
           it.
+        </li>
+        <li>
+          A ruleset you build with Change ruleset is kept the same way, under the key{' '}
+          <code>chess9s.rulesets</code>: its name and settings, on your device only. It is never
+          sent anywhere, and clearing your site data deletes it. A game played on it also keeps
+          those settings with the saved game.
         </li>
         <li>
           The site is hosted by Cloudflare, which keeps standard request logs (such as IP address,
