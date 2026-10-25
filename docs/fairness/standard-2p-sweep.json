@@ -1,0 +1,2784 @@
+{
+  "ruleset": {
+    "id": "standard-2p",
+    "version": "0.1.0"
+  },
+  "overrides": {},
+  "date": "2026-10-25",
+  "decision": "0008",
+  "measures": {
+    "decision": "0008",
+    "version": 2,
+    "band": {
+      "min": 0.47,
+      "max": 0.53
+    },
+    "minGames": 2000,
+    "depths": [
+      1,
+      2
+    ],
+    "nodes": 100000,
+    "openingPlies": 4,
+    "maxPlies": 2000
+  },
+  "verdict": "incomplete",
+  "runs": [
+    {
+      "combination": "default",
+      "overrides": {},
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 123,
+      "summary": {
+        "games": 40,
+        "firstWins": 9,
+        "secondWins": 14,
+        "draws": 17,
+        "score": 0.4375,
+        "interval": [
+          0.29602809418250353,
+          0.5899249732237956
+        ],
+        "drawRate": 0.425,
+        "winsBySide": {
+          "light": 14,
+          "dark": 9
+        },
+        "results": {
+          "repetition": 17,
+          "checkmate": 23
+        },
+        "plies": {
+          "mean": 116.075,
+          "median": 115,
+          "min": 8,
+          "max": 359
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 117,
+      "summary": {
+        "games": 40,
+        "firstWins": 9,
+        "secondWins": 14,
+        "draws": 17,
+        "score": 0.4375,
+        "interval": [
+          0.29602809418250353,
+          0.5899249732237956
+        ],
+        "drawRate": 0.425,
+        "winsBySide": {
+          "light": 14,
+          "dark": 9
+        },
+        "results": {
+          "checkmate": 23,
+          "repetition": 16,
+          "insufficient-material": 1
+        },
+        "plies": {
+          "mean": 114.7,
+          "median": 108,
+          "min": 10,
+          "max": 305
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "king.range=3",
+      "overrides": {
+        "king.range": 3
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 133,
+      "summary": {
+        "games": 40,
+        "firstWins": 8,
+        "secondWins": 13,
+        "draws": 19,
+        "score": 0.4375,
+        "interval": [
+          0.29602809418250353,
+          0.5899249732237956
+        ],
+        "drawRate": 0.475,
+        "winsBySide": {
+          "light": 13,
+          "dark": 8
+        },
+        "results": {
+          "checkmate": 21,
+          "repetition": 19
+        },
+        "plies": {
+          "mean": 119.1,
+          "median": 99.5,
+          "min": 14,
+          "max": 368
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "king.range=4",
+      "overrides": {
+        "king.range": 4
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 137,
+      "summary": {
+        "games": 40,
+        "firstWins": 5,
+        "secondWins": 11,
+        "draws": 24,
+        "score": 0.425,
+        "interval": [
+          0.28509168524815875,
+          0.5780519956394001
+        ],
+        "drawRate": 0.6,
+        "winsBySide": {
+          "light": 11,
+          "dark": 5
+        },
+        "results": {
+          "fifty-move": 4,
+          "repetition": 19,
+          "checkmate": 16,
+          "insufficient-material": 1
+        },
+        "plies": {
+          "mean": 136.475,
+          "median": 119.5,
+          "min": 17,
+          "max": 318
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "king.canJump=true",
+      "overrides": {
+        "king.canJump": true
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 110,
+      "summary": {
+        "games": 40,
+        "firstWins": 9,
+        "secondWins": 14,
+        "draws": 17,
+        "score": 0.4375,
+        "interval": [
+          0.29602809418250353,
+          0.5899249732237956
+        ],
+        "drawRate": 0.425,
+        "winsBySide": {
+          "light": 14,
+          "dark": 9
+        },
+        "results": {
+          "repetition": 17,
+          "checkmate": 23
+        },
+        "plies": {
+          "mean": 116.075,
+          "median": 115,
+          "min": 8,
+          "max": 359
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "king.canEnterCoast=false",
+      "overrides": {
+        "king.canEnterCoast": false
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 109,
+      "summary": {
+        "games": 40,
+        "firstWins": 9,
+        "secondWins": 15,
+        "draws": 16,
+        "score": 0.425,
+        "interval": [
+          0.28509168524815875,
+          0.5780519956394001
+        ],
+        "drawRate": 0.4,
+        "winsBySide": {
+          "light": 15,
+          "dark": 9
+        },
+        "results": {
+          "repetition": 16,
+          "checkmate": 24
+        },
+        "plies": {
+          "mean": 110.425,
+          "median": 112,
+          "min": 8,
+          "max": 268
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "castling.enabled=true",
+      "overrides": {
+        "castling.enabled": true
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 121,
+      "summary": {
+        "games": 40,
+        "firstWins": 9,
+        "secondWins": 14,
+        "draws": 17,
+        "score": 0.4375,
+        "interval": [
+          0.29602809418250353,
+          0.5899249732237956
+        ],
+        "drawRate": 0.425,
+        "winsBySide": {
+          "light": 14,
+          "dark": 9
+        },
+        "results": {
+          "repetition": 17,
+          "checkmate": 23
+        },
+        "plies": {
+          "mean": 115.65,
+          "median": 116,
+          "min": 8,
+          "max": 359
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "queen.canCrossVoid=true",
+      "overrides": {
+        "queen.canCrossVoid": true
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 96,
+      "summary": {
+        "games": 40,
+        "firstWins": 11,
+        "secondWins": 5,
+        "draws": 24,
+        "score": 0.575,
+        "interval": [
+          0.42194800436059987,
+          0.7149083147518411
+        ],
+        "drawRate": 0.6,
+        "winsBySide": {
+          "light": 5,
+          "dark": 11
+        },
+        "results": {
+          "repetition": 24,
+          "checkmate": 16
+        },
+        "plies": {
+          "mean": 118.525,
+          "median": 105.5,
+          "min": 8,
+          "max": 361
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "queen.canStandOnVoid=true",
+      "overrides": {
+        "queen.canStandOnVoid": true
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 118,
+      "summary": {
+        "games": 40,
+        "firstWins": 9,
+        "secondWins": 14,
+        "draws": 17,
+        "score": 0.4375,
+        "interval": [
+          0.29602809418250353,
+          0.5899249732237956
+        ],
+        "drawRate": 0.425,
+        "winsBySide": {
+          "light": 14,
+          "dark": 9
+        },
+        "results": {
+          "checkmate": 23,
+          "repetition": 17
+        },
+        "plies": {
+          "mean": 117.15,
+          "median": 103,
+          "min": 8,
+          "max": 359
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "queen.voidCrossings=e5-only",
+      "overrides": {
+        "queen.voidCrossings": "e5-only"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 126,
+      "summary": {
+        "games": 40,
+        "firstWins": 8,
+        "secondWins": 10,
+        "draws": 22,
+        "score": 0.475,
+        "interval": [
+          0.32935229550181694,
+          0.6250289314607027
+        ],
+        "drawRate": 0.55,
+        "winsBySide": {
+          "light": 10,
+          "dark": 8
+        },
+        "results": {
+          "repetition": 19,
+          "checkmate": 18,
+          "fifty-move": 3
+        },
+        "plies": {
+          "mean": 147.475,
+          "median": 135,
+          "min": 8,
+          "max": 654
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "queen.voidCrossings=none",
+      "overrides": {
+        "queen.voidCrossings": "none"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 182,
+      "summary": {
+        "games": 40,
+        "firstWins": 2,
+        "secondWins": 7,
+        "draws": 31,
+        "score": 0.4375,
+        "interval": [
+          0.29602809418250353,
+          0.5899249732237956
+        ],
+        "drawRate": 0.775,
+        "winsBySide": {
+          "light": 7,
+          "dark": 2
+        },
+        "results": {
+          "repetition": 21,
+          "checkmate": 9,
+          "fifty-move": 10
+        },
+        "plies": {
+          "mean": 223.225,
+          "median": 209.5,
+          "min": 8,
+          "max": 591
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "queen.canEnterCoast=false",
+      "overrides": {
+        "queen.canEnterCoast": false
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 106,
+      "summary": {
+        "games": 40,
+        "firstWins": 9,
+        "secondWins": 13,
+        "draws": 18,
+        "score": 0.45,
+        "interval": [
+          0.30705075280944694,
+          0.6017117011155924
+        ],
+        "drawRate": 0.45,
+        "winsBySide": {
+          "light": 13,
+          "dark": 9
+        },
+        "results": {
+          "repetition": 18,
+          "checkmate": 22
+        },
+        "plies": {
+          "mean": 114.625,
+          "median": 105.5,
+          "min": 8,
+          "max": 359
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "pawn.initialDoubleStep=false",
+      "overrides": {
+        "pawn.initialDoubleStep": false
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 117,
+      "summary": {
+        "games": 40,
+        "firstWins": 13,
+        "secondWins": 12,
+        "draws": 15,
+        "score": 0.5125,
+        "interval": [
+          0.3634396866693108,
+          0.6593696998494294
+        ],
+        "drawRate": 0.375,
+        "winsBySide": {
+          "dark": 13,
+          "light": 12
+        },
+        "results": {
+          "checkmate": 25,
+          "repetition": 15
+        },
+        "plies": {
+          "mean": 130.175,
+          "median": 119.5,
+          "min": 7,
+          "max": 458
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "pawn.promotion.targets-queen",
+      "overrides": {
+        "pawn.promotion.targets": [
+          "rook",
+          "bishop",
+          "knight"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 106,
+      "summary": {
+        "games": 40,
+        "firstWins": 9,
+        "secondWins": 14,
+        "draws": 17,
+        "score": 0.4375,
+        "interval": [
+          0.29602809418250353,
+          0.5899249732237956
+        ],
+        "drawRate": 0.425,
+        "winsBySide": {
+          "light": 14,
+          "dark": 9
+        },
+        "results": {
+          "repetition": 17,
+          "checkmate": 23
+        },
+        "plies": {
+          "mean": 116.075,
+          "median": 115,
+          "min": 8,
+          "max": 359
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "pawn.promotion.targets-rook",
+      "overrides": {
+        "pawn.promotion.targets": [
+          "queen",
+          "bishop",
+          "knight"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 110,
+      "summary": {
+        "games": 40,
+        "firstWins": 9,
+        "secondWins": 14,
+        "draws": 17,
+        "score": 0.4375,
+        "interval": [
+          0.29602809418250353,
+          0.5899249732237956
+        ],
+        "drawRate": 0.425,
+        "winsBySide": {
+          "light": 14,
+          "dark": 9
+        },
+        "results": {
+          "repetition": 17,
+          "checkmate": 23
+        },
+        "plies": {
+          "mean": 116.075,
+          "median": 115,
+          "min": 8,
+          "max": 359
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "pawn.promotion.targets-bishop",
+      "overrides": {
+        "pawn.promotion.targets": [
+          "queen",
+          "rook",
+          "knight"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 114,
+      "summary": {
+        "games": 40,
+        "firstWins": 9,
+        "secondWins": 14,
+        "draws": 17,
+        "score": 0.4375,
+        "interval": [
+          0.29602809418250353,
+          0.5899249732237956
+        ],
+        "drawRate": 0.425,
+        "winsBySide": {
+          "light": 14,
+          "dark": 9
+        },
+        "results": {
+          "repetition": 17,
+          "checkmate": 23
+        },
+        "plies": {
+          "mean": 116.075,
+          "median": 115,
+          "min": 8,
+          "max": 359
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "pawn.promotion.targets-knight",
+      "overrides": {
+        "pawn.promotion.targets": [
+          "queen",
+          "rook",
+          "bishop"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 108,
+      "summary": {
+        "games": 40,
+        "firstWins": 9,
+        "secondWins": 14,
+        "draws": 17,
+        "score": 0.4375,
+        "interval": [
+          0.29602809418250353,
+          0.5899249732237956
+        ],
+        "drawRate": 0.425,
+        "winsBySide": {
+          "light": 14,
+          "dark": 9
+        },
+        "results": {
+          "repetition": 17,
+          "checkmate": 23
+        },
+        "plies": {
+          "mean": 116.075,
+          "median": 115,
+          "min": 8,
+          "max": 359
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "pawn.promotion.targets+captured-piece",
+      "overrides": {
+        "pawn.promotion.targets": [
+          "queen",
+          "rook",
+          "bishop",
+          "knight",
+          "captured-piece"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 107,
+      "summary": {
+        "games": 40,
+        "firstWins": 9,
+        "secondWins": 14,
+        "draws": 17,
+        "score": 0.4375,
+        "interval": [
+          0.29602809418250353,
+          0.5899249732237956
+        ],
+        "drawRate": 0.425,
+        "winsBySide": {
+          "light": 14,
+          "dark": 9
+        },
+        "results": {
+          "repetition": 17,
+          "checkmate": 23
+        },
+        "plies": {
+          "mean": 116.075,
+          "median": 115,
+          "min": 8,
+          "max": 359
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "pawn.safeZones=any-colored-square",
+      "overrides": {
+        "pawn.safeZones": "any-colored-square"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 109,
+      "summary": {
+        "games": 40,
+        "firstWins": 7,
+        "secondWins": 16,
+        "draws": 17,
+        "score": 0.3875,
+        "interval": [
+          0.25280911078248314,
+          0.5419064105488552
+        ],
+        "drawRate": 0.425,
+        "winsBySide": {
+          "light": 16,
+          "dark": 7
+        },
+        "results": {
+          "repetition": 17,
+          "checkmate": 23
+        },
+        "plies": {
+          "mean": 112.05,
+          "median": 105,
+          "min": 8,
+          "max": 359
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "pawn.safeZones=off",
+      "overrides": {
+        "pawn.safeZones": "off"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 114,
+      "summary": {
+        "games": 40,
+        "firstWins": 9,
+        "secondWins": 14,
+        "draws": 17,
+        "score": 0.4375,
+        "interval": [
+          0.29602809418250353,
+          0.5899249732237956
+        ],
+        "drawRate": 0.425,
+        "winsBySide": {
+          "light": 14,
+          "dark": 9
+        },
+        "results": {
+          "fifty-move": 1,
+          "checkmate": 23,
+          "repetition": 16
+        },
+        "plies": {
+          "mean": 118.425,
+          "median": 115,
+          "min": 8,
+          "max": 359
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "pawn.canEnterCoast=true",
+      "overrides": {
+        "pawn.canEnterCoast": true
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 123,
+      "summary": {
+        "games": 40,
+        "firstWins": 7,
+        "secondWins": 19,
+        "draws": 14,
+        "score": 0.35,
+        "interval": [
+          0.2213433317104915,
+          0.5049440300646263
+        ],
+        "drawRate": 0.35,
+        "winsBySide": {
+          "light": 19,
+          "dark": 7
+        },
+        "results": {
+          "repetition": 14,
+          "checkmate": 26
+        },
+        "plies": {
+          "mean": 133.925,
+          "median": 127.5,
+          "min": 9,
+          "max": 362
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "pawn.canEnterCenter=true",
+      "overrides": {
+        "pawn.canEnterCenter": true
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 114,
+      "summary": {
+        "games": 40,
+        "firstWins": 9,
+        "secondWins": 14,
+        "draws": 17,
+        "score": 0.4375,
+        "interval": [
+          0.29602809418250353,
+          0.5899249732237956
+        ],
+        "drawRate": 0.425,
+        "winsBySide": {
+          "light": 14,
+          "dark": 9
+        },
+        "results": {
+          "repetition": 17,
+          "checkmate": 23
+        },
+        "plies": {
+          "mean": 116.075,
+          "median": 115,
+          "min": 8,
+          "max": 359
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "center.occupants=dragons-and-sun-moon",
+      "overrides": {
+        "center.occupants": "dragons-and-sun-moon"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 112,
+      "summary": {
+        "games": 40,
+        "firstWins": 9,
+        "secondWins": 14,
+        "draws": 17,
+        "score": 0.4375,
+        "interval": [
+          0.29602809418250353,
+          0.5899249732237956
+        ],
+        "drawRate": 0.425,
+        "winsBySide": {
+          "light": 14,
+          "dark": 9
+        },
+        "results": {
+          "repetition": 17,
+          "checkmate": 23
+        },
+        "plies": {
+          "mean": 116.075,
+          "median": 115,
+          "min": 8,
+          "max": 359
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "center.occupants=any",
+      "overrides": {
+        "center.occupants": "any"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 109,
+      "summary": {
+        "games": 40,
+        "firstWins": 9,
+        "secondWins": 16,
+        "draws": 15,
+        "score": 0.4125,
+        "interval": [
+          0.27424235635053607,
+          0.5660919380182826
+        ],
+        "drawRate": 0.375,
+        "winsBySide": {
+          "light": 16,
+          "dark": 9
+        },
+        "results": {
+          "repetition": 15,
+          "checkmate": 25
+        },
+        "plies": {
+          "mean": 112.05,
+          "median": 99.5,
+          "min": 8,
+          "max": 375
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "center.passThrough-dragon-head",
+      "overrides": {
+        "center.passThrough": [
+          "queen",
+          "king",
+          "sun-moon-pawn",
+          "knight"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 111,
+      "summary": {
+        "games": 40,
+        "firstWins": 9,
+        "secondWins": 14,
+        "draws": 17,
+        "score": 0.4375,
+        "interval": [
+          0.29602809418250353,
+          0.5899249732237956
+        ],
+        "drawRate": 0.425,
+        "winsBySide": {
+          "light": 14,
+          "dark": 9
+        },
+        "results": {
+          "repetition": 17,
+          "checkmate": 23
+        },
+        "plies": {
+          "mean": 123.175,
+          "median": 110.5,
+          "min": 8,
+          "max": 502
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "center.passThrough-queen",
+      "overrides": {
+        "center.passThrough": [
+          "dragon-head",
+          "king",
+          "sun-moon-pawn",
+          "knight"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 134,
+      "summary": {
+        "games": 40,
+        "firstWins": 9,
+        "secondWins": 10,
+        "draws": 21,
+        "score": 0.4875,
+        "interval": [
+          0.3406303001505707,
+          0.6365603133306892
+        ],
+        "drawRate": 0.525,
+        "winsBySide": {
+          "light": 10,
+          "dark": 9
+        },
+        "results": {
+          "repetition": 19,
+          "checkmate": 19,
+          "fifty-move": 2
+        },
+        "plies": {
+          "mean": 142.5,
+          "median": 115.5,
+          "min": 8,
+          "max": 673
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "center.passThrough-king",
+      "overrides": {
+        "center.passThrough": [
+          "dragon-head",
+          "queen",
+          "sun-moon-pawn",
+          "knight"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 113,
+      "summary": {
+        "games": 40,
+        "firstWins": 9,
+        "secondWins": 14,
+        "draws": 17,
+        "score": 0.4375,
+        "interval": [
+          0.29602809418250353,
+          0.5899249732237956
+        ],
+        "drawRate": 0.425,
+        "winsBySide": {
+          "light": 14,
+          "dark": 9
+        },
+        "results": {
+          "repetition": 17,
+          "checkmate": 23
+        },
+        "plies": {
+          "mean": 116.075,
+          "median": 115,
+          "min": 8,
+          "max": 359
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "center.passThrough-sun-moon-pawn",
+      "overrides": {
+        "center.passThrough": [
+          "dragon-head",
+          "queen",
+          "king",
+          "knight"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 115,
+      "summary": {
+        "games": 40,
+        "firstWins": 9,
+        "secondWins": 14,
+        "draws": 17,
+        "score": 0.4375,
+        "interval": [
+          0.29602809418250353,
+          0.5899249732237956
+        ],
+        "drawRate": 0.425,
+        "winsBySide": {
+          "light": 14,
+          "dark": 9
+        },
+        "results": {
+          "repetition": 17,
+          "checkmate": 23
+        },
+        "plies": {
+          "mean": 116.075,
+          "median": 115,
+          "min": 8,
+          "max": 359
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "center.passThrough-knight",
+      "overrides": {
+        "center.passThrough": [
+          "dragon-head",
+          "queen",
+          "king",
+          "sun-moon-pawn"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 112,
+      "summary": {
+        "games": 40,
+        "firstWins": 9,
+        "secondWins": 14,
+        "draws": 17,
+        "score": 0.4375,
+        "interval": [
+          0.29602809418250353,
+          0.5899249732237956
+        ],
+        "drawRate": 0.425,
+        "winsBySide": {
+          "light": 14,
+          "dark": 9
+        },
+        "results": {
+          "repetition": 17,
+          "checkmate": 23
+        },
+        "plies": {
+          "mean": 116.075,
+          "median": 115,
+          "min": 8,
+          "max": 359
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "center.passThrough+rook",
+      "overrides": {
+        "center.passThrough": [
+          "dragon-head",
+          "queen",
+          "king",
+          "sun-moon-pawn",
+          "knight",
+          "rook"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 114,
+      "summary": {
+        "games": 40,
+        "firstWins": 9,
+        "secondWins": 14,
+        "draws": 17,
+        "score": 0.4375,
+        "interval": [
+          0.29602809418250353,
+          0.5899249732237956
+        ],
+        "drawRate": 0.425,
+        "winsBySide": {
+          "light": 14,
+          "dark": 9
+        },
+        "results": {
+          "repetition": 15,
+          "checkmate": 23,
+          "insufficient-material": 1,
+          "fifty-move": 1
+        },
+        "plies": {
+          "mean": 130.2,
+          "median": 125.5,
+          "min": 8,
+          "max": 299
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "center.passThrough+bishop",
+      "overrides": {
+        "center.passThrough": [
+          "dragon-head",
+          "queen",
+          "king",
+          "sun-moon-pawn",
+          "knight",
+          "bishop"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 106,
+      "summary": {
+        "games": 40,
+        "firstWins": 15,
+        "secondWins": 15,
+        "draws": 10,
+        "score": 0.5,
+        "interval": [
+          0.35199278797099753,
+          0.6480072120290025
+        ],
+        "drawRate": 0.25,
+        "winsBySide": {
+          "dark": 15,
+          "light": 15
+        },
+        "results": {
+          "checkmate": 30,
+          "repetition": 10
+        },
+        "plies": {
+          "mean": 111.3,
+          "median": 103,
+          "min": 8,
+          "max": 383
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "center.passThrough+pawn",
+      "overrides": {
+        "center.passThrough": [
+          "dragon-head",
+          "queen",
+          "king",
+          "sun-moon-pawn",
+          "knight",
+          "pawn"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 112,
+      "summary": {
+        "games": 40,
+        "firstWins": 9,
+        "secondWins": 14,
+        "draws": 17,
+        "score": 0.4375,
+        "interval": [
+          0.29602809418250353,
+          0.5899249732237956
+        ],
+        "drawRate": 0.425,
+        "winsBySide": {
+          "light": 14,
+          "dark": 9
+        },
+        "results": {
+          "repetition": 17,
+          "checkmate": 23
+        },
+        "plies": {
+          "mean": 116.075,
+          "median": 115,
+          "min": 8,
+          "max": 359
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "coast.2p.initiation=open-at-start",
+      "overrides": {
+        "coast.2p.initiation": "open-at-start"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 150,
+      "summary": {
+        "games": 40,
+        "firstWins": 9,
+        "secondWins": 12,
+        "draws": 19,
+        "score": 0.4625,
+        "interval": [
+          0.3181589915266756,
+          0.6134128489171039
+        ],
+        "drawRate": 0.475,
+        "winsBySide": {
+          "dark": 9,
+          "light": 12
+        },
+        "results": {
+          "checkmate": 21,
+          "repetition": 19
+        },
+        "plies": {
+          "mean": 125.325,
+          "median": 107.5,
+          "min": 9,
+          "max": 415
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "coast.2p.exit=a5-only",
+      "overrides": {
+        "coast.2p.exit": "a5-only"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 109,
+      "summary": {
+        "games": 40,
+        "firstWins": 10,
+        "secondWins": 10,
+        "draws": 20,
+        "score": 0.5,
+        "interval": [
+          0.35199278797099753,
+          0.6480072120290025
+        ],
+        "drawRate": 0.5,
+        "winsBySide": {
+          "dark": 10,
+          "light": 10
+        },
+        "results": {
+          "checkmate": 20,
+          "repetition": 20
+        },
+        "plies": {
+          "mean": 133.85,
+          "median": 123,
+          "min": 8,
+          "max": 415
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "coast.openToAll=true",
+      "overrides": {
+        "coast.openToAll": true
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 160,
+      "summary": {
+        "games": 40,
+        "firstWins": 16,
+        "secondWins": 10,
+        "draws": 14,
+        "score": 0.575,
+        "interval": [
+          0.42194800436059987,
+          0.7149083147518411
+        ],
+        "drawRate": 0.35,
+        "winsBySide": {
+          "dark": 16,
+          "light": 10
+        },
+        "results": {
+          "checkmate": 26,
+          "repetition": 14
+        },
+        "plies": {
+          "mean": 120.55,
+          "median": 100,
+          "min": 13,
+          "max": 309
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "coast.returnAllowed=false",
+      "overrides": {
+        "coast.returnAllowed": false
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 101,
+      "summary": {
+        "games": 40,
+        "firstWins": 10,
+        "secondWins": 11,
+        "draws": 19,
+        "score": 0.4875,
+        "interval": [
+          0.3406303001505707,
+          0.6365603133306892
+        ],
+        "drawRate": 0.475,
+        "winsBySide": {
+          "light": 11,
+          "dark": 10
+        },
+        "results": {
+          "repetition": 19,
+          "checkmate": 21
+        },
+        "plies": {
+          "mean": 133.225,
+          "median": 108.5,
+          "min": 8,
+          "max": 385
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "coast.2p.capturable=false",
+      "overrides": {
+        "coast.2p.capturable": false
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 100,
+      "summary": {
+        "games": 40,
+        "firstWins": 10,
+        "secondWins": 14,
+        "draws": 16,
+        "score": 0.45,
+        "interval": [
+          0.30705075280944694,
+          0.6017117011155924
+        ],
+        "drawRate": 0.4,
+        "winsBySide": {
+          "light": 14,
+          "dark": 10
+        },
+        "results": {
+          "fifty-move": 1,
+          "checkmate": 24,
+          "repetition": 15
+        },
+        "plies": {
+          "mean": 109.075,
+          "median": 107.5,
+          "min": 8,
+          "max": 296
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "tail.2p.path=e5-i5-only",
+      "overrides": {
+        "tail.2p.path": "e5-i5-only"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 99,
+      "summary": {
+        "games": 40,
+        "firstWins": 11,
+        "secondWins": 15,
+        "draws": 14,
+        "score": 0.45,
+        "interval": [
+          0.30705075280944694,
+          0.6017117011155924
+        ],
+        "drawRate": 0.35,
+        "winsBySide": {
+          "dark": 11,
+          "light": 15
+        },
+        "results": {
+          "checkmate": 26,
+          "repetition": 13,
+          "fifty-move": 1
+        },
+        "plies": {
+          "mean": 101.175,
+          "median": 97.5,
+          "min": 8,
+          "max": 286
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "tail.repeatLimit=0",
+      "overrides": {
+        "tail.repeatLimit": 0
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 84,
+      "summary": {
+        "games": 40,
+        "firstWins": 8,
+        "secondWins": 13,
+        "draws": 19,
+        "score": 0.4375,
+        "interval": [
+          0.29602809418250353,
+          0.5899249732237956
+        ],
+        "drawRate": 0.475,
+        "winsBySide": {
+          "light": 13,
+          "dark": 8
+        },
+        "results": {
+          "repetition": 19,
+          "checkmate": 21
+        },
+        "plies": {
+          "mean": 86.625,
+          "median": 66.5,
+          "min": 8,
+          "max": 237
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "tail.2p.canCapture=true",
+      "overrides": {
+        "tail.2p.canCapture": true
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 121,
+      "summary": {
+        "games": 40,
+        "firstWins": 7,
+        "secondWins": 14,
+        "draws": 19,
+        "score": 0.4125,
+        "interval": [
+          0.27424235635053607,
+          0.5660919380182826
+        ],
+        "drawRate": 0.475,
+        "winsBySide": {
+          "light": 14,
+          "dark": 7
+        },
+        "results": {
+          "stalemate": 3,
+          "checkmate": 21,
+          "repetition": 16
+        },
+        "plies": {
+          "mean": 122.825,
+          "median": 118,
+          "min": 8,
+          "max": 312
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "tail.canCheck=true",
+      "overrides": {
+        "tail.canCheck": true
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 115,
+      "summary": {
+        "games": 40,
+        "firstWins": 9,
+        "secondWins": 14,
+        "draws": 17,
+        "score": 0.4375,
+        "interval": [
+          0.29602809418250353,
+          0.5899249732237956
+        ],
+        "drawRate": 0.425,
+        "winsBySide": {
+          "light": 14,
+          "dark": 9
+        },
+        "results": {
+          "repetition": 17,
+          "checkmate": 23
+        },
+        "plies": {
+          "mean": 116.075,
+          "median": 115,
+          "min": 8,
+          "max": 359
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "tail.capturable=true",
+      "overrides": {
+        "tail.capturable": true
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 117,
+      "summary": {
+        "games": 40,
+        "firstWins": 15,
+        "secondWins": 15,
+        "draws": 10,
+        "score": 0.5,
+        "interval": [
+          0.35199278797099753,
+          0.6480072120290025
+        ],
+        "drawRate": 0.25,
+        "winsBySide": {
+          "dark": 15,
+          "light": 15
+        },
+        "results": {
+          "checkmate": 30,
+          "repetition": 10
+        },
+        "plies": {
+          "mean": 135.05,
+          "median": 116,
+          "min": 8,
+          "max": 447
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "dragonHead.range=1",
+      "overrides": {
+        "dragonHead.range": 1
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 119,
+      "summary": {
+        "games": 40,
+        "firstWins": 13,
+        "secondWins": 11,
+        "draws": 16,
+        "score": 0.525,
+        "interval": [
+          0.37497106853929735,
+          0.6706477044981831
+        ],
+        "drawRate": 0.4,
+        "winsBySide": {
+          "dark": 13,
+          "light": 11
+        },
+        "results": {
+          "checkmate": 24,
+          "repetition": 16
+        },
+        "plies": {
+          "mean": 137.4,
+          "median": 154,
+          "min": 8,
+          "max": 309
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "dragonHead.range=2",
+      "overrides": {
+        "dragonHead.range": 2
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 118,
+      "summary": {
+        "games": 40,
+        "firstWins": 7,
+        "secondWins": 16,
+        "draws": 17,
+        "score": 0.3875,
+        "interval": [
+          0.25280911078248314,
+          0.5419064105488552
+        ],
+        "drawRate": 0.425,
+        "winsBySide": {
+          "light": 16,
+          "dark": 7
+        },
+        "results": {
+          "repetition": 17,
+          "checkmate": 23
+        },
+        "plies": {
+          "mean": 130.7,
+          "median": 132,
+          "min": 8,
+          "max": 417
+        },
+        "distinct": 40,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "dragonHead.range=3",
+      "overrides": {
+        "dragonHead.range": 3
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 111,
+      "summary": {
+        "games": 39,
+        "firstWins": 11,
+        "secondWins": 11,
+        "draws": 17,
+        "score": 0.5,
+        "interval": [
+          0.35027537477068194,
+          0.6497246252293181
+        ],
+        "drawRate": 0.4358974358974359,
+        "winsBySide": {
+          "dark": 11,
+          "light": 11
+        },
+        "results": {
+          "checkmate": 22,
+          "repetition": 17
+        },
+        "plies": {
+          "mean": 117.02564102564102,
+          "median": 117,
+          "min": 8,
+          "max": 314
+        },
+        "distinct": 39,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "dragonHead.range=4",
+      "overrides": {
+        "dragonHead.range": 4
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 0,
+      "summary": {
+        "games": 1,
+        "firstWins": 0,
+        "secondWins": 1,
+        "draws": 0,
+        "score": 0,
+        "interval": [
+          0,
+          0.7934567085261071
+        ],
+        "drawRate": 0,
+        "winsBySide": {
+          "light": 1
+        },
+        "results": {
+          "checkmate": 1
+        },
+        "plies": {
+          "mean": 8,
+          "median": 8,
+          "min": 8,
+          "max": 8
+        },
+        "distinct": 1,
+        "unfinished": 0,
+        "minDepth": 1,
+        "capped": 0,
+        "flags": [
+          "score outside 47–53%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "dragonHead.range=5",
+      "overrides": {
+        "dragonHead.range": 5
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 0,
+      "summary": {
+        "games": 0,
+        "firstWins": 0,
+        "secondWins": 0,
+        "draws": 0,
+        "score": 0,
+        "interval": [
+          0,
+          1
+        ],
+        "drawRate": 0,
+        "winsBySide": {},
+        "results": {},
+        "plies": {
+          "mean": 0,
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "distinct": 0,
+        "unfinished": 0,
+        "minDepth": 0,
+        "capped": 0,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "dragonHead.range=6",
+      "overrides": {
+        "dragonHead.range": 6
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 0,
+      "summary": {
+        "games": 0,
+        "firstWins": 0,
+        "secondWins": 0,
+        "draws": 0,
+        "score": 0,
+        "interval": [
+          0,
+          1
+        ],
+        "drawRate": 0,
+        "winsBySide": {},
+        "results": {},
+        "plies": {
+          "mean": 0,
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "distinct": 0,
+        "unfinished": 0,
+        "minDepth": 0,
+        "capped": 0,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "dragonHead.range=7",
+      "overrides": {
+        "dragonHead.range": 7
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 0,
+      "summary": {
+        "games": 0,
+        "firstWins": 0,
+        "secondWins": 0,
+        "draws": 0,
+        "score": 0,
+        "interval": [
+          0,
+          1
+        ],
+        "drawRate": 0,
+        "winsBySide": {},
+        "results": {},
+        "plies": {
+          "mean": 0,
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "distinct": 0,
+        "unfinished": 0,
+        "minDepth": 0,
+        "capped": 0,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "dragon.canJump=true",
+      "overrides": {
+        "dragon.canJump": true
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 0,
+      "summary": {
+        "games": 0,
+        "firstWins": 0,
+        "secondWins": 0,
+        "draws": 0,
+        "score": 0,
+        "interval": [
+          0,
+          1
+        ],
+        "drawRate": 0,
+        "winsBySide": {},
+        "results": {},
+        "plies": {
+          "mean": 0,
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "distinct": 0,
+        "unfinished": 0,
+        "minDepth": 0,
+        "capped": 0,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "coastPieces.2p.giveCheck=false",
+      "overrides": {
+        "coastPieces.2p.giveCheck": false
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 0,
+      "summary": {
+        "games": 0,
+        "firstWins": 0,
+        "secondWins": 0,
+        "draws": 0,
+        "score": 0,
+        "interval": [
+          0,
+          1
+        ],
+        "drawRate": 0,
+        "winsBySide": {},
+        "results": {},
+        "plies": {
+          "mean": 0,
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "distinct": 0,
+        "unfinished": 0,
+        "minDepth": 0,
+        "capped": 0,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "sunMoon.range=2",
+      "overrides": {
+        "sunMoon.range": 2
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 0,
+      "summary": {
+        "games": 0,
+        "firstWins": 0,
+        "secondWins": 0,
+        "draws": 0,
+        "score": 0,
+        "interval": [
+          0,
+          1
+        ],
+        "drawRate": 0,
+        "winsBySide": {},
+        "results": {},
+        "plies": {
+          "mean": 0,
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "distinct": 0,
+        "unfinished": 0,
+        "minDepth": 0,
+        "capped": 0,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "sunMoon.firstMoveDouble=false",
+      "overrides": {
+        "sunMoon.firstMoveDouble": false
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 0,
+      "summary": {
+        "games": 0,
+        "firstWins": 0,
+        "secondWins": 0,
+        "draws": 0,
+        "score": 0,
+        "interval": [
+          0,
+          1
+        ],
+        "drawRate": 0,
+        "winsBySide": {},
+        "results": {},
+        "plies": {
+          "mean": 0,
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "distinct": 0,
+        "unfinished": 0,
+        "minDepth": 0,
+        "capped": 0,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "sunMoon.capture=diagonal-only",
+      "overrides": {
+        "sunMoon.capture": "diagonal-only"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 0,
+      "summary": {
+        "games": 0,
+        "firstWins": 0,
+        "secondWins": 0,
+        "draws": 0,
+        "score": 0,
+        "interval": [
+          0,
+          1
+        ],
+        "drawRate": 0,
+        "winsBySide": {},
+        "results": {},
+        "plies": {
+          "mean": 0,
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "distinct": 0,
+        "unfinished": 0,
+        "minDepth": 0,
+        "capped": 0,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "sunMoon.capture=none",
+      "overrides": {
+        "sunMoon.capture": "none"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 0,
+      "summary": {
+        "games": 0,
+        "firstWins": 0,
+        "secondWins": 0,
+        "draws": 0,
+        "score": 0,
+        "interval": [
+          0,
+          1
+        ],
+        "drawRate": 0,
+        "winsBySide": {},
+        "results": {},
+        "plies": {
+          "mean": 0,
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "distinct": 0,
+        "unfinished": 0,
+        "minDepth": 0,
+        "capped": 0,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "sunMoon.canPromote=true",
+      "overrides": {
+        "sunMoon.canPromote": true
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 0,
+      "summary": {
+        "games": 0,
+        "firstWins": 0,
+        "secondWins": 0,
+        "draws": 0,
+        "score": 0,
+        "interval": [
+          0,
+          1
+        ],
+        "drawRate": 0,
+        "winsBySide": {},
+        "results": {},
+        "plies": {
+          "mean": 0,
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "distinct": 0,
+        "unfinished": 0,
+        "minDepth": 0,
+        "capped": 0,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "turn.firstMove=light",
+      "overrides": {
+        "turn.firstMove": "light"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 0,
+      "summary": {
+        "games": 0,
+        "firstWins": 0,
+        "secondWins": 0,
+        "draws": 0,
+        "score": 0,
+        "interval": [
+          0,
+          1
+        ],
+        "drawRate": 0,
+        "winsBySide": {},
+        "results": {},
+        "plies": {
+          "mean": 0,
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "distinct": 0,
+        "unfinished": 0,
+        "minDepth": 0,
+        "capped": 0,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "draw.stalemate=loss-for-stalemated",
+      "overrides": {
+        "draw.stalemate": "loss-for-stalemated"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 0,
+      "summary": {
+        "games": 0,
+        "firstWins": 0,
+        "secondWins": 0,
+        "draws": 0,
+        "score": 0,
+        "interval": [
+          0,
+          1
+        ],
+        "drawRate": 0,
+        "winsBySide": {},
+        "results": {},
+        "plies": {
+          "mean": 0,
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "distinct": 0,
+        "unfinished": 0,
+        "minDepth": 0,
+        "capped": 0,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "draw.stalemate=win-for-stalemated",
+      "overrides": {
+        "draw.stalemate": "win-for-stalemated"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 0,
+      "summary": {
+        "games": 0,
+        "firstWins": 0,
+        "secondWins": 0,
+        "draws": 0,
+        "score": 0,
+        "interval": [
+          0,
+          1
+        ],
+        "drawRate": 0,
+        "winsBySide": {},
+        "results": {},
+        "plies": {
+          "mean": 0,
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "distinct": 0,
+        "unfinished": 0,
+        "minDepth": 0,
+        "capped": 0,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "draw.threefoldRepetition=false",
+      "overrides": {
+        "draw.threefoldRepetition": false
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 0,
+      "summary": {
+        "games": 0,
+        "firstWins": 0,
+        "secondWins": 0,
+        "draws": 0,
+        "score": 0,
+        "interval": [
+          0,
+          1
+        ],
+        "drawRate": 0,
+        "winsBySide": {},
+        "results": {},
+        "plies": {
+          "mean": 0,
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "distinct": 0,
+        "unfinished": 0,
+        "minDepth": 0,
+        "capped": 0,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "draw.fiftyMove=false",
+      "overrides": {
+        "draw.fiftyMove": false
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 0,
+      "summary": {
+        "games": 0,
+        "firstWins": 0,
+        "secondWins": 0,
+        "draws": 0,
+        "score": 0,
+        "interval": [
+          0,
+          1
+        ],
+        "drawRate": 0,
+        "winsBySide": {},
+        "results": {},
+        "plies": {
+          "mean": 0,
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "distinct": 0,
+        "unfinished": 0,
+        "minDepth": 0,
+        "capped": 0,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "draw.insufficientMaterial=false",
+      "overrides": {
+        "draw.insufficientMaterial": false
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 0,
+      "summary": {
+        "games": 0,
+        "firstWins": 0,
+        "secondWins": 0,
+        "draws": 0,
+        "score": 0,
+        "interval": [
+          0,
+          1
+        ],
+        "drawRate": 0,
+        "winsBySide": {},
+        "results": {},
+        "plies": {
+          "mean": 0,
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "distinct": 0,
+        "unfinished": 0,
+        "minDepth": 0,
+        "capped": 0,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    }
+  ],
+  "flagged": [],
+  "skipped": [
+    {
+      "combination": "queen.pawnSwap=true",
+      "reason": "not built yet: queen.pawnSwap"
+    },
+    {
+      "combination": "setup.swapKingQueen=true",
+      "reason": "not built yet: setup.swapKingQueen"
+    }
+  ]
+}
