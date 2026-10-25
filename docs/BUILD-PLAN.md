@@ -157,7 +157,7 @@ Actions → **Sim depth 2** → Run workflow, with ruleset `standard-2p` (shards
 Commit the merged depth-2 report (the run's artifact) to `docs/fairness/standard-2p.md` and `.json`, keeping the depth-1 run. If both depths pass decision 0008, change `standard-2p` to `candidate` (version unchanged, as 0010 did for `draft-2p`) and write decision record 0012; if not, leave it experimental and report the numbers. Decisions: D12, D43.
 Done when: the report shows both depths and the status matches the verdict.
 
-### S39 — Option labels and groups in the registry · Sonnet 5.5 · medium · `todo`
+### S39 — Option labels and groups in the registry · Sonnet 5.5 · medium · `done`
 Add `group` (King, Queen, Pawns, Center, Coast, Dragon Tail, Dragon Heads, Sun and Moon, Turns and draws, Setup) and `optionLabels` (a short player-facing label for every option, such as `a5-e5-i5` → "A5, E5 and I5") to `rules/schema/parameters.schema.json` and every live parameter in `rules/parameters.json`. Labels are presentation only; no rule changes. The rules page and the dialog show labels instead of raw values, and group by `group` instead of id prefixes.
 Done when: a test fails for any live parameter without a group or without a label for each option, and `/rules/<id>` shows labels.
 
