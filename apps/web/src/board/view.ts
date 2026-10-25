@@ -1,7 +1,7 @@
 // Pure view logic for the board renderer: seat rotation, edge labels, square
 // colors and the tetrahedron on the Center square. Display only; no rule is
 // read from here. Board data: rules/boards/standard-9x9.json.
-import type { Side, Square } from '@chess9s/engine';
+import type { Board, Side, Square } from '@chess9s/engine';
 
 export type Rotation = 0 | 90 | 180 | 270;
 
@@ -92,6 +92,32 @@ export function squareFill(square: Square): string {
   if (square.color) return square.color;
   const { file, rank } = parseSquare(square.at);
   return (file + rank) % 2 === 0 ? BLACK : WHITE;
+}
+
+/** The name the rules give the E-file pawns (docs/RULES.md, `queen.pawnSwap`). */
+const CENTER_PAWN = 'Green';
+
+/**
+ * A pawn's identifying color, drawn as a ring on its token so a player can see which colored
+ * square is its safe zone. It is the color of its own side's colored square in the file it
+ * started on (B2 red for light's B pawn, B8 pink for dark's), green for the E-file pawns (the
+ * Center's color), and none for the I-file pawns, which have no color. `home` is the square the
+ * pawn started on: a pawn that captures onto another file keeps its color. Display only.
+ */
+export function pawnColor(
+  board: Board,
+  side: string,
+  home: string | undefined,
+): { name: string; color: string } | undefined {
+  const file = home?.[0];
+  if (!file) return undefined;
+  const own = board.squares.find(
+    (sq) => sq.at[0] === file && sq.side === side && sq.types.includes('safe-zone'),
+  );
+  if (own?.color) return { name: own.label ?? own.at, color: own.color };
+  const center = board.squares.find((sq) => sq.at[0] === file && sq.types.includes('center'));
+  if (center?.color) return { name: CENTER_PAWN, color: center.color };
+  return undefined;
 }
 
 export interface Point {

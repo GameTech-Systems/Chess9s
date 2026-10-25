@@ -4,6 +4,7 @@ import {
   FILES,
   SIZE,
   edgeLabels,
+  pawnColor,
   squareFill,
   tetrahedron,
   toScreen,
@@ -13,6 +14,9 @@ import {
 
 // Setup key for pieces that belong to no side (engine's NEUTRAL; importing it would pull Ajv into the bundle).
 const NEUTRAL = 'neutral';
+
+/** The piece whose token carries its starting file's color (display only). */
+const PAWN = 'pawn';
 
 const CELL = 100;
 const MARGIN = 64;
@@ -67,11 +71,19 @@ export function Board({
     ),
   );
   const setup = board.setups.find((s) => s.players === players);
-  const placed: { at: string; id: string; side: string }[] = position
-    ? Object.entries(position).map(([at, p]) => ({ at, id: p.piece, side: p.side }))
+  const placed: { at: string; id: string; side: string; home?: string | undefined }[] = position
+    ? Object.entries(position).map(([at, p]) => ({ at, id: p.piece, side: p.side, home: p.home }))
     : Object.entries(setup?.pieces ?? {}).flatMap(([side, byAt]) =>
-        Object.entries(byAt).map(([at, id]) => ({ at, id, side })),
+        Object.entries(byAt).map(([at, id]) => ({ at, id, side, home: at })),
       );
+  // Pawns carry their starting file's color as a ring, so each player can find its safe zone.
+  const ringOf = (p: { id: string; side: string; home?: string | undefined }) =>
+    p.id === PAWN ? pawnColor(board, p.side, p.home) : undefined;
+  const nameOf = (p: { id: string; side: string; home?: string | undefined }) => {
+    const ring = ringOf(p);
+    const name = p.id.replace(/-/g, ' ');
+    return ring ? `${ring.name.toLowerCase()} ${name}` : name;
+  };
   const bySquare = new Map(placed.map((p) => [p.at, p]));
   const reachable = new Set([...highlights.movable, ...highlights.targets.map((t) => t.at)]);
   const centerOf = (at: string) => {
@@ -205,10 +217,12 @@ export function Board({
 
       <Marks highlights={highlights} centerOf={centerOf} />
 
-      {placed.map(({ at, id, side }) => {
+      {placed.map((p) => {
+        const { at, id, side } = p;
         const { x, y } = centerOf(at);
         const tone = TOKENS[side] ?? TOKENS[NEUTRAL]!;
         const letter = pieceLetters[id] ?? id.charAt(0).toUpperCase();
+        const ring = ringOf(p);
         return (
           <g
             key={`${side}-${at}`}
@@ -218,7 +232,7 @@ export function Board({
             transform={`translate(${x} ${y})`}
             pointerEvents="none"
           >
-            <title>{`${at} · ${id.replace(/-/g, ' ')}`}</title>
+            <title>{`${at} · ${nameOf(p)}`}</title>
             <circle
               r="37"
               fill={tone.fill}
@@ -226,13 +240,41 @@ export function Board({
               strokeWidth="3"
               filter={`url(#${uid}-shadow)`}
             />
-            <circle
-              r="30"
-              fill="none"
-              stroke={tone.stroke}
-              strokeOpacity="0.45"
-              strokeWidth="1.5"
-            />
+            {ring ? (
+              <g>
+                {/* A band in the pawn's color, edged in the token's outline so pale and dark
+                    colors both read on either side's token. */}
+                <circle
+                  r="31"
+                  fill="none"
+                  data-pawn-ring={ring.name}
+                  stroke={ring.color}
+                  strokeWidth="7"
+                />
+                <circle
+                  r="34.5"
+                  fill="none"
+                  stroke={tone.stroke}
+                  strokeOpacity="0.7"
+                  strokeWidth="1.2"
+                />
+                <circle
+                  r="27.5"
+                  fill="none"
+                  stroke={tone.stroke}
+                  strokeOpacity="0.7"
+                  strokeWidth="1.2"
+                />
+              </g>
+            ) : (
+              <circle
+                r="30"
+                fill="none"
+                stroke={tone.stroke}
+                strokeOpacity="0.45"
+                strokeWidth="1.5"
+              />
+            )}
             <text
               textAnchor="middle"
               dominantBaseline="central"
@@ -253,7 +295,7 @@ export function Board({
           {squares.map(({ at }) => {
             const { x, y } = centerOf(at);
             const piece = bySquare.get(at);
-            const name = piece ? `${at}, ${piece.id.replace(/-/g, ' ')}, ${piece.side}` : at;
+            const name = piece ? `${at}, ${nameOf(piece)}, ${piece.side}` : at;
             return (
               <rect
                 key={at}
