@@ -219,12 +219,51 @@ Only if S48 ran and passed. Actions → **Sim depth 2** → Run workflow, rulese
 Needs the owner's ratification decision in the brief. It has no default; without the decision the step is `blocked`. If S48 ran: commit the depth-2 report (both depths must pass decision 0008, or stop). Set the ruleset to `official` with `ratification` (decision record and date) at the version D48 gives. Write decision record 0014 with the owner's reasoning, the S47 summary and the evidence. Its lock becomes permanent: a test fails if an Official ruleset's file or lock changes at all. Update GOVERNANCE (the 21-day minimum is confirmed, no longer "proposed"; status no longer draft if the owner says so), RULES.md, the rules page and picker badges, `/tournament`, and the share text (`matchingOfficial` now finds Standard).
 Done when: the real data has one Official 2-player ruleset; a share link with its values says "This is the Official ruleset Standard"; `/tournament` names it and its version; all checks pass. This is the Phase 4 exit.
 
+## Phase 5: Online multiplayer
+
+Planned in S31 (2026-10-25). Two people play over the internet as guests: one makes a room, the other joins by its code or link, and either can drop and come back. The ruleset is fixed when the room is made, and the server checks every move with the same engine the browser uses. Phase 5 does not wait for Phase 4 (the owner put S47 to S50 on hold, 25 Oct 2026): any ruleset in the picker can be played online (a custom one says "Unofficial"), and online tournament games use the Official ruleset once S50 ratifies one. S51 to S53 run in order; S54 is the owner's go-live.
+
+Found in planning: the web app reads `rules/` through Vite's `import.meta.glob`, which a Worker build doesn't have, and Workers forbid `eval`, so the server can't use Ajv (S27 left it out of the web bundles for the same reason). Resign and draw by agreement are not results the engine knows yet.
+
+### S31 — Phase 5 planning · Opus 5.5 · high · `done`
+Wrote the steps below and the defaults D50 to D54.
+
+### S51 — Room logic and protocol · Opus 5.5 · high · `todo`
+A new workspace package `packages/online`: pure TypeScript with no DOM and no Cloudflare APIs, so Vitest tests it in Node and both the Worker and the web app import it.
+- **Protocol.** Versioned JSON messages (`v: 1`) for create, join, move (in notation), resign, offer draw, accept or decline a draw, snapshot, opponent present or away, refused (with a reason) and game over. Every message has a size cap and strict keys; anything else is refused, never thrown.
+- **Room.** A state machine over the engine: the ruleset fixed at creation (an id and version through the S45 lookup, so a Candidate, Official or archived version plays from its lock; a custom ruleset's overrides checked as untrusted input, as `readRulesetFile` does), two seats (D52), a random secret seat token per seat that reconnects it (compared in constant time, never sent to the other player), moves checked with `findMove`/`playMove` (refused out of turn, illegal, or after the end), and a snapshot (ruleset reference, moves, result, seat status) that a client replays to the same position.
+- **Results** (D51): add resign and draw by agreement to the engine's `GameResult`, and let a game record (S46) carry them, so `openRecord` accepts a resigned or agreed game whose replay is otherwise still going. Record format stays `v: 1` and old records still open.
+- **Rules data without Vite.** Move the assembly of board, pieces, registry, rulesets, archive and locks out of `apps/web/src/game/rules.ts` into a library that takes the files as input; the web app keeps feeding it from `import.meta.glob`. For the Worker, a script writes a static index of every file in `rules/` (`pnpm rules:index`), and a test fails when the index and the folder differ.
+- Tests first: each message type, valid and malformed; every refusal; the S17 80-move game played through two seats ends with the hot-seat result; a reconnect snapshot replays to the same `stateKey`; a custom ruleset with an unknown or out-of-range override is refused; a room on an archived version plays from its lock; resign and agreed-draw records round-trip.
+Done when: the 80-move game plays through the protocol to the same result, every refusal has a test, and the web app still builds and plays with the shared rules library.
+Decisions: D51, D52, D54.
+
+### S52 — Rooms on Cloudflare · Opus 5.5 · high · `todo`
+Read Cloudflare's current documentation first (Durable Objects on Workers Free with SQLite storage, the WebSocket Hibernation API, `run_worker_first`, and Worker Previews for a Worker with a Durable Object) and note anything that differs from this plan in the handoff.
+- **Worker** (D18, D50) in `apps/worker`: `wrangler.jsonc` gets `main`, `assets.run_worker_first: ["/api/*"]`, a Durable Object class `Room` with a `new_sqlite_classes` migration, and keeps static assets and the SPA fallback for every other path. Routes: `POST /api/rooms` (ruleset reference in, room code and the creator's seat token out; a new code on collision), `GET /api/rooms/<code>` (ruleset and open seats, no tokens), `GET /api/rooms/<code>/socket` (WebSocket upgrade; the `Origin` must be chess9s.com or a local dev origin).
+- **Room** Durable Object: a thin adapter over S51's room logic using the Hibernation API; moves are written to its storage as they are played, so a restart loses nothing; an alarm deletes the room per D53. Limits: message size, two seats and no spectators (D52), and an idle socket closed after a while. No names, IP addresses or user agents are stored, and nothing is logged beyond Cloudflare's own request logs.
+- **Headers.** `_headers` keeps every rule; `connect-src 'none'` becomes `connect-src 'self'` (same-origin WebSocket). Worker responses set the same security headers.
+- Pre-approved dependencies: `@cloudflare/workers-types` (MIT OR Apache-2.0). `@cloudflare/vitest-pool-workers` (MIT) only if it supports the repo's Vitest version; otherwise test the adapter against a fake Durable Object state. Add both to NOTICE if used.
+- CI typechecks, lints and tests `apps/worker`, and the `ci` job also runs `wrangler deploy --dry-run` so a broken Worker config fails the PR.
+Done when: `wrangler dev` serves the app and the rooms; two Node 22 WebSocket clients (built in, no dependency) play the 80-move game through the local Worker, one drops and reconnects with its token mid-game, and the result matches; a room past D53 is gone; `pnpm build` still produces the static app; the PR's Cloudflare preview build passes (or D50's fallback is applied and written down).
+Decisions: D18, D50, D53.
+
+### S53 — Play online in the browser · Sonnet 5.5 · high · `todo`
+- **Create.** "Play online" on the game screen and the picker makes a room with the current ruleset (a custom one carries its overrides) and the creator's seat choice (D52). It shows the room code, a link `/room/<code>`, and the `mailto:` invitation from S42 with the link.
+- **Join.** By code or link. Before taking the seat the page shows the ruleset's name, version and badge, "Unofficial" and what differs for a custom one, and which side the player gets. A full, expired or unknown room says so plainly.
+- **Play.** The board turns to the player's side (D34). It shows whose turn it is, whether the opponent is connected, and buttons for resign and offer draw (D51). No undo, no computer opponent; the legal-move and danger aids stay, as they are local. Save game record (S46) works for online games.
+- **Reconnect.** Room code and seat token are kept in local storage (`chess9s.online`, one entry per room, removed when the room ends or expires). The page reconnects with backoff after a drop or a reload and replays the snapshot through the engine. A move the server refuses is taken back with the reason. A protocol mismatch after a deploy says "Reload to update".
+- **Pages.** The privacy page says what is sent (room code, ruleset, moves, seat token), what the server keeps and for how long (D53), that Cloudflare handles the connection (IP addresses included) under its own terms, and that there are no names or accounts; its date changes. `/tournament`, the builder's tournament note and the tournament invitation say games can be played online by room code, still with the Official ruleset only (D46).
+- Tests first: the online session against a fake socket (connect, opponent move, drop, reconnect, refused move, resign, draw offer, game over); create and join screens in every room state; the privacy and tournament copy.
+Done when: in two Chromium contexts against `wrangler dev`, a room is created, joined by link, played to checkmate, and one tab reloaded mid-game resumes on the same position; the same game works at Pixel 7 width with no sideways scroll; all checks pass.
+Decisions: D34, D46, D51, D52, D53.
+
+### S54 — Go live with rooms · Owner · `todo`
+After S53 merges and Workers Builds deploys it: confirm in the Cloudflare dashboard that the Worker shows the `Room` Durable Object, add the free rate-limiting rule for `POST /api/rooms` with the setting from the S52 handoff, confirm Cloudflare's terms for Durable Objects on the free plan (decision 0003 is still provisional), and play one game between two devices on chess9s.com, with a reload in the middle. Phase 5 exit when that game finishes.
+
 ## Later phases
 
 Each later phase opens with an Opus 5.5 · high planning session that replaces its placeholder with detailed steps.
-
-### S31 — Phase 5: Online multiplayer · `todo`
-Room codes, guest play, reconnection, ruleset locked per game. Backend per D18.
 
 ### S32 — Phase 6: 3-player Dragon mode (experimental) · `todo`
 Dragon role, win conditions, timer, balance simulations across variants. Decisions: D4, D5.
@@ -254,7 +293,7 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D15 | Hosting | Default, applied in S27: Cloudflare Workers with Static Assets (`wrangler.jsonc`); confirm terms at signup | S27 |
 | D41 | Deploys | Provisional: Cloudflare's Git connection (Workers Builds) deploys `main`; no Cloudflare token in GitHub and no deploy workflow | S27 |
 | D17 | ChessNines repo and site | Default: story, lore, and company information | S4 |
-| D18 | Multiplayer backend | Default: Cloudflare Durable Objects | S31 |
+| D18 | Multiplayer backend | Default: Cloudflare Durable Objects (SQLite storage, WebSocket Hibernation API), planned in S31 | S52 |
 | D20 | Discussion period before ratification | Default: 21 days from the owner's announcement (S44) | S47 |
 | D21 | Phase 1 dependencies | Default: the S7 pre-approved list | S7 |
 | D22 | DCO check alongside the CLA | Default: keep it; Claude signs off every commit with `git commit -s` | S7 |
@@ -267,6 +306,11 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D47 | Tournament conduct rules (clock, draw offers, touch-move, disputes) | Decided (ledger brief 25 Oct 2026, default kept): the project publishes none yet; `/tournament` says the organizer announces them with the invitation | S46 |
 | D48 | Version of the ratified ruleset | Decided (ledger brief 25 Oct 2026, default kept): keep the version that was fairness-checked (Standard 0.1.0), as 0010 and 0012 kept versions on status changes | S50 |
 | D49 | New discussion after a change | Decided (ledger brief 25 Oct 2026, default kept): none; a ruleset changed by the discussion is re-checked at both depths and then ratified, with the change named in the decision record (GOVERNANCE, 2-player rules, step 3) | S50 |
+| D50 | Worker layout for rooms | Default: one Worker serves the app and the rooms (same origin, one deploy, no version skew); if Cloudflare's preview builds refuse a Worker with a Durable Object, the rooms move to a second Worker bound by `script_name` and the owner connects it in S54 | S52 |
+| D51 | Online results and conduct | Default: resign and draw by agreement (offer, accept, decline); no clock (D47), no takebacks, no forfeit for a disconnection: an abandoned game stays open until its room expires | S51 |
+| D52 | Seats | Default: the room's creator chooses light, dark or random (random preselected); two seats; no spectators in Phase 5 | S51 |
+| D53 | Room retention | Default: a room and its moves are deleted 24 hours after the game ends, or after 7 days with no move; the server keeps no other copy | S52 |
+| D54 | Room codes | Default: 6 characters from 31 letters and digits without look-alikes (no 0, O, 1, I, L); a code lets anyone see the ruleset and take an open seat, the seat token is the secret | S51 |
 
 ## Ledger sync format
 
