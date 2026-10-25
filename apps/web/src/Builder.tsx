@@ -461,10 +461,11 @@ export function Builder({
           <p className="meta">Name the ruleset to export it, invite someone or submit it.</p>
         )}
         <p className="meta">
-          A custom ruleset is never a tournament ruleset: the tournament invitation says so.
-          Tournaments are not played online yet, so an invitation carries the link for a hot-seat or
-          over-the-board game. To have a ruleset considered for tournaments, submit it: that opens a
-          Rule proposals discussion on GitHub with your settings filled in, and it goes through the{' '}
+          A custom ruleset is never a tournament ruleset: the tournament invitation says so (see the{' '}
+          <a href="/tournament">tournament rules</a>). Tournaments are not played online yet, so an
+          invitation carries the link for a hot-seat or over-the-board game. To have a ruleset
+          considered for tournaments, submit it: that opens a Rule proposals discussion on GitHub
+          with your settings filled in, and it goes through the{' '}
           <a href={GOVERNANCE_URL}>review checklist</a> (a fairness check at both depths, 21 days of
           discussion, and ratification).
         </p>
