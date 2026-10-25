@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { newGame, playMove, toNotation } from '@chess9s/engine';
 import { App, pageOf } from './App';
 import { Builder } from './Builder';
+import { shareLink } from './game/share';
 import { RulePicker } from './RulePicker';
 import { RulesScreen } from './Rules';
 import { computerReply } from './game/bot';
@@ -209,6 +210,38 @@ describe('Change ruleset page', () => {
     expect(html).toContain('value="Wide"');
     expect(html).toContain('>3 squares<');
     expect(html).toContain('data-diff="king.range"');
+  });
+});
+
+describe('sharing a ruleset', () => {
+  it('says unofficial, and offers export, load, link and the two invitations', () => {
+    const html = render({ ...startBuilder('standard-2p'), name: 'Mine' });
+    expect(html).toContain('Share');
+    expect(html).toMatch(/Unofficial/);
+    expect(html).toContain('Export as file');
+    expect(html).toContain('type="file"');
+    expect(html).toContain('accept=".json,application/json"');
+    expect(html).toContain('Invite to a game');
+    expect(html).toContain('Invite to a tournament');
+    expect(html).toMatch(/href="mailto:\?subject=/);
+    expect(html).toContain('/build#ruleset=');
+  });
+
+  it('opens a shared link preloaded', () => {
+    const state = draftOf(
+      'standard-2p',
+      { type: 'name', name: 'Linked' },
+      { type: 'set', id: 'castling.enabled', value: true },
+    );
+    const hash = shareLink(state).slice(shareLink(state).indexOf('#'));
+    const html = renderToStaticMarkup(<App path="/build" hash={hash} />);
+    expect(html).toContain('value="Linked"');
+    expect(html).toContain('data-diff="castling.enabled"');
+  });
+
+  it('keeps the invitation buttons off until the ruleset has a name', () => {
+    const html = render();
+    expect(html).toMatch(/aria-disabled="true"[^>]*>Invite to a game/);
   });
 });
 

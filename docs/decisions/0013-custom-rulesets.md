@@ -17,3 +17,8 @@
 
 ## Open
 The flag rule above is a default reading. If the owner wants a different one (for example, flagging only pairs the sweep has not covered), say so in the ledger.
+
+## S42 additions (provisional)
+
+- Files and links: a ruleset file is the ruleset format with status `proposed`; on load the file's id and status are ignored. A share link is `/build#ruleset=<base64url of {n, o}>` (the plan said `/play?ruleset=`); the hash is never sent to the site.
+- Invitation mail has no address and is built from the draft: link, "unofficial" note, and what differs from Standard. The tournament version says custom rulesets are not tournament rulesets (D46).

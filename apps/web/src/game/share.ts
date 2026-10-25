@@ -20,7 +20,6 @@ import {
   overridesOf,
   rulesetValues,
   same,
-  settingsFor,
   type CustomRuleset,
 } from './rules';
 
@@ -69,7 +68,10 @@ function draftFrom(name: unknown, overrides: unknown): Parsed {
       overrides: overrides as Values,
     });
   } catch (e) {
-    const detail = e instanceof RulesError ? e.issues.join('; ') : 'it could not be read';
+    const detail =
+      e instanceof RulesError
+        ? e.issues.map((i) => i.replace(/^custom-draft: /, '')).join('; ')
+        : 'it could not be read';
     return refuse(`These settings do not fit this game: ${detail}.`);
   }
   const state = startBuilder(closestPreset(values));

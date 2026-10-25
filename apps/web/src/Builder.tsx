@@ -1,4 +1,4 @@
-import { useMemo, useReducer, useState } from 'react';
+import { useMemo, useReducer, useRef, useState } from 'react';
 import { grouped } from './RulesPage';
 import {
   MAX_NAME,
@@ -19,7 +19,29 @@ import {
   type BuilderState,
 } from './game/custom';
 import { rulesetValues, settingsFor, type CustomRuleset, type Setting } from './game/rules';
+import {
+  MAX_FILE_BYTES,
+  exportFile,
+  exportName,
+  inviteMailto,
+  matchingOfficial,
+  parseRulesetFile,
+  shareLink,
+} from './game/share';
 import { DISCUSSIONS_URL } from './links';
+
+const SITE = 'https://chess9s.com';
+const originNow = () => (typeof window === 'undefined' ? SITE : window.location.origin);
+
+/** Hand the player a file to save. */
+function download(name: string, text: string) {
+  const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 type Dispatch = (action: BuilderAction) => void;
 
@@ -184,7 +206,7 @@ export function Builder({
   saved?: CustomRuleset | undefined;
   /** Ids of the saved rulesets, so a new one gets a free id. */
   taken?: string[];
-  /** Start from this draft (tests). */
+  /** Start from this draft (a share link, or tests). */
   draft?: BuilderState;
   onSave?: (c: CustomRuleset) => void;
   /** Called after onSave with the same ruleset. */
@@ -197,6 +219,9 @@ export function Builder({
   );
   const [id, setId] = useState(state.id);
   const [kept, setKept] = useState<string | null>(null);
+  const [loadProblem, setLoadProblem] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const picker = useRef<HTMLInputElement>(null);
   const settings = useMemo(() => settingsFor(state.values), [state.values]);
   const base = presets().find((r) => r.id === state.base);
   const baseValues = useMemo(() => rulesetValues(state.base), [state.base]);
@@ -217,6 +242,33 @@ export function Builder({
     onSave?.(c);
     return c;
   };
+
+  const official = useMemo(() => matchingOfficial(state.values), [state.values]);
+  const link = `${originNow()}${shareLink(state)}`;
+  const loadFile = async (file: File | undefined) => {
+    if (!file) return;
+    setCopied(false);
+    if (file.size > MAX_FILE_BYTES) {
+      setLoadProblem(`The file is too large for a ruleset (over ${MAX_FILE_BYTES / 1000} KB).`);
+      return;
+    }
+    const parsed = parseRulesetFile(await file.text());
+    if (parsed.ok) {
+      setId(undefined);
+      dispatch({ type: 'replace', state: parsed.state });
+      setLoadProblem(null);
+    } else setLoadProblem(parsed.problem);
+  };
+  const invite = (kind: 'game' | 'tournament', label: string) => (
+    <a
+      className="again"
+      {...(problem === null
+        ? { href: inviteMailto(kind, state, originNow()) }
+        : { 'aria-disabled': true })}
+    >
+      {label}
+    </a>
+  );
 
   return (
     <article className="builder" aria-labelledby="builder-title">
@@ -316,6 +368,89 @@ export function Builder({
           </span>
         )}
       </div>
+
+      <section aria-labelledby="builder-share">
+        <h3 id="builder-share">Share</h3>
+        <p className="facts">
+          {official ? (
+            <>This matches the Official ruleset {official.name}.</>
+          ) : (
+            <>
+              <strong>Unofficial</strong> until it matches an Official ruleset. Anyone you share it
+              with sees it that way.
+            </>
+          )}{' '}
+          Nothing is sent: a file is saved on your device, and an invitation opens your own mail
+          app.
+        </p>
+        <div className="builder-actions">
+          <button
+            type="button"
+            className="again"
+            disabled={problem !== null}
+            onClick={() => {
+              const c = customFrom(state, id ?? newCustomId(taken));
+              download(exportName(c), exportFile(c));
+            }}
+          >
+            Export as file
+          </button>
+          <button type="button" className="again" onClick={() => picker.current?.click()}>
+            Load from file
+          </button>
+          <input
+            ref={picker}
+            type="file"
+            hidden
+            aria-label="Ruleset file"
+            accept=".json,application/json"
+            onChange={(e) => {
+              void loadFile(e.target.files?.[0]);
+              e.target.value = '';
+            }}
+          />
+        </div>
+        {loadProblem && (
+          <p className="flags" role="alert">
+            {loadProblem}
+          </p>
+        )}
+        <div className="builder-actions">
+          <input
+            type="text"
+            readOnly
+            className="name-input"
+            aria-label="Share link"
+            value={link}
+            onFocus={(e) => e.currentTarget.select()}
+          />
+          <button
+            type="button"
+            className="again"
+            onClick={() => {
+              void navigator.clipboard?.writeText(link).then(
+                () => setCopied(true),
+                () => {},
+              );
+            }}
+          >
+            Copy link
+          </button>
+          {copied && (
+            <span className="meta" role="status">
+              Link copied.
+            </span>
+          )}
+        </div>
+        <div className="builder-actions">
+          {invite('game', 'Invite to a game')}
+          {invite('tournament', 'Invite to a tournament')}
+        </div>
+        {problem && <p className="meta">Name the ruleset to export it or invite someone.</p>}
+        <p className="meta">
+          A custom ruleset is never a tournament ruleset: the tournament invitation says so.
+        </p>
+      </section>
 
       {grouped(settings).map((g) => (
         <section key={g.title} className="setting-group" aria-label={g.title}>

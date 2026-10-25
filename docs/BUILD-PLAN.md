@@ -173,7 +173,7 @@ Decisions: D44, D45.
 "Change ruleset" opens a builder: start from a preset, then a section per piece (King, Queen, Pawns, Coast and the Coast pieces, Center, Turns and draws) with a control per parameter (switches for on/off, choices for options, steppers for ranges). It shows what differs from the starting preset, flags combinations that share `affects` systems and have not been fairness-checked (`parameterInteractions`), and plays the result. A custom ruleset is status `proposed`, named by the player, never official, and its game record carries the full overrides so saved games replay. Custom rulesets are saved in the player's browser only; update the privacy page and its date.
 Done when: a player builds a ruleset from Standard, plays it against the computer, reloads and finds it saved; tests cover every control type.
 
-### S42 — Export, load and share a ruleset · Sonnet 5.5 · medium · `todo`
+### S42 — Export, load and share a ruleset · Sonnet 5.5 · medium · `done`
 - **Export** a ruleset as a `.json` file in the ruleset format, and **load** one from a file (treated as untrusted: size cap, parsed and checked against the registry with `resolveRuleset`, no new parameters accepted).
 - **Share link**: `/play?ruleset=<encoded overrides>` (or `#`), which opens the builder preloaded and says "unofficial" until it matches an Official ruleset.
 - **Email**: "Invite to a game" and "Invite to a tournament" open the player's own mail app (`mailto:`) with a subject, the link and the settings in plain text. The app sends nothing and stores no address.
