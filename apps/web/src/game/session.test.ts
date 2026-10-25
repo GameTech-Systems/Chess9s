@@ -98,6 +98,19 @@ describe('the ruleset list', () => {
     expect(rulesetSettings('draft-2p').filter((x) => x.changed)).toEqual([]);
   });
 
+  it('gives each setting its group and the label of its value', () => {
+    const settings = rulesetSettings('standard-2p');
+    const king = settings.find((x) => x.id === 'king.range')!;
+    expect(king.group).toBe('King');
+    expect(settings.find((x) => x.id === 'queen.voidCrossings')).toMatchObject({
+      group: 'Queen',
+      valueLabel: 'A5, E5 and I5',
+      defaultLabel: 'A5, E5 and I5',
+    });
+    expect(king).toMatchObject({ valueLabel: '1 square', defaultLabel: '2 squares' });
+    for (const s of settings) expect(s.valueLabel, s.id).not.toBe('');
+  });
+
   it('refuses a ruleset that is unknown or not playable yet', () => {
     expect(() => createRules('nope')).toThrow(/unknown ruleset/i);
     expect(() => createRules('draft-3p')).toThrow(/not playable/i);

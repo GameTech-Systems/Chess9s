@@ -19,6 +19,13 @@
         3,
         4
       ],
+      "group": "King",
+      "optionLabels": {
+        "1": "1 square",
+        "2": "2 squares",
+        "3": "3 squares",
+        "4": "4 squares"
+      },
       "status": "proposed",
       "affects": [
         "movement",
@@ -43,6 +50,11 @@
         false,
         true
       ],
+      "group": "King",
+      "optionLabels": {
+        "false": "Blocked by pieces",
+        "true": "Jumps over a piece"
+      },
       "status": "proposed",
       "affects": [
         "movement",
@@ -65,6 +77,11 @@
         true,
         false
       ],
+      "group": "King",
+      "optionLabels": {
+        "true": "Allowed",
+        "false": "Not allowed"
+      },
       "status": "proposed",
       "affects": [
         "movement",
@@ -87,6 +104,11 @@
         false,
         true
       ],
+      "group": "King",
+      "optionLabels": {
+        "false": "No castling",
+        "true": "Castling allowed"
+      },
       "status": "proposed",
       "affects": [
         "movement",
@@ -109,6 +131,11 @@
         false,
         true
       ],
+      "group": "Queen",
+      "optionLabels": {
+        "false": "Off",
+        "true": "On"
+      },
       "status": "proposed",
       "affects": [
         "movement",
@@ -132,6 +159,12 @@
         "e5-only",
         "none"
       ],
+      "group": "Queen",
+      "optionLabels": {
+        "a5-e5-i5": "A5, E5 and I5",
+        "e5-only": "E5 only",
+        "none": "Nowhere"
+      },
       "status": "proposed",
       "affects": [
         "movement",
@@ -155,6 +188,11 @@
         true,
         false
       ],
+      "group": "Queen",
+      "optionLabels": {
+        "true": "Allowed",
+        "false": "Not allowed"
+      },
       "status": "proposed",
       "affects": [
         "movement",
@@ -177,6 +215,11 @@
         false,
         true
       ],
+      "group": "Queen",
+      "optionLabels": {
+        "false": "No swap",
+        "true": "Swap allowed"
+      },
       "status": "proposed",
       "affects": [
         "movement",
@@ -200,6 +243,11 @@
         true,
         false
       ],
+      "group": "Pawns",
+      "optionLabels": {
+        "true": "Two squares on the first move",
+        "false": "One square only"
+      },
       "status": "proposed",
       "affects": [
         "movement"
@@ -229,6 +277,14 @@
         "knight",
         "captured-piece"
       ],
+      "group": "Pawns",
+      "optionLabels": {
+        "queen": "Queen",
+        "rook": "Rook",
+        "bishop": "Bishop",
+        "knight": "Knight",
+        "captured-piece": "Any lost piece"
+      },
       "status": "proposed",
       "affects": [
         "promotion",
@@ -253,6 +309,12 @@
         "any-colored-square",
         "off"
       ],
+      "group": "Pawns",
+      "optionLabels": {
+        "starting-file": "Colored square of its starting file",
+        "any-colored-square": "Any colored square",
+        "off": "No safe zones"
+      },
       "status": "proposed",
       "affects": [
         "capture",
@@ -277,6 +339,11 @@
         false,
         true
       ],
+      "group": "Pawns",
+      "optionLabels": {
+        "false": "Not allowed",
+        "true": "Allowed"
+      },
       "status": "proposed",
       "affects": [
         "movement"
@@ -299,6 +366,12 @@
         "dragons-and-sun-moon",
         "any"
       ],
+      "group": "Center",
+      "optionLabels": {
+        "dragons": "Dragons only",
+        "dragons-and-sun-moon": "Dragons, Sun and Moon",
+        "any": "Any piece"
+      },
       "status": "proposed",
       "affects": [
         "movement",
@@ -334,6 +407,17 @@
         "bishop",
         "pawn"
       ],
+      "group": "Center",
+      "optionLabels": {
+        "dragon-head": "Dragon Head",
+        "queen": "Queen",
+        "king": "King",
+        "sun-moon-pawn": "Sun and Moon",
+        "knight": "Knight",
+        "rook": "Rook",
+        "bishop": "Bishop",
+        "pawn": "Pawn"
+      },
       "status": "proposed",
       "affects": [
         "movement",
@@ -356,6 +440,11 @@
         "tail-to-center",
         "open-at-start"
       ],
+      "group": "Coast",
+      "optionLabels": {
+        "tail-to-center": "Tail moves A5 to E5",
+        "open-at-start": "Open from the start"
+      },
       "status": "proposed",
       "affects": [
         "movement",
@@ -378,6 +467,11 @@
         "any-legal-move",
         "a5-only"
       ],
+      "group": "Coast",
+      "optionLabels": {
+        "any-legal-move": "Any legal move",
+        "a5-only": "Through A5 only"
+      },
       "status": "proposed",
       "affects": [
         "movement"
@@ -398,6 +492,11 @@
         "a5-first-then-any",
         "a5-always"
       ],
+      "group": "Coast",
+      "optionLabels": {
+        "a5-first-then-any": "A5 first, then any move",
+        "a5-always": "Always through A5"
+      },
       "status": "experimental",
       "affects": [
         "movement"
@@ -420,6 +519,11 @@
         true,
         false
       ],
+      "group": "Coast",
+      "optionLabels": {
+        "true": "Pieces may return",
+        "false": "No return"
+      },
       "status": "proposed",
       "affects": [
         "movement"
@@ -440,6 +544,11 @@
         true,
         false
       ],
+      "group": "Coast",
+      "optionLabels": {
+        "true": "Can be captured",
+        "false": "Cannot be captured"
+      },
       "status": "proposed",
       "affects": [
         "capture",
@@ -461,6 +570,11 @@
         false,
         true
       ],
+      "group": "Coast",
+      "optionLabels": {
+        "false": "Cannot be captured",
+        "true": "Can be captured"
+      },
       "status": "experimental",
       "affects": [
         "capture"
@@ -481,6 +595,11 @@
         "a5-e5-i5",
         "e5-i5-only"
       ],
+      "group": "Dragon Tail",
+      "optionLabels": {
+        "a5-e5-i5": "A5, E5 and I5",
+        "e5-i5-only": "E5 and I5 only"
+      },
       "status": "proposed",
       "affects": [
         "movement",
@@ -503,6 +622,11 @@
         "like-dragon-head",
         "two-player-path"
       ],
+      "group": "Dragon Tail",
+      "optionLabels": {
+        "like-dragon-head": "Like a Dragon Head",
+        "two-player-path": "The 2-player path"
+      },
       "status": "experimental",
       "affects": [
         "movement",
@@ -524,6 +648,11 @@
         1,
         0
       ],
+      "group": "Dragon Tail",
+      "optionLabels": {
+        "0": "No limit",
+        "1": "One move in a row"
+      },
       "status": "proposed",
       "affects": [
         "movement",
@@ -546,6 +675,11 @@
         false,
         true
       ],
+      "group": "Dragon Tail",
+      "optionLabels": {
+        "false": "Cannot capture",
+        "true": "Can capture"
+      },
       "status": "proposed",
       "affects": [
         "capture",
@@ -568,6 +702,11 @@
         "non-coast-pieces",
         "none"
       ],
+      "group": "Dragon Tail",
+      "optionLabels": {
+        "non-coast-pieces": "Pieces not on the Coast",
+        "none": "Nothing"
+      },
       "status": "experimental",
       "affects": [
         "capture",
@@ -590,6 +729,11 @@
         false,
         true
       ],
+      "group": "Dragon Tail",
+      "optionLabels": {
+        "false": "Cannot give check",
+        "true": "Can give check"
+      },
       "status": "proposed",
       "affects": [
         "check-detection"
@@ -611,6 +755,11 @@
         false,
         true
       ],
+      "group": "Dragon Tail",
+      "optionLabels": {
+        "false": "Cannot be captured",
+        "true": "Can be captured"
+      },
       "status": "proposed",
       "affects": [
         "capture",
@@ -639,6 +788,17 @@
         7,
         8
       ],
+      "group": "Dragon Heads",
+      "optionLabels": {
+        "1": "1 square",
+        "2": "2 squares",
+        "3": "3 squares",
+        "4": "4 squares",
+        "5": "5 squares",
+        "6": "6 squares",
+        "7": "7 squares",
+        "8": "Unlimited"
+      },
       "status": "proposed",
       "affects": [
         "movement",
@@ -662,6 +822,10 @@
       "options": [
         "squares"
       ],
+      "group": "Dragon Heads",
+      "optionLabels": {
+        "squares": "Squares in a line"
+      },
       "status": "proposed",
       "affects": [
         "movement"
@@ -684,6 +848,11 @@
         false,
         true
       ],
+      "group": "Dragon Heads",
+      "optionLabels": {
+        "false": "Blocked by pieces",
+        "true": "Jumps over pieces"
+      },
       "status": "proposed",
       "affects": [
         "movement",
@@ -705,6 +874,11 @@
         true,
         false
       ],
+      "group": "Coast",
+      "optionLabels": {
+        "true": "Can give check",
+        "false": "Cannot give check"
+      },
       "status": "proposed",
       "affects": [
         "check-detection"
@@ -725,6 +899,11 @@
         false,
         true
       ],
+      "group": "Dragon Heads",
+      "optionLabels": {
+        "false": "Cannot give check",
+        "true": "Can give check"
+      },
       "status": "experimental",
       "affects": [
         "check-detection",
@@ -746,6 +925,11 @@
         1,
         2
       ],
+      "group": "Sun and Moon",
+      "optionLabels": {
+        "1": "1 square",
+        "2": "2 squares"
+      },
       "status": "proposed",
       "affects": [
         "movement",
@@ -767,6 +951,11 @@
         true,
         false
       ],
+      "group": "Sun and Moon",
+      "optionLabels": {
+        "true": "Two squares on the first move",
+        "false": "One square only"
+      },
       "status": "proposed",
       "affects": [
         "movement"
@@ -787,6 +976,11 @@
         1,
         2
       ],
+      "group": "Sun and Moon",
+      "optionLabels": {
+        "1": "1 square",
+        "2": "2 squares"
+      },
       "status": "experimental",
       "affects": [
         "movement",
@@ -810,6 +1004,12 @@
         "diagonal-only",
         "none"
       ],
+      "group": "Sun and Moon",
+      "optionLabels": {
+        "any-move-square": "Any square it can move to",
+        "diagonal-only": "Diagonally only",
+        "none": "Never"
+      },
       "status": "proposed",
       "affects": [
         "capture",
@@ -833,6 +1033,11 @@
         false,
         true
       ],
+      "group": "Sun and Moon",
+      "optionLabels": {
+        "false": "Cannot promote",
+        "true": "Can promote"
+      },
       "status": "proposed",
       "affects": [
         "promotion",
@@ -854,6 +1059,11 @@
         "dark",
         "light"
       ],
+      "group": "Turns and draws",
+      "optionLabels": {
+        "dark": "Dark",
+        "light": "Light"
+      },
       "status": "proposed",
       "affects": [
         "balance"
@@ -876,6 +1086,12 @@
         "loss-for-stalemated",
         "win-for-stalemated"
       ],
+      "group": "Turns and draws",
+      "optionLabels": {
+        "draw": "Draw",
+        "loss-for-stalemated": "Loss for the stalemated player",
+        "win-for-stalemated": "Win for the stalemated player"
+      },
       "status": "proposed",
       "affects": [
         "game-end"
@@ -895,6 +1111,10 @@
       "options": [
         "draw-between-kinged"
       ],
+      "group": "Turns and draws",
+      "optionLabels": {
+        "draw-between-kinged": "Draw between the Kinged players"
+      },
       "status": "experimental",
       "affects": [
         "game-end"
@@ -915,6 +1135,11 @@
         true,
         false
       ],
+      "group": "Turns and draws",
+      "optionLabels": {
+        "true": "Draw by repetition",
+        "false": "No repetition draw"
+      },
       "status": "proposed",
       "affects": [
         "game-end"
@@ -935,6 +1160,11 @@
         true,
         false
       ],
+      "group": "Turns and draws",
+      "optionLabels": {
+        "true": "Fifty-move draw",
+        "false": "No fifty-move draw"
+      },
       "status": "proposed",
       "affects": [
         "game-end"
@@ -955,6 +1185,11 @@
         true,
         false
       ],
+      "group": "Turns and draws",
+      "optionLabels": {
+        "true": "Draw on too little material",
+        "false": "Play on"
+      },
       "status": "proposed",
       "affects": [
         "game-end"
@@ -976,6 +1211,11 @@
         false,
         true
       ],
+      "group": "Setup",
+      "optionLabels": {
+        "false": "Standard setup",
+        "true": "King and Queen swapped"
+      },
       "status": "experimental",
       "affects": [
         "board-state",
@@ -997,6 +1237,10 @@
       "options": [
         false
       ],
+      "group": "Setup",
+      "optionLabels": {
+        "false": "Off"
+      },
       "status": "experimental",
       "affects": [
         "game-end"
