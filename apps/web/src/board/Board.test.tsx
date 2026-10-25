@@ -8,6 +8,36 @@ const render = (props: Partial<Parameters<typeof Board>[0]> = {}) =>
 const count = (html: string, needle: RegExp) => (html.match(needle) ?? []).length;
 
 describe('Board', () => {
+  it("rings each pawn with its starting file's color, and names the color", () => {
+    const html = render();
+    const ring = (at: string) =>
+      new RegExp(
+        `data-piece="pawn" data-at="${at}"[^>]*>[\\s\\S]*?data-pawn-ring="([^"]+)" stroke="(#[0-9a-f]{6})"`,
+      ).exec(html);
+    expect(ring('b2')?.slice(1)).toEqual(['Red', '#ff000e']);
+    expect(ring('b8')?.slice(1)).toEqual(['Pink', '#f440ad']);
+    expect(ring('e2')?.slice(1)).toEqual(['Green', '#359b35']);
+    expect(html).toMatch(/aria-label="b2, red pawn, light"|<title>b2 · red pawn<\/title>/);
+    expect(count(html, /data-pawn-ring="/g)).toBe(14);
+  });
+
+  it('keeps the ring of the file a pawn started on after it changes file', () => {
+    const html = render({
+      position: {
+        d3: { piece: 'pawn', side: 'light', home: 'c2', moved: true },
+        f1: { piece: 'king', side: 'light', home: 'f1' },
+        f9: { piece: 'king', side: 'dark', home: 'f9' },
+      },
+    });
+    expect(html).toMatch(/data-at="d3"[^>]*>[\s\S]*?data-pawn-ring="Orange"/);
+  });
+
+  it('draws no ring on the I-file pawns or on other pieces', () => {
+    const html = render();
+    expect(html).not.toMatch(/data-at="i2"[^>]*>(?:(?!<\/g>)[\s\S])*data-pawn-ring/);
+    expect(html).not.toMatch(/data-piece="queen"[^>]*>(?:(?!<\/g>)[\s\S])*data-pawn-ring/);
+  });
+
   it('draws 81 squares', () => {
     expect(count(render(), /data-square="/g)).toBe(81);
   });

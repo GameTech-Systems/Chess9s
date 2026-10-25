@@ -5,6 +5,7 @@ import {
   PHI,
   edgeLabels,
   parseSquare,
+  pawnColor,
   squareFill,
   tetrahedron,
   toScreen,
@@ -162,6 +163,40 @@ describe('tetrahedron on the Center square (D36)', () => {
     for (const p of [...t.base, t.apex]) {
       expect(Math.abs(p.x)).toBeLessThanOrEqual(0.5);
       expect(Math.abs(p.y)).toBeLessThanOrEqual(0.5);
+    }
+  });
+});
+
+describe('pawnColor', () => {
+  validateBoard(board);
+  const data = board as unknown as Board;
+
+  it("is the color of the side's own colored square in the pawn's starting file", () => {
+    expect(pawnColor(data, 'light', 'b2')).toEqual({ name: 'Red', color: '#ff000e' });
+    expect(pawnColor(data, 'dark', 'b8')).toEqual({ name: 'Pink', color: '#f440ad' });
+    expect(pawnColor(data, 'light', 'h2')).toEqual({ name: 'Violet', color: '#760c7b' });
+    expect(pawnColor(data, 'dark', 'c8')).toEqual({ name: 'Burnt orange', color: '#db7209' });
+  });
+
+  it("is green for the E-file pawns, the Center square's color", () => {
+    const e5 = data.squares.find((s) => s.at === 'e5')!;
+    expect(pawnColor(data, 'light', 'e2')).toEqual({ name: 'Green', color: e5.color });
+    expect(pawnColor(data, 'dark', 'e8')).toEqual({ name: 'Green', color: e5.color });
+  });
+
+  it('is none for the I-file pawns and for an unknown start', () => {
+    expect(pawnColor(data, 'light', 'i2')).toBeUndefined();
+    expect(pawnColor(data, 'dark', 'i8')).toBeUndefined();
+    expect(pawnColor(data, 'light', undefined)).toBeUndefined();
+  });
+
+  it('gives each side 7 distinct colors across its 8 pawns', () => {
+    for (const side of ['light', 'dark']) {
+      const rank = side === 'light' ? 2 : 8;
+      const colors = [...'bcdefghi']
+        .map((f) => pawnColor(data, side, `${f}${rank}`)?.color)
+        .filter(Boolean);
+      expect(new Set(colors).size).toBe(7);
     }
   });
 });
