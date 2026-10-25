@@ -52,24 +52,24 @@ Measured as decision 0008 (version 2) sets out (ledger D12): the first player's 
 | tail.capturable=true | 1 | 40 | 50.0% | 35.2–64.8% | 25.0% | 15 | 15 | 135 / 116 / 8–447 | 40 | too few games |
 | dragonHead.range=1 | 1 | 40 | 52.5% | 37.5–67.1% | 40.0% | 13 | 11 | 137 / 154 / 8–309 | 40 | too few games |
 | dragonHead.range=2 | 1 | 40 | 38.8% | 25.3–54.2% | 42.5% | 7 | 16 | 131 / 132 / 8–417 | 40 | score outside 47–53%, too few games |
-| dragonHead.range=3 | 1 | 39 | 50.0% | 35.0–65.0% | 43.6% | 11 | 11 | 117 / 117 / 8–314 | 39 | too few games |
-| dragonHead.range=4 | 1 | 1 | 0.0% | 0.0–79.3% | 0.0% | 0 | 1 | 8 / 8 / 8–8 | 1 | score outside 47–53%, too few games |
-| dragonHead.range=5 | 1 | 0 | 0.0% | 0.0–100.0% | 0.0% | 0 | 0 | 0 / 0 / 0–0 | 0 | too few games |
-| dragonHead.range=6 | 1 | 0 | 0.0% | 0.0–100.0% | 0.0% | 0 | 0 | 0 / 0 / 0–0 | 0 | too few games |
-| dragonHead.range=7 | 1 | 0 | 0.0% | 0.0–100.0% | 0.0% | 0 | 0 | 0 / 0 / 0–0 | 0 | too few games |
-| dragon.canJump=true | 1 | 0 | 0.0% | 0.0–100.0% | 0.0% | 0 | 0 | 0 / 0 / 0–0 | 0 | too few games |
-| coastPieces.2p.giveCheck=false | 1 | 0 | 0.0% | 0.0–100.0% | 0.0% | 0 | 0 | 0 / 0 / 0–0 | 0 | too few games |
-| sunMoon.range=2 | 1 | 0 | 0.0% | 0.0–100.0% | 0.0% | 0 | 0 | 0 / 0 / 0–0 | 0 | too few games |
-| sunMoon.firstMoveDouble=false | 1 | 0 | 0.0% | 0.0–100.0% | 0.0% | 0 | 0 | 0 / 0 / 0–0 | 0 | too few games |
-| sunMoon.capture=diagonal-only | 1 | 0 | 0.0% | 0.0–100.0% | 0.0% | 0 | 0 | 0 / 0 / 0–0 | 0 | too few games |
-| sunMoon.capture=none | 1 | 0 | 0.0% | 0.0–100.0% | 0.0% | 0 | 0 | 0 / 0 / 0–0 | 0 | too few games |
-| sunMoon.canPromote=true | 1 | 0 | 0.0% | 0.0–100.0% | 0.0% | 0 | 0 | 0 / 0 / 0–0 | 0 | too few games |
-| turn.firstMove=light | 1 | 0 | 0.0% | 0.0–100.0% | 0.0% | 0 | 0 | 0 / 0 / 0–0 | 0 | too few games |
-| draw.stalemate=loss-for-stalemated | 1 | 0 | 0.0% | 0.0–100.0% | 0.0% | 0 | 0 | 0 / 0 / 0–0 | 0 | too few games |
-| draw.stalemate=win-for-stalemated | 1 | 0 | 0.0% | 0.0–100.0% | 0.0% | 0 | 0 | 0 / 0 / 0–0 | 0 | too few games |
-| draw.threefoldRepetition=false | 1 | 0 | 0.0% | 0.0–100.0% | 0.0% | 0 | 0 | 0 / 0 / 0–0 | 0 | too few games |
-| draw.fiftyMove=false | 1 | 0 | 0.0% | 0.0–100.0% | 0.0% | 0 | 0 | 0 / 0 / 0–0 | 0 | too few games |
-| draw.insufficientMaterial=false | 1 | 0 | 0.0% | 0.0–100.0% | 0.0% | 0 | 0 | 0 / 0 / 0–0 | 0 | too few games |
+| dragonHead.range=3 | 1 | 40 | 48.8% | 34.1–63.7% | 42.5% | 11 | 12 | 120 / 121 / 8–314 | 40 | too few games |
+| dragonHead.range=4 | 1 | 40 | 48.8% | 34.1–63.7% | 32.5% | 13 | 14 | 125 / 123 / 8–416 | 40 | too few games |
+| dragonHead.range=5 | 1 | 40 | 47.5% | 32.9–62.5% | 50.0% | 9 | 11 | 116 / 114.5 / 8–262 | 40 | too few games |
+| dragonHead.range=6 | 1 | 40 | 42.5% | 28.5–57.8% | 40.0% | 9 | 15 | 117 / 123 / 8–256 | 40 | score outside 47–53%, too few games |
+| dragonHead.range=7 | 1 | 40 | 43.8% | 29.6–59.0% | 47.5% | 8 | 13 | 113 / 115 / 8–268 | 40 | score outside 47–53%, too few games |
+| dragon.canJump=true | 1 | 40 | 60.0% | 44.6–73.7% | 30.0% | 18 | 10 | 89 / 69.5 / 5–237 | 40 | score outside 47–53%, too few games |
+| coastPieces.2p.giveCheck=false | 1 | 40 | 52.5% | 37.5–67.1% | 70.0% | 7 | 5 | 149 / 149 / 8–506 | 40 | too few games |
+| sunMoon.range=2 | 1 | 40 | 46.3% | 31.8–61.3% | 32.5% | 12 | 15 | 125 / 114.5 / 8–389 | 40 | score outside 47–53%, too few games |
+| sunMoon.firstMoveDouble=false | 1 | 40 | 47.5% | 32.9–62.5% | 40.0% | 11 | 13 | 111 / 107 / 8–324 | 40 | too few games |
+| sunMoon.capture=diagonal-only | 1 | 40 | 46.3% | 31.8–61.3% | 42.5% | 10 | 13 | 119 / 105 / 8–399 | 40 | score outside 47–53%, too few games |
+| sunMoon.capture=none | 1 | 40 | 46.3% | 31.8–61.3% | 47.5% | 9 | 12 | 112 / 106 / 8–295 | 40 | score outside 47–53%, too few games |
+| sunMoon.canPromote=true | 1 | 40 | 43.8% | 29.6–59.0% | 42.5% | 9 | 14 | 116 / 115 / 8–359 | 40 | score outside 47–53%, too few games |
+| turn.firstMove=light | 1 | 40 | 55.0% | 39.8–69.3% | 30.0% | 16 | 12 | 128 / 118.5 / 7–452 | 40 | score outside 47–53%, too few games |
+| draw.stalemate=loss-for-stalemated | 1 | 40 | 43.8% | 29.6–59.0% | 42.5% | 9 | 14 | 116 / 115 / 8–359 | 40 | score outside 47–53%, too few games |
+| draw.stalemate=win-for-stalemated | 1 | 40 | 43.8% | 29.6–59.0% | 42.5% | 9 | 14 | 116 / 115 / 8–359 | 40 | score outside 47–53%, too few games |
+| draw.threefoldRepetition=false | 1 | 40 | 46.3% | 31.8–61.3% | 22.5% | 14 | 17 | 181 / 156.5 / 8–575 | 40 | score outside 47–53%, too few games |
+| draw.fiftyMove=false | 1 | 40 | 43.8% | 29.6–59.0% | 42.5% | 9 | 14 | 116 / 115 / 8–359 | 40 | score outside 47–53%, too few games |
+| draw.insufficientMaterial=false | 1 | 40 | 43.8% | 29.6–59.0% | 42.5% | 9 | 14 | 116 / 115 / 8–359 | 40 | score outside 47–53%, too few games |
 
 ## How the games ended
 
