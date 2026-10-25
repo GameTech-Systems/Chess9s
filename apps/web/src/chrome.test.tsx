@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
-import { App, pageOf } from './App';
+import { App, pageOf, rulesIdOf } from './App';
 import { ErrorBoundary, ErrorScreen } from './ErrorScreen';
 import { installErrorFallback } from './errorFallback';
 import { CONTACT_ADDRESS, DISCUSSIONS_URL } from './links';
@@ -39,6 +39,29 @@ describe('pages', () => {
     expect(pageOf('/no/such/page')).toBe('game');
   });
 
+  it("routes /rules/<ruleset id> to that ruleset's rules page", () => {
+    expect(pageOf('/rules/standard-2p')).toBe('rules');
+    expect(pageOf('/rules/standard-2p/')).toBe('rules');
+    expect(rulesIdOf('/rules/standard-2p')).toBe('standard-2p');
+    expect(rulesIdOf('/rules/')).toBeUndefined();
+  });
+
+  it('the rules page lists every setting of the ruleset, marking what it changes', () => {
+    const html = renderToStaticMarkup(<App path="/rules/standard-2p" />);
+    expect(html).toContain('Standard');
+    expect(html).toContain('King range');
+    expect(html).toMatch(/data-setting="king.range" data-changed=""/);
+    expect(html).not.toMatch(/data-setting="queen.canEnterVoid" data-changed=""/);
+    expect(html).toContain('Pawn colors and safe zones');
+    expect(html).toContain('>Play Standard<');
+  });
+
+  it('the rules page for an unknown ruleset says so and lists the real ones', () => {
+    const html = renderToStaticMarkup(<App path="/rules/nope" />);
+    expect(html).toContain('No ruleset called');
+    expect(html).toContain('href="/rules/standard-2p"');
+  });
+
   it('privacy page states the facts and the storage key', () => {
     const html = renderToStaticMarkup(<App path="/privacy" />);
     for (const fact of [
@@ -55,7 +78,7 @@ describe('pages', () => {
   });
 
   it('every page links to Suggest a variant', () => {
-    for (const path of ['/', '/privacy']) {
+    for (const path of ['/', '/privacy', '/rules/standard-2p']) {
       expect(renderToStaticMarkup(<App path={path} />)).toContain(
         `href="${DISCUSSIONS_URL}">Suggest a variant`,
       );
