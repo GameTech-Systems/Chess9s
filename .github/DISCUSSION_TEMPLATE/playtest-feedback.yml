@@ -18,3 +18,10 @@ body:
       description: Did either side feel favored? Which moments felt unclear?
     validations:
       required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Contribution terms
+      options:
+        - label: I agree this feedback is a Contribution under the Chess Nines CLA (CLA.md), and it contains no art, lore or characters.
+          required: true

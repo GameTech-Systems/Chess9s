@@ -18,3 +18,10 @@ body:
       label: Why is it fair or better?
     validations:
       required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Contribution terms
+      options:
+        - label: I agree this proposal is a Contribution under the Chess Nines CLA (CLA.md), and it contains no art, lore or characters.
+          required: true
