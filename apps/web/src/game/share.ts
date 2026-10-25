@@ -2,7 +2,8 @@
 // file a player picked, a link someone sent), so it is size-capped, checked key by key, and
 // resolved against the registry with `resolveRuleset` before it becomes a draft. Nothing is
 // sent anywhere: an invitation is a `mailto:` link the player's own mail app opens.
-import { RulesError } from '@chess9s/engine';
+import { MAX_RULESET_FILE_BYTES, readRulesetFile, resolveFileOverrides } from '@chess9s/engine';
+import registry from '../../../../rules/parameters.json';
 import {
   MAX_NAME,
   differences,
@@ -15,7 +16,6 @@ import {
 import {
   CUSTOM_VERSION,
   DEFAULT_RULESET_ID,
-  customValues,
   listRulesets,
   overridesOf,
   rulesetValues,
@@ -23,22 +23,11 @@ import {
   type CustomRuleset,
 } from './rules';
 
-export const MAX_FILE_BYTES = 20_000;
+export const MAX_FILE_BYTES = MAX_RULESET_FILE_BYTES;
 export const MAX_LINK_CHARS = 4_000;
 /** Share links open the builder; the ruleset rides in the hash, which a server never sees. */
 export const SHARE_PATH = '/build';
 const HASH_KEY = 'ruleset=';
-
-const FILE_KEYS = new Set([
-  '$schema',
-  'id',
-  'name',
-  'version',
-  'status',
-  'players',
-  'description',
-  'overrides',
-]);
 
 export type Parsed = { ok: true; state: BuilderState } | { ok: false; problem: string };
 const refuse = (problem: string): Parsed => ({ ok: false, problem });
@@ -60,22 +49,10 @@ function draftFrom(name: unknown, overrides: unknown): Parsed {
   const problem = nameProblem(name);
   if (problem) return refuse(problem);
   if (!isRecord(overrides)) return refuse('The file has no “overrides” object.');
-  let values: Values;
-  try {
-    values = customValues({
-      id: 'custom-draft',
-      name: name.trim(),
-      overrides: overrides as Values,
-    });
-  } catch (e) {
-    const detail =
-      e instanceof RulesError
-        ? e.issues.map((i) => i.replace(/^custom-draft: /, '')).join('; ')
-        : 'it could not be read';
-    return refuse(`These settings do not fit this game: ${detail}.`);
-  }
-  const state = startBuilder(closestPreset(values));
-  return { ok: true, state: { ...state, name: name.trim(), values } };
+  const r = resolveFileOverrides(registry, name.trim(), overrides);
+  if (!r.ok) return refuse(r.problem);
+  const state = startBuilder(closestPreset(r.values));
+  return { ok: true, state: { ...state, name: r.name, values: r.values } };
 }
 
 /** The ruleset as a `.json` file in the ruleset format (rules/schema/ruleset.schema.json). */
@@ -111,23 +88,9 @@ export const exportName = (c: Pick<CustomRuleset, 'id' | 'name'>) =>
  * id and status are ignored (a loaded ruleset is always `proposed`, and gets a free id on save).
  */
 export function parseRulesetFile(text: string): Parsed {
-  if (new TextEncoder().encode(text).length > MAX_FILE_BYTES) {
-    return refuse(`The file is too large for a ruleset (over ${MAX_FILE_BYTES / 1000} KB).`);
-  }
-  let file: unknown;
-  try {
-    file = JSON.parse(text);
-  } catch {
-    return refuse('This is not a ruleset file: it is not valid JSON.');
-  }
-  if (!isRecord(file)) return refuse('This is not a ruleset file.');
-  if ('extends' in file) return refuse('A ruleset file cannot use “extends”.');
-  const stray = Object.keys(file).find((k) => !FILE_KEYS.has(k));
-  if (stray) return refuse(`The file has a field a ruleset does not have: “${stray}”.`);
-  if (file.players !== 2) return refuse('Only 2-player rulesets can be loaded.');
-  if (isRecord(file.overrides) && Object.keys(file.overrides).includes('__proto__')) {
-    return refuse('The file names a setting this game does not have: “__proto__”.');
-  }
+  // The same check the sim runs on a submitted file (`pnpm sim --ruleset-file`).
+  const file = readRulesetFile(text, registry);
+  if (!file.ok) return refuse(file.problem);
   return draftFrom(file.name, file.overrides);
 }
 
