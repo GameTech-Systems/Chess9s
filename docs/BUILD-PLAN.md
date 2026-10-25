@@ -130,7 +130,7 @@ Decisions: D12 (decision 0008), decision 0009.
 ### S25 — Mobile layout · Sonnet 5.5 · medium · `done`
 Responsive layout and touch input. Done when a full game against the computer works in a phone browser.
 
-### S26 — Candidate 2-player ruleset · Owner with Claude in chat · `todo`
+### S26 — Candidate 2-player ruleset · Owner with Claude in chat · `done`
 Review the fairness evidence, settle the draft defaults, and publish the default 2-player ruleset as a Candidate with its evidence. Phase 2 exit.
 
 ## Phase 3: Public launch
@@ -140,8 +140,48 @@ Deploy the static app per D15 at chess9s.com, add a privacy policy page, an erro
 
 ### S28 — Owner task (tracked privately) · `todo`
 
-### S29 — Outside testers · Owner · `todo`
+### S29 — Outside testers · Owner · `doing`
 A handful of outside testers finish games and send feedback. Phase 3 exit.
+
+## Presets and the ruleset builder
+
+Added 2026-10-24 from the owner's playtest (S29). Players test configurations, export and load them, send them to others for a game or a tournament, and submit them for consideration as an official tournament ruleset. Steps S39 to S43 build it in order; each is one session and one PR.
+
+### S36 — Playtest fixes, presets and legal audit · Owner with Claude in chat · Opus 5.5 · high · `done`
+Readable rules dialog (dark panel, focus, Escape), color rings on pawns by starting file, presets Standard (new default, King range 1), Good Practice (`draft-2p`, unchanged rules) and Easy Start, a rules page per ruleset at `/rules/<id>` linked from the dialog and picker, depth-1 fairness run for Standard, and the legal audit fixes (bundled license notices, privacy page, footer notice, Discussions terms). Decision 0011.
+
+### S37 — Depth-2 fairness run for Standard · Owner · `todo`
+Actions → **Sim depth 2** → Run workflow, with ruleset `standard-2p` (shards 20, games 2000). It takes about one hour per shard, run in parallel. When it finishes, start S38.
+
+### S38 — Publish Standard as a Candidate · Sonnet 5.5 · medium · `todo`
+Commit the merged depth-2 report (the run's artifact) to `docs/fairness/standard-2p.md` and `.json`, keeping the depth-1 run. If both depths pass decision 0008, change `standard-2p` to `candidate` (version unchanged, as 0010 did for `draft-2p`) and write decision record 0012; if not, leave it experimental and report the numbers. Decisions: D12, D43.
+Done when: the report shows both depths and the status matches the verdict.
+
+### S39 — Option labels and groups in the registry · Sonnet 5.5 · medium · `todo`
+Add `group` (King, Queen, Pawns, Center, Coast, Dragon Tail, Dragon Heads, Sun and Moon, Turns and draws, Setup) and `optionLabels` (a short player-facing label for every option, such as `a5-e5-i5` → "A5, E5 and I5") to `rules/schema/parameters.schema.json` and every live parameter in `rules/parameters.json`. Labels are presentation only; no rule changes. The rules page and the dialog show labels instead of raw values, and group by `group` instead of id prefixes.
+Done when: a test fails for any live parameter without a group or without a label for each option, and `/rules/<id>` shows labels.
+
+### S40 — The owner's new piece options (24 Oct 2026) · Opus 5.5 · high · `todo`
+New parameters from the owner, each defaulting to today's behavior and tested at its default and every option, with a 40-game sweep entry:
+- **Queen crosses the void** and **Queen may stand on a void square**, as two switches. They replace `queen.canEnterVoid`, which becomes deprecated (kept so old games replay); rulesets that set it get a new version with the two new ones.
+- **Pawns may enter the Coast once it is open** (`pawn.canEnterCoast`, default off).
+- **Every piece may enter the Coast at any time** (default off).
+Already parameters, no new work: Queen may enter the Coast once it is open (`queen.canEnterCoast`), and pawn-safe zones on the like-colored square or on any colored square (`pawn.safeZones`; the builder shows its options as two switches).
+Decisions: D44, D45.
+
+### S41 — Change Ruleset page · Sonnet 5.5 · high · `todo`
+"Change ruleset" opens a builder: start from a preset, then a section per piece (King, Queen, Pawns, Coast and the Coast pieces, Center, Turns and draws) with a control per parameter (switches for on/off, choices for options, steppers for ranges). It shows what differs from the starting preset, flags combinations that share `affects` systems and have not been fairness-checked (`parameterInteractions`), and plays the result. A custom ruleset is status `proposed`, named by the player, never official, and its game record carries the full overrides so saved games replay. Custom rulesets are saved in the player's browser only; update the privacy page and its date.
+Done when: a player builds a ruleset from Standard, plays it against the computer, reloads and finds it saved; tests cover every control type.
+
+### S42 — Export, load and share a ruleset · Sonnet 5.5 · medium · `todo`
+- **Export** a ruleset as a `.json` file in the ruleset format, and **load** one from a file (treated as untrusted: size cap, parsed and checked against the registry with `resolveRuleset`, no new parameters accepted).
+- **Share link**: `/play?ruleset=<encoded overrides>` (or `#`), which opens the builder preloaded and says "unofficial" until it matches an Official ruleset.
+- **Email**: "Invite to a game" and "Invite to a tournament" open the player's own mail app (`mailto:`) with a subject, the link and the settings in plain text. The app sends nothing and stores no address.
+Done when: export → load round-trips exactly, a broken or hostile file is refused with a clear message, and the mail draft opens with the link.
+
+### S43 — Submit a ruleset for tournament consideration · Opus 5.5 · medium · `todo`
+"Submit for consideration" opens the Rule proposals Discussion form prefilled with the ruleset JSON and its settings summary (the poster ticks the contribution terms). `pnpm sim --ruleset-file <path>` checks a submitted file; a short review checklist in GOVERNANCE (fairness run at both depths, 21-day discussion, owner ratification) says how a submission can become a Candidate and then Official. Tournament play online waits for Phase 5 (S31); until then invitations carry the ruleset link for hot-seat or over-the-board games.
+Decisions: D43, D46.
 
 ## Later phases
 
@@ -187,6 +227,10 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D22 | DCO check alongside the CLA | Default: keep it; Claude signs off every commit with `git commit -s` | S7 |
 | D34 | Dark's seat view | Decided: turned 180° (rank 9 at the bottom, Coast on the right) | S12 |
 | D36 | e5 arrow | Decided: a tetrahedron symbol, not a rule (see decision 0007, S12 additions) | S12 |
+| D43 | Ruleset for the tournament discussion | Default: Standard (`standard-2p`) once it passes at both depths; Good Practice stays a Candidate for practice play | S38 |
+| D44 | "Every piece may enter the Coast at any time" | Default: the Coast is open to every piece from the start; each piece's own Coast setting no longer bars it; Coast pieces may move from the first turn | S40 |
+| D45 | Pawns on the Coast | Default: a pawn enters the Coast only by capturing onto it once it is open, then moves forward along file A and promotes on its last rank as usual | S40 |
+| D46 | Custom rulesets in tournaments | Default: never directly; a submitted ruleset becomes Official only through the S43 checklist (fairness at both depths, discussion, ratification) | S43 |
 
 ## Ledger sync format
 
