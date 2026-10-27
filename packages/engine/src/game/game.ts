@@ -2,7 +2,8 @@
 // is open, the Tail's repeat limit, what may be captured in passing, the counts behind the
 // fifty-move and repetition draws, the moves played, and how the game ended. It supplies what
 // legalMoves/gameStatus take as inputs (docs/RULES-FRAMEWORK.md, "Game state"). Immutable and
-// deterministic: playMove returns a new state. Two players only; 3-player game end is not built.
+// deterministic: playMove returns a new state. 3-player games (S56, decision 0016) also keep each
+// seat's status; their check, checkmate, stones and game end are in three.ts.
 import { applyMove, gameStatus, type GameStatus, type TurnOptions } from '../moves/check';
 import {
   givesCheck,
@@ -18,6 +19,17 @@ import {
 } from '../moves/generate';
 import { NEUTRAL } from '../rules/formats';
 import { RulesError, type ParamValue } from '../rules/loader';
+import {
+  activeKinged,
+  checkersOn,
+  drawSeats,
+  outSeats,
+  outcomeOf,
+  outcomes,
+  three,
+  type GameEvent,
+  type Seats,
+} from './three';
 import { nextSide, turnOrder } from './turns';
 
 /** Square-type ids the Coast and Tail rules are written against (rules/boards/standard-9x9.json). */
@@ -27,13 +39,23 @@ const TING_YANG = 'ting-yang';
 
 export type DrawReason = 'stalemate' | 'insufficient-material' | 'repetition' | 'fifty-move';
 
-/** How a game is won: on the board, or by the loser's resignation (S51, D51). */
-export type WinReason = 'checkmate' | 'stalemate' | 'resignation';
+/**
+ * How a game is won: on the board, or by the loser's resignation (S51, D51). 3-player games
+ * (decision 0016) add the Dragon capturing the last King, a Kinged player capturing both Dragon
+ * Heads, the Sun and the Moon in the duel, and a King left in check for an earlier seat under
+ * `check.3p.exposedKing` = counts-as-checkmate. A checkmated Tail is a checkmate of the Dragon.
+ */
+export type WinReason =
+  'checkmate' | 'stalemate' | 'resignation' | 'king-capture' | 'dragon-captured' | 'exposed-king';
 
+/**
+ * The end of a game. In a 3-player win, `loser` is the seat the deciding move beat (the King or
+ * Tail checkmated or captured, or the Dragon); a 3-player draw names the seats that share it.
+ */
 export type GameResult =
   | { status: 'ongoing' }
   | { status: 'win'; winner: string; loser: string; reason: WinReason }
-  | { status: 'draw'; reason: DrawReason | 'agreement' };
+  | { status: 'draw'; reason: DrawReason | 'agreement'; between?: string[] };
 
 /**
  * The positions since the last capture or irreversible move, newest first, as a chain each
@@ -48,6 +70,8 @@ export interface Seen {
 export interface PlayedMove extends GeneratedMove {
   side: string;
   notation: string;
+  /** 3-player games: what the move did besides moving (a King captured, the Tail in stone). */
+  events?: GameEvent[];
 }
 
 /**
@@ -68,6 +92,8 @@ export interface GameState {
   order: string[];
   /** The side to move. */
   turn: string;
+  /** Each seat's status: all active in 2-player games (3-player: three.ts, SeatStatus). */
+  seats: Seats;
   position: Position;
   /** Side id to the piece types that side has lost. */
   lost: Lost;
@@ -96,6 +122,8 @@ export interface GameState {
 export interface GameInit {
   position?: Position;
   turn?: string;
+  /** 3-player games: the seats' statuses (all active by default). */
+  seats?: Seats;
   coastOpen?: boolean;
   lost?: Lost;
 }
@@ -183,7 +211,8 @@ function resultOf(status: GameStatus, order: readonly string[]): GameResult {
  */
 function insufficientMaterial(rules: MoveRules, position: Position): boolean {
   return !Object.entries(position).some(
-    ([at, p]) => rules.pieces[p.piece]?.royal !== true && givesCheck(rules, at, p),
+    ([at, p]) =>
+      p.stone !== true && rules.pieces[p.piece]?.royal !== true && givesCheck(rules, at, p),
   );
 }
 
@@ -192,12 +221,24 @@ function insufficientMaterial(rules: MoveRules, position: Position): boolean {
  * rights they carry), the side to move, the Coast, and the moves that side has, so a lost
  * capture in passing or a Tail that may no longer move makes a different position.
  */
-function positionKey(rules: MoveRules, s: Dynamic & { turn: string }, legal: GeneratedMove[]) {
+function positionKey(
+  rules: MoveRules,
+  s: Dynamic & { turn: string; seats: Seats },
+  legal: GeneratedMove[],
+) {
   const pieces = Object.keys(s.position)
     .sort()
     .map((at) => `${at}=${placedKey(rules, s.position[at]!)}`);
-  return `${s.turn}|${s.coastOpen ? 'open' : 'closed'}|${pieces.join(',')}|${legal.map(toNotation).join(',')}`;
+  // 3-player games: the seats' statuses too (decision 0016, rule 13). Stones are in placedKey.
+  const seats = rules.players === 3 ? `|${seatsKey(s.seats)}` : '';
+  return `${s.turn}|${s.coastOpen ? 'open' : 'closed'}${seats}|${pieces.join(',')}|${legal.map(toNotation).join(',')}`;
 }
+
+const seatsKey = (seats: Seats) =>
+  Object.keys(seats)
+    .sort()
+    .map((side) => `${side}:${seats[side]}`)
+    .join(',');
 
 /**
  * Everything the rest of the game depends on apart from the moves that led here: the facts of
@@ -215,7 +256,8 @@ export function stateKey(state: GameState): string {
     .sort()
     .map((side) => `${side}:${state.tailRun[side]}`);
   const passing = state.passing ? `${state.passing.squares.join('+')}>${state.passing.at}` : '';
-  return `${position}|${lost.join(',')}|${runs.join(',')}|${state.tailBonus ?? ''}|${passing}`;
+  const seats = state.rules.players === 3 ? `|${seatsKey(state.seats)}` : '';
+  return `${position}|${lost.join(',')}|${runs.join(',')}|${state.tailBonus ?? ''}|${passing}${seats}`;
 }
 
 function occurrences(seen: Seen): number {
@@ -241,6 +283,84 @@ function drawnBy(rules: MoveRules, base: Settled, seen: Seen | null): DrawReason
 }
 
 type Settled = Omit<GameState, 'inCheck' | 'checkers' | 'legal' | 'result' | 'seen'>;
+
+/**
+ * The 3-player draws (decision 0016, rules 12 to 17), in order: insufficient material once the
+ * Dragon is out, threefold repetition, and the fifty-move rule: 50 turns of every seat still in
+ * the game. A skipped turn (rule 15) counts as a turn (provisional reading, S56).
+ */
+function drawnThree(rules: MoveRules, base: Settled, seen: Seen | null): DrawReason | null {
+  const g = three(rules, base.order);
+  if (base.seats[g.dragon] === 'out' && insufficientMaterial(rules, base.position)) {
+    return 'insufficient-material';
+  }
+  if (seen && occurrences(seen) >= 3) return 'repetition';
+  const seats = base.order.length - outSeats(base.seats).length;
+  if (param(rules, 'draw.3p.fiftyMove') === true && base.quiet >= 50 * seats) return 'fifty-move';
+  return null;
+}
+
+/**
+ * settle for 3-player games: the side to move's legal moves (three.ts), its turn skipped when the
+ * Dragon has no legal move with both Kings on the board (rule 15), and the result. Checkmates are
+ * judged right after the move that gives them (rule 7), so `ended` carries a move's own result; no
+ * legal move at the start of a turn is a stalemate, a draw between the seats of rules 12, 16, 17.
+ */
+function settleThree(
+  rules: MoveRules,
+  base: Settled,
+  prev: Seen | null,
+  ended: GameResult | null = null,
+): GameState {
+  const g = three(rules, base.order);
+  let b = base;
+  for (;;) {
+    const table = { position: b.position, seats: b.seats, lost: b.lost, passing: b.passing };
+    const checkers = checkersOn(g, b.position, b.seats, b.turn);
+    const found = ended ? [] : outcomes(g, table, b.turn);
+    const skip =
+      !ended &&
+      found.length === 0 &&
+      checkers.length === 0 &&
+      b.turn === g.dragon &&
+      !g.mode.firstMate &&
+      activeKinged(g, b.seats).length === 2;
+    if (skip) {
+      const last = b.moves.at(-1);
+      const event: GameEvent = { kind: 'turn-skipped', side: b.turn };
+      const moves = last
+        ? [...b.moves.slice(0, -1), { ...last, events: [...(last.events ?? []), event] }]
+        : b.moves;
+      const turn = nextSide(b.order, b.turn, outSeats(b.seats));
+      b = { ...b, moves, turn, passing: null, quiet: b.quiet + 1 };
+      continue;
+    }
+    const legal = found.map((o) => o.move);
+    const seen =
+      param(rules, 'draw.3p.threefoldRepetition') === true
+        ? { key: positionKey(rules, b, legal), prev }
+        : null;
+    let result: GameResult = ended ?? { status: 'ongoing' };
+    if (!ended && legal.length === 0) {
+      if (param(rules, 'draw.3p.stalemate') !== 'draw-between-kinged') {
+        throw new RulesError(
+          `draw.3p.stalemate = ${JSON.stringify(rules.values['draw.3p.stalemate'])} is not an option`,
+        );
+      }
+      result = { status: 'draw', reason: 'stalemate', between: drawSeats(g, b.seats) };
+    }
+    const drawn = result.status === 'ongoing' ? drawnThree(rules, b, seen) : null;
+    if (drawn) result = { status: 'draw', reason: drawn, between: drawSeats(g, b.seats) };
+    return {
+      ...b,
+      seen,
+      inCheck: checkers.length > 0,
+      checkers,
+      legal: result.status === 'ongoing' ? legal : [],
+      result,
+    };
+  }
+}
 
 /**
  * Fill in what follows from the position and whose turn it is: check, legal moves, the
@@ -271,13 +391,11 @@ const copyRef = (r: RulesetRef): RulesetRef => ({
 });
 
 /**
- * Start a game. Refuses a ruleset with an undecided value and any player count but 2. The Coast
- * starts open only under `coast.2p.initiation = open-at-start` or `coast.openToAll` (D44).
+ * Start a game. Refuses a ruleset with an undecided value. In 2-player games the Coast starts open
+ * only under `coast.2p.initiation = open-at-start` or `coast.openToAll` (D44); 3-player games have
+ * no closed Coast.
  */
 export function newGame(rules: MoveRules, ruleset: RulesetRef, init: GameInit = {}): GameState {
-  if (rules.players !== 2) {
-    throw new RulesError('Only 2-player games can be played yet (3-player game end is not built)');
-  }
   const nulls = Object.keys(rules.values).filter((id) => rules.values[id] === null);
   if (nulls.length > 0) {
     throw new RulesError(`Ruleset ${ruleset.id} cannot start: undecided parameters`, nulls);
@@ -285,6 +403,29 @@ export function newGame(rules: MoveRules, ruleset: RulesetRef, init: GameInit = 
   const order = turnOrder(rules);
   const turn = init.turn ?? order[0]!;
   if (!order.includes(turn)) throw new RulesError(`${turn} has no seat in this game`);
+  const seats: Seats = init.seats ?? Object.fromEntries(order.map((s) => [s, 'active']));
+  if (rules.players === 3) {
+    three(rules, order);
+    return settleThree(
+      rules,
+      {
+        ruleset: copyRef(ruleset),
+        rules,
+        order,
+        turn,
+        seats,
+        position: init.position ?? startPosition(rules.board, 3),
+        lost: init.lost ?? {},
+        coastOpen: true,
+        tailRun: {},
+        tailBonus: null,
+        passing: null,
+        quiet: 0,
+        moves: [],
+      },
+      null,
+    );
+  }
   const coastOpen =
     init.coastOpen ??
     (param(rules, 'coast.2p.initiation') === 'open-at-start' ||
@@ -296,6 +437,7 @@ export function newGame(rules: MoveRules, ruleset: RulesetRef, init: GameInit = 
       rules,
       order,
       turn,
+      seats,
       position: init.position ?? startPosition(rules.board, 2),
       lost: init.lost ?? {},
       coastOpen,
@@ -332,6 +474,7 @@ export function playMove(state: GameState, move: GeneratedMove): GameState {
   if (state.result.status !== 'ongoing') throw new RulesError('The game is over');
   const legal = state.legal.find((m) => same(m, move));
   if (!legal) throw new RulesError(`${toNotation(move)} is not a legal move for ${state.turn}`);
+  if (state.rules.players === 3) return playThree(state, legal);
 
   const { rules, turn } = state;
   const placed = state.position[legal.from]!;
@@ -361,6 +504,7 @@ export function playMove(state: GameState, move: GeneratedMove): GameState {
       rules,
       order: state.order,
       turn: nextSide(state.order, turn),
+      seats: state.seats,
       position: applyMove(state.position, legal),
       lost,
       coastOpen: state.coastOpen || opens,
@@ -374,9 +518,57 @@ export function playMove(state: GameState, move: GeneratedMove): GameState {
   );
 }
 
+/** playMove in a 3-player game: the move's outcome (three.ts), then the next turn. */
+function playThree(state: GameState, legal: GeneratedMove): GameState {
+  const { rules, turn } = state;
+  const g = three(rules, state.order);
+  const table = {
+    position: state.position,
+    seats: state.seats,
+    lost: state.lost,
+    passing: state.passing,
+  };
+  const o = outcomeOf(g, table, turn, legal);
+  if (!o) throw new RulesError(`${toNotation(legal)} is not a legal move for ${turn}`);
+  const target = state.position[legal.captureAt ?? legal.to];
+  const played: PlayedMove = {
+    ...o.move,
+    side: turn,
+    notation: toNotation(o.move),
+    ...(o.events.length > 0 && { events: o.events }),
+  };
+  // A capture, a pawn move, a King captured or a piece turned to stone: nothing earlier comes back.
+  const fresh =
+    target !== undefined || rules.pieces[legal.piece]?.irreversible === true || o.events.length > 0;
+  return settleThree(
+    rules,
+    {
+      ruleset: state.ruleset,
+      rules,
+      order: state.order,
+      turn: nextSide(state.order, turn, outSeats(o.seats)),
+      seats: o.seats,
+      position: o.position,
+      lost: o.lost,
+      coastOpen: state.coastOpen,
+      tailRun: state.tailRun,
+      tailBonus: null,
+      passing: legal.passes ? { squares: legal.passes, at: legal.to } : null,
+      quiet: fresh ? 0 : state.quiet + 1,
+      moves: [...state.moves, played],
+    },
+    fresh ? null : state.seen,
+    o.result,
+  );
+}
+
 /** The game ended without a move: the position stays, nothing more may be played. */
 function ended(state: GameState, result: GameResult): GameState {
   if (state.result.status !== 'ongoing') throw new RulesError('The game is over');
+  // Decision 0016 gives no rule for resigning or agreeing a draw with three seats.
+  if (state.rules.players !== 2) {
+    throw new RulesError('Resigning and agreed draws are 2-player only so far');
+  }
   return { ...state, legal: [], result };
 }
 
@@ -400,7 +592,7 @@ export const agreeDraw = (state: GameState): GameState =>
  * so a record cannot claim either for a game that ended on the board.
  */
 export function endedBy(state: GameState, result: GameResult): GameState | null {
-  if (state.result.status !== 'ongoing') return null;
+  if (state.result.status !== 'ongoing' || state.rules.players !== 2) return null;
   if (result.status === 'win' && result.reason === 'resignation') {
     if (!state.order.includes(result.loser)) return null;
     const ended = resign(state, result.loser);
@@ -438,6 +630,7 @@ export function unbuiltFeatures(rules: MoveRules): UnbuiltFeature[] {
       { id: 'setup.swapKingQueen', label: 'King and Queen swapped at the start' },
       v['setup.swapKingQueen'] === true,
     ],
+    [{ id: 'coast.3p.exit', label: "Coast pieces' first way out through A5" }, rules.players === 3],
   ];
   return all.filter(([, on]) => on).map(([f]) => f);
 }
