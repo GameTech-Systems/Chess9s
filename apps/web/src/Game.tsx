@@ -4,7 +4,7 @@ import { RulesScreen } from './Rules';
 import { formatElapsed, play, soundsFor } from './game/aids';
 import { searchMove, type BotSearch } from './game/botClient';
 import { clearGuest, loadGuest, saveGuest, type Mode, type Store } from './game/guest';
-import { openRecord, recordFile, recordJson, type Opened } from './game/record';
+import { openRecord, saveRecordFile, type Opened } from './game/record';
 import { Board } from './board/Board';
 import { boardData, pieceLetters } from './board/data';
 import { DEFAULT_RULESET_ID, createRulesFor, listRulesets, type RulesetInfo } from './game/rules';
@@ -120,18 +120,7 @@ export function Game({
   }, [game.moves.length, mode]);
   const picker = useRef<HTMLInputElement>(null);
   const [recordProblem, setRecordProblem] = useState<string | null>(null);
-  // Save game record: a download from this page; nothing is sent anywhere.
-  const saveRecord = () => {
-    const date = new Date().toISOString().slice(0, 10);
-    const url = URL.createObjectURL(
-      new Blob([recordJson(game, date)], { type: 'application/json' }),
-    );
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = recordFile(ruleset, date);
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+  const saveRecord = () => saveRecordFile(game, ruleset);
   const openFile = async (file: File | undefined) => {
     if (!file) return;
     const opened = openRecord(await file.text());

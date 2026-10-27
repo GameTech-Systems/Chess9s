@@ -246,6 +246,9 @@ export const RELOAD_TEXT = 'Chess Nines has been updated. Reload to update.';
 export const GONE_TEXT =
   'This room no longer exists. It may have expired, or the code may be wrong.';
 export const FULL_TEXT = 'This room is full: both seats are taken.';
+export const REPLACED_TEXT =
+  'You joined this room from another window or device, so this one stopped.';
+export const DESYNC_TEXT = 'This game and the server no longer agree. Reload to get back in sync.';
 export const LOST_TEXT = 'Your seat in this room is no longer valid, so it cannot be taken back.';
 
 /** What a refusal to join means for the page. */

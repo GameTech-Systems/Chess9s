@@ -76,6 +76,7 @@ export function saveSeat(
 
 /** The room ended or expired: its entry goes. */
 export function forgetSeat(store: Store | null, code: string, now = Date.now()): void {
-  const { [code]: _gone, ...rest } = read(store, now);
-  write(store, rest);
+  const rooms = read(store, now);
+  delete rooms[code];
+  write(store, rooms);
 }

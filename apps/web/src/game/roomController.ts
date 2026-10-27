@@ -15,6 +15,7 @@ import type { Store } from './guest';
 import {
   GONE_TEXT,
   RELOAD_TEXT,
+  REPLACED_TEXT,
   applyServer,
   canAct,
   cancelPromotion,
@@ -51,7 +52,6 @@ export interface ControllerDeps {
 }
 
 const OFFLINE_TEXT = 'Could not reach the room. Check your connection and try again.';
-const REPLACED_TEXT = 'You joined this room from another window or device, so this one stopped.';
 
 export class RoomController {
   phase: Phase = { kind: 'loading' };
@@ -128,7 +128,10 @@ export class RoomController {
       },
       onMessage: (m) => this.onMessage(m),
       onStatus: (s, why) => this.onStatus(s, why),
-      probe: async () => ((await fetchRoom(this.deps.fetch, code)).gone ? 'gone' : 'ok'),
+      probe: async () => {
+        const peek = await fetchRoom(this.deps.fetch, code);
+        return !peek.ok && peek.gone ? 'gone' : 'ok';
+      },
     });
     this.conn = conn;
     conn.start();

@@ -17,6 +17,17 @@ export const recordJson = (game: GameState, date: string): string =>
 export const recordFile = (info: Pick<RulesetInfo, 'id'>, date: string): string =>
   `chess9s-${info.id}-${date}.json`;
 
+/** Save game record: a download from this page; nothing is sent anywhere. */
+export function saveRecordFile(game: GameState, info: Pick<RulesetInfo, 'id'>): void {
+  const date = new Date().toISOString().slice(0, 10);
+  const url = URL.createObjectURL(new Blob([recordJson(game, date)], { type: 'application/json' }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = recordFile(info, date);
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export type Opened =
   { ok: true; info: RulesetInfo; game: GameState; date: string } | { ok: false; problem: string };
 
