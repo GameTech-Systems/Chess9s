@@ -151,4 +151,48 @@ describe('Board', () => {
       expect(html).toMatch(/data-hit="e4"[^>]*aria-label="e4"/);
     });
   });
+
+  describe('3-player games (S57)', () => {
+    const position = {
+      f1: { piece: 'king', side: 'light', home: 'f1' },
+      f9: { piece: 'king', side: 'dark', home: 'f9' },
+      c4: { piece: 'rook', side: 'dark', stone: true as const },
+      g4: { piece: 'dragon-tail', side: 'dragon', stone: true as const },
+      h8: { piece: 'sun', side: 'dragon' },
+    };
+
+    it('draws a stone as stone: marked and named, whichever side it was', () => {
+      const html = render({ position, players: 3 });
+      expect(html).toMatch(/data-piece="rook" data-at="c4" data-side="dark" data-stone=""/);
+      expect(html).toMatch(
+        /data-piece="dragon-tail" data-at="g4" data-side="dragon" data-stone=""/,
+      );
+      expect(html).not.toMatch(/data-piece="king" data-at="f1"[^>]*data-stone/);
+      expect(html).not.toMatch(/data-piece="sun" data-at="h8"[^>]*data-stone/);
+      expect(count(html, /data-stone=""/g)).toBe(2);
+      expect(html).toContain('<title>c4 · rook, stone</title>');
+    });
+
+    it('names a stone in the hit area, and a stone has no moves to offer', () => {
+      const html = render({ position, players: 3, onSquareClick: () => {} });
+      expect(html).toMatch(/data-hit="c4"[^>]*aria-label="c4, rook, stone"/);
+      expect(html).toMatch(/data-hit="h8"[^>]*aria-label="h8, sun, dragon"/);
+    });
+
+    it("turns to the Dragon seat: its view is the data's own", () => {
+      const html = render({ position, players: 3, seat: 'dragon' });
+      expect(html).toContain('Chess Nines board, dragon seat');
+      expect(html).toMatch(/data-square="a1"[^>]*data-col="8" data-row="8"/);
+    });
+
+    it('marks a King a Dragon piece attacks without check', () => {
+      const html = render({
+        position,
+        players: 3,
+        highlights: { targets: [], check: [], movable: [], exposed: ['f1'] },
+      });
+      expect(html).toMatch(/data-exposed="f1"/);
+      expect(render({ position, players: 3 })).not.toContain('data-exposed');
+    });
+  });
 });
