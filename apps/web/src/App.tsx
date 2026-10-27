@@ -5,12 +5,15 @@ import { Builder } from './Builder';
 import { RulesPage } from './RulesPage';
 import { Privacy } from './Privacy';
 import { Tournament } from './Tournament';
+import { CreateRoom } from './CreateRoom';
+import { OnlineRoom } from './OnlineRoom';
 import { DISCUSSIONS_URL, LICENSES_PATH, RIGHTS_HOLDER } from './links';
 import { parseShareLink } from './game/share';
 import { loadCustoms, saveCustoms } from './game/custom';
 import { customInfo, type CustomRuleset, type RulesetInfo } from './game/rules';
 import type { Store } from './game/guest';
 import { fromGame } from './game/session';
+import { roomPath } from './game/share';
 import type { Opened } from './game/record';
 
 export const PRIVACY_PATH = '/privacy';
@@ -32,8 +35,14 @@ const COPYRIGHT_YEAR = 2026;
 export const rulesIdOf = (pathname: string): string | undefined =>
   /^\/rules\/([a-z0-9]+(?:-[a-z0-9]+)*)\/?$/.exec(pathname)?.[1];
 
+/** The room code (upper case) of a room page path such as /room/K7RX2M, else undefined. */
+export const roomCodeOf = (pathname: string): string | undefined =>
+  /^\/room\/([A-Za-z0-9]+)\/?$/.exec(pathname)?.[1]?.toUpperCase();
+
 /** Which page a URL path shows. Anything unknown is the game: the host falls back to index.html. */
-export const pageOf = (pathname: string): 'privacy' | 'rules' | 'build' | 'tournament' | 'game' => {
+export const pageOf = (
+  pathname: string,
+): 'privacy' | 'rules' | 'build' | 'tournament' | 'room' | 'game' => {
   const bare = pathname.replace(/\/+$/, '');
   return bare === PRIVACY_PATH
     ? 'privacy'
@@ -43,7 +52,9 @@ export const pageOf = (pathname: string): 'privacy' | 'rules' | 'build' | 'tourn
         ? 'tournament'
         : rulesIdOf(pathname) !== undefined
           ? 'rules'
-          : 'game';
+          : roomCodeOf(pathname) !== undefined
+            ? 'room'
+            : 'game';
 };
 
 export function App({
@@ -64,6 +75,8 @@ export function App({
     path ?? (typeof window === 'undefined' ? '/' : window.location.pathname),
   );
   const [picked, setPicked] = useState<RulesetInfo | null>(null);
+  // "Play online" was chosen for this ruleset: the create-room screen is showing (S53).
+  const [creating, setCreating] = useState<RulesetInfo | null>(null);
   // A game record opened for replay (S46): the game it replays to, played on from there.
   const [opened, setOpened] = useState<(Opened & { ok: true }) | null>(null);
   // The player's own rulesets live in this browser only (privacy page).
@@ -104,9 +117,11 @@ export function App({
         ? 'Change ruleset'
         : page === 'tournament'
           ? 'Tournaments'
-          : picked && page === 'game'
-            ? `Hot-seat · ${picked.players} players`
-            : 'Hot-seat';
+          : page === 'room' || (creating && page === 'game')
+            ? 'Online'
+            : picked && page === 'game'
+              ? `Hot-seat · ${picked.players} players`
+              : 'Hot-seat';
   return (
     <main className="page">
       <header className="masthead">
@@ -141,6 +156,25 @@ export function App({
             navigate('/');
           }}
         />
+      ) : page === 'room' ? (
+        <OnlineRoom
+          key={roomCodeOf(here)}
+          code={roomCodeOf(here)!}
+          store={store}
+          onLeave={() => navigate('/')}
+          linkTo={go}
+        />
+      ) : creating ? (
+        <CreateRoom
+          ruleset={creating}
+          store={store}
+          linkTo={go}
+          onCancel={() => setCreating(null)}
+          onCreated={(code) => {
+            setCreating(null);
+            navigate(roomPath(code));
+          }}
+        />
       ) : picked ? (
         <Game
           key={opened ? `record-${opened.date}-${picked.id}` : picked.id}
@@ -150,6 +184,8 @@ export function App({
             setOpened(null);
             setPicked(null);
           }}
+          onPlayOnline={() => setCreating(picked)}
+          onJoinRoom={(code) => navigate(roomPath(code))}
           onOpenRecord={(r) => {
             setOpened(r);
             setPicked(r.info);
@@ -158,6 +194,8 @@ export function App({
       ) : (
         <RulePicker
           onPick={setPicked}
+          onPlayOnline={setCreating}
+          onJoinRoom={(code) => navigate(roomPath(code))}
           linkTo={go}
           customs={customs.map(customInfo)}
           onBuild={() => {

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { unbuiltFeatures } from '@chess9s/engine';
 import { RulesScreen } from './Rules';
+import { JoinByCode } from './JoinByCode';
 import { formatElapsed, play, soundsFor } from './game/aids';
 import { searchMove, type BotSearch } from './game/botClient';
 import { clearGuest, loadGuest, saveGuest, type Mode, type Store } from './game/guest';
@@ -62,6 +63,8 @@ export function Game({
   ruleset = listRulesets().find((r) => r.id === DEFAULT_RULESET_ID)!,
   onChangeRuleset,
   onOpenRecord,
+  onPlayOnline,
+  onJoinRoom,
   store = browserStore(),
 }: {
   initial?: Model;
@@ -71,6 +74,10 @@ export function Game({
   onChangeRuleset?: () => void;
   /** A game record was opened; the app shows its game, on the ruleset it names. */
   onOpenRecord?: (record: Opened & { ok: true }) => void;
+  /** Make an online room for this ruleset (S53). */
+  onPlayOnline?: () => void;
+  /** Go to the room with this code. */
+  onJoinRoom?: (code: string) => void;
 }) {
   const rules = useMemo(
     () => createRulesFor(ruleset),
@@ -303,6 +310,13 @@ export function Game({
             {recordProblem}
           </p>
         )}
+
+        {onPlayOnline && (
+          <button type="button" className="again" onClick={onPlayOnline}>
+            Play online
+          </button>
+        )}
+        {onJoinRoom && <JoinByCode onJoin={onJoinRoom} />}
 
         <button type="button" className="again" onClick={onChangeRuleset}>
           Change ruleset

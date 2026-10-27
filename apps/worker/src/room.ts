@@ -24,7 +24,6 @@ import {
   type RoomInfo,
   type RoomContext,
   type RoomRuleset,
-  type SeatStatus,
 } from '@chess9s/online';
 
 const data = loadRules(rulesFiles);

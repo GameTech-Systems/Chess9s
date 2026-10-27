@@ -70,9 +70,12 @@ export function Tournament({
       </p>
       <h3>How games are played</h3>
       <p>
-        Until online play (Phase 5), tournament games are hot-seat or over the board. A tournament
-        invitation carries the link to the ruleset. After a game, Save game record downloads it as a
-        file you can send the organizer; Open game record replays it.
+        Tournament games can be played online by room code: one player makes a room and sends the
+        link or the code, and the other joins. A tournament game is still played with the Official
+        ruleset only, never a custom one (the room shows which ruleset it plays before you take a
+        seat). Games can also be played hot-seat or over the board: a tournament invitation carries
+        the link to the ruleset. After a game, Save game record downloads it as a file you can send
+        the organizer; Open game record replays it.
       </p>
       <h3>Conduct</h3>
       <p>
