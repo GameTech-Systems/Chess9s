@@ -27,10 +27,13 @@ const TING_YANG = 'ting-yang';
 
 export type DrawReason = 'stalemate' | 'insufficient-material' | 'repetition' | 'fifty-move';
 
+/** How a game is won: on the board, or by the loser's resignation (S51, D51). */
+export type WinReason = 'checkmate' | 'stalemate' | 'resignation';
+
 export type GameResult =
   | { status: 'ongoing' }
-  | { status: 'win'; winner: string; loser: string; reason: 'checkmate' | 'stalemate' }
-  | { status: 'draw'; reason: DrawReason };
+  | { status: 'win'; winner: string; loser: string; reason: WinReason }
+  | { status: 'draw'; reason: DrawReason | 'agreement' };
 
 /**
  * The positions since the last capture or irreversible move, newest first, as a chain each
@@ -370,6 +373,26 @@ export function playMove(state: GameState, move: GeneratedMove): GameState {
     fresh ? null : state.seen,
   );
 }
+
+/** The game ended without a move: the position stays, nothing more may be played. */
+function ended(state: GameState, result: GameResult): GameState {
+  if (state.result.status !== 'ongoing') throw new RulesError('The game is over');
+  return { ...state, legal: [], result };
+}
+
+/**
+ * The game after `side` resigns: the other seat wins. A seat may resign on either seat's turn.
+ * Two players only, like the rest of game end.
+ */
+export function resign(state: GameState, side: string): GameState {
+  if (!state.order.includes(side)) throw new RulesError(`${side} has no seat in this game`);
+  const winner = state.order.find((s) => s !== side)!;
+  return ended(state, { status: 'win', winner, loser: side, reason: 'resignation' });
+}
+
+/** The game after both seats agree to a draw. */
+export const agreeDraw = (state: GameState): GameState =>
+  ended(state, { status: 'draw', reason: 'agreement' });
 
 /** What is kept with a game: the ruleset id and version, the moves and the result. */
 export function gameRecord(state: GameState): GameRecord {
