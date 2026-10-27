@@ -10,3 +10,4 @@ export const checkRulesetSchema = passed;
 export const checkBoardSchema = passed;
 export const checkPieceSchema = passed;
 export const checkLockSchema = passed;
+export const checkTimeControlsSchema = passed;

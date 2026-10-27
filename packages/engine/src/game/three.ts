@@ -306,12 +306,18 @@ export interface Resigned {
  * Kinged player left, that player wins; when the Dragon is already out, the other Kinged player
  * wins (the 2-player end rules).
  */
-export function resignedBy(g: Three, position: Position, seats: Seats, side: string): Resigned {
+export function resignedBy(
+  g: Three,
+  position: Position,
+  seats: Seats,
+  side: string,
+  reason: 'resignation' | 'timeout' = 'resignation',
+): Resigned {
   const kinged = activeKinged(g, seats);
   const lost = (winner: string): Resigned => ({
     position,
     seats,
-    result: win(winner, side, 'resignation'),
+    result: win(winner, side, reason),
   });
   if (side === g.dragon) {
     if (kinged.length === 1) return lost(kinged[0]!);

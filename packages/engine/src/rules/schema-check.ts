@@ -11,6 +11,7 @@ import lockSchema from '../../../../rules/schema/lock.schema.json';
 import parametersSchema from '../../../../rules/schema/parameters.schema.json';
 import pieceSchema from '../../../../rules/schema/piece.schema.json';
 import rulesetSchema from '../../../../rules/schema/ruleset.schema.json';
+import timeControlsSchema from '../../../../rules/schema/timeControls.schema.json';
 
 export interface SchemaError {
   instancePath: string;
@@ -31,3 +32,4 @@ export const checkRulesetSchema: SchemaCheck = ajv.compile(rulesetSchema);
 export const checkBoardSchema: SchemaCheck = ajv.compile(boardSchema);
 export const checkPieceSchema: SchemaCheck = ajv.compile(pieceSchema);
 export const checkLockSchema: SchemaCheck = ajv.compile(lockSchema);
+export const checkTimeControlsSchema: SchemaCheck = ajv.compile(timeControlsSchema);
