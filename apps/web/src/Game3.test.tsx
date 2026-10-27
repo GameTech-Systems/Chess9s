@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import {
   newGame,
   playMove,
+  replayResignations,
   resign,
   toNotation,
   type GameState,
@@ -23,6 +24,7 @@ import { saveGuest, type Store } from './game/guest';
 import { choose, click, fromGame, newModel, type Model } from './game/session';
 import registry from '../../../rules/parameters.json';
 import dragonMates from '../scripts/draft-3p-dragon-mates.json';
+import resignedGame from '../scripts/draft-3p-resigned.json';
 
 const info = (id: string) => listRulesets().find((r) => r.id === id)!;
 const render = (model: Model, id = 'standard-3p') =>
@@ -416,5 +418,22 @@ describe('resigning on the 3-player screen (S67)', () => {
     saveGuest(store, { game: g, mode: 'hot-seat' });
     const html = renderToStaticMarkup(<Game store={store} ruleset={info('standard-3p')} />);
     expect(html).toContain('out · resigned');
+  });
+
+  it('replays the recorded game the browser check clicks: Light resigns, the others play to a result', () => {
+    const { moves, resigns, result } = resignedGame;
+    let game = fresh('draft-3p').game;
+    game = replayResignations(game, [resigns]);
+    for (const notation of moves) {
+      game = replayResignations(
+        playMove(
+          game,
+          game.legal.find((m) => toNotation(m) === notation)!,
+        ),
+        [resigns],
+      );
+    }
+    expect(game.resignations).toEqual([resigns]);
+    expect(game.result).toEqual(result);
   });
 });
