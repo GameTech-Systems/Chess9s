@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { playMove } from '@chess9s/engine';
+import { playMove, resign } from '@chess9s/engine';
 import { clearGuest, loadGuest, saveGuest, type Store } from './guest';
 import { newModel } from './session';
-import { createRules, ruleset } from './rules';
+import { createRules, listRulesets, ruleset } from './rules';
 
 const memory = (): Store & { data: Map<string, string> } => {
   const data = new Map<string, string>();
@@ -89,5 +89,32 @@ describe('guest play kept in the browser', () => {
     expect(() => saveGuest(broken, { game: twoMoves(), mode: 'computer' })).not.toThrow();
     expect(loadGuest(broken, createRules(), ruleset)).toBeNull();
     expect(() => clearGuest(broken)).not.toThrow();
+  });
+});
+
+describe('a 3-player guest game with a resignation (S67)', () => {
+  it('is kept and restored with the resignation in its place', () => {
+    const info = listRulesets().find((r) => r.id === 'standard-3p')!;
+    const rules = createRules('standard-3p');
+    let { game } = newModel(rules, info);
+    game = playMove(game, game.legal[0]!);
+    game = resign(game, 'light');
+    game = playMove(game, game.legal[0]!);
+    const store = memory();
+    saveGuest(store, { game, mode: 'hot-seat' });
+    const back = loadGuest(store, rules, info)!;
+    expect(back.game.resignations).toEqual([{ side: 'light', after: 1 }]);
+    expect(back.game.seats.light).toBe('out');
+    expect(back.game.position).toEqual(game.position);
+    expect(back.game.turn).toBe(game.turn);
+  });
+
+  it('keeps a game that ended by resignation', () => {
+    const info = listRulesets().find((r) => r.id === 'standard-3p')!;
+    const rules = createRules('standard-3p');
+    const game = resign(resign(newModel(rules, info).game, 'light'), 'dark');
+    const store = memory();
+    saveGuest(store, { game, mode: 'hot-seat' });
+    expect(loadGuest(store, rules, info)!.game.result).toEqual(game.result);
   });
 });

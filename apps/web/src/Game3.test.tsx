@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import {
   newGame,
   playMove,
+  resign,
   toNotation,
   type GameState,
   type PlacedPiece,
@@ -375,5 +376,45 @@ describe('the computer in 3-player games (S58)', () => {
     const html = renderToStaticMarkup(<Game ruleset={info('standard-2p')} store={null} />);
     expect(html).toContain('aria-label="Opponent"');
     expect(html).not.toContain('Computer seats');
+  });
+});
+
+describe('resigning on the 3-player screen (S67)', () => {
+  it('offers a Resign button for each seat a person plays, with the confirm step to come', () => {
+    const html = render(fresh());
+    expect(html).toContain('aria-label="Resign"');
+    for (const side of ['Dark', 'Light', 'Dragon']) {
+      expect(html).toContain(`Resign as ${side}`);
+    }
+    expect(html).not.toContain('Confirm resignation');
+  });
+
+  it('offers none for a seat that is out, and none once the game is over', () => {
+    const g = resign(fresh().game, 'light');
+    const html = render(fromGame(g));
+    expect(html).not.toContain('Resign as Light');
+    expect(html).toContain('Resign as Dark');
+    expect(html).toContain('out · resigned');
+    expect(html).toContain('Light resigned.');
+    const over = render(fromGame(resign(g, 'dark')));
+    expect(over).not.toContain('aria-label="Resign"');
+    expect(over).toContain('Dark resigned.');
+  });
+
+  it('is a 3-player button only', () => {
+    expect(renderToStaticMarkup(<Game initial={newModel()} />)).not.toContain('Resign as');
+  });
+
+  it('keeps a resignation made in a saved guest game', () => {
+    const g = resign(fresh().game, 'light');
+    const data = new Map<string, string>();
+    const store: Store = {
+      getItem: (k) => data.get(k) ?? null,
+      setItem: (k, v) => void data.set(k, v),
+      removeItem: (k) => void data.delete(k),
+    };
+    saveGuest(store, { game: g, mode: 'hot-seat' });
+    const html = renderToStaticMarkup(<Game store={store} ruleset={info('standard-3p')} />);
+    expect(html).toContain('out · resigned');
   });
 });

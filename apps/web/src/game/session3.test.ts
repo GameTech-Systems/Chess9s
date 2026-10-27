@@ -4,14 +4,17 @@
 import { describe, expect, it } from 'vitest';
 import { newGame, type PlacedPiece, type Position, type Seats } from '@chess9s/engine';
 import {
+  canUndo,
   cancelPromotion,
   choose,
   click,
   fromGame,
   highlights,
+  resignFor,
   rounds,
   statusLine,
   toggleDanger,
+  undo,
   type Model,
 } from './session';
 import { createRules, listRulesets } from './rules';
@@ -250,5 +253,26 @@ describe('the move list in 3-player games', () => {
       { number: 1, first: 'e9-e8', second: 'b2-b3', third: 'a5-a6' },
       { number: 2, first: 'e8-e9' },
     ]);
+  });
+});
+
+describe('resigning in a 3-player hot-seat game (S67)', () => {
+  it('resignFor puts the resignation on the history, and undo takes it back', () => {
+    const m0 = fromGame(newGame(createRules('standard-3p'), info('standard-3p')));
+    const m1 = resignFor(m0, 'light');
+    expect(m1.game.seats.light).toBe('out');
+    expect(canUndo(m1)).toBe(true);
+    const back = undo(m1);
+    expect(back.game).toBe(m0.game);
+    expect(back.game.seats.light).toBe('active');
+  });
+
+  it('clears a selected piece, and a resignation that ends the game leaves nothing to move', () => {
+    const m0 = fromGame(newGame(createRules('standard-3p'), info('standard-3p')));
+    const picked = click(m0, m0.game.legal[0]!.from);
+    expect(picked.selected).not.toBeNull();
+    const m = resignFor(resignFor(picked, 'light'), 'dark');
+    expect(m.selected).toBeNull();
+    expect(m.game.result).toMatchObject({ status: 'win', reason: 'resignation' });
   });
 });

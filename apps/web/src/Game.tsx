@@ -10,7 +10,14 @@ import { openRecord, saveRecordFile, type Opened } from './game/record';
 import { Board } from './board/Board';
 import { boardData, pieceLetters } from './board/data';
 import { DEFAULT_RULESET_ID, createRulesFor, listRulesets, type RulesetInfo } from './game/rules';
-import { noticeLines, phaseLine, resultCard, seatLines } from './game/threeText';
+import {
+  noticeLines,
+  phaseLine,
+  resignable,
+  resignPrompt,
+  resultCard,
+  seatLines,
+} from './game/threeText';
 import {
   canUndo,
   cancelPromotion,
@@ -21,6 +28,7 @@ import {
   playFor,
   fromGame,
   promote,
+  resignFor,
   rounds,
   statusLine,
   toggleDanger,
@@ -111,6 +119,8 @@ export function Game({
   const list = useRef<HTMLOListElement>(null);
   const [sound, setSound] = useState(true);
   const [showRules, setShowRules] = useState(false);
+  // 3-player games: the seat whose Resign button was pressed and awaits its confirm step (S67).
+  const [resigning, setResigning] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
   // 3-player games: the time each seat has had the move, for display only (untimed, decision 0017).
   const [spent, setSpent] = useState<Record<string, number>>({});
@@ -134,11 +144,12 @@ export function Game({
       clearTimeout(id);
       search?.cancel();
     };
-  }, [botTurn, game.moves.length]);
+  }, [botTurn, game]);
   // Keep the game in the browser.
   useEffect(() => {
     if (store) saveGuest(store, { game, mode, bots });
-  }, [game.moves.length, mode, bots]);
+    // A resignation is not a move, so the game itself is the sign that something changed.
+  }, [game, mode, bots]);
   const picker = useRef<HTMLInputElement>(null);
   const [recordProblem, setRecordProblem] = useState<string | null>(null);
   const saveRecord = () => saveRecordFile(game, ruleset);
@@ -161,6 +172,8 @@ export function Game({
       const back = undo(m);
       return botSide !== undefined && back.game.turn === botSide ? undo(back) : back;
     });
+  // A pending resignation lapses when the game moves on (a move, an undo, a new game).
+  useEffect(() => setResigning(null), [game]);
   // Sound on each new move.
   useEffect(() => {
     const before = moveCount.current;
@@ -268,6 +281,35 @@ export function Game({
               {line}
             </p>
           ))}
+        {three && resignable(game, bots).length > 0 && (
+          <div className="resign" role="group" aria-label="Resign">
+            {resigning === null ? (
+              <div className="segmented">
+                {resignable(game, bots).map((side) => (
+                  <button key={side} type="button" onClick={() => setResigning(side)}>
+                    Resign as {title(side)}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="promotion" role="alertdialog" aria-label="Confirm resignation">
+                <span>{resignPrompt(game, resigning)}</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setModel((m) => resignFor(m, resigning));
+                    setResigning(null);
+                  }}
+                >
+                  Confirm
+                </button>
+                <button type="button" onClick={() => setResigning(null)}>
+                  Keep playing
+                </button>
+              </div>
+            )}
+          </div>
+        )}
         {three && phaseLine(game) && <p className="facts phase">{phaseLine(game)}</p>}
 
         <p className="facts">

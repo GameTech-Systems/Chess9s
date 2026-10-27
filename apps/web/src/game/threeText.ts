@@ -1,7 +1,15 @@
 // What the 3-player screens say (S57, decision 0016): the seats and their states, the notices a
 // move leaves, the phase of the game, and the result card for every row of both end tables.
 // Read from the game state; no rule is decided here.
-import { activeKinged, inDuel, three, type GameState, type SeatStatus } from '@chess9s/engine';
+import {
+  TAIL,
+  resign,
+  activeKinged,
+  inDuel,
+  three,
+  type GameState,
+  type SeatStatus,
+} from '@chess9s/engine';
 
 const title = (id: string) => id.charAt(0).toUpperCase() + id.slice(1);
 
@@ -34,7 +42,10 @@ export function seatLines(game: GameState): SeatLine[] {
     const toMove = ongoing && game.turn === side && state !== 'out';
     const notes: string[] = [];
     if (toMove) notes.push('to move');
-    if (state === 'out') notes.push(side === g.dragon ? 'out' : 'out · King captured');
+    const resigned = game.resignations.some((r) => r.side === side);
+    if (state === 'out') {
+      notes.push(resigned ? 'out · resigned' : side === g.dragon ? 'out' : 'out · King captured');
+    } else if (resigned) notes.push('resigned');
     if (state === 'tail-stone') notes.push('Tail in stone');
     return { side, name: title(side), state, toMove, text: notes.join(' · ') };
   });
@@ -42,8 +53,10 @@ export function seatLines(game: GameState): SeatLine[] {
 
 /** What the last move did besides moving and capturing (a King taken, the Tail in stone, ...). */
 export function noticeLines(game: GameState): string[] {
-  const events = game.moves.at(-1)?.events ?? [];
-  return events.map((e) => {
+  const last = game.moves.at(-1);
+  const events = last?.events ?? [];
+  const taken = last?.capture === TAIL;
+  const lines = events.map((e) => {
     switch (e.kind) {
       case 'king-captured': {
         const how =
@@ -55,7 +68,7 @@ export function noticeLines(game: GameState): string[] {
         return `${whose(e.side)} King was ${how} the Dragon. ${title(e.side)} is out and its pieces are stone.`;
       }
       case 'tail-stone':
-        return `${who(e.by)} checkmated the Dragon's Tail; it turns to stone on ${e.at}. The Dragon plays on without it.`.replace(
+        return `${who(e.by)} ${taken ? 'captured' : 'checkmated'} the Dragon's Tail; it turns to stone on ${e.at}. The Dragon plays on without it.`.replace(
           /^the /,
           'The ',
         );
@@ -65,6 +78,43 @@ export function noticeLines(game: GameState): string[] {
         return `${title(e.side)} had no legal move, so its turn was skipped.`;
     }
   });
+  // A resignation made since the last move (it is not a move, decision 0018).
+  const resigned = game.resignations.filter((r) => r.after === game.moves.length);
+  const g = three(game.rules, game.order);
+  for (const { side } of resigned) {
+    if (game.result.status !== 'ongoing' || game.seats[side] !== 'out') continue;
+    lines.push(
+      side === g.dragon
+        ? 'The Dragon resigned. All its pieces, the Tail too, are stone.'
+        : `${title(side)} resigned. Its King leaves the board and its other pieces are stone.`,
+    );
+  }
+  return lines;
+}
+
+/**
+ * The seats a person can resign for: seats still in the game that the computer does not play. The
+ * computer never resigns (S67).
+ */
+export function resignable(game: GameState, bots: readonly string[]): string[] {
+  if (game.result.status !== 'ongoing') return [];
+  return game.order.filter((side) => game.seats[side] !== 'out' && !bots.includes(side));
+}
+
+/** What the confirm step says a resignation will do, from the engine's own answer (decision 0018). */
+export function resignPrompt(game: GameState, side: string): string {
+  const after = resign(game, side);
+  const { result } = after;
+  const head = `${title(who(side))} resigns?`;
+  if (result.status === 'win') {
+    return `${head} The game ends and ${who(result.winner)} wins.`;
+  }
+  const what =
+    side === three(game.rules, game.order).dragon
+      ? 'All its pieces, the Tail too, turn to stone.'
+      : 'Its King leaves the board and its other pieces turn to stone.';
+  const rest = game.order.filter((s) => s !== side && after.seats[s] !== 'out');
+  return `${head} ${what} ${list(rest)} play on.`;
 }
 
 /** Where the game stands: the duel, the Tail in stone, or the Dragon out; none at the start. */
@@ -112,9 +162,11 @@ export function resultCard(game: GameState): ResultCard | null {
   const detail = (() => {
     switch (result.reason) {
       case 'checkmate':
-        return tail
-          ? `${title(who(winner))} checkmated the Dragon's Tail.`
-          : `${title(who(winner))} checkmated ${whose(loser)} King.`;
+        return tail && game.moves.at(-1)?.capture === TAIL
+          ? `${title(who(winner))} captured the Dragon's Tail.`
+          : tail
+            ? `${title(who(winner))} checkmated the Dragon's Tail.`
+            : `${title(who(winner))} checkmated ${whose(loser)} King.`;
       case 'king-capture':
         return `${title(who(winner))} captured ${whose(loser)} King.`;
       case 'dragon-captured':

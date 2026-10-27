@@ -134,3 +134,53 @@ describe('game record', () => {
     expect(recordFile(standard, '2026-10-25')).toBe('chess9s-standard-2p-2026-10-25.json');
   });
 });
+
+describe('a 3-player record with resignations (S67)', () => {
+  const three = findRuleset('standard-3p')!;
+  const start = () => newModel(createRulesFor(three), three).game;
+
+  it('opens and replays to the same game, resignations in their place', () => {
+    let game = played(start(), 2);
+    game = resign(game, 'light');
+    game = played(game, 3);
+    game = resign(game, 'dark');
+    const text = recordJson(game, '2026-10-27');
+    expect(JSON.parse(text).resignations).toEqual([
+      { side: 'light', after: 2 },
+      { side: 'dark', after: 5 },
+    ]);
+    const opened = openRecord(text);
+    if (!opened.ok) throw new Error(opened.problem);
+    expect(opened.game.result).toEqual(game.result);
+    expect(stateKey(opened.game)).toBe(stateKey(game));
+    expect(opened.game.resignations).toEqual(game.resignations);
+  });
+
+  it('opens a game that is still going after a resignation', () => {
+    const game = played(resign(played(start(), 1), 'dragon'), 4);
+    const opened = openRecord(recordJson(game, '2026-10-27'));
+    if (!opened.ok) throw new Error(opened.problem);
+    expect(opened.game.result).toEqual({ status: 'ongoing' });
+    expect(opened.game.seats.dragon).toBe('out');
+    expect(stateKey(opened.game)).toBe(stateKey(game));
+  });
+
+  it('refuses resignations the record cannot replay, or that its result does not match', () => {
+    const game = played(resign(played(start(), 1), 'light'), 2);
+    const saved = JSON.parse(recordJson(game, '2026-10-27'));
+    const bad = (patch: object) => openRecord(JSON.stringify({ ...saved, ...patch })).ok;
+    expect(bad({})).toBe(true);
+    expect(bad({ resignations: [] })).toBe(false);
+    expect(
+      bad({
+        resignations: [
+          { side: 'light', after: 1 },
+          { side: 'light', after: 2 },
+        ],
+      }),
+    ).toBe(false);
+    expect(bad({ resignations: [{ side: 'nobody', after: 1 }] })).toBe(false);
+    expect(bad({ resignations: [{ side: 'light', after: 99 }] })).toBe(false);
+    expect(bad({ resignations: 'light' })).toBe(false);
+  });
+});
