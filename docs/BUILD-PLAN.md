@@ -324,7 +324,7 @@ Added in S55 (D64): the owner wants the Dragon settings open for players to expe
 Done when: a player builds a 3-player ruleset from Standard, plays it hot-seat with a computer Dragon, exports it, loads it back and opens its share link; all checks pass.
 Decisions: D46, D64.
 
-### S65 — Time controls for hot-seat games · Sonnet 5.5 · high · `todo`
+### S65 — Time controls for hot-seat games · Sonnet 5.5 · high · `done`
 The owner's answer to D58 ([decision 0017](decisions/0017-time-controls.md)): keep untimed as the default, and let players choose a time control, like Apex Chess.
 - **Data.** `rules/timeControls.json` with the presets in 0017 (default `untimed`) and a schema in `rules/schema/`; `validate:rules` checks it, and a test fails if the default is not one of the controls. The online-only controls (day-long moves, the abandonment rule) are marked so the hot-seat picker leaves them out.
 - **Clock.** Pure functions in the engine that take the time as `now` (start, time left, after a move, deadline), for Fischer and per-move controls and any number of seats. A seat that is out stops its clock.

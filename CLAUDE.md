@@ -50,6 +50,7 @@ Node 22, pnpm 10 (pinned in `package.json`).
 - `pnpm worker:check`: `wrangler deploy --dry-run` (bundles the Worker). `pnpm worker:e2e`: after `pnpm build`, plays a game through `wrangler dev` with two WebSocket clients.
 - `node apps/worker/scripts/e2e-browser.mjs` (after `pnpm build`): two Chromium contexts play the 80-move game through `wrangler dev` by clicking, with a reload at move 40, at desktop and Pixel 7 width. Needs Playwright (not a repo dependency); `SHOTS=<dir>` saves screenshots.
 - `node apps/web/scripts/e2e-3p.mjs` (after `pnpm build`): Chromium plays three recorded 3-player hot-seat games by clicking (Good Practice: the Dragon takes a King then checkmates the other, and one Kinged player checkmates the other; Easy Start: the Tail checkmated), at desktop and Pixel 7 width. Needs Playwright (not a repo dependency); `SHOTS=<dir>` saves screenshots.
+- `node apps/web/scripts/e2e-clock.mjs` (after `pnpm build`): Chromium with a fake clock plays a 2-player game at 3+2 and a 3-player game at 30 seconds per move to a flag fall by clicking, with Pause and a reload, at desktop and Pixel 7 width. Needs Playwright (not a repo dependency); `SHOTS=<dir>` saves screenshots.
 - `pnpm bench [--depth 2]`: search benchmark: positions per move, moves that hit the cap, same results as the S23 search (decision 0009).
 
 ## Where things live
