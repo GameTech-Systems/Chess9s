@@ -24,6 +24,11 @@ export interface PlacedPiece {
   moved?: boolean;
   /** The square it started the game on, read by `homeFile` square rules (pawn-safe zones). */
   home?: string;
+  /**
+   * Turned to stone (3-player games, decision 0016 rules 10 and 11): it only blocks. It never
+   * moves, can't be captured, attacks nothing and gives no check, and no piece may move onto it.
+   */
+  stone?: boolean;
 }
 
 /** Coordinate (such as "e5") to the piece standing there. */
@@ -333,10 +338,12 @@ function access(rules: MoveRules, ctx: Context, move?: Move): Access {
 }
 
 /**
- * Whether the piece standing on `at` may be captured: its `capturable` flag, then its square
- * rules' `capturable` for the square it stands on (pawn-safe zones, capture on the Coast).
+ * Whether the piece standing on `at` may be captured: never a stone; otherwise its `capturable`
+ * flag, then its square rules' `capturable` for the square it stands on (pawn-safe zones, capture
+ * on the Coast).
  */
 export function capturable(rules: MoveRules, at: string, placed: PlacedPiece): boolean {
+  if (placed.stone === true) return false;
   const piece = pieceOf(rules, at, placed);
   if (!flag(rules, piece.capturable, true)) return false;
   const env: Env = {
@@ -427,7 +434,7 @@ export function movesFrom(
   passing?: Passing,
 ): GeneratedMove[] {
   const placed = position[from];
-  if (!placed) return [];
+  if (!placed || placed.stone === true) return [];
   const ctx = context(rules, from, placed);
   const { piece, forward, env } = ctx;
   const [f0, r0] = parse(from);
@@ -562,7 +569,7 @@ export function castlePath({ from, to }: { from: string; to: string }): string[]
  */
 export function attacksFrom(rules: MoveRules, position: Position, from: string): string[] {
   const placed = position[from];
-  if (!placed) return [];
+  if (!placed || placed.stone === true) return [];
   const squares = new Set<string>();
   walk(rules, position, from, context(rules, from, placed), (to, move) => {
     if (move.capture !== 'move-only') squares.add(to);
@@ -583,7 +590,7 @@ export function attackReach(
   const attacks = new Set<string>();
   const reads = new Set<string>();
   const placed = position[from];
-  if (!placed) return { attacks, reads };
+  if (!placed || placed.stone === true) return { attacks, reads };
   walk(
     rules,
     position,
@@ -654,7 +661,7 @@ function keyFacts(rules: MoveRules, id: string): { moved: boolean; home: boolean
  */
 export function placedKey(rules: MoveRules, placed: PlacedPiece): string {
   const facts = keyFacts(rules, placed.piece);
-  return `${placed.side}:${placed.piece}${facts.moved && placed.moved ? '*' : ''}${facts.home ? `@${placed.home?.[0] ?? ''}` : ''}`;
+  return `${placed.side}:${placed.piece}${facts.moved && placed.moved ? '*' : ''}${facts.home ? `@${placed.home?.[0] ?? ''}` : ''}${placed.stone === true ? '~stone' : ''}`;
 }
 
 /** The board's start position for a player count. */
