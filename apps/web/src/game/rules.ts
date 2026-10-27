@@ -32,6 +32,8 @@ const data = loadRules(
 
 /** The ruleset a new game starts on until another is picked (owner, 24 Oct 2026). */
 export const DEFAULT_RULESET_ID = 'standard-2p';
+/** The ruleset that starts 3-player games (D63, owner, 26 Oct 2026). */
+export const DEFAULT_3P_RULESET_ID = 'standard-3p';
 
 /** What the picker shows about a ruleset, and what is recorded with a game. */
 export interface RulesetInfo {
@@ -41,10 +43,14 @@ export interface RulesetInfo {
   status: Ruleset['status'];
   players: 2 | 3;
   description: string;
-  /** False while the engine cannot play the player count (it plays 2 players only). */
+  /** The engine plays it in hot-seat: every bundled ruleset, 2 or 3 players. */
   playable: boolean;
+  /** An online room can play it: 2 players only until S63 adds the 3-seat room. */
+  online: boolean;
   /** The ruleset a new game starts on. */
   isDefault: boolean;
+  /** Set on the preset that is the default for its player count (2 or 3 players). */
+  defaultFor?: 2 | 3;
   /** An earlier version, kept so games recorded under it replay; it plays from its lock's values. */
   archived?: true;
   /** A ruleset a player built, kept in their browser (not in rules/rulesets/). */
@@ -89,19 +95,23 @@ const infoOf = (r: Ruleset): RulesetInfo => ({
   status: r.status,
   players: r.players,
   description: r.description ?? '',
-  playable: r.players === 2,
+  playable: true,
+  online: r.players === 2,
   isDefault: r.id === DEFAULT_RULESET_ID,
+  ...(r.id === DEFAULT_RULESET_ID && { defaultFor: 2 as const }),
+  ...(r.id === DEFAULT_3P_RULESET_ID && { defaultFor: 3 as const }),
 });
 
-// The default first, then by player count, then by name.
+// The 2-player default first, then by player count with each count's default first, then by name.
+const isFirst = (r: Ruleset) => r.id === DEFAULT_RULESET_ID || r.id === DEFAULT_3P_RULESET_ID;
 const files = [...data.library.current].sort(
   (a, b) =>
-    Number(b.id === DEFAULT_RULESET_ID) - Number(a.id === DEFAULT_RULESET_ID) ||
     a.players - b.players ||
+    Number(isFirst(b)) - Number(isFirst(a)) ||
     a.name.localeCompare(b.name),
 );
 
-/** The current version of every ruleset in rules/rulesets/: the default first, then 2-player, then 3-player. */
+/** The current version of every ruleset in rules/rulesets/: 2-player, then 3-player, each with its default first. */
 export function listRulesets(): RulesetInfo[] {
   return files.map(infoOf);
 }

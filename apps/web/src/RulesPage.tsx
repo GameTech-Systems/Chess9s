@@ -151,7 +151,8 @@ export function RulesPage({
         </h2>
         <p className="meta">
           {info.id} v{info.version} · {info.players} players
-          {info.isDefault && ' · the default ruleset'}
+          {info.defaultFor === 2 && ' · the default ruleset'}
+          {info.defaultFor === 3 && ' · the default 3-player ruleset'}
         </p>
         {info.description && <p>{info.description}</p>}
         {info.status !== 'official' && (

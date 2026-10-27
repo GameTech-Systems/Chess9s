@@ -60,34 +60,40 @@ describe('the rules the game plays', () => {
 describe('the ruleset list', () => {
   it('has every ruleset in rules/rulesets/, with a status and a player count', () => {
     const list = listRulesets();
-    // The default first, then the other 2-player presets by name, then 3-player.
+    // The 2-player default first, then the other 2-player presets by name, then the 3-player
+    // default (D63) and the other 3-player presets by name.
     expect(list.map((r) => r.id)).toEqual([
       'standard-2p',
       'easy-2p',
       'draft-2p',
+      'standard-3p',
       'easy-3p',
       'draft-3p',
-      'standard-3p',
     ]);
     expect(list.map((r) => r.name)).toEqual([
       'Standard',
       'Easy Start',
       'Good Practice',
+      'Standard (3-player)',
       'Easy Start (3-player)',
       'Good Practice (3-player)',
-      'Standard (3-player)',
     ]);
     expect(list.filter((r) => r.isDefault).map((r) => r.id)).toEqual(['standard-2p']);
+    expect(list.filter((r) => r.defaultFor).map((r) => [r.id, r.defaultFor])).toEqual([
+      ['standard-2p', 2],
+      ['standard-3p', 3],
+    ]);
     for (const r of list) {
       expect(['proposed', 'experimental', 'candidate', 'official']).toContain(r.status);
       expect(r.name).not.toBe('');
     }
   });
 
-  it('marks only the rulesets the engine can play as playable', () => {
+  it('plays every ruleset in hot-seat; only the 2-player ones online (the room is S63)', () => {
     const byId = Object.fromEntries(listRulesets().map((r) => [r.id, r]));
-    expect(byId['draft-2p']!.playable).toBe(true);
-    expect(byId['draft-3p']!.playable).toBe(false);
+    for (const r of Object.values(byId)) expect(r.playable, r.id).toBe(true);
+    expect(byId['draft-2p']!.online).toBe(true);
+    expect(byId['draft-3p']!.online).toBe(false);
     expect(byId['draft-3p']!.players).toBe(3);
   });
 
@@ -122,9 +128,15 @@ describe('the ruleset list', () => {
     for (const s of settings) expect(s.valueLabel, s.id).not.toBe('');
   });
 
-  it('refuses a ruleset that is unknown or not playable yet', () => {
+  it('refuses a ruleset that is unknown, and builds 3-player rules for a 3-player one', () => {
     expect(() => createRules('nope')).toThrow(/unknown ruleset/i);
-    expect(() => createRules('draft-3p')).toThrow(/not playable/i);
+    expect(createRules('draft-3p').players).toBe(3);
+    const m = newModel(
+      createRules('standard-3p'),
+      listRulesets().find((r) => r.id === 'standard-3p')!,
+    );
+    expect(m.game.order).toEqual(['dark', 'light', 'dragon']);
+    expect(m.game.turn).toBe('dark');
   });
 });
 
