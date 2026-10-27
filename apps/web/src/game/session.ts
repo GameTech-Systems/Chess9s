@@ -2,10 +2,12 @@
 // for a promotion piece. Pure functions over a model; React only draws it. The engine decides
 // every rule (legal moves, check, game end); nothing here knows how a piece moves.
 import {
+  TAIL,
   attackMap,
-  findMove,
+  checkersOn,
   newGame,
   playMove,
+  three,
   type GameState,
   type GeneratedMove,
   type MoveRules,
@@ -20,12 +22,41 @@ export interface Promoting {
   choices: string[];
 }
 
+/** One answer to a question a move asks. */
+export interface Choice {
+  value: string;
+  /** What the player reads on the button. */
+  label: string;
+}
+
+/**
+ * A 3-player move that asks more than the promotion (decision 0016): which of two or more
+ * pieces checkmating the Tail is the one that swaps with it (rule 8), and what a pawn swapped
+ * onto its last rank becomes (rule 9). Chosen like a promotion piece, as part of the move.
+ */
+export interface Choosing {
+  from: string;
+  to: string;
+  kind: 'mate' | 'swap';
+  choices: Choice[];
+  /** What was already chosen for this move. */
+  picked: Picked;
+}
+
+interface Picked {
+  promotion?: string;
+  mateBy?: string;
+  swapPromotion?: string;
+}
+
 export interface Model {
   game: GameState;
   /** The square of the piece whose moves are shown. */
   selected: string | null;
   /** A promotion waiting for the player to pick a piece. */
   promoting: Promoting | null;
+  /** A 3-player checkmate choice waiting for an answer, after any promotion. */
+  choosing: Choosing | null;
   /** Earlier states of this game, oldest first; undo pops the last. */
   history: GameState[];
   /** Play aid: show the selected piece's legal moves (on by default). */
@@ -38,6 +69,7 @@ export const fromGame = (game: GameState): Model => ({
   game,
   selected: null,
   promoting: null,
+  choosing: null,
   history: [],
   showMoves: true,
   showDanger: false,
@@ -62,6 +94,7 @@ const played = (model: Model, move: GeneratedMove): Model => ({
   game: playMove(model.game, move),
   selected: null,
   promoting: null,
+  choosing: null,
   history: [...model.history, model.game],
 });
 
@@ -74,23 +107,65 @@ export const canUndo = (model: Model): boolean => model.history.length > 0;
 export function undo(model: Model): Model {
   const game = model.history.at(-1);
   if (!game) return model;
-  return { ...model, game, selected: null, promoting: null, history: model.history.slice(0, -1) };
+  return {
+    ...model,
+    game,
+    selected: null,
+    promoting: null,
+    choosing: null,
+    history: model.history.slice(0, -1),
+  };
 }
 
 export const toggleMoves = (model: Model): Model => ({ ...model, showMoves: !model.showMoves });
 export const toggleDanger = (model: Model): Model => ({ ...model, showDanger: !model.showDanger });
 
+const unique = <T>(xs: T[]): T[] => [...new Set(xs)];
+
+/**
+ * Play the move from `from` to `to` once everything it asks is answered, else ask the next
+ * question: the promotion piece, then the checkmating piece, then the swap promotion.
+ */
+function ask(model: Model, from: string, to: string, picked: Picked): Model {
+  const { game } = model;
+  const moves = movesFrom(game, from).filter(
+    (m) =>
+      pickedAt(m) === to &&
+      (picked.promotion === undefined || m.promotion === picked.promotion) &&
+      (picked.mateBy === undefined || m.mateBy === picked.mateBy) &&
+      (picked.swapPromotion === undefined || m.swapPromotion === picked.swapPromotion),
+  );
+  if (moves.length === 0) return { ...model, selected: null, promoting: null, choosing: null };
+  if (picked.promotion === undefined && moves.some((m) => m.promotion !== undefined)) {
+    const choices = unique(moves.flatMap((m) => m.promotion ?? []));
+    return { ...model, promoting: { from, to, choices }, choosing: null };
+  }
+  const pieceAt = (at: string) => game.position[at]?.piece.replace(/-/g, ' ') ?? 'piece';
+  if (picked.mateBy === undefined && moves.some((m) => m.mateBy !== undefined)) {
+    const choices = unique(moves.flatMap((m) => m.mateBy ?? [])).map((at) => ({
+      value: at,
+      label: `${at} ${pieceAt(at)}`,
+    }));
+    return { ...model, promoting: null, choosing: { from, to, kind: 'mate', choices, picked } };
+  }
+  if (picked.swapPromotion === undefined && moves.some((m) => m.swapPromotion !== undefined)) {
+    const choices = unique(moves.flatMap((m) => m.swapPromotion ?? [])).map((piece) => ({
+      value: piece,
+      label: piece,
+    }));
+    return { ...model, promoting: null, choosing: { from, to, kind: 'swap', choices, picked } };
+  }
+  return played(model, moves[0]!);
+}
+
 /** A click on a square: play a shown move, or select the piece standing there, or clear. */
 export function click(model: Model, at: string): Model {
   const { game, selected } = model;
-  if (game.result.status !== 'ongoing' || model.promoting) return model;
+  if (game.result.status !== 'ongoing' || model.promoting || model.choosing) return model;
 
   if (selected && at !== selected) {
-    const moves = movesFrom(game, selected).filter((m) => pickedAt(m) === at);
-    if (moves.length === 1 && moves[0]!.promotion === undefined) return played(model, moves[0]!);
-    if (moves.length > 0) {
-      const choices = moves.flatMap((m) => m.promotion ?? []);
-      return { ...model, promoting: { from: selected, to: at, choices } };
+    if (movesFrom(game, selected).some((m) => pickedAt(m) === at)) {
+      return ask(model, selected, at, {});
     }
   }
   if (at !== selected && movesFrom(game, at).length > 0) return { ...model, selected: at };
@@ -100,13 +175,28 @@ export function click(model: Model, at: string): Model {
 /** The player picked a promotion piece. A piece that is not a choice changes nothing. */
 export function promote(model: Model, piece: string): Model {
   const { promoting } = model;
-  if (!promoting) return model;
-  const move = findMove(model.game, promoting.from, promoting.to, piece);
-  return move ? played(model, move) : model;
+  if (!promoting?.choices.includes(piece)) return model;
+  return ask(model, promoting.from, promoting.to, { promotion: piece });
 }
 
+/** The player answered a 3-player checkmate question. An answer that is not a choice changes nothing. */
+export function choose(model: Model, value: string): Model {
+  const { choosing } = model;
+  if (!choosing?.choices.some((c) => c.value === value)) return model;
+  const { from, to, kind, picked } = choosing;
+  return ask(
+    model,
+    from,
+    to,
+    kind === 'mate' ? { ...picked, mateBy: value } : { ...picked, swapPromotion: value },
+  );
+}
+
+/** Drop the move that is waiting for a promotion piece or a checkmate choice. */
 export const cancelPromotion = (model: Model): Model =>
-  model.promoting ? { ...model, selected: null, promoting: null } : model;
+  model.promoting || model.choosing
+    ? { ...model, selected: null, promoting: null, choosing: null }
+    : model;
 
 /** Squares of the side to move's pieces that any other side attacks. */
 function endangered(game: GameState): string[] {
@@ -121,14 +211,47 @@ function endangered(game: GameState): string[] {
     .sort();
 }
 
+/**
+ * Squares of a side's royal pieces: its King, or in a 3-player game the Dragon's Tail while it
+ * is not stone (the Tail plays the role of the Dragon's King, rule 4). A stone is never royal.
+ */
+export function royalSquares(game: GameState, side: string): string[] {
+  const tailSide = game.rules.players === 3 ? three(game.rules, game.order).dragon : undefined;
+  return Object.entries(game.position)
+    .filter(
+      ([, p]) =>
+        p.side === side &&
+        p.stone !== true &&
+        (game.rules.pieces[p.piece]?.royal === true || (side === tailSide && p.piece === TAIL)),
+    )
+    .map(([at]) => at);
+}
+
+/**
+ * 3-player danger aid: the Kings of the Kinged players that a Dragon piece attacks without it
+ * being check (decision 0016 rule 2): the Dragon may capture one on its turn. Any active
+ * Kinged player's King is shown, not only that of the side to move.
+ */
+function exposedKings(game: GameState): string[] {
+  if (game.rules.players !== 3) return [];
+  const g = three(game.rules, game.order);
+  const attacked = new Set(attackMap(game.rules, game.position, g.dragon));
+  return g.kinged
+    .filter(
+      (side) =>
+        game.seats[side] === 'active' &&
+        checkersOn(g, game.position, game.seats, side, [g.dragon]).length === 0,
+    )
+    .flatMap((side) => royalSquares(game, side))
+    .filter((at) => attacked.has(at))
+    .sort();
+}
+
 /** What the board shows besides the pieces. */
 export function highlights(model: Model): Highlights {
   const { game, selected, showMoves, showDanger } = model;
   const ongoing = game.result.status === 'ongoing';
   const last = game.moves.at(-1);
-  const royal = Object.entries(game.position)
-    .filter(([, p]) => p.side === game.turn && game.rules.pieces[p.piece]?.royal === true)
-    .map(([at]) => at);
   return {
     ...(selected && { selected }),
     targets:
@@ -138,8 +261,9 @@ export function highlights(model: Model): Highlights {
           )
         : [],
     ...(last && { lastMove: [last.from, last.to] as [string, string] }),
-    check: game.inCheck ? royal : [],
+    check: game.inCheck ? royalSquares(game, game.turn) : [],
     danger: showDanger && ongoing ? endangered(game) : [],
+    exposed: showDanger && ongoing ? exposedKings(game) : [],
     movable: ongoing ? [...new Set(game.legal.map((m) => m.from))].sort() : [],
   };
 }
@@ -153,15 +277,28 @@ const REASONS: Record<string, string> = {
   agreement: 'By agreement',
 };
 
+/** Win reasons that title() would not read well (3-player games, decision 0016). */
+const WINS: Record<string, string> = {
+  'king-capture': 'King captured',
+  'dragon-captured': 'Dragon pieces captured',
+  'exposed-king': 'King left in check',
+};
+
+/** "Dark and Light", "Dark, Light and Dragon". */
+const names = (sides: string[]) =>
+  sides.length < 2
+    ? sides.map(title).join('')
+    : `${sides.slice(0, -1).map(title).join(', ')} and ${title(sides.at(-1)!)}`;
+
 /** One line on the state of the game: whose move, check, or how it ended. */
 export function statusLine({ result, turn, inCheck }: GameState): string {
   switch (result.status) {
     case 'ongoing':
       return `${title(turn)} to move${inCheck ? ' · in check' : ''}`;
     case 'draw':
-      return `${REASONS[result.reason] ?? title(result.reason)} · draw`;
+      return `${REASONS[result.reason] ?? title(result.reason)} · draw${result.between ? ` between ${names(result.between)}` : ''}`;
     case 'win':
-      return `${title(result.reason)} · ${title(result.winner)} wins`;
+      return `${WINS[result.reason] ?? title(result.reason)} · ${title(result.winner)} wins`;
   }
 }
 
