@@ -3,7 +3,7 @@
 // declared square types and sides, parameter references, and setups that only
 // place known pieces. Pure: callers pass parsed JSON, nothing is read here.
 // Format: docs/decisions/0007-board-and-piece-formats.md.
-import { checkBoardSchema, checkPieceSchema, type SchemaCheck } from './schema-check';
+import { checkBoardSchema, checkPieceSchema, type SchemaCheck } from '#schema-check';
 import { RulesError, validateRegistry, type Parameter, type Registry } from './loader';
 
 /** Setup key for pieces that belong to no side. */

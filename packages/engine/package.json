@@ -4,6 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "main": "src/index.ts",
+  "imports": {
+    "#schema-check": {
+      "workerd": "./src/rules/schema-check.static.ts",
+      "default": "./src/rules/schema-check.ts"
+    }
+  },
   "dependencies": {
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1"

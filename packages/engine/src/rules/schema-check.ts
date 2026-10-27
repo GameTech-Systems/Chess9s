@@ -1,7 +1,9 @@
 // Schema checks for the registry, rulesets, boards and pieces. Compiled with Ajv, which builds its
 // validators with `new Function`. The web app swaps this module for schema-check.static.ts at build
 // time (apps/web/vite.config.ts), so a strict Content-Security-Policy works there; the build first
-// runs `pnpm validate:rules`, which checks the same data against the same schemas.
+// runs `pnpm validate:rules`, which checks the same data against the same schemas. The Worker
+// (apps/worker), where `new Function` is forbidden, gets the same stand-in through the `workerd`
+// condition of `#schema-check` in this package's package.json.
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import boardSchema from '../../../../rules/schema/board.schema.json';

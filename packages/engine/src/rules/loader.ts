@@ -1,7 +1,7 @@
 // Rules loader: validates the parameter registry and a ruleset against the
 // JSON Schemas in rules/schema/, then resolves every parameter for the
 // ruleset's player count. Pure: callers pass parsed JSON, nothing is read here.
-import { checkRegistrySchema, checkRulesetSchema, type SchemaCheck } from './schema-check';
+import { checkRegistrySchema, checkRulesetSchema, type SchemaCheck } from '#schema-check';
 
 export type ParamValue = string | number | boolean | null | readonly (string | number | boolean)[];
 export type Status = 'proposed' | 'experimental' | 'candidate' | 'official' | 'deprecated';
