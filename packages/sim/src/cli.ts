@@ -3,7 +3,9 @@
 // so a long run that is stopped still leaves its games counted (flagged as too few).
 //
 //   --players <2|3>    3: greedy players on a 3-player ruleset (standard-3p, 100 games), reporting
-//                      each seat's results; depths, nodes, --sweep and --shard are 2-player only
+//                      each seat's results; --sweep and --shard are 2-player only
+//   --search           with --players 3: every seat searches paranoid (S62) at the one depth in
+//                      --depths, with --nodes, instead of playing greedy
 //   --ruleset <id>     ruleset in rules/rulesets (draft-2p)
 //   --ruleset-file <f> a ruleset file instead (one exported from the builder or submitted for
 //                      tournament consideration), checked as strictly as the builder loads it;
@@ -46,6 +48,8 @@ import { combinations, playable, type Combination } from './sweep';
 export interface Options {
   /** `3` plays greedy 3-player games (cli3.ts); unset follows the ruleset. */
   players?: 2 | 3;
+  /** 3-player games: every seat searches instead of playing greedy. */
+  search?: boolean;
   ruleset: string;
   /** A ruleset file to play instead of a bundled ruleset; see `addRulesetFile`. */
   rulesetFile?: string;
@@ -103,6 +107,7 @@ export function options(argv: string[], cores: number): Options {
       name: { type: 'string' },
       report: { type: 'string' },
       shard: { type: 'string' },
+      search: { type: 'boolean', default: false },
     },
   });
   const file = v['ruleset-file'];
@@ -114,6 +119,7 @@ export function options(argv: string[], cores: number): Options {
   }
   const players = v.players === undefined ? undefined : (Number(v.players) as 2 | 3);
   if (players === 3 && file !== undefined) throw new Error('--ruleset-file is 2-player only');
+  if (v.search && players !== 3) throw new Error('--search needs --players 3');
   const ruleset =
     file === undefined ? (v.ruleset ?? (players === 3 ? DEFAULT_3P.ruleset : 'draft-2p')) : '';
   const overrides: Record<string, unknown> = {};
@@ -131,6 +137,7 @@ export function options(argv: string[], cores: number): Options {
   }
   return {
     ...(players === undefined ? {} : { players }),
+    ...(v.search && { search: true }),
     ruleset,
     ...(file === undefined ? {} : { rulesetFile: file }),
     games: whole(
@@ -277,14 +284,16 @@ export function runReports(
   }));
 }
 
-/** Greedy self-play on a 3-player ruleset: the report is rewritten as games finish. */
+/** Greedy or search self-play on a 3-player ruleset: the report is rewritten as games finish. */
 async function main3(o: Options, source: RulesSource, root: string, cwd: string): Promise<void> {
   const plan = plan3(o, source);
   const games: Summary3[] = [];
   const date = new Date().toISOString().slice(0, 10);
   const outDir = resolve(cwd, o.out);
   mkdirSync(outDir, { recursive: true });
-  const base = join(outDir, `${o.name}.greedy`);
+  const search = plan.job.options.search;
+  const players = search ? `search-d${search.depth}` : 'greedy';
+  const base = join(outDir, `${o.name}.${players}`);
   const write = () => {
     const report = report3(plan, date, games);
     writeFileSync(`${base}.json`, JSON.stringify(report, null, 2) + '\n');
@@ -292,7 +301,7 @@ async function main3(o: Options, source: RulesSource, root: string, cwd: string)
   };
   const total = plan.job.seeds.length;
   const started = Date.now();
-  console.error(`${total} greedy games of ${plan.ruleset.id} on ${o.workers} workers`);
+  console.error(`${total} ${players} games of ${plan.ruleset.id} on ${o.workers} workers`);
   const { done, stop } = runPool<Summary3>(
     new URL('./worker.js', import.meta.url),
     root,

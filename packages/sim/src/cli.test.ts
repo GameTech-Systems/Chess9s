@@ -189,6 +189,16 @@ describe('3 players (S58)', () => {
     expect(job).toMatchObject({ players: 3, rulesetId: 'easy-3p', seeds: [10, 11, 12] });
   });
 
+  it('--search: every seat searches at the one depth given, with --nodes (S62)', () => {
+    const o = options(['--players', '3', '--search', '--depths', '2', '--nodes', '500'], 2);
+    expect(plan3(o, source()).job.options).toMatchObject({ search: { depth: 2, nodes: 500 } });
+    expect(plan3(options(['--players', '3'], 2), source()).job.options).not.toHaveProperty(
+      'search',
+    );
+    expect(() => plan3(options(['--players', '3', '--search'], 2), source())).toThrow(/one depth/);
+    expect(() => options(['--search'], 2)).toThrow(/--players 3/);
+  });
+
   it('refuses 2-player options and a 2-player ruleset', () => {
     const src = source();
     const three = (...args: string[]) => options(['--players', '3', ...args], 1);
