@@ -93,6 +93,16 @@ const validServer = {
     type: 'game-over',
     result: { status: 'draw', reason: 'agreement' },
   },
+  'game-over (3-player draw, shared)': {
+    v: 1,
+    type: 'game-over',
+    result: { status: 'draw', reason: 'fifty-move', between: ['light', 'dragon'] },
+  },
+  'game-over (3-player win)': {
+    v: 1,
+    type: 'game-over',
+    result: { status: 'win', winner: 'dark', loser: 'dragon', reason: 'dragon-captured' },
+  },
 };
 
 describe('client messages', () => {
@@ -302,6 +312,14 @@ describe('the room peek (S53)', () => {
     ['no seats', json({ ...info, seats: {} })],
     ['a seat status that is unknown', json({ ...info, seats: { light: 'here' } })],
     ['a result that is not one', json({ ...info, result: { status: 'won' } })],
+    [
+      'a draw shared by a repeated seat',
+      json({ ...info, result: { status: 'draw', reason: 'stalemate', between: ['dark', 'dark'] } }),
+    ],
+    [
+      'a draw shared by one seat',
+      json({ ...info, result: { status: 'draw', reason: 'stalemate', between: ['dark'] } }),
+    ],
   ])('refuses %s', (_, text) => {
     expect(parseRoomInfo(text).ok).toBe(false);
   });
