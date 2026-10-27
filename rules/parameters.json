@@ -853,7 +853,7 @@
     {
       "id": "tail.capturable",
       "label": "Dragon Tail can be captured",
-      "description": "Whether the Tail can be captured. In 3-player games it can be checkmated instead.",
+      "description": "Whether the Tail can be captured. In 3-player games the capturing piece switches places with the Tail, which turns to stone, handled as a checkmate of the Tail (decision 0018).",
       "piece": "dragon-tail",
       "players": [
         2,

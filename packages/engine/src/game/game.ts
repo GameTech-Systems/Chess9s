@@ -26,6 +26,7 @@ import {
   outSeats,
   outcomeOf,
   outcomes,
+  resignedBy,
   three,
   type GameEvent,
   type Seats,
@@ -84,6 +85,12 @@ export interface RulesetRef {
   overrides?: Readonly<Record<string, ParamValue>>;
 }
 
+/** A seat that resigned a 3-player game, and how many moves had been played (decision 0018). */
+export interface Resignation {
+  side: string;
+  after: number;
+}
+
 export interface GameState {
   /** The ruleset the game is played under, kept with the game. */
   ruleset: RulesetRef;
@@ -109,6 +116,8 @@ export interface GameState {
   /** This position and the earlier ones that could repeat, for threefold repetition. */
   seen: Seen | null;
   moves: PlayedMove[];
+  /** 3-player games: the resignations so far, in order (a resignation is not a move). */
+  resignations: Resignation[];
   /** The side to move is in check. */
   inCheck: boolean;
   /** Squares of the pieces giving check. */
@@ -133,6 +142,8 @@ export interface GameRecord {
   players: number;
   turnOrder: string[];
   moves: string[];
+  /** 3-player games with a resignation in them (none: the key is left out). */
+  resignations?: Resignation[];
   result: GameResult;
 }
 
@@ -422,6 +433,7 @@ export function newGame(rules: MoveRules, ruleset: RulesetRef, init: GameInit = 
         passing: null,
         quiet: 0,
         moves: [],
+        resignations: [],
       },
       null,
     );
@@ -446,6 +458,7 @@ export function newGame(rules: MoveRules, ruleset: RulesetRef, init: GameInit = 
       passing: null,
       quiet: 0,
       moves: [],
+      resignations: [],
     },
     null,
   );
@@ -513,6 +526,7 @@ export function playMove(state: GameState, move: GeneratedMove): GameState {
       passing: legal.passes ? { squares: legal.passes, at: legal.to } : null,
       quiet: fresh ? 0 : state.quiet + 1,
       moves: [...state.moves, played],
+      resignations: state.resignations,
     },
     fresh ? null : state.seen,
   );
@@ -556,6 +570,7 @@ function playThree(state: GameState, legal: GeneratedMove): GameState {
       passing: legal.passes ? { squares: legal.passes, at: legal.to } : null,
       quiet: fresh ? 0 : state.quiet + 1,
       moves: [...state.moves, played],
+      resignations: state.resignations,
     },
     fresh ? null : state.seen,
     o.result,
@@ -565,21 +580,53 @@ function playThree(state: GameState, legal: GeneratedMove): GameState {
 /** The game ended without a move: the position stays, nothing more may be played. */
 function ended(state: GameState, result: GameResult): GameState {
   if (state.result.status !== 'ongoing') throw new RulesError('The game is over');
-  // Decision 0016 gives no rule for resigning or agreeing a draw with three seats.
+  // Decision 0016 gives no rule for agreeing a draw with three seats (decision 0018 keeps it so).
   if (state.rules.players !== 2) {
-    throw new RulesError('Resigning and agreed draws are 2-player only so far');
+    throw new RulesError('Agreed draws are 2-player only');
   }
   return { ...state, legal: [], result };
 }
 
 /**
- * The game after `side` resigns: the other seat wins. A seat may resign on either seat's turn.
- * Two players only, like the rest of game end.
+ * The game after `side` resigns. With two seats the other seat wins. With three (decision 0018) a
+ * seat's pieces turn to stone and the others play on, unless that ends the game: see `resignedBy`
+ * in three.ts. A seat may resign on any turn; a seat that is out cannot.
  */
 export function resign(state: GameState, side: string): GameState {
+  if (state.result.status !== 'ongoing') throw new RulesError('The game is over');
   if (!state.order.includes(side)) throw new RulesError(`${side} has no seat in this game`);
+  if (state.rules.players === 3) return resignThree(state, side);
   const winner = state.order.find((s) => s !== side)!;
   return ended(state, { status: 'win', winner, loser: side, reason: 'resignation' });
+}
+
+function resignThree(state: GameState, side: string): GameState {
+  if (state.seats[side] === 'out') throw new RulesError(`${side} is already out of the game`);
+  const g = three(state.rules, state.order);
+  const r = resignedBy(g, state.position, state.seats, side);
+  const resignations = [...state.resignations, { side, after: state.moves.length }];
+  if (r.result) return { ...state, resignations, legal: [], result: r.result };
+  // The pieces that turned to stone can't return: no earlier position comes back.
+  return settleThree(
+    state.rules,
+    {
+      ruleset: state.ruleset,
+      rules: state.rules,
+      order: state.order,
+      turn: state.turn === side ? nextSide(state.order, side, outSeats(r.seats)) : state.turn,
+      seats: r.seats,
+      position: r.position,
+      lost: state.lost,
+      coastOpen: state.coastOpen,
+      tailRun: state.tailRun,
+      tailBonus: null,
+      passing: state.turn === side ? null : state.passing,
+      quiet: 0,
+      moves: state.moves,
+      resignations,
+    },
+    null,
+  );
 }
 
 /** The game after both seats agree to a draw. */
@@ -587,17 +634,41 @@ export const agreeDraw = (state: GameState): GameState =>
   ended(state, { status: 'draw', reason: 'agreement' });
 
 /**
+ * A replayed game with the resignations of a record that come next: those listed after the ones
+ * already in `state`, made when exactly `state.moves.length` moves have been played. Replay a
+ * record by calling this before the first move, after each move, and at the end.
+ */
+export function replayResignations(state: GameState, list: readonly Resignation[]): GameState {
+  let g = state;
+  for (;;) {
+    const next = list[g.resignations.length];
+    if (!next || next.after !== g.moves.length || g.result.status !== 'ongoing') return g;
+    g = resign(g, next.side);
+  }
+}
+
+/**
  * A replayed game with a recorded result that no move gives: a resignation by one of its seats,
- * or a draw by agreement. Null when the game is already over or the result is not one of those,
- * so a record cannot claim either for a game that ended on the board.
+ * or a draw by agreement (2-player only). Null when the game is already over or the result is not
+ * one of those, so a record cannot claim either for a game that ended on the board.
  */
 export function endedBy(state: GameState, result: GameResult): GameState | null {
-  if (state.result.status !== 'ongoing' || state.rules.players !== 2) return null;
+  if (state.result.status !== 'ongoing') return null;
   if (result.status === 'win' && result.reason === 'resignation') {
     if (!state.order.includes(result.loser)) return null;
-    const ended = resign(state, result.loser);
-    return ended.result.status === 'win' && ended.result.winner === result.winner ? ended : null;
+    let ended: GameState;
+    try {
+      ended = resign(state, result.loser);
+    } catch {
+      return null;
+    }
+    return ended.result.status === 'win' &&
+      ended.result.winner === result.winner &&
+      ended.result.loser === result.loser
+      ? ended
+      : null;
   }
+  if (state.rules.players !== 2) return null;
   if (result.status === 'draw' && result.reason === 'agreement') return agreeDraw(state);
   return null;
 }
@@ -609,6 +680,9 @@ export function gameRecord(state: GameState): GameRecord {
     players: state.rules.players,
     turnOrder: [...state.order],
     moves: state.moves.map((m) => m.notation),
+    ...(state.resignations.length > 0 && {
+      resignations: state.resignations.map((r) => ({ ...r })),
+    }),
     result: state.result,
   };
 }
