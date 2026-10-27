@@ -8,6 +8,7 @@
 // side or random; two seats; no spectators.
 import {
   agreeDraw,
+  endedBy,
   newGame,
   playMove,
   resign,
@@ -131,16 +132,6 @@ const startGame = (rules: MoveRules, ruleset: RoomRuleset): GameState =>
     ...(ruleset.overrides && { overrides: ruleset.overrides }),
   });
 
-/** A result that no move gives, applied after the moves: a resignation or an agreed draw. */
-function endedOffBoard(game: GameState, result: GameResult): GameState | null {
-  if (game.result.status !== 'ongoing' || result.status === 'ongoing') return null;
-  if (result.status === 'win' && result.reason === 'resignation') {
-    return game.order.includes(result.loser) ? resign(game, result.loser) : null;
-  }
-  if (result.status === 'draw' && result.reason === 'agreement') return agreeDraw(game);
-  return null;
-}
-
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 
 /**
@@ -165,7 +156,7 @@ export function replayGame(
       if (!move) return { ok: false, problem: `Move ${i + 1} (${notation}) is not legal.` };
       game = playMove(game, move);
     }
-    game = endedOffBoard(game, result) ?? game;
+    game = endedBy(game, result) ?? game;
     if (!same(game.result, result)) {
       return { ok: false, problem: 'The result does not match the moves.' };
     }

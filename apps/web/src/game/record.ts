@@ -3,7 +3,7 @@
 // overrides), the turn order, the moves in notation, the result and the date; no names. A load
 // replays the moves through the engine, so a record can never hold an illegal position, and it is
 // refused when the replay does not give the recorded turn order and result.
-import { gameRecord, playMove, toNotation, type GameState } from '@chess9s/engine';
+import { endedBy, gameRecord, playMove, toNotation, type GameState } from '@chess9s/engine';
 import { newModel } from './session';
 import { createRulesFor, customInfo, findRuleset, same, type RulesetInfo } from './rules';
 
@@ -70,6 +70,8 @@ export function openRecord(text: string): Opened {
       if (!move) return refuse(`Move ${i + 1} (${notation}) is not legal in this game.`);
       game = playMove(game, move);
     }
+    // A resignation or a draw by agreement (S51) ends a game that its moves leave going.
+    game = endedBy(game, saved.result as GameState['result']) ?? game;
     if (!same(saved.turnOrder, game.order)) {
       return refuse('The turn order in this game record does not match its ruleset.');
     }

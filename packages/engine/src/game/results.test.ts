@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { toNotation, type MoveRules } from '../moves/generate';
 import { validateBoardAndPieces } from '../rules/formats';
 import { RulesError, resolveRuleset, type Registry } from '../rules/loader';
-import { agreeDraw, gameRecord, newGame, playMove, resign, type GameState } from './game';
+import { agreeDraw, endedBy, gameRecord, newGame, playMove, resign, type GameState } from './game';
 
 const root = new URL('../../../../', import.meta.url).pathname;
 const read = (path: string): unknown => JSON.parse(readFileSync(root + path, 'utf8'));
@@ -78,5 +78,33 @@ describe('the record of a resigned or agreed game', () => {
       reason: 'resignation',
     });
     expect(gameRecord(agreeDraw(start())).result).toEqual({ status: 'draw', reason: 'agreement' });
+  });
+});
+
+describe('endedBy (replaying a record)', () => {
+  const resigned = {
+    status: 'win',
+    winner: 'light',
+    loser: 'dark',
+    reason: 'resignation',
+  } as const;
+
+  it('applies a resignation or an agreement to a game still going', () => {
+    expect(endedBy(start(), resigned)?.result).toEqual(resigned);
+    expect(endedBy(start(), { status: 'draw', reason: 'agreement' })?.result).toEqual({
+      status: 'draw',
+      reason: 'agreement',
+    });
+  });
+
+  it('refuses a seat the game lacks, a winner who is not the other seat, and board results', () => {
+    expect(endedBy(start(), { ...resigned, loser: 'dragon' })).toBeNull();
+    expect(endedBy(start(), { ...resigned, winner: 'dark' })).toBeNull();
+    expect(endedBy(start(), { status: 'draw', reason: 'repetition' })).toBeNull();
+    expect(endedBy(start(), { status: 'ongoing' })).toBeNull();
+  });
+
+  it('refuses a game that is already over', () => {
+    expect(endedBy(agreeDraw(start()), resigned)).toBeNull();
   });
 });
