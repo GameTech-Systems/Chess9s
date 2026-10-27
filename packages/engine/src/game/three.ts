@@ -272,14 +272,59 @@ function kingTaken(
     w.result = win(by, side, reason);
     return;
   }
-  const position: Position = {};
-  for (const [at, p] of Object.entries(w.position)) {
-    if (p.side !== side) position[at] = p;
-    else if (g.rules.pieces[p.piece]?.royal !== true) position[at] = { ...p, stone: true };
-  }
-  w.position = position;
+  w.position = stoneOut(g, w.position, side);
   w.seats = { ...w.seats, [side]: 'out' };
   w.events = [...w.events, { kind: 'king-captured', side, how }];
+}
+
+/**
+ * A Kinged side leaves the game (rule 11): its King leaves the board and its other pieces turn to
+ * stone. The Dragon (the side that is not Kinged) keeps every piece, the Tail too, as stone.
+ */
+function stoneOut(g: Three, position: Position, side: string): Position {
+  const out: Position = {};
+  for (const [at, p] of Object.entries(position)) {
+    if (p.side !== side) out[at] = p;
+    else if (side === g.dragon || g.rules.pieces[p.piece]?.royal !== true) {
+      out[at] = { ...p, stone: true };
+    }
+  }
+  return out;
+}
+
+/** What a resignation leads to: the position and seats after it, and the result if it ends the game. */
+export interface Resigned {
+  position: Position;
+  seats: Seats;
+  result: GameResult | null;
+}
+
+/**
+ * `side` resigns (decision 0018). With both Kinged players in, a Kinged side is out as after a King
+ * capture and the Dragon, if it resigns, is out with every piece in stone; no result. When the
+ * resigning side is the last Kinged player, the Dragon wins; when the Dragon resigns with one
+ * Kinged player left, that player wins; when the Dragon is already out, the other Kinged player
+ * wins (the 2-player end rules).
+ */
+export function resignedBy(g: Three, position: Position, seats: Seats, side: string): Resigned {
+  const kinged = activeKinged(g, seats);
+  const lost = (winner: string): Resigned => ({
+    position,
+    seats,
+    result: win(winner, side, 'resignation'),
+  });
+  if (side === g.dragon) {
+    if (kinged.length === 1) return lost(kinged[0]!);
+  } else if (seats[g.dragon] === 'out') {
+    return lost(kinged.find((s) => s !== side)!);
+  } else if (kinged.length === 1) {
+    return lost(g.dragon);
+  }
+  return {
+    position: stoneOut(g, position, side),
+    seats: { ...seats, [side]: 'out' },
+    result: null,
+  };
 }
 
 interface Mate {
@@ -340,10 +385,26 @@ function applyMate(
     w.result = win(owner, g.dragon, 'checkmate');
     return [{ work: w }];
   }
+  return stoneTail(g, w, at, false);
+}
+
+/**
+ * The Tail on its square turns to stone and, unless it stands on the center or the piece on `at`
+ * (the checkmating or capturing piece) may not stand on its square, switches places with that piece
+ * (rule 9). A swapped pawn promotes at once, one variant per choice. `keepSeat`: the Dragon seat
+ * stays as it is (a capture that ends the game).
+ */
+function stoneTail(
+  g: Three,
+  w: Work,
+  at: string,
+  keepSeat: boolean,
+): { work: Work; promotion?: string }[] {
+  const owner = w.position[at]!.side;
   const tailAt = royals(g, w.position, w.seats, g.dragon)[0]!;
   const tail = w.position[tailAt]!;
   const piece = w.position[at]!;
-  const seats: Seats = { ...w.seats, [g.dragon]: 'tail-stone' };
+  const seats: Seats = keepSeat ? w.seats : { ...w.seats, [g.dragon]: 'tail-stone' };
   const stays =
     (squareTypes(g.rules.board).get(tailAt) ?? []).includes(CENTER) ||
     !mayStand(g.rules, at, piece, tailAt);
@@ -378,6 +439,11 @@ const effectKey = (g: Three, w: Work, mate: Mate, at: string): string =>
  */
 function resolve(g: Three, t: Table, mover: string, move: GeneratedMove, depth: number): Outcome[] {
   const victim = t.position[move.captureAt ?? move.to];
+  if (victim?.piece === TAIL && victim.side === g.dragon && move.captureAt === undefined) {
+    return tailCaptures(g, t, mover, move).flatMap((start) =>
+      settleMove(g, t, mover, move, depth, start),
+    );
+  }
   const lost = copyLost(t.lost);
   if (victim) (lost[victim.side] ??= []).push(victim.piece);
   if (move.promotion !== undefined) giveBack(lost, mover, move.promotion);
@@ -391,7 +457,45 @@ function resolve(g: Three, t: Table, mover: string, move: GeneratedMove, depth: 
   if (victim && victim.side !== g.dragon && g.rules.pieces[victim.piece]?.royal === true) {
     kingTaken(g, start, victim.side, mover, 'capture');
   }
+  return settleMove(g, t, mover, move, depth, start);
+}
 
+/**
+ * A capture of the Tail (`tail.capturable`, decision 0018): handled as a checkmate of the Tail
+ * (rule 9). The Tail never leaves the board: the capturing piece switches places with it and it
+ * turns to stone, or turns to stone where it stands (on the center, or if the piece may not stand
+ * there). While both Kinged players are in, the Dragon plays on; in the duel, and in Easy Start's
+ * first-checkmate game (provisional), the capturing player wins as by checkmate.
+ */
+function tailCaptures(g: Three, t: Table, mover: string, move: GeneratedMove): Work[] {
+  const before: Work = {
+    position: t.position,
+    seats: t.seats,
+    lost: copyLost(t.lost),
+    events: [],
+    result: null,
+  };
+  const final = !swaps(g, t.seats, g.dragon);
+  return stoneTail(g, before, move.from, final)
+    .filter((v) => v.promotion === move.promotion)
+    .map(({ work }) => {
+      if (final) work.result = win(mover, g.dragon, 'checkmate');
+      return work;
+    });
+}
+
+/**
+ * The rest of `resolve` for a move whose own effect is `start` (the position after it): the
+ * checkmates it gives, the choices they leave, and whether the position is legal.
+ */
+function settleMove(
+  g: Three,
+  t: Table,
+  mover: string,
+  move: GeneratedMove,
+  depth: number,
+  start: Work,
+): Outcome[] {
   let works: { work: Work; mateBy?: string; promotion?: string }[] = [{ work: start }];
   if (depth < MATE_DEPTH && !start.result) {
     const duelBefore = inDuel(g, start.seats);

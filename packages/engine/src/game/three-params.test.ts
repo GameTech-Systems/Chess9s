@@ -70,3 +70,36 @@ describe('every 3-player parameter at its default and each option, in a game tha
     expect(g.result.status, `${g.moves.length} moves`).not.toBe('ongoing');
   });
 });
+
+// S67: tail.capturable is a 2- and 3-player parameter, so the loop above skips it (decision 0018).
+describe('tail.capturable in a 3-player game that ends', () => {
+  it.each([false, true])('= %j', (option) => {
+    const g = seeded(rulesFor('draft-3p', { 'tail.capturable': option }), 1);
+    expect(g.result.status, `${g.moves.length} moves`).not.toBe('ongoing');
+  });
+
+  it('on: after a capture the Tail is stone on the board, and a seeded game plays on to a result', () => {
+    const rules = rulesFor('draft-3p', { 'tail.capturable': true });
+    const position = {
+      b7: { piece: 'king', side: 'dark', moved: true },
+      e2: { piece: 'king', side: 'light', moved: true },
+      g8: { piece: 'knight', side: 'light', moved: true },
+      h8: { piece: 'moon', side: 'dragon', moved: true },
+      i9: { piece: 'dragon-tail', side: 'dragon', moved: true },
+      a1: { piece: 'dark-dragon-head', side: 'dragon', moved: true },
+      c3: { piece: 'rook', side: 'dark', moved: true },
+    };
+    let g = newGame(rules, { id: 'draft-3p', version: '0' }, { position, turn: 'light' });
+    g = playMove(
+      g,
+      g.legal.find((m) => m.capture === 'dragon-tail')!,
+    );
+    expect(g.position.g8).toMatchObject({ piece: 'dragon-tail', stone: true });
+    let x = 7;
+    const rnd = () => (x = (x * 48271) % 2147483647) / 2147483647;
+    while (g.result.status === 'ongoing' && g.moves.length < 1500) {
+      g = playMove(g, g.legal[Math.floor(rnd() * g.legal.length)]!);
+    }
+    expect(g.result.status, `${g.moves.length} moves`).not.toBe('ongoing');
+  });
+});

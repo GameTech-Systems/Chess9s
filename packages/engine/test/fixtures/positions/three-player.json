@@ -1325,6 +1325,191 @@
           "between": ["dark", "light", "dragon"]
         }
       }
+    },
+    {
+      "name": "S67 Tail capture off (default): a knight attacking the Tail may not take it",
+      "rule": "tail-capture",
+      "turn": "light",
+      "pieces": {
+        "b7": "dark king",
+        "e2": "light king",
+        "g8": "light knight",
+        "h8": "dragon moon",
+        "i9": "dragon dragon-tail",
+        "a1": "dragon dark-dragon-head"
+      },
+      "expect": {
+        "legalLacks": ["g8xi9"]
+      }
+    },
+    {
+      "name": "S67 tail.capturable on: light's knight takes the Tail; they switch places and the Tail turns to stone (handled as a checkmate, rule 9)",
+      "rule": "tail-capture",
+      "overrides": { "tail.capturable": true },
+      "turn": "light",
+      "pieces": {
+        "b7": "dark king",
+        "e2": "light king",
+        "g8": "light knight",
+        "h8": "dragon moon",
+        "i9": "dragon dragon-tail",
+        "a1": "dragon dark-dragon-head"
+      },
+      "play": ["g8xi9"],
+      "expect": {
+        "events": [{ "kind": "tail-stone", "by": "light", "at": "g8" }],
+        "at": { "i9": "light knight", "g8": "dragon dragon-tail stone" },
+        "seats": { "dark": "active", "light": "active", "dragon": "tail-stone" },
+        "turn": "dragon",
+        "result": { "status": "ongoing" }
+      }
+    },
+    {
+      "name": "S67 tail.capturable on: the Tail on E5 turns to stone where it stands and the capturing piece stays on its own square",
+      "rule": "tail-capture",
+      "overrides": { "tail.capturable": true, "center.occupants": "any" },
+      "turn": "light",
+      "pieces": {
+        "e1": "light king",
+        "e9": "dark king",
+        "e5": "dragon dragon-tail",
+        "a1": "dragon moon",
+        "g6": "light knight"
+      },
+      "play": ["g6xe5"],
+      "expect": {
+        "events": [{ "kind": "tail-stone", "by": "light", "at": "e5" }],
+        "at": { "e5": "dragon dragon-tail stone", "g6": "light knight" },
+        "seats": { "dark": "active", "light": "active", "dragon": "tail-stone" }
+      }
+    },
+    {
+      "name": "S67 tail.capturable on: a pawn that takes the Tail onto its last rank promotes at once",
+      "rule": "tail-capture",
+      "overrides": { "tail.capturable": true },
+      "turn": "light",
+      "pieces": {
+        "b7": "dark king",
+        "e2": "light king",
+        "h8": "light pawn",
+        "h7": "dragon moon",
+        "i9": "dragon dragon-tail"
+      },
+      "expect": {
+        "legalHas": ["h8xi9=queen", "h8xi9=rook", "h8xi9=bishop", "h8xi9=knight"],
+        "legalLacks": ["h8xi9"]
+      }
+    },
+    {
+      "name": "S67 tail.capturable on: the pawn that took the Tail becomes the piece chosen, and the stone is left where it came from",
+      "rule": "tail-capture",
+      "overrides": { "tail.capturable": true },
+      "turn": "light",
+      "pieces": {
+        "b7": "dark king",
+        "e2": "light king",
+        "h8": "light pawn",
+        "h7": "dragon moon",
+        "i9": "dragon dragon-tail"
+      },
+      "play": ["h8xi9=queen"],
+      "expect": {
+        "at": { "i9": "light queen", "h8": "dragon dragon-tail stone" },
+        "events": [{ "kind": "tail-stone", "by": "light", "at": "h8" }]
+      }
+    },
+    {
+      "name": "S67 tail.capturable on: in the duel the last Kinged player who takes the Tail wins, as by checkmate",
+      "rule": "tail-capture",
+      "overrides": { "tail.capturable": true },
+      "turn": "dark",
+      "seats": { "light": "out" },
+      "pieces": {
+        "e3": "light pawn stone",
+        "b7": "dark king",
+        "i9": "dragon dragon-tail",
+        "h8": "dragon moon",
+        "a1": "dragon dark-dragon-head",
+        "g8": "dark knight"
+      },
+      "play": ["g8xi9"],
+      "expect": {
+        "result": { "status": "win", "winner": "dark", "loser": "dragon", "reason": "checkmate" },
+        "at": { "i9": "dark knight", "g8": "dragon dragon-tail stone" }
+      }
+    },
+    {
+      "name": "S67 tail.capturable on: a capture that leaves the mover's King in check is not allowed",
+      "rule": "tail-capture",
+      "overrides": { "tail.capturable": true },
+      "turn": "light",
+      "pieces": {
+        "b7": "dark king",
+        "e2": "light king",
+        "h2": "dark rook",
+        "g8": "light knight",
+        "h8": "dragon moon",
+        "i9": "dragon dragon-tail",
+        "a1": "dragon dark-dragon-head"
+      },
+      "expect": {
+        "legalLacks": ["g8xi9"]
+      }
+    },
+    {
+      "name": "S67 tail.capturable on: the swap is part of the move, so a pinned piece may take the Tail (the stone fills the square it left)",
+      "rule": "tail-capture",
+      "overrides": { "tail.capturable": true },
+      "turn": "light",
+      "pieces": {
+        "b7": "dark king",
+        "g1": "light king",
+        "g9": "dark rook",
+        "g8": "light knight",
+        "h8": "dragon moon",
+        "i9": "dragon dragon-tail",
+        "a1": "dragon dark-dragon-head"
+      },
+      "expect": {
+        "legalHas": ["g8xi9"]
+      }
+    },
+    {
+      "name": "S67 Easy Start with tail.capturable on: the capture is handled as the Tail's checkmate, so the first checkmate wins",
+      "rule": "tail-capture",
+      "ruleset": "easy-3p",
+      "overrides": { "tail.capturable": true },
+      "turn": "light",
+      "pieces": {
+        "b7": "dark king",
+        "e2": "light king",
+        "g8": "light knight",
+        "h8": "dragon moon",
+        "i9": "dragon dragon-tail",
+        "a1": "dragon dark-dragon-head"
+      },
+      "play": ["g8xi9"],
+      "expect": {
+        "result": { "status": "win", "winner": "light", "loser": "dragon", "reason": "checkmate" },
+        "at": { "i9": "light knight", "g8": "dragon dragon-tail stone" }
+      }
+    },
+    {
+      "name": "S67 Easy Start keeps the Tail uncapturable at its default",
+      "rule": "tail-capture",
+      "ruleset": "easy-3p",
+      "turn": "light",
+      "pieces": {
+        "b7": "dark king",
+        "e2": "light king",
+        "g8": "light knight",
+        "h8": "dragon moon",
+        "i9": "dragon dragon-tail",
+        "a1": "dragon dark-dragon-head"
+      },
+      "expect": {
+        "legalLacks": ["g8xi9"]
+      }
     }
   ]
 }
