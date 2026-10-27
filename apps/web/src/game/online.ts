@@ -85,6 +85,7 @@ export function startOnline(
       game,
       selected: null,
       promoting: null,
+      choosing: null,
       history: [],
       showMoves: aids?.showMoves ?? true,
       showDanger: aids?.showDanger ?? false,

@@ -26,6 +26,8 @@ export interface Highlights {
   check: string[];
   /** Squares of the side to move's pieces that the other side attacks (play aid). */
   danger?: string[];
+  /** 3-player play aid: Kings a Dragon piece attacks without check (the Dragon may capture them). */
+  exposed?: string[];
   /** Squares of the pieces that have a legal move. */
   movable: string[];
 }
