@@ -3,6 +3,7 @@
 import { Worker } from 'node:worker_threads';
 import type { Ruleset } from '@chess9s/engine';
 import type { GameSummary, PlayOptions } from './play';
+import type { Play3Options, Summary3 } from './play3';
 
 export interface Job {
   rulesetId: string;
@@ -13,26 +14,32 @@ export interface Job {
   seeds: number[];
 }
 
-export interface Played {
+/** A run of 3-player greedy games (S58). */
+export interface Job3 extends Omit<Job, 'options'> {
+  players: 3;
+  options: Omit<Play3Options, 'seed' | 'init'>;
+}
+
+export interface Played<G = GameSummary> {
   job: number;
-  game: GameSummary;
+  game: G;
   ms: number;
 }
 
 /** Messages a worker sends back: a finished game. */
-export type FromWorker = Played;
+export type FromWorker = Played<GameSummary | Summary3>;
 /** Messages a worker receives: the next game to play. */
 export interface ToWorker {
   job: number;
   seed: number;
 }
 
-export function runPool(
+export function runPool<G = GameSummary>(
   workerUrl: URL,
   root: string,
-  jobs: Job[],
+  jobs: (Job | Job3)[],
   workers: number,
-  onGame: (played: Played) => void,
+  onGame: (played: Played<G>) => void,
 ): { done: Promise<void>; stop: () => Promise<void> } {
   const queue: ToWorker[] = jobs.flatMap((j, job) => j.seeds.map((seed) => ({ job, seed })));
   const pool: Worker[] = [];
@@ -55,7 +62,7 @@ export function runPool(
     const w = new Worker(workerUrl, { workerData: { root, jobs } });
     w.on('message', (played: FromWorker) => {
       busy--;
-      onGame(played);
+      onGame(played as Played<G>);
       next(w);
     });
     w.on('error', reject);
