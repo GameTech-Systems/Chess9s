@@ -426,6 +426,10 @@ describe('features the game does not play yet', () => {
     const swap = unbuiltFeatures(rulesFor(2, { 'setup.swapKingQueen': true })).map((f) => f.id);
     expect(swap).toEqual(['setup.swapKingQueen']);
   });
+
+  it("lists the 3-player Coast pieces' first way out through A5 (coast.3p.exit, not built)", () => {
+    expect(unbuiltFeatures(rulesFor(3)).map((f) => f.id)).toEqual(['coast.3p.exit']);
+  });
 });
 
 describe('a whole game', () => {

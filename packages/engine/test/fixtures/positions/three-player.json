@@ -625,6 +625,29 @@
       }
     },
     {
+      "name": "rule 9: a swap that would leave the mover's King in check is not allowed (dark's knight on i9 would check light's King on h7)",
+      "rule": "9",
+      "turn": "dark",
+      "pieces": {
+        "a1": "dragon dark-dragon-head",
+        "b7": "dark king",
+        "c9": "light rook",
+        "e7": "dark knight",
+        "e9": "light bishop",
+        "f6": "light bishop",
+        "h8": "dragon moon",
+        "i6": "light rook",
+        "i8": "dragon light-dragon-head",
+        "i9": "dragon dragon-tail",
+        "h7": "light king"
+      },
+      "play": ["e7-g8"],
+      "expect": {
+        "legalHas": ["e9-d8#c9"],
+        "legalLacks": ["e9-d8#g8", "e9-d8"]
+      }
+    },
+    {
       "name": "rule 9: the Tail checkmated on E5 turns to stone where it stands (center.occupants = any, so a knight may check it there)",
       "rule": "9",
       "overrides": {
