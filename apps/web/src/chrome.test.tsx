@@ -1,11 +1,13 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
-import { App, pageOf, rulesIdOf } from './App';
+import { App, pageOf, roomCodeOf, rulesIdOf } from './App';
 import { ErrorBoundary, ErrorScreen } from './ErrorScreen';
 import { installErrorFallback } from './errorFallback';
 import { CONTACT_ADDRESS, DISCUSSIONS_URL } from './links';
 import { Tournament } from './Tournament';
 import { STANDARD_DISCUSSION } from './tournament';
+import { PRIVACY_UPDATED } from './Privacy';
+import { listRulesets } from './game/rules';
 
 describe('error screen', () => {
   it('replaces the app with a message and a way to report it', () => {
@@ -134,7 +136,7 @@ describe('tournament page (S46)', () => {
     expect(html).toMatch(/Official rulesets only/);
     expect(html).toMatch(/never custom/i);
     expect(html).toContain('hot-seat or over the board');
-    expect(html).toContain('Phase 5');
+    expect(html).not.toContain('Phase 5');
   });
 
   it('before the discussion is announced it says it starts when announced', () => {
@@ -190,5 +192,67 @@ describe('tournament page (S46)', () => {
     const html = renderToStaticMarkup(<App path="/privacy" />);
     expect(html).toMatch(/game record/i);
     expect(html).toMatch(/Nothing is sent or stored/);
+  });
+});
+
+describe('online play pages (S53)', () => {
+  it('routes /room/<code> to the room page, in any case, with or without a trailing slash', () => {
+    expect(pageOf('/room/K7RX2M')).toBe('room');
+    expect(pageOf('/room/k7rx2m/')).toBe('room');
+    expect(roomCodeOf('/room/k7rx2m/')).toBe('K7RX2M');
+    expect(roomCodeOf('/room/')).toBeUndefined();
+    expect(roomCodeOf('/privacy')).toBeUndefined();
+    expect(pageOf('/room/')).toBe('game');
+  });
+
+  it('the room page starts by looking for the room, under the Online heading', () => {
+    const html = renderToStaticMarkup(<App path="/room/K7RX2M" />);
+    expect(html).toContain('Looking for the room');
+    expect(html).toContain('<p>Online</p>');
+    expect(html).toContain('Back to the game');
+  });
+
+  it('the picker offers Play online for every playable ruleset, and joining by code', () => {
+    const html = renderToStaticMarkup(<App path="/" />);
+    const playable = listRulesets().filter((r) => r.playable).length;
+    expect(html.split('>Play online<')).toHaveLength(playable + 1);
+    expect(html).toContain('Join a room');
+    expect(html).toContain('aria-label="Room code"');
+  });
+
+  it('privacy says what online play sends, what the server keeps and for how long (D53)', () => {
+    const html = renderToStaticMarkup(<App path="/privacy" />);
+    for (const fact of [
+      'room code',
+      'the ruleset',
+      'your moves',
+      'seat token',
+      '24 hours after the game ends',
+      '7 days with no move',
+      'IP address',
+      'its own terms',
+      'no names or accounts',
+      'chess9s.online',
+    ]) {
+      expect(html, fact).toContain(fact);
+    }
+    // Online play is the one time the app talks to the server, and only when chosen.
+    expect(html).toMatch(/no network requests until you/);
+    expect(html).not.toContain('never sent anywhere');
+  });
+
+  it('privacy’s date changed with the page', () => {
+    expect(PRIVACY_UPDATED).toBe('27 October 2026');
+    expect(renderToStaticMarkup(<App path="/privacy" />)).toContain('Last updated 27 October 2026');
+  });
+
+  it('the tournament page, the builder note and the tournament invitation say games can be played online by room code, Official ruleset only (D46)', () => {
+    const t = renderToStaticMarkup(<Tournament discussion={null} />);
+    expect(t).toMatch(/played online by room code/);
+    expect(t).toMatch(/Official ruleset only/);
+    expect(t).not.toContain('Until online play');
+    const b = renderToStaticMarkup(<App path="/build" />);
+    expect(b).toMatch(/played online by room code/);
+    expect(b).not.toContain('not played online yet');
   });
 });

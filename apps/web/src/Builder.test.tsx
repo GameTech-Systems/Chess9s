@@ -343,7 +343,7 @@ describe('privacy page covers the saved rulesets', () => {
   it('names the storage key and carries the new date', () => {
     const html = renderToStaticMarkup(<App path="/privacy" />);
     expect(html).toContain('chess9s.rulesets');
-    expect(PRIVACY_UPDATED).toBe('25 October 2026');
-    expect(html).toContain('Last updated 25 October 2026');
+    expect(PRIVACY_UPDATED).toBe('27 October 2026');
+    expect(html).toContain('Last updated 27 October 2026');
   });
 });

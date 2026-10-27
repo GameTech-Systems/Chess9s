@@ -91,6 +91,15 @@ describe('Rule picker', () => {
     expect(html).not.toContain('aria-label="Moves"');
   });
 
+  it('the game screen offers Play online and joining a room, when the app wires them (S53)', () => {
+    const html = renderToStaticMarkup(
+      <Game initial={newModel()} ruleset={ruleset} onPlayOnline={() => {}} onJoinRoom={() => {}} />,
+    );
+    expect(html).toContain('>Play online<');
+    expect(html).toContain('Join a room');
+    expect(render()).not.toContain('Play online');
+  });
+
   it('the game screen offers a way back to the picker', () => {
     expect(render()).toContain('Change ruleset');
   });

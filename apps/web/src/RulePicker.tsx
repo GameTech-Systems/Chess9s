@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { listRulesets, type RulesetInfo } from './game/rules';
 import { rulesPath } from './links';
+import { JoinByCode } from './JoinByCode';
 
 /** Pick a ruleset before a game. A ruleset the engine cannot play yet is listed, not offered. */
 export function RulePicker({
   onPick,
+  onPlayOnline,
+  onJoinRoom,
   linkTo,
   customs = [],
   onBuild,
@@ -12,6 +15,10 @@ export function RulePicker({
   onDelete,
 }: {
   onPick: (ruleset: RulesetInfo) => void;
+  /** Make an online room for a ruleset (S53). */
+  onPlayOnline?: (ruleset: RulesetInfo) => void;
+  /** Go to the room with this code. */
+  onJoinRoom?: (code: string) => void;
   /** In-app navigation for the rules links. */
   linkTo?: (to: string) => (e: React.MouseEvent) => void;
   /** The player's own rulesets, kept in this browser. */
@@ -47,6 +54,11 @@ export function RulePicker({
           </button>
         ) : (
           <p className="facts small">Not playable yet</p>
+        )}
+        {r.playable && onPlayOnline && (
+          <button type="button" className="again" onClick={() => onPlayOnline(r)}>
+            Play online
+          </button>
         )}
         <a href={rulesPath(r.id)} onClick={linkTo?.(rulesPath(r.id))}>
           Rules
@@ -97,6 +109,7 @@ export function RulePicker({
           Build a ruleset
         </button>
       </div>
+      {onJoinRoom && <JoinByCode onJoin={onJoinRoom} />}
     </section>
   );
 }
