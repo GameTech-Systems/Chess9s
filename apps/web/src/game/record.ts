@@ -8,27 +8,56 @@ import {
   gameRecord,
   playMove,
   replayResignations,
+  snapshot,
+  startClock,
   toNotation,
   type GameState,
   type Resignation,
+  type Times,
 } from '@chess9s/engine';
 import { newModel } from './session';
+import { controlById } from './timeControls';
+import { timedFromSaved, type Timed } from './timed';
 import { createRulesFor, customInfo, findRuleset, same, type RulesetInfo } from './rules';
 
 export const RECORD_FORMAT = 'chess9s-game-record';
 
-/** The record of a game as JSON text. `date` is the day it is saved, YYYY-MM-DD. */
-export const recordJson = (game: GameState, date: string): string =>
-  JSON.stringify({ format: RECORD_FORMAT, v: 1, ...gameRecord(game), date }, null, 2);
+/**
+ * The record of a game as JSON text. `date` is the day it is saved, YYYY-MM-DD. A game played with
+ * a clock also carries the time control, Show only and each seat's time left after each move
+ * (S65, decision 0017); older records, and untimed games, have none of these.
+ */
+export const recordJson = (game: GameState, date: string, timed: Timed | null = null): string =>
+  JSON.stringify(
+    {
+      format: RECORD_FORMAT,
+      v: 1,
+      ...gameRecord(game),
+      ...(timed && {
+        timeControl: timed.control.id,
+        showOnly: timed.showOnly,
+        timeLeft: timed.lefts,
+      }),
+      date,
+    },
+    null,
+    2,
+  );
 
 /** The file name a record is saved as. */
 export const recordFile = (info: Pick<RulesetInfo, 'id'>, date: string): string =>
   `chess9s-${info.id}-${date}.json`;
 
 /** Save game record: a download from this page; nothing is sent anywhere. */
-export function saveRecordFile(game: GameState, info: Pick<RulesetInfo, 'id'>): void {
+export function saveRecordFile(
+  game: GameState,
+  info: Pick<RulesetInfo, 'id'>,
+  timed: Timed | null = null,
+): void {
   const date = new Date().toISOString().slice(0, 10);
-  const url = URL.createObjectURL(new Blob([recordJson(game, date)], { type: 'application/json' }));
+  const url = URL.createObjectURL(
+    new Blob([recordJson(game, date, timed)], { type: 'application/json' }),
+  );
   const a = document.createElement('a');
   a.href = url;
   a.download = recordFile(info, date);
@@ -37,7 +66,8 @@ export function saveRecordFile(game: GameState, info: Pick<RulesetInfo, 'id'>): 
 }
 
 export type Opened =
-  { ok: true; info: RulesetInfo; game: GameState; date: string } | { ok: false; problem: string };
+  | { ok: true; info: RulesetInfo; game: GameState; date: string; timed: Timed | null }
+  | { ok: false; problem: string };
 
 const refuse = (problem: string): Opened => ({ ok: false, problem });
 
@@ -107,8 +137,35 @@ export function openRecord(text: string): Opened {
     if (!same(saved.result, game.result)) {
       return refuse('The result in this game record does not match its moves.');
     }
-    return { ok: true, info, game, date: saved.date };
+    const timed = recordClock(saved, game);
+    if (timed === 'bad') return refuse('The clock in this game record does not match its moves.');
+    return { ok: true, info, game, date: saved.date, timed };
   } catch {
     return refuse('This game record could not be replayed on its ruleset.');
   }
+}
+
+/**
+ * The clock of a record, paused at the time left after the last move; null for a record with none
+ * (or one naming a control this app does not know, which opens as an untimed game), 'bad' when
+ * the fields are there but do not fit the game.
+ */
+function recordClock(saved: Record<string, unknown>, game: GameState): Timed | null | 'bad' {
+  if (saved.timeControl === undefined) return null;
+  if (typeof saved.timeControl !== 'string') return 'bad';
+  const control = controlById(saved.timeControl);
+  if (!control) return null;
+  const lefts = saved.timeLeft;
+  if (!Array.isArray(lefts)) return 'bad';
+  const start = startClock(control, game.order, game.order[0]!, 0);
+  if (!start) return null;
+  const left: Times = { ...((lefts.at(-1) as Times | undefined) ?? snapshot(start, 0)) };
+  // The seat that lost on time ends with none left, whatever it had after its last move.
+  if (game.result.status === 'win' && game.result.reason === 'timeout') {
+    left[game.result.loser] = 0;
+  }
+  return (
+    timedFromSaved({ control: control.id, showOnly: saved.showOnly ?? false, left, lefts }, game) ??
+    'bad'
+  );
 }

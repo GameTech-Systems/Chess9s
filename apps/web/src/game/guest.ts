@@ -2,9 +2,11 @@
 // version (and a custom ruleset's full overrides), the mode and the moves are stored; a load replays them through the engine, so a saved
 // game can never hold an illegal position.
 import {
+  endedBy,
   playMove,
   replayResignations,
   toNotation,
+  type GameResult,
   type GameState,
   type MoveRules,
   type Resignation,
@@ -12,6 +14,7 @@ import {
 import { MAX_BOT_SEATS } from './bots';
 import { newModel } from './session';
 import { same, type RulesetInfo } from './rules';
+import { timedFromSaved, timedToSaved, type Timed } from './timed';
 
 export type Mode = 'hot-seat' | 'computer';
 
@@ -27,11 +30,18 @@ export interface Guest {
   mode: Mode;
   /** 3-player games: the seats the computer plays (S58); none or absent for hot-seat. */
   bots?: string[];
+  /** The clock, when a time control was chosen (S65); it comes back paused. */
+  timed?: Timed;
 }
 
 const KEY = 'chess9s.guest';
 
-export function saveGuest(store: Store, { game, mode, bots }: Guest): void {
+/** `now` is when the clock is read for the save, in the same units the clock runs on. */
+export function saveGuest(
+  store: Store,
+  { game, mode, bots, timed }: Guest,
+  now = Date.now(),
+): void {
   try {
     const { id, version, overrides } = game.ruleset;
     const moves = game.moves.map((m) => m.notation);
@@ -46,12 +56,20 @@ export function saveGuest(store: Store, { game, mode, bots }: Guest): void {
         ...(bots && bots.length > 0 && { bots }),
         moves,
         ...(game.resignations.length > 0 && { resignations: game.resignations }),
+        ...(timed && { timed: timedToSaved(timed, now) }),
+        // Running out of time in a 2-player game is not a move: the result is kept as it is.
+        ...(endedByTime(game) && { result: game.result }),
       }),
     );
   } catch {
     // Storage blocked or full: the game goes on, just not kept.
   }
 }
+
+const endedByTime = ({ result, rules }: GameState): boolean =>
+  rules.players === 2 &&
+  ((result.status === 'win' && result.reason === 'timeout') ||
+    (result.status === 'draw' && result.reason === 'timeout-insufficient-material'));
 
 export function clearGuest(store: Store): void {
   try {
@@ -95,6 +113,11 @@ export function loadGuest(
       game = replayResignations(playMove(game, move), resigned);
     }
     if (!same(resigned, game.resignations)) return null;
+    if (saved.result !== undefined) {
+      const ended = endedBy(game, saved.result as GameResult);
+      if (!ended) return null;
+      game = ended;
+    }
     // The computer's seats: seats of this game, at most two, and only in 3-player games.
     const seats = Array.isArray(saved.bots) ? (saved.bots as unknown[]) : [];
     const bots =
@@ -103,7 +126,9 @@ export function loadGuest(
       seats.every((s) => typeof s === 'string' && game.order.includes(s))
         ? (seats as string[])
         : [];
-    return { game, mode: saved.mode, ...(bots.length > 0 && { bots }) };
+    // A clock that does not fit the game is dropped; the game is kept.
+    const timed = saved.timed === undefined ? null : timedFromSaved(saved.timed, game);
+    return { game, mode: saved.mode, ...(bots.length > 0 && { bots }), ...(timed && { timed }) };
   } catch {
     return null;
   }
