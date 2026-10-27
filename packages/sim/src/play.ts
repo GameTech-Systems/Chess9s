@@ -8,6 +8,7 @@ import {
   type DrawReason,
   type GameInit,
   type MoveRules,
+  type WinReason,
 } from '@chess9s/engine';
 
 export interface PlayOptions {
@@ -33,7 +34,8 @@ export interface GameSummary {
   first: string;
   second: string;
   outcome: Outcome;
-  reason: 'checkmate' | 'stalemate' | DrawReason | 'unfinished';
+  // Bots never resign or agree a draw, but the engine's result types allow both (S51).
+  reason: WinReason | DrawReason | 'agreement' | 'unfinished';
   winner: string | null;
   plies: number;
   /** Shallowest depth the search finished on any of its moves (0 if it never searched). */
