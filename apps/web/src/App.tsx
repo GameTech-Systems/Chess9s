@@ -179,7 +179,7 @@ export function App({
         <Game
           key={opened ? `record-${opened.date}-${picked.id}` : picked.id}
           ruleset={picked}
-          {...(opened && { initial: fromGame(opened.game) })}
+          {...(opened && { initial: fromGame(opened.game, opened.timed) })}
           onChangeRuleset={() => {
             setOpened(null);
             setPicked(null);

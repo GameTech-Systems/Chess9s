@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { unbuiltFeatures } from '@chess9s/engine';
+import { deadline, unbuiltFeatures } from '@chess9s/engine';
 import { RulesScreen } from './Rules';
 import { JoinByCode } from './JoinByCode';
-import { addSpent, formatElapsed, play, soundsFor } from './game/aids';
+import { addSpent, formatElapsed, formatLeft, play, soundsFor } from './game/aids';
+import { clockSeats, controlText } from './game/clockText';
+import { controlById, hotSeatControls, timeControls } from './game/timeControls';
 import { searchMove, type BotSearch } from './game/botClient';
 import { BOT_LEVEL_3P, canToggleBot, followSeat, toggleBot, undoForHuman } from './game/bots';
 import { clearGuest, loadGuest, saveGuest, type Mode, type Store } from './game/guest';
@@ -22,15 +24,21 @@ import {
   canUndo,
   cancelPromotion,
   choose,
+  clockLines,
   click,
   highlights,
+  isPaused,
   newModel,
+  pauseTimed,
   playFor,
   fromGame,
   promote,
   resignFor,
+  resumeTimed,
   rounds,
+  startTimed,
   statusLine,
+  tick,
   toggleDanger,
   toggleMoves,
   undo,
@@ -101,7 +109,7 @@ export function Game({
     [],
   );
   const [model, setModel] = useState(
-    () => initial ?? (saved ? fromGame(saved.game) : newModel(rules, ruleset)),
+    () => initial ?? (saved ? fromGame(saved.game, saved.timed ?? null) : newModel(rules, ruleset)),
   );
   const [mode, setMode] = useState<Mode>(saved?.mode ?? 'hot-seat');
   // 3-player games: the computer plays the seats in `bots`, at the Greedy level (S58).
@@ -129,8 +137,16 @@ export function Game({
   // Against the computer, the player has the side that moves first (2 players; S58 adds the
   // computer to 3-player games).
   const botSide = !three && mode === 'computer' ? game.order[1] : undefined;
+  // A clock (S65): the Pause button stops it, and with it the computer and the board.
+  const { timed } = model;
+  const paused = isPaused(model);
   const botTurn =
-    (botSide !== undefined ? game.turn === botSide : three && bots.includes(game.turn)) && !over;
+    (botSide !== undefined ? game.turn === botSide : three && bots.includes(game.turn)) &&
+    !over &&
+    !paused;
+  const [now, setNow] = useState(() => Date.now());
+  const clocks = clockLines(model, now);
+  const begun = game.moves.length > 0 || game.resignations.length > 0;
   useEffect(() => {
     if (!botTurn) return;
     let search: BotSearch | undefined;
@@ -145,14 +161,55 @@ export function Game({
       search?.cancel();
     };
   }, [botTurn, game]);
-  // Keep the game in the browser.
+  // Keep the game in the browser, with its clock: it comes back paused.
+  const latest = useRef({ game, mode, bots, timed });
+  latest.current = { game, mode, bots, timed };
   useEffect(() => {
-    if (store) saveGuest(store, { game, mode, bots });
+    if (store) saveGuest(store, { game, mode, bots, ...(timed && { timed }) });
     // A resignation is not a move, so the game itself is the sign that something changed.
-  }, [game, mode, bots]);
+  }, [game, mode, bots, timed]);
+  // Leaving the page keeps the time the running seat has used.
+  useEffect(() => {
+    if (!store || typeof window === 'undefined') return;
+    const keep = () => {
+      const { game: g, mode: md, bots: b, timed: t } = latest.current;
+      saveGuest(store, { game: g, mode: md, bots: b, ...(t && { timed: t }) });
+    };
+    const hidden = () => document.visibilityState === 'hidden' && keep();
+    window.addEventListener('pagehide', keep);
+    document.addEventListener('visibilitychange', hidden);
+    return () => {
+      window.removeEventListener('pagehide', keep);
+      document.removeEventListener('visibilitychange', hidden);
+    };
+  }, []);
+  // The clock: the display follows it, and a seat whose time is up runs out (D66).
+  const ticking = timed !== null && !paused && !over;
+  useEffect(() => {
+    if (!ticking) return;
+    const id = setInterval(() => {
+      const t = Date.now();
+      setNow(t);
+      setModel((m) => tick(m, t));
+    }, 250);
+    return () => clearInterval(id);
+  }, [ticking]);
+  const due = timed && ticking ? deadline(timed.clock) : null;
+  useEffect(() => {
+    if (due === null) return;
+    const id = setTimeout(
+      () => {
+        const t = Date.now();
+        setNow(t);
+        setModel((m) => tick(m, t));
+      },
+      Math.max(0, due - Date.now()),
+    );
+    return () => clearTimeout(id);
+  }, [due]);
   const picker = useRef<HTMLInputElement>(null);
   const [recordProblem, setRecordProblem] = useState<string | null>(null);
-  const saveRecord = () => saveRecordFile(game, ruleset);
+  const saveRecord = () => saveRecordFile(game, ruleset, timed);
   const openFile = async (file: File | undefined) => {
     if (!file) return;
     const opened = openRecord(await file.text());
@@ -163,7 +220,9 @@ export function Game({
   };
   const restart = () => {
     if (store) clearGuest(store);
-    setModel(newModel(rules, ruleset));
+    // The time control chosen stays for the next game; its clock starts now.
+    const fresh = newModel(rules, ruleset);
+    setModel(timed ? startTimed(fresh, timed.control, timed.showOnly) : fresh);
   };
   // Undo takes back the computer's reply too, so it is the player's turn again.
   const undoMove = () =>
@@ -248,6 +307,7 @@ export function Game({
                 data-seat={s.side}
                 data-turn={s.toMove ? 'true' : 'false'}
                 data-state={s.state}
+                {...(clocks.find((c) => c.side === s.side)?.flagged && { 'data-flag': 'true' })}
               >
                 <span className="seat-name">{s.name}</span>
                 <span className="seat-note">
@@ -258,9 +318,32 @@ export function Game({
                     </>
                   )}
                   {s.text}
+                  {clocks.find((c) => c.side === s.side)?.flagged &&
+                    !s.text.includes('out of time') && <>{s.text && ' · '}out of time</>}
                 </span>
                 <span className="seat-time" aria-label={`${s.name} time`}>
-                  {formatElapsed(spent[s.side] ?? 0)}
+                  {timed
+                    ? formatLeft(clocks.find((c) => c.side === s.side)?.ms ?? 0)
+                    : formatElapsed(spent[s.side] ?? 0)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {!three && timed && (
+          <ul className="seats" aria-label="Clocks">
+            {clockSeats(clocks, over, game.turn).map((c) => (
+              <li
+                key={c.side}
+                data-seat={c.side}
+                data-turn={c.toMove ? 'true' : 'false'}
+                {...(c.flagged && { 'data-flag': 'true' })}
+              >
+                <span className="seat-name">{c.name}</span>
+                <span className="seat-note">{c.text}</span>
+                <span className="seat-time" aria-label={`${c.name} time`}>
+                  {formatLeft(c.ms)}
                 </span>
               </li>
             ))}
@@ -314,7 +397,7 @@ export function Game({
 
         <p className="facts">
           Time <strong aria-label="Elapsed time">{formatElapsed(elapsed)}</strong>
-          {three && ' · Untimed'}
+          {three && !timed && ' · Untimed'}
           <button
             type="button"
             className="help"
@@ -324,6 +407,61 @@ export function Game({
             ?
           </button>
         </p>
+
+        {!begun && !over ? (
+          <div className="timecontrol" role="group" aria-label="Time control">
+            <label>
+              Time control{' '}
+              <select
+                aria-label="Time control"
+                value={timed?.control.id ?? timeControls.default}
+                onChange={(e) => {
+                  const control = controlById(e.target.value);
+                  if (control) setModel((m) => startTimed(m, control, m.timed?.showOnly ?? false));
+                }}
+              >
+                {hotSeatControls().map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div className="segmented">
+              <button
+                type="button"
+                aria-pressed={timed?.showOnly ?? false}
+                disabled={!timed}
+                onClick={() =>
+                  timed && setModel((m) => startTimed(m, timed.control, !timed.showOnly))
+                }
+              >
+                Show only
+              </button>
+            </div>
+          </div>
+        ) : (
+          timed && (
+            <p className="facts">
+              Time control: <strong>{controlText(timed)}</strong>
+            </p>
+          )
+        )}
+        {timed && !over && (
+          <div className="segmented" role="group" aria-label="Clock">
+            <button
+              type="button"
+              onClick={() => setModel((m) => (isPaused(m) ? resumeTimed(m) : pauseTimed(m)))}
+            >
+              {paused ? 'Resume' : 'Pause'}
+            </button>
+          </div>
+        )}
+        {paused && (
+          <p className="facts notice" role="status">
+            Paused. Press Resume to go on.
+          </p>
+        )}
 
         {promoting && (
           <div className="promotion" role="group" aria-label="Promote the pawn to">

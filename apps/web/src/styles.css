@@ -1082,3 +1082,27 @@ a:hover {
   margin: 1.5rem 0 0.5rem;
   font-weight: 400;
 }
+
+/* Time controls (S65): the picker before the first move, and a seat shown out of time. */
+.timecontrol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.timecontrol select {
+  font: inherit;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--gold) 40%, transparent);
+  border-radius: 8px;
+  padding: 0.25rem 0.4rem;
+}
+
+.seats li[data-flag='true'] .seat-time {
+  color: var(--ink);
+  font-weight: 600;
+}
