@@ -177,6 +177,8 @@ export function resultCard(game: GameState): ResultCard | null {
         return `${title(who(loser))} was stalemated.`;
       case 'resignation':
         return `${title(who(loser))} resigned.`;
+      case 'timeout':
+        return `${title(who(loser))} ran out of time.`;
     }
   })();
   return { tone: 'win', heading, detail };

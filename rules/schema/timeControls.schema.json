@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Chess Nines time controls",
+  "type": "object",
+  "required": ["default", "controls"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "source": { "type": "string" },
+    "default": { "type": "string" },
+    "controls": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "kind"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9]+([-+][a-z0-9]+)*$" },
+          "name": { "type": "string" },
+          "kind": { "enum": ["untimed", "fischer", "perMove", "abandonment"] },
+          "minutes": { "type": "number", "exclusiveMinimum": 0 },
+          "increment": { "type": "number", "minimum": 0 },
+          "seconds": { "type": "number", "exclusiveMinimum": 0 },
+          "awayMinutes": { "type": "number", "exclusiveMinimum": 0 },
+          "onlineOnly": { "type": "boolean" }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "kind": { "const": "fischer" } } },
+            "then": { "required": ["minutes", "increment"] }
+          },
+          {
+            "if": { "properties": { "kind": { "const": "perMove" } } },
+            "then": { "required": ["seconds"] }
+          },
+          {
+            "if": { "properties": { "kind": { "const": "abandonment" } } },
+            "then": { "required": ["awayMinutes", "onlineOnly"] }
+          }
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

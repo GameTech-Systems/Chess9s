@@ -23,6 +23,7 @@ const validateRuleset = ajv.compile(read('rules/schema/ruleset.schema.json'));
 const validateLock = ajv.compile(read('rules/schema/lock.schema.json'));
 const validateBoard = ajv.compile(read('rules/schema/board.schema.json'));
 const validatePiece = ajv.compile(read('rules/schema/piece.schema.json'));
+const validateTimeControls = ajv.compile(read('rules/schema/timeControls.schema.json'));
 
 for (const name of ['--boards', '--pieces']) {
   const dir = option(name);
@@ -47,6 +48,9 @@ const targets = [
   ...jsonFiles('rules/locks').map((f) => [f, validateLock]),
   ...jsonFiles(boardsDir).map((f) => [f, validateBoard]),
   ...jsonFiles(piecesDir).map((f) => [f, validatePiece]),
+  ...(existsSync('rules/timeControls.json')
+    ? [['rules/timeControls.json', validateTimeControls]]
+    : []),
 ];
 
 let failed = false;

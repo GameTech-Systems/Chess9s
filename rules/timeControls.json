@@ -1,0 +1,122 @@
+{
+  "$schema": "schema/timeControls.schema.json",
+  "source": "Decision 0017; the presets are Claude's choice, provisional, taken from Apex Chess's rules/timeControls.json (its decision D19).",
+  "default": "untimed",
+  "controls": [
+    {
+      "id": "untimed",
+      "name": "Untimed",
+      "kind": "untimed"
+    },
+    {
+      "id": "1+0",
+      "name": "1+0",
+      "kind": "fischer",
+      "minutes": 1,
+      "increment": 0
+    },
+    {
+      "id": "2+1",
+      "name": "2+1",
+      "kind": "fischer",
+      "minutes": 2,
+      "increment": 1
+    },
+    {
+      "id": "3+0",
+      "name": "3+0",
+      "kind": "fischer",
+      "minutes": 3,
+      "increment": 0
+    },
+    {
+      "id": "3+2",
+      "name": "3+2",
+      "kind": "fischer",
+      "minutes": 3,
+      "increment": 2
+    },
+    {
+      "id": "5+0",
+      "name": "5+0",
+      "kind": "fischer",
+      "minutes": 5,
+      "increment": 0
+    },
+    {
+      "id": "5+3",
+      "name": "5+3",
+      "kind": "fischer",
+      "minutes": 5,
+      "increment": 3
+    },
+    {
+      "id": "10+0",
+      "name": "10+0",
+      "kind": "fischer",
+      "minutes": 10,
+      "increment": 0
+    },
+    {
+      "id": "10+5",
+      "name": "10+5",
+      "kind": "fischer",
+      "minutes": 10,
+      "increment": 5
+    },
+    {
+      "id": "15+10",
+      "name": "15+10",
+      "kind": "fischer",
+      "minutes": 15,
+      "increment": 10
+    },
+    {
+      "id": "30+0",
+      "name": "30+0",
+      "kind": "fischer",
+      "minutes": 30,
+      "increment": 0
+    },
+    {
+      "id": "30+20",
+      "name": "30+20",
+      "kind": "fischer",
+      "minutes": 30,
+      "increment": 20
+    },
+    {
+      "id": "move30s",
+      "name": "30 seconds per move",
+      "kind": "perMove",
+      "seconds": 30
+    },
+    {
+      "id": "move1m",
+      "name": "1 minute per move",
+      "kind": "perMove",
+      "seconds": 60
+    },
+    {
+      "id": "move1d",
+      "name": "1 day per move",
+      "kind": "perMove",
+      "seconds": 86400,
+      "onlineOnly": true
+    },
+    {
+      "id": "move3d",
+      "name": "3 days per move",
+      "kind": "perMove",
+      "seconds": 259200,
+      "onlineOnly": true
+    },
+    {
+      "id": "away5m",
+      "name": "Untimed; away 5 minutes loses",
+      "kind": "abandonment",
+      "awayMinutes": 5,
+      "onlineOnly": true
+    }
+  ]
+}

@@ -6,6 +6,7 @@ import {
   playMove,
   toNotation,
   type DrawReason,
+  type TimeoutDraw,
   type GameInit,
   type MoveRules,
   type WinReason,
@@ -35,7 +36,7 @@ export interface GameSummary {
   second: string;
   outcome: Outcome;
   // Bots never resign or agree a draw, but the engine's result types allow both (S51).
-  reason: WinReason | DrawReason | 'agreement' | 'unfinished';
+  reason: WinReason | DrawReason | TimeoutDraw | 'agreement' | 'unfinished';
   winner: string | null;
   plies: number;
   /** Shallowest depth the search finished on any of its moves (0 if it never searched). */

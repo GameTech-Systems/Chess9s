@@ -27,6 +27,8 @@ import f23 from '../../../rules/schema/lock.schema.json';
 import f24 from '../../../rules/schema/parameters.schema.json';
 import f25 from '../../../rules/schema/piece.schema.json';
 import f26 from '../../../rules/schema/ruleset.schema.json';
+import f27 from '../../../rules/schema/timeControls.schema.json';
+import f28 from '../../../rules/timeControls.json';
 
 /** Every JSON file in rules/, keyed by its path under rules/. */
 export const rulesFiles: RulesFiles = {
@@ -57,4 +59,6 @@ export const rulesFiles: RulesFiles = {
   'schema/parameters.schema.json': f24,
   'schema/piece.schema.json': f25,
   'schema/ruleset.schema.json': f26,
+  'schema/timeControls.schema.json': f27,
+  'timeControls.json': f28,
 };

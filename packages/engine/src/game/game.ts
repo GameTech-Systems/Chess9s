@@ -47,7 +47,13 @@ export type DrawReason = 'stalemate' | 'insufficient-material' | 'repetition' | 
  * `check.3p.exposedKing` = counts-as-checkmate. A checkmated Tail is a checkmate of the Dragon.
  */
 export type WinReason =
-  'checkmate' | 'stalemate' | 'resignation' | 'king-capture' | 'dragon-captured' | 'exposed-king';
+  | 'checkmate'
+  | 'stalemate'
+  | 'resignation'
+  | 'timeout'
+  | 'king-capture'
+  | 'dragon-captured'
+  | 'exposed-king';
 
 /**
  * The end of a game. In a 3-player win, `loser` is the seat the deciding move beat (the King or
@@ -56,7 +62,10 @@ export type WinReason =
 export type GameResult =
   | { status: 'ongoing' }
   | { status: 'win'; winner: string; loser: string; reason: WinReason }
-  | { status: 'draw'; reason: DrawReason | 'agreement'; between?: string[] };
+  | { status: 'draw'; reason: DrawReason | 'agreement' | TimeoutDraw; between?: string[] };
+
+/** A 2-player game drawn because a player ran out of time against a player who could not checkmate (D66). */
+export type TimeoutDraw = 'timeout-insufficient-material';
 
 /**
  * The positions since the last capture or irreversible move, newest first, as a chain each
@@ -85,10 +94,15 @@ export interface RulesetRef {
   overrides?: Readonly<Record<string, ParamValue>>;
 }
 
-/** A seat that resigned a 3-player game, and how many moves had been played (decision 0018). */
+/**
+ * A seat that resigned a 3-player game, or ran out of time in one (decision 0017), and how many
+ * moves had been played (decision 0018).
+ */
 export interface Resignation {
   side: string;
   after: number;
+  /** The seat ran out of time (S65, D66) rather than resigning; the same effect on the game. */
+  timeout?: true;
 }
 
 export interface GameState {
@@ -593,18 +607,48 @@ function ended(state: GameState, result: GameResult): GameState {
  * in three.ts. A seat may resign on any turn; a seat that is out cannot.
  */
 export function resign(state: GameState, side: string): GameState {
-  if (state.result.status !== 'ongoing') throw new RulesError('The game is over');
-  if (!state.order.includes(side)) throw new RulesError(`${side} has no seat in this game`);
-  if (state.rules.players === 3) return resignThree(state, side);
-  const winner = state.order.find((s) => s !== side)!;
-  return ended(state, { status: 'win', winner, loser: side, reason: 'resignation' });
+  return leave(state, side, 'resignation');
 }
 
-function resignThree(state: GameState, side: string): GameState {
+/**
+ * The game after `side` runs out of time (D66, decision 0017). With two seats it loses, or the
+ * game is drawn when the other seat could not checkmate with the pieces it has (the insufficient
+ * material test, applied to that seat's pieces alone). With three the seat is out as after a
+ * resignation: its side turns to stone and the others play on, and in the duel it loses.
+ */
+export function timeOut(state: GameState, side: string): GameState {
+  return leave(state, side, 'timeout');
+}
+
+function leave(state: GameState, side: string, reason: 'resignation' | 'timeout'): GameState {
+  if (state.result.status !== 'ongoing') throw new RulesError('The game is over');
+  if (!state.order.includes(side)) throw new RulesError(`${side} has no seat in this game`);
+  if (state.rules.players === 3) return leaveThree(state, side, reason);
+  const winner = state.order.find((s) => s !== side)!;
+  if (reason === 'timeout' && !canCheckmate(state.rules, state.position, winner)) {
+    return ended(state, { status: 'draw', reason: 'timeout-insufficient-material' });
+  }
+  return ended(state, { status: 'win', winner, loser: side, reason });
+}
+
+/** Whether `side` has a piece besides its King that could give check (a stone never does). */
+const canCheckmate = (rules: MoveRules, position: Position, side: string): boolean =>
+  Object.entries(position).some(
+    ([at, p]) =>
+      p.side === side &&
+      p.stone !== true &&
+      rules.pieces[p.piece]?.royal !== true &&
+      givesCheck(rules, at, p),
+  );
+
+function leaveThree(state: GameState, side: string, reason: 'resignation' | 'timeout'): GameState {
   if (state.seats[side] === 'out') throw new RulesError(`${side} is already out of the game`);
   const g = three(state.rules, state.order);
-  const r = resignedBy(g, state.position, state.seats, side);
-  const resignations = [...state.resignations, { side, after: state.moves.length }];
+  const r = resignedBy(g, state.position, state.seats, side, reason);
+  const resignations: Resignation[] = [
+    ...state.resignations,
+    { side, after: state.moves.length, ...(reason === 'timeout' && { timeout: true as const }) },
+  ];
   if (r.result) return { ...state, resignations, legal: [], result: r.result };
   // The pieces that turned to stone can't return: no earlier position comes back.
   return settleThree(
@@ -643,7 +687,7 @@ export function replayResignations(state: GameState, list: readonly Resignation[
   for (;;) {
     const next = list[g.resignations.length];
     if (!next || next.after !== g.moves.length || g.result.status !== 'ongoing') return g;
-    g = resign(g, next.side);
+    g = next.timeout ? timeOut(g, next.side) : resign(g, next.side);
   }
 }
 
@@ -654,22 +698,33 @@ export function replayResignations(state: GameState, list: readonly Resignation[
  */
 export function endedBy(state: GameState, result: GameResult): GameState | null {
   if (state.result.status !== 'ongoing') return null;
-  if (result.status === 'win' && result.reason === 'resignation') {
-    if (!state.order.includes(result.loser)) return null;
-    let ended: GameState;
+  const by = (loser: string, how: typeof resign): GameState | null => {
+    if (!state.order.includes(loser)) return null;
     try {
-      ended = resign(state, result.loser);
+      return how(state, loser);
     } catch {
       return null;
     }
-    return ended.result.status === 'win' &&
+  };
+  if (result.status === 'win' && (result.reason === 'resignation' || result.reason === 'timeout')) {
+    const ended = by(result.loser, result.reason === 'timeout' ? timeOut : resign);
+    return ended &&
+      ended.result.status === 'win' &&
       ended.result.winner === result.winner &&
-      ended.result.loser === result.loser
+      ended.result.loser === result.loser &&
+      ended.result.reason === result.reason
       ? ended
       : null;
   }
   if (state.rules.players !== 2) return null;
   if (result.status === 'draw' && result.reason === 'agreement') return agreeDraw(state);
+  if (result.status === 'draw' && result.reason === 'timeout-insufficient-material') {
+    // The record does not say who ran out; the draw is the same whichever seat did.
+    for (const side of state.order) {
+      const ended = by(side, timeOut);
+      if (ended?.result.status === 'draw') return ended;
+    }
+  }
   return null;
 }
 
