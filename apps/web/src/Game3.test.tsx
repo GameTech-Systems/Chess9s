@@ -20,6 +20,7 @@ import { createRules, listRulesets, rulesetSettings } from './game/rules';
 import { openRecord, recordJson } from './game/record';
 import { choose, click, fromGame, newModel, type Model } from './game/session';
 import registry from '../../../rules/parameters.json';
+import dragonMates from '../scripts/draft-3p-dragon-mates.json';
 
 const info = (id: string) => listRulesets().find((r) => r.id === id)!;
 const render = (model: Model, id = 'standard-3p') =>
@@ -317,5 +318,21 @@ describe('the 3-player game record', () => {
     );
     const html = render(fromGame(game));
     expect(html).toMatch(/<button type="button">Save game record<\/button>/);
+  });
+});
+
+describe('the Good Practice game the browser check plays (apps/web/scripts)', () => {
+  it('has the Dragon capture a King and then checkmate the other', () => {
+    let { game } = fresh('draft-3p');
+    const events: string[] = [];
+    for (const notation of dragonMates.moves) {
+      const move = game.legal.find((m) => toNotation(m) === notation);
+      expect(move, notation).toBeDefined();
+      game = playMove(game, move!);
+      for (const e of game.moves.at(-1)?.events ?? []) events.push(e.kind);
+    }
+    expect(events).toEqual(['king-captured']);
+    expect(game.result).toEqual(dragonMates.result);
+    expect(game.result).toMatchObject({ winner: 'dragon', reason: 'checkmate' });
   });
 });
