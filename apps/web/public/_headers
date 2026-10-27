@@ -1,8 +1,9 @@
 # Security headers for Cloudflare Workers Static Assets (limit: 100 rules).
 # No 'unsafe-eval' or 'unsafe-inline': scripts, the computer's Web Worker and styles all come from
-# this origin, and the app makes no network requests after load (connect-src 'none').
+# this origin. The only connections are to this origin's rooms (connect-src 'self': /api/* and the
+# room WebSocket). The Worker sets the same headers on its own responses (apps/worker/src/index.ts).
 /*
-  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; worker-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; worker-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-ancestors 'none'
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: no-referrer
