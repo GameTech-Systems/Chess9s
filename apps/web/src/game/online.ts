@@ -13,11 +13,13 @@ import type {
   ServerMessage,
   Snapshot,
 } from '@chess9s/online/protocol';
+import type { Highlights } from '../board/view';
 import type { ClosedWhy, Status } from './connection';
 import { createRulesFor, same } from './rules';
 import {
   cancelPromotion as cancelPick,
   click,
+  highlights,
   newModel,
   promote,
   statusLine,
@@ -166,6 +168,9 @@ const settled = (o: Online): Online =>
       }
     : o;
 
+/** The board back to what the server has, with the reason a move did not go through. */
+export const takeBack = (o: Online, notice: string): Online => ({ ...settled(o), notice });
+
 const desync = (o: Online): Online => ({ ...o, closed: 'desync' });
 
 /** What a message from the server does to the session. */
@@ -215,7 +220,7 @@ function refusal(o: Online, reason: Refusal, text: string): Online {
   if (reason === 'no-room') return { ...o, closed: 'gone' };
   if (reason === 'bad-token') return { ...o, closed: 'lost' };
   // While a move is out, its refusal comes first; the board goes back to what the server has.
-  return { ...settled(o), notice: text };
+  return takeBack(o, text);
 }
 
 /** One line on the state of the room: connection, waiting, whose move, or how it ended. */
@@ -260,4 +265,10 @@ export function joinProblem(
     default:
       return { kind: 'other', text: message };
   }
+}
+
+/** What the board shows: the usual marks, but nothing to pick up while it is the opponent's turn. */
+export function onlineHighlights(o: Online): Highlights {
+  const marks = highlights(o.model);
+  return canPlay(o) ? marks : { ...marks, targets: [], movable: [] };
 }
