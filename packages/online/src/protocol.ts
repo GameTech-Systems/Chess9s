@@ -20,6 +20,8 @@ const CODE = new RegExp(`^[${CODE_ALPHABET}]{${CODE_LENGTH}}$`);
 export const isRoomCode = (s: string): boolean => CODE.test(s);
 /** A seat token: 32 random bytes as base64url. */
 const TOKEN = /^[A-Za-z0-9_-]{43}$/;
+/** Whether a value is shaped like a seat token (a browser checks what it keeps before it uses it). */
+export const isSeatToken = (v: unknown): v is string => typeof v === 'string' && TOKEN.test(v);
 const SIDE = /^[a-z][a-z0-9-]{0,31}$/;
 const ID = /^[a-z0-9][a-z0-9-]{0,63}$/;
 const VERSION = /^\d+\.\d+\.\d+$/;
@@ -76,6 +78,15 @@ export interface Snapshot {
   seats: Record<string, SeatStatus>;
   /** The seat whose draw offer stands, if any. */
   drawOffer: string | null;
+}
+
+/** What `GET /api/rooms/<code>` shows (S52): enough to decide to join (D54), never a token. */
+export interface RoomInfo {
+  v: 1;
+  code: string;
+  ruleset: RoomRuleset;
+  seats: Record<string, SeatStatus>;
+  result: GameResult;
 }
 
 export type Refusal =
@@ -327,3 +338,31 @@ export const parseClientMessage = (text: string): Parsed<ClientMessage> =>
 /** A message from the server, checked whole (the browser trusts nothing it receives either). */
 export const parseServerMessage = (text: string): Parsed<ServerMessage> =>
   parse(text, MAX_SERVER_MESSAGE_BYTES, SERVER);
+
+/** The room peek, checked whole (the browser trusts nothing it receives). */
+export function parseRoomInfo(text: string): { ok: true; info: RoomInfo } | { ok: false } {
+  if (
+    typeof text !== 'string' ||
+    new TextEncoder().encode(text).length > MAX_SERVER_MESSAGE_BYTES
+  ) {
+    return { ok: false };
+  }
+  let value: unknown;
+  try {
+    value = JSON.parse(text);
+  } catch {
+    return { ok: false };
+  }
+  if (
+    !isObj(value) ||
+    !keys(value, ['v', 'code', 'ruleset', 'seats', 'result']) ||
+    value.v !== PROTOCOL_VERSION ||
+    !str(value.code, CODE) ||
+    !isRoomRuleset(value.ruleset) ||
+    !isSeats(value.seats) ||
+    !isResult(value.result)
+  ) {
+    return { ok: false };
+  }
+  return { ok: true, info: value as unknown as RoomInfo };
+}
