@@ -267,7 +267,7 @@ Planned in S32 (2026-10-25); rules settled in S55 (2026-10-26, [decision 0016](d
 
 Already built: 3-player movement is data. The pieces read `coast.3p.exit`, `coast.3p.capturable`, `tail.3p.movement`, `tail.3p.captures`, `sunMoon.3p.range` and `dragon.3p.givesCheck`, the board has the 3-player setup and turn order (dark, light, Dragon), and `nextSide` skips seats that are out. S56 built the 3-player game (`game/three.ts`): seats, stones, check and rule 6, King capture, the Tail's checkmate and swap, the duel, draws and every end-table row. Not built: the Coast pieces' first way out through A5 (`coast.3p.exit`), a 3-player computer player (S23's negamax is 2-player), and 3-player play in the web app and rooms (`loadRules().rules` still refuses 3 players). The ruleset file (S42) is 2-player only.
 
-Phase 6 order: S56, S57, S58, S64, S65, S62, S59, S60, S61. S63 (3-seat online rooms) needs S54 and S58, and S66 (clocks in online rooms) needs S54 and S65; neither is part of the exit.
+Phase 6 order: S56, S57, S58, S67, S64, S65, S62, S59, S60, S61. S63 (3-seat online rooms) needs S54 and S58, and S66 (clocks in online rooms) needs S54 and S65; neither is part of the exit.
 
 ### S32 — Phase 6 planning · Opus 5.5 · high · `done`
 Wrote the steps below and D55 to D61.
@@ -297,7 +297,7 @@ Decisions: D55, D56, D57, D62, D63, D65.
 Done when: Playwright plays a Good Practice hot-seat game that ends with the Dragon capturing a King and then checkmating the other, another that ends with one Kinged player checkmating the other, and an Easy Start game won by checkmating the Tail, at desktop size and at Pixel 7 width with no sideways scroll; all checks pass.
 Decisions: D34, D58, D63.
 
-### S58 — 3-player computer, greedy first · Sonnet 5.5 · high · `todo`
+### S58 — 3-player computer, greedy first · Sonnet 5.5 · high · `done`
 The owner (26 Oct 2026, D59): the computer can play the Dragon in a game, starting with a greedy heuristic.
 - **Greedy player** in the engine, for any seat: it plays a winning move first, then a King capture, then the move with the best immediate result by S23's piece values and evaluation, scored for that seat's goals in decision 0016 (Kings for the Kinged players; the Kings and the Tail's safety for the Dragon). No look-ahead. Ties are broken by the seed, so the same seed gives the same game (decision 0008). Weights are provisional, noted in a code comment.
 - **Play.** On the game screen the computer can play any one or two seats; the Dragon is the usual one. In 3-player games the level is "Greedy" until S62 adds the search.
@@ -305,6 +305,15 @@ The owner (26 Oct 2026, D59): the computer can play the Dragon in a game, starti
 - Tests first: greedy takes a mate in one for each seat, a free King capture as the Dragon, and the biggest free capture; the same seed gives the same moves; bots finish games from the start in all three presets.
 Done when: two people can play a full hot-seat game against a computer Dragon in the browser, bots finish greedy games in all three presets, and the 2-player search and bench tests are unchanged.
 Decisions: D59.
+
+### S67 — 3-player resignation and Tail capture · Sonnet 5.5 · high · `todo`
+Added in S58 from the owner's answers of 27 Oct 2026 ([decision 0018](decisions/0018-three-player-resignation-and-tail-capture.md)).
+- **Resign.** A seat that resigns turns its pieces to stone and the others play on; the table in 0018 gives each case (a Kinged player, the last Kinged player in the duel, the Dragon, Easy Start). `resign` and `endedBy` take 3 seats, the result reason is `resignation`, and records with a 3-player resignation open. Agreed draws stay refused.
+- **Tail capture.** `tail.capturable` in 3-player games: the capturing piece swaps places with the Tail and it turns to stone, handled as a Tail checkmate (0016 rule 9). Easy Start's Tail stays uncapturable.
+- **Screen.** A Resign button for each person's seat in hot-seat and computer games, with a confirm step; the result card and notices say who resigned and what became stone. The computer never resigns.
+- Tests first: each row of 0018's resignation table, with the turn passing on and the draw seats following; a record round trip; Tail capture by a piece that may and one that may not stand on its square, by a pawn onto its last rank, in the duel, and as a move that leaves the mover's King in check; `tail.capturable` at its default and each option.
+Done when: Playwright plays a 3-player game in which one player resigns and the other two play on to a result, at desktop size and at Pixel 7 width; all checks pass, and the 2-player tests and locks are unchanged.
+Decisions: D68.
 
 ### S64 — 3-player rulesets in the builder · Sonnet 5.5 · medium · `todo`
 Added in S55 (D64): the owner wants the Dragon settings open for players to experiment with.
@@ -429,6 +438,7 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D64 | 3-player rulesets in the builder | Decided (owner, 26 Oct 2026): the builder, export, load and share links take 3-player rulesets (S64); Submit stays 2-player (D46) | S64 |
 | D65 | Easy Start for 3 players | Decided (Claude, at the owner's request): the first checkmate wins; every attack on a King is check; the Tail is the Dragon's King on A5, E5 and I5 (decision 0016) | S56 |
 | D66 | Running out of time | Default: the seat is out. In 2-player games it loses, or draws if the other player could not checkmate; in 3-player games its side turns to stone and the others play on, and in the duel it loses (decision 0017). Show only turns this off for a game | S65 |
+| D68 | 3-player resignation and Tail capture | Decided (owner, 27 Oct 2026): a resigning seat's pieces turn to stone and the others play on; a captured Tail swaps with the capturing piece and turns to stone, as in a checkmate. Easy Start parts by Claude, provisional (decision 0018) | S67 |
 
 ## Ledger sync format
 
