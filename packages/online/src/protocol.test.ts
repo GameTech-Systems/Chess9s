@@ -4,7 +4,10 @@ import { describe, expect, it } from 'vitest';
 import {
   MAX_CLIENT_MESSAGE_BYTES,
   MAX_SERVER_MESSAGE_BYTES,
+  PING,
+  PONG,
   encode,
+  isRoomCode,
   parseClientMessage,
   parseServerMessage,
   type Parsed,
@@ -256,5 +259,19 @@ describe('server messages', () => {
       moves: Array(Math.ceil(MAX_SERVER_MESSAGE_BYTES / 6)).fill('c9-b7'),
     });
     expect(reasonOf(parseServerMessage(big))).toBe('too-large');
+  });
+});
+
+describe('around the messages', () => {
+  it('knows a room code by its alphabet and length', () => {
+    expect(isRoomCode(CODE)).toBe(true);
+    for (const bad of ['K7RX2', 'K7RX2MM', 'k7rx2m', 'K7RX0M', 'K7RXIM', 'K7RX2M/', ''])
+      expect(isRoomCode(bad), bad).toBe(false);
+  });
+
+  it('keeps the keep-alive ping outside the messages a room answers', () => {
+    // The server answers PING with PONG itself, without waking the room; a room never sees it.
+    expect(client(JSON.parse(PING))).toBe('unknown-type');
+    expect(server(JSON.parse(PONG))).toBe('unknown-type');
   });
 });
