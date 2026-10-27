@@ -8,6 +8,7 @@ export * from './game/game';
 export * from './game/three';
 export * from './rules/interactions';
 export * from './ai/search';
+export * from './ai/greedy';
 export * from './ai/search-reference';
 export * from './rules/ruleset-file';
 export * from './rules/data';
