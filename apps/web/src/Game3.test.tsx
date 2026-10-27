@@ -365,7 +365,7 @@ describe('the computer in 3-player games (S58)', () => {
     const html = renderToStaticMarkup(<Game store={store} ruleset={info('standard-3p')} />);
     expect(html).toMatch(/aria-pressed="true"[^>]*>Dragon</);
     expect(html).toMatch(
-      /data-seat="dragon"[^>]*><span class="seat-name">Dragon<\/span><span class="seat-bot">Computer<\/span>/,
+      /data-seat="dragon"[^>]*><span class="seat-name">Dragon<\/span><span class="seat-note"><span class="seat-bot">Computer<\/span>/,
     );
     expect(html.match(/seat-bot/g)).toHaveLength(1);
     expect(html).toMatch(/aria-pressed="false"[^>]*>Dark</);

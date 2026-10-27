@@ -237,8 +237,15 @@ export function Game({
                 data-state={s.state}
               >
                 <span className="seat-name">{s.name}</span>
-                {bots.includes(s.side) && <span className="seat-bot">Computer</span>}
-                <span className="seat-note">{s.text}</span>
+                <span className="seat-note">
+                  {bots.includes(s.side) && (
+                    <>
+                      <span className="seat-bot">Computer</span>
+                      {s.text && ' · '}
+                    </>
+                  )}
+                  {s.text}
+                </span>
                 <span className="seat-time" aria-label={`${s.name} time`}>
                   {formatElapsed(spent[s.side] ?? 0)}
                 </span>
@@ -341,6 +348,9 @@ export function Game({
 
         {three && (
           <>
+            <p className="facts">
+              Computer plays: <strong>{BOT_LEVEL_3P}</strong> level, no look-ahead
+            </p>
             <div className="segmented" role="group" aria-label="Computer seats">
               {game.order.map((side) => (
                 <button
@@ -354,9 +364,6 @@ export function Game({
                 </button>
               ))}
             </div>
-            <p className="facts">
-              Computer seats play at the <strong>{BOT_LEVEL_3P}</strong> level (no look-ahead).
-            </p>
           </>
         )}
 

@@ -5,6 +5,8 @@
 //   Good Practice (draft-3p): the Dragon captures a King, then checkmates the other.
 //   Good Practice (draft-3p): one Kinged player checkmates the other.
 //   Easy Start (easy-3p): a Kinged player wins by checkmating the Tail.
+// Then a hot-seat game against a computer Dragon (S58): two people click their moves and the
+// greedy Dragon answers each round; undo takes its reply back too. Desktop and Pixel 7 width.
 // Needs Playwright with Chromium (not a dependency of this repo):
 //   pnpm build && node apps/web/scripts/e2e-3p.mjs      (SHOTS=<directory> saves screenshots)
 import { spawn } from 'node:child_process';
@@ -232,14 +234,116 @@ async function play(browser, options, size, spec) {
   await context.close();
 }
 
+/**
+ * A person's move, whatever the computer has done: select a pawn that has a move (other pieces
+ * if none does), then one of its targets.
+ */
+async function anyMove(page, side) {
+  const pieces = page.locator(`svg.board [data-piece][data-side="${side}"]`);
+  const squares = await pieces.evaluateAll((els) =>
+    els
+      .map((el) => [el.getAttribute('data-piece') === 'pawn' ? 0 : 1, el.getAttribute('data-at')])
+      .sort((x, y) => x[0] - y[0])
+      .map(([, at]) => at),
+  );
+  for (const at of squares) {
+    await page.locator(`[data-hit="${at}"]`).click();
+    const target = page.locator('svg.board [data-target]').first();
+    if ((await target.count()) > 0) {
+      await page.locator(`[data-hit="${await target.getAttribute('data-target')}"]`).click();
+      return;
+    }
+  }
+  throw new Error(`${side} has no move to click`);
+}
+
+/** A Good Practice game with the Dragon handed to the computer. */
+async function playComputerDragon(browser, options, size) {
+  const label = `${size} · computer Dragon`;
+  const context = await browser.newContext(options);
+  const page = await context.newPage();
+  page.on('pageerror', (e) => console.error(`${label} page error:`, e.message));
+  await page.goto(BASE);
+  const card = page.locator('li.ruleset', {
+    has: page.getByText('Good Practice (3-player)', { exact: true }),
+  });
+  await card.getByRole('button', { name: 'Play', exact: true }).click();
+  await page.locator('ul[aria-label="Seats"]').waitFor({ timeout: TIMEOUT });
+  const seats = page.getByRole('group', { name: 'Computer seats' });
+  check(
+    (await seats.getByRole('button').count()) === 3 &&
+      (await seats.locator('[aria-pressed="true"]').count()) === 0,
+    `${label}: three seats can go to the computer, none do at first`,
+  );
+  await seats.getByRole('button', { name: 'Dragon', exact: true }).click();
+  check(
+    (await seats
+      .getByRole('button', { name: 'Dragon', exact: true })
+      .getAttribute('aria-pressed')) === 'true' &&
+      (await page.locator('[data-seat="dragon"] .seat-bot').count()) === 1,
+    `${label}: the Dragon seat is marked as the computer's`,
+  );
+  await shot(page, `${size.replace(/\W+/g, '')}-computer-dragon-1-start`);
+
+  // Three rounds, or until the game ends: the people click, the Dragon answers by itself.
+  let played = 0;
+  let dragonMoves = 0;
+  while (played < 9 && (await page.getByRole('region', { name: 'Result' }).count()) === 0) {
+    const to = await page.locator('[data-seat][data-turn="true"]').getAttribute('data-seat');
+    if (to !== 'dragon') {
+      const board = await page.locator('svg.board').getAttribute('aria-label');
+      check(
+        board.includes(`${to} seat`),
+        `${label}: move ${played + 1}: the board is turned to ${to}`,
+      );
+      await anyMove(page, to);
+    } else {
+      dragonMoves++;
+    }
+    played++;
+    await page
+      .waitForFunction((n) => document.querySelectorAll('ol.moves span').length >= n, played, {
+        timeout: TIMEOUT,
+      })
+      .catch((e) => {
+        throw new Error(`${label}: move ${played} (${to}) never appeared: ${e.message}`);
+      });
+    if (to === 'dragon') {
+      // The board stays on the person who moved last while the computer thinks, and the Dragon's
+      // own move never turns it.
+      const board = await page.locator('svg.board').getAttribute('aria-label');
+      check(
+        !board.includes('dragon seat'),
+        `${label}: the board did not turn to the computer Dragon`,
+      );
+    }
+  }
+  check(dragonMoves > 0, `${label}: the computer Dragon moved ${dragonMoves} times by itself`);
+  await noSidewaysScroll(page, `${label} (after ${played} moves)`);
+  await shot(page, `${size.replace(/\W+/g, '')}-computer-dragon-2-played`);
+
+  if ((await page.getByRole('region', { name: 'Result' }).count()) === 0) {
+    const before = await page.locator('ol.moves span').count();
+    await page.getByRole('button', { name: 'Undo' }).click();
+    const left = await page.locator('ol.moves span').count();
+    check(
+      left < before && (await page.locator('[data-seat="dragon"][data-turn="true"]').count()) === 0,
+      `${label}: undo takes the computer's moves back too, to a person's turn (${before} to ${left} moves)`,
+    );
+  }
+  await context.close();
+}
+
 async function main() {
   await waitForServer();
   const browser = await chromium.launch();
   try {
-    for (const spec of GAMES) {
+    for (const spec of process.env.ONLY === 'computer' ? [] : GAMES) {
       await play(browser, { viewport: { width: 1280, height: 900 } }, 'desktop', spec);
       await play(browser, { ...devices['Pixel 7'] }, 'Pixel 7', spec);
     }
+    await playComputerDragon(browser, { viewport: { width: 1280, height: 900 } }, 'desktop');
+    await playComputerDragon(browser, { ...devices['Pixel 7'] }, 'Pixel 7');
     console.log('3-player browser check passed');
   } finally {
     await browser.close();
