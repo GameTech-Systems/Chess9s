@@ -6,8 +6,9 @@
 // or a Tail in stone is seen as the rules play it). Ties are broken by the random source passed in
 // (decision 0008), so the same seed gives the same game.
 //
-// The weights below are playing heuristics, not rules, and provisional until S59 reports how the
-// seats fare (hundredths of a value unit, like `pieceValues`).
+// The weights are playing heuristics, not rules, and provisional until S59 reports how the seats
+// fare (hundredths of a value unit, like `pieceValues`). They live in paranoid.ts, shared with
+// the 3-player search (S62).
 import { attackMap } from '../moves/check';
 import { attacksFrom, toNotation, type GeneratedMove } from '../moves/generate';
 import type { GameState } from '../game/game';
@@ -20,24 +21,19 @@ import {
   type Outcome,
   type Three,
 } from '../game/three';
+import {
+  CHECK,
+  KING_ATTACKED,
+  KING_CAPTURE,
+  KING_EXPOSED,
+  KING_LOST,
+  TAIL_SQUARE,
+  TAIL_STONE,
+} from './paranoid';
 import { pieceValues } from './search';
 
 /** A move that wins the game outright. */
 const WIN = 1_000_000;
-/** The Dragon's move takes a King (captures or checkmates it): worth more than any capture. */
-const KING_CAPTURE = 20_000;
-/** The mover's own King is lost to the Dragon's capture. */
-const KING_LOST = 40_000;
-/** A Kinged player's move turns the Tail to stone. */
-const TAIL_STONE = 1_500;
-/** Per King of a Kinged player that a Dragon piece attacks (the Dragon may take it next turn). */
-const KING_EXPOSED = 6_000;
-/** The Dragon's pieces attack a King: it must answer or may be taken. */
-const KING_ATTACKED = 600;
-/** A Kinged player's piece gives check to the other King, or to the Tail. */
-const CHECK = 150;
-/** Per square the Tail could go to that a Kinged player attacks, taken from the Dragon's score. */
-const TAIL_SQUARE = 40;
 
 /** What a position is worth to `seat`, in hundredths: its material less the other seats'. */
 function material(g: Three, o: Outcome, seat: string, values: Record<string, number>): number {
