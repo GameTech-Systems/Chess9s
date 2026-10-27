@@ -166,6 +166,10 @@ const WIN_REASONS: Record<WinReason, true> = {
   checkmate: true,
   stalemate: true,
   resignation: true,
+  // 3-player results (S56); rooms are 2-player until S63.
+  'king-capture': true,
+  'dragon-captured': true,
+  'exposed-king': true,
 };
 const DRAW_REASONS: Record<DrawReason | 'agreement', true> = {
   stalemate: true,
@@ -191,9 +195,15 @@ function isResult(v: unknown): v is GameResult {
       );
     case 'draw':
       return (
-        keys(v, ['status', 'reason']) &&
+        keys(v, ['status', 'reason'], ['between']) &&
         typeof v.reason === 'string' &&
-        Object.hasOwn(DRAW_REASONS, v.reason)
+        Object.hasOwn(DRAW_REASONS, v.reason) &&
+        (v.between === undefined ||
+          (Array.isArray(v.between) &&
+            v.between.length >= 2 &&
+            v.between.length <= 3 &&
+            v.between.every((s) => str(s, SIDE)) &&
+            new Set(v.between).size === v.between.length))
       );
     default:
       return false;
