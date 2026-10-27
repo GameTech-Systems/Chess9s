@@ -9,6 +9,10 @@
 //   --make              write new positions instead, from seeded self-play games of draft-2p at
 //                       --depth with --nodes
 //   --seeds <a,b>       seeds of those games (1,2,3,4,5,6,7,8)
+//   --players <2|3>     3: 3-player positions (packages/sim/bench/positions-3p.json, made from
+//                       standard-3p games with --make), searched paranoid (S62) with no S23
+//                       reference; the report is search-3p-depth<depth>
+//   --max-plies <n>     with --make: stop each game after this many plies (the decision 0008 cap)
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -24,11 +28,14 @@ import {
   type BenchStats,
 } from './bench';
 import { repoRoot } from './cli';
+import { DEFAULT_3P } from './cli3';
 import { loadSource, rulesFor } from './load';
 import { MEASURES } from './measures';
 
 export interface BenchReport {
   date: string;
+  /** 3 for 3-player positions; absent for 2-player ones. */
+  players?: 3;
   ruleset: { id: string; version: string };
   depth: number;
   nodes: number;
@@ -49,6 +56,12 @@ export function benchMarkdown(r: BenchReport): string {
     `# Search benchmark: ${r.ruleset.id} ${r.ruleset.version}, depth ${r.depth}`,
     '',
     `${r.date}. Each position is searched once to depth ${r.depth} with at most ${num(r.nodes)} positions per move (decision 0008). "Capped" means the budget ran out before the search finished depth ${r.depth}. Times are from the machine that ran it.`,
+    ...(r.players === 3
+      ? [
+          '',
+          'Three players: the seat to move searches paranoid, as if the other two played together against it (S62, decision D59). Depth counts plies, one per seat. There is no S23 search to compare with.',
+        ]
+      : []),
     '',
     '| Search | Moves | Positions per move: mean | median | 95th percentile | max | Capped | ms per move |',
     '| --- | --- | --- | --- | --- | --- | --- | --- |',
@@ -79,7 +92,7 @@ function main(): void {
   const { values: v } = parseArgs({
     args: process.argv.slice(2),
     options: {
-      positions: { type: 'string', default: 'packages/sim/bench/positions.json' },
+      positions: { type: 'string' },
       depth: { type: 'string', default: '2' },
       nodes: { type: 'string', default: String(MEASURES.nodes) },
       'no-reference': { type: 'boolean', default: false },
@@ -87,15 +100,23 @@ function main(): void {
       name: { type: 'string' },
       make: { type: 'boolean', default: false },
       seeds: { type: 'string', default: '1,2,3,4,5,6,7,8' },
+      players: { type: 'string', default: '2' },
+      'max-plies': { type: 'string', default: String(MEASURES.maxPlies) },
     },
   });
+  if (v.players !== '2' && v.players !== '3') {
+    throw new Error(`--players needs 2 or 3, not ${JSON.stringify(v.players)}`);
+  }
+  const three = v.players === '3';
+  const positions =
+    v.positions ?? `packages/sim/bench/${three ? 'positions-3p.json' : 'positions.json'}`;
   const cwd = process.env['INIT_CWD'] ?? process.cwd();
   const root = repoRoot(cwd);
   const source = loadSource(root);
-  const file = join(root, v.positions);
+  const file = join(root, positions);
 
   if (v.make) {
-    const { rules, ruleset } = rulesFor(source, 'draft-2p');
+    const { rules, ruleset } = rulesFor(source, three ? DEFAULT_3P.ruleset : 'draft-2p');
     const seeds = v.seeds.split(',').map(Number);
     const games = samplePositions(
       rules,
@@ -107,7 +128,7 @@ function main(): void {
         openingPlies: MEASURES.openingPlies,
         from: 8,
         every: 24,
-        maxPlies: MEASURES.maxPlies,
+        maxPlies: Number(v['max-plies']),
       },
       (seed, ply, nodes, capped) => {
         if (capped || ply % 50 === 0)
@@ -115,13 +136,13 @@ function main(): void {
       },
     );
     const data: BenchPositions = {
-      description: `Search benchmark positions (decision 0009), each game as its moves from the start up to its last sampled position; a position is the game after that many plies. Taken from depth-${v.depth} self-play games with seeds ${v.seeds} (${MEASURES.openingPlies} random opening plies, ${v.nodes} positions per move): ply 8, then every 24th ply, and every position where the search ran out of nodes.`,
+      description: `Search benchmark positions (decision 0009), each game as its moves from the start up to its last sampled position; a position is the game after that many plies. Taken from depth-${v.depth} ${three ? '3-player (paranoid search) ' : ''}self-play games with seeds ${v.seeds} (${MEASURES.openingPlies} random opening plies, ${v.nodes} positions per move, at most ${v['max-plies']} plies): ply 8, then every 24th ply, and every position where the search ran out of nodes.`,
       ruleset,
       games,
     };
     writeFileSync(file, JSON.stringify(data, null, 2) + '\n');
     console.error(
-      `Wrote ${games.reduce((n, g) => n + g.plies.length, 0)} positions to ${v.positions}`,
+      `Wrote ${games.reduce((n, g) => n + g.plies.length, 0)} positions to ${positions}`,
     );
     return;
   }
@@ -135,7 +156,13 @@ function main(): void {
   }
   const depth = Number(v.depth);
   const nodes = Number(v.nodes);
-  const reference = !v['no-reference'];
+  if (rules.players !== Number(v.players)) {
+    throw new Error(
+      `${positions} has ${rules.players}-player positions; pass --players ${rules.players}`,
+    );
+  }
+  // The S23 search plays 2-player games only.
+  const reference = !three && !v['no-reference'];
   const rows: BenchRow[] = [];
   for (const p of positionsOf(data)) {
     const row = benchPosition(replay(rules, ruleset, p.moves), p.name, { depth, nodes, reference });
@@ -151,6 +178,7 @@ function main(): void {
   const finished = rows.filter((r) => r.same !== undefined);
   const report: BenchReport = {
     date: new Date().toISOString().slice(0, 10),
+    ...(three && { players: 3 as const }),
     ruleset,
     depth,
     nodes,
@@ -162,7 +190,7 @@ function main(): void {
     rows,
   };
   const outDir = resolve(cwd, v.out);
-  const name = v.name ?? `search-depth${depth}`;
+  const name = v.name ?? `search-${three ? '3p-' : ''}depth${depth}`;
   mkdirSync(outDir, { recursive: true });
   writeFileSync(join(outDir, `${name}.json`), JSON.stringify(report, null, 2) + '\n');
   writeFileSync(join(outDir, `${name}.md`), benchMarkdown(report));

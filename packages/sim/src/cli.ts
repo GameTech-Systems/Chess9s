@@ -202,7 +202,7 @@ function rebuild(file: string): void {
   console.error(`Verdict: ${report.verdict}. Rebuilt ${file} and its .md`);
 }
 
-/** A 3-player run: greedy games on every seat (cli3.ts). */
+/** A 3-player run: greedy or search games on every seat (cli3.ts). */
 export interface Plan3 {
   ruleset: { id: string; version: string };
   job: Job3;
@@ -325,7 +325,7 @@ async function main3(o: Options, source: RulesSource, root: string, cwd: string)
   }
   await done;
   write();
-  console.error(`Wrote ${join(o.out, o.name)}.greedy.json and .md (${games.length} games)`);
+  console.error(`Wrote ${join(o.out, o.name)}.${players}.json and .md (${games.length} games)`);
 }
 
 async function main(): Promise<void> {
