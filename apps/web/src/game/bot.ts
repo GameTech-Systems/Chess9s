@@ -1,5 +1,6 @@
 import {
   bestMove,
+  greedyMove,
   playMove,
   toNotation,
   type GameState,
@@ -13,13 +14,15 @@ export const BOT_NODES = 800;
 
 /**
  * Computer opponent v1: the engine's search (negamax with alpha-beta over the selected ruleset),
- * with equally good moves picked at random. `random` returns [0, 1).
+ * with equally good moves picked at random. `random` returns [0, 1). In 3-player games it is the
+ * greedy player for the seat to move (S58, decision D59), with `nodes` unused.
  */
 export function computerMove(
   game: GameState,
   random: () => number = Math.random,
   nodes: number = BOT_NODES,
 ): GeneratedMove | undefined {
+  if (game.rules.players === 3) return greedyMove(game, { random });
   return bestMove(game, { nodes, random }).move;
 }
 

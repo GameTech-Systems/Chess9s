@@ -18,6 +18,7 @@ import { Game } from './Game';
 import { RulesPage } from './RulesPage';
 import { createRules, listRulesets, rulesetSettings } from './game/rules';
 import { openRecord, recordJson } from './game/record';
+import { saveGuest, type Store } from './game/guest';
 import { choose, click, fromGame, newModel, type Model } from './game/session';
 import registry from '../../../rules/parameters.json';
 import dragonMates from '../scripts/draft-3p-dragon-mates.json';
@@ -334,5 +335,45 @@ describe('the Good Practice game the browser check plays (apps/web/scripts)', ()
     expect(events).toEqual(['king-captured']);
     expect(game.result).toEqual(dragonMates.result);
     expect(game.result).toMatchObject({ winner: 'dragon', reason: 'checkmate' });
+  });
+});
+
+describe('the computer in 3-player games (S58)', () => {
+  const memory = (): Store => {
+    const data = new Map<string, string>();
+    return {
+      getItem: (k) => data.get(k) ?? null,
+      setItem: (k, v) => void data.set(k, v),
+      removeItem: (k) => void data.delete(k),
+    };
+  };
+
+  it('offers a person per seat to hand to the computer, none by default, at the Greedy level', () => {
+    const html = render(fresh());
+    expect(html).toContain('aria-label="Computer seats"');
+    for (const label of ['Dark', 'Light', 'Dragon']) {
+      expect(html).toMatch(new RegExp(`aria-pressed="false"[^>]*>${label}<`));
+    }
+    expect(html).toContain('Greedy');
+    expect(html).not.toContain('aria-label="Opponent"');
+  });
+
+  it('restores a saved game with a computer Dragon, and marks that seat', () => {
+    const { game } = fresh();
+    const store = memory();
+    saveGuest(store, { game, mode: 'hot-seat', bots: ['dragon'] });
+    const html = renderToStaticMarkup(<Game store={store} ruleset={info('standard-3p')} />);
+    expect(html).toMatch(/aria-pressed="true"[^>]*>Dragon</);
+    expect(html).toMatch(
+      /data-seat="dragon"[^>]*><span class="seat-name">Dragon<\/span><span class="seat-bot">Computer<\/span>/,
+    );
+    expect(html.match(/seat-bot/g)).toHaveLength(1);
+    expect(html).toMatch(/aria-pressed="false"[^>]*>Dark</);
+  });
+
+  it('leaves the 2-player screen as it was', () => {
+    const html = renderToStaticMarkup(<Game ruleset={info('standard-2p')} store={null} />);
+    expect(html).toContain('aria-label="Opponent"');
+    expect(html).not.toContain('Computer seats');
   });
 });

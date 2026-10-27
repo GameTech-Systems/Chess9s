@@ -4,6 +4,7 @@ import { RulesScreen } from './Rules';
 import { JoinByCode } from './JoinByCode';
 import { addSpent, formatElapsed, play, soundsFor } from './game/aids';
 import { searchMove, type BotSearch } from './game/botClient';
+import { BOT_LEVEL_3P, canToggleBot, followSeat, toggleBot, undoForHuman } from './game/bots';
 import { clearGuest, loadGuest, saveGuest, type Mode, type Store } from './game/guest';
 import { openRecord, saveRecordFile, type Opened } from './game/record';
 import { Board } from './board/Board';
@@ -95,6 +96,8 @@ export function Game({
     () => initial ?? (saved ? fromGame(saved.game) : newModel(rules, ruleset)),
   );
   const [mode, setMode] = useState<Mode>(saved?.mode ?? 'hot-seat');
+  // 3-player games: the computer plays the seats in `bots`, at the Greedy level (S58).
+  const [bots, setBots] = useState<string[]>(saved?.bots ?? []);
   // 3-player games turn the board to the side to move (each seat's view, D34); 2-player games
   // start on Light's view.
   const three = rules.players === 3;
@@ -102,7 +105,7 @@ export function Game({
   const { game, promoting, choosing } = model;
   const over = game.result.status !== 'ongoing';
   const card = three ? resultCard(game) : null;
-  const seat = view === 'follow' ? game.turn : view;
+  const seat = view === 'follow' ? followSeat(game, bots) : view;
   const missing = unbuiltFeatures(rules);
   const lost = Object.entries(game.lost);
   const list = useRef<HTMLOListElement>(null);
@@ -116,7 +119,8 @@ export function Game({
   // Against the computer, the player has the side that moves first (2 players; S58 adds the
   // computer to 3-player games).
   const botSide = !three && mode === 'computer' ? game.order[1] : undefined;
-  const botTurn = botSide !== undefined && game.turn === botSide && !over;
+  const botTurn =
+    (botSide !== undefined ? game.turn === botSide : three && bots.includes(game.turn)) && !over;
   useEffect(() => {
     if (!botTurn) return;
     let search: BotSearch | undefined;
@@ -133,8 +137,8 @@ export function Game({
   }, [botTurn, game.moves.length]);
   // Keep the game in the browser.
   useEffect(() => {
-    if (store) saveGuest(store, { game, mode });
-  }, [game.moves.length, mode]);
+    if (store) saveGuest(store, { game, mode, bots });
+  }, [game.moves.length, mode, bots]);
   const picker = useRef<HTMLInputElement>(null);
   const [recordProblem, setRecordProblem] = useState<string | null>(null);
   const saveRecord = () => saveRecordFile(game, ruleset);
@@ -153,6 +157,7 @@ export function Game({
   // Undo takes back the computer's reply too, so it is the player's turn again.
   const undoMove = () =>
     setModel((m) => {
+      if (three) return undoForHuman(m, bots);
       const back = undo(m);
       return botSide !== undefined && back.game.turn === botSide ? undo(back) : back;
     });
@@ -232,6 +237,7 @@ export function Game({
                 data-state={s.state}
               >
                 <span className="seat-name">{s.name}</span>
+                {bots.includes(s.side) && <span className="seat-bot">Computer</span>}
                 <span className="seat-note">{s.text}</span>
                 <span className="seat-time" aria-label={`${s.name} time`}>
                   {formatElapsed(spent[s.side] ?? 0)}
@@ -331,6 +337,27 @@ export function Game({
               </button>
             ))}
           </div>
+        )}
+
+        {three && (
+          <>
+            <div className="segmented" role="group" aria-label="Computer seats">
+              {game.order.map((side) => (
+                <button
+                  key={side}
+                  type="button"
+                  aria-pressed={bots.includes(side)}
+                  disabled={!canToggleBot(bots, side)}
+                  onClick={() => setBots((b) => toggleBot(b, side))}
+                >
+                  {title(side)}
+                </button>
+              ))}
+            </div>
+            <p className="facts">
+              Computer seats play at the <strong>{BOT_LEVEL_3P}</strong> level (no look-ahead).
+            </p>
+          </>
         )}
 
         <div className="segmented" role="group" aria-label="Board view">
