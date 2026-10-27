@@ -212,5 +212,5 @@
     }
   ],
   "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026.",
-  "notes": "Game state, not piece data (S17, src/game/game.ts): its first move is a5 to e5, which opens the Coast (coast.2p.initiation); the repeat limit (tail.repeatLimit); either player may move it in 2-player games, and it never captures a piece of the player moving it. Not expressed yet (engine features): in 3-player games it is the Dragon's royal piece (checkmated, never captured) and turns to stone. In 3-player games all other Coast pieces are the Dragon's own, so non-coast-pieces captures any enemy piece."
+  "notes": "Game state, not piece data (S17, src/game/game.ts): its first move is a5 to e5, which opens the Coast (coast.2p.initiation); the repeat limit (tail.repeatLimit); either player may move it in 2-player games, and it never captures a piece of the player moving it. In 3-player games it is the Dragon's King while it is active, and turns to stone when checkmated: game state (S56, src/game/three.ts, decision 0016). In 3-player games all other Coast pieces are the Dragon's own, so non-coast-pieces captures any enemy piece."
 }
