@@ -42,10 +42,11 @@ export function seatLines(game: GameState): SeatLine[] {
     const toMove = ongoing && game.turn === side && state !== 'out';
     const notes: string[] = [];
     if (toMove) notes.push('to move');
-    const resigned = game.resignations.some((r) => r.side === side);
+    const left = game.resignations.find((r) => r.side === side);
+    const how = left?.timeout ? 'out of time' : 'resigned';
     if (state === 'out') {
-      notes.push(resigned ? 'out · resigned' : side === g.dragon ? 'out' : 'out · King captured');
-    } else if (resigned) notes.push('resigned');
+      notes.push(left ? `out · ${how}` : side === g.dragon ? 'out' : 'out · King captured');
+    } else if (left) notes.push(how);
     if (state === 'tail-stone') notes.push('Tail in stone');
     return { side, name: title(side), state, toMove, text: notes.join(' · ') };
   });
@@ -78,15 +79,16 @@ export function noticeLines(game: GameState): string[] {
         return `${title(e.side)} had no legal move, so its turn was skipped.`;
     }
   });
-  // A resignation made since the last move (it is not a move, decision 0018).
+  // A resignation, or a seat out of time, since the last move (neither is a move, decisions 0018, 0017).
   const resigned = game.resignations.filter((r) => r.after === game.moves.length);
   const g = three(game.rules, game.order);
-  for (const { side } of resigned) {
+  for (const { side, timeout } of resigned) {
     if (game.result.status !== 'ongoing' || game.seats[side] !== 'out') continue;
+    const did = timeout ? 'ran out of time' : 'resigned';
     lines.push(
       side === g.dragon
-        ? 'The Dragon resigned. All its pieces, the Tail too, are stone.'
-        : `${title(side)} resigned. Its King leaves the board and its other pieces are stone.`,
+        ? `The Dragon ${did}. All its pieces, the Tail too, are stone.`
+        : `${title(side)} ${did}. Its King leaves the board and its other pieces are stone.`,
     );
   }
   return lines;

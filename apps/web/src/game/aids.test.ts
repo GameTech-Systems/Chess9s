@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addSpent, formatElapsed, soundsFor } from './aids';
+import { addSpent, formatElapsed, formatLeft, soundsFor } from './aids';
 
 describe('formatElapsed', () => {
   it('shows minutes and seconds, then hours', () => {
@@ -36,5 +36,19 @@ describe('addSpent (3-player seat clocks, display only)', () => {
     expect(addSpent(two, 'dark', 500)).toEqual({ dark: 2000, light: 400 });
     expect(addSpent(two, 'dark', -50)).toEqual(two);
     expect(one).toEqual({ dark: 1500 });
+  });
+});
+
+describe('formatLeft (a clock counting down)', () => {
+  it('rounds up, so 0:00 is only the moment time is up', () => {
+    expect(formatLeft(0)).toBe('0:00');
+    expect(formatLeft(1)).toBe('0:01');
+    expect(formatLeft(29_500)).toBe('0:30');
+    expect(formatLeft(180_000)).toBe('3:00');
+    expect(formatLeft(61_000)).toBe('1:01');
+    expect(formatLeft(3_600_000)).toBe('1:00:00');
+  });
+  it('never goes negative', () => {
+    expect(formatLeft(-5)).toBe('0:00');
   });
 });

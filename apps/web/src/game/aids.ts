@@ -9,6 +9,11 @@ export function formatElapsed(ms: number): string {
   return h > 0 ? `${h}:${String(m).padStart(2, '0')}:${s}` : `${m}:${s}`;
 }
 
+/** Time left on a clock as `m:ss`, or `h:mm:ss` from one hour; rounded up, so 0:00 is time up. */
+export function formatLeft(ms: number): string {
+  return formatElapsed(Math.ceil(Math.max(0, ms) / 1000) * 1000);
+}
+
 /** Sounds for a change in the move count: a knock, then a chime if someone is still to move. */
 export function soundsFor(before: number, after: number, over: boolean): Sound[] {
   if (after <= before) return [];

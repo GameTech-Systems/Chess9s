@@ -2,7 +2,7 @@
 // result for every row of both end tables. The games are the engine's recorded ones
 // (packages/engine/test/fixtures/games/three-player-ends.json), replayed from the start.
 import { describe, expect, it } from 'vitest';
-import { newGame, playMove, resign, toNotation, type GameState } from '@chess9s/engine';
+import { newGame, playMove, resign, timeOut, toNotation, type GameState } from '@chess9s/engine';
 import ends from '../../../../packages/engine/test/fixtures/games/three-player-ends.json';
 import { newModel } from './session';
 import { createRules, listRulesets } from './rules';
@@ -306,5 +306,47 @@ describe('who can resign, and what the confirm step says (S67)', () => {
     const duel = resign(fresh(), 'light');
     expect(resignPrompt(duel, 'dark')).toBe('Dark resigns? The game ends and the Dragon wins.');
     expect(resignPrompt(duel, 'dragon')).toBe('The Dragon resigns? The game ends and Dark wins.');
+  });
+});
+
+describe('running out of time (S65, D66)', () => {
+  const info = listRulesets().find((r) => r.id === 'standard-3p')!;
+  const fresh = () => newModel(createRules('standard-3p'), info).game;
+
+  it('shows the seat as out of time and says what became of it', () => {
+    const g = timeOut(fresh(), 'light');
+    expect(seatLines(g).find((s) => s.side === 'light')!.text).toBe('out · out of time');
+    expect(noticeLines(g)).toEqual([
+      'Light ran out of time. Its King leaves the board and its other pieces are stone.',
+    ]);
+    expect(phaseLine(g)).toBe('The duel: Dark against the Dragon.');
+  });
+
+  it('says the Dragon ran out of time: all its pieces, the Tail too, are stone', () => {
+    const g = timeOut(fresh(), 'dragon');
+    expect(noticeLines(g)).toEqual([
+      'The Dragon ran out of time. All its pieces, the Tail too, are stone.',
+    ]);
+  });
+
+  it('puts the result on the card when running out of time ends the game', () => {
+    const g = timeOut(timeOut(fresh(), 'light'), 'dark');
+    expect(resultCard(g)).toEqual({
+      tone: 'win',
+      heading: 'The Dragon wins',
+      detail: 'Dark ran out of time.',
+    });
+    const h = timeOut(timeOut(fresh(), 'light'), 'dragon');
+    expect(resultCard(h)).toEqual({
+      tone: 'win',
+      heading: 'Dark wins',
+      detail: 'The Dragon ran out of time.',
+    });
+  });
+
+  it('a resignation still reads as one', () => {
+    expect(seatLines(resign(fresh(), 'light')).find((s) => s.side === 'light')!.text).toBe(
+      'out · resigned',
+    );
   });
 });
