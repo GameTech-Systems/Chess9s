@@ -1,6 +1,6 @@
 # 0017: Time controls
 
-**Status:** Accepted (owner, ledger D58, 26 Oct 2026: keep the default, and add time controls for players to choose, such as the ones Apex Chess uses). The preset list is Claude's choice, provisional, taken from Apex Chess's `rules/timeControls.json` (its decision D19). What running out of time does is the default D66. S65 builds it for hot-seat games and S66 for online rooms.
+**Status:** Accepted (owner, ledger D58, 26 Oct 2026: keep the default, and add time controls for players to choose, such as the ones Apex Chess uses). The preset list is Claude's choice, provisional, taken from Apex Chess's `rules/timeControls.json` (its decision D19). What running out of time does is the default D66. S65 built it for hot-seat games (the readings below are provisional); S66 builds it for online rooms.
 
 ## Context
 The roadmap listed a timer for 3-player games, but no rule defined one (D58). Phase 2 shows each seat's elapsed time, for display only. Online rooms (Phase 5) were planned with no clock (D51), and the project publishes no tournament clock rules (D47).
@@ -34,3 +34,13 @@ The ledger's alternative for D66: a Kinged player out of time loses at once to t
 ## Consequences
 - D51's "no clock" becomes "untimed by default": online rooms offer the same controls (S66).
 - D47 is unchanged: the project still publishes no tournament clock rules, and an organizer names the time control with the invitation.
+
+## Readings made in S65 (provisional)
+Where 0017 left a detail open, S65 chose the following. None changes a rule parameter, ruleset or lock.
+- **When the clock starts.** Choosing a control (or starting a new game with the same one) starts the clock of the seat to move at once, as "runs from the start of the game" says. The picker is only offered before the first move; changing the control or Show only restarts the clock.
+- **A move after time is up.** A move that arrives after the seat's time ran out counts as the flag fall, not as a move (as at a board). With Show only the move is accepted and the seat gains no increment.
+- **Time out draw.** The draw for a player who could not checkmate is judged from that player's pieces alone whatever `draw.insufficientMaterial` is set to, as 0017 words it; a stone never counts.
+- **3-player time out** is the same as a resignation (decision 0018) with the reason `timeout`: the same stone-out, the same ends in the duel and in Easy Start.
+- **Per-move controls.** Each seat starts its turn with the full time; the record keeps what it had left when it moved.
+- **Reload.** The guest game keeps each seat's time left, and comes back paused; leaving the page saves the time the running seat has used. A computer seat's thinking time counts on its clock.
+- **Game record.** Optional top-level fields `timeControl` (the id), `showOnly` and `timeLeft` (one entry per move: every seat's milliseconds left after it). A control id this app does not know opens as an untimed game; fields that do not fit the moves refuse the record. A seat out of time in a 3-player game is a resignation entry with `timeout: true`.

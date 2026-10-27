@@ -3,7 +3,7 @@
 // and exactly that type's keys with values of the right shape. Anything else becomes a `refused`
 // message; nothing here throws on input. Side ids (light, dark) come from the board's data, so
 // seats are checked against the game, not here.
-import type { DrawReason, GameResult, ParamValue, TimeoutDraw, WinReason } from '@chess9s/engine';
+import type { DrawReason, GameResult, ParamValue, WinReason } from '@chess9s/engine';
 
 export const PROTOCOL_VERSION = 1;
 /** A create message carries a custom ruleset's overrides, as large as a ruleset file (20 KB). */
@@ -162,24 +162,22 @@ const isName = (v: unknown): v is string =>
   typeof v === 'string' && v.trim() !== '' && v.length <= MAX_RULESET_NAME;
 
 // Records keep the reason lists in step with the engine's types: a new reason fails to compile.
-const WIN_REASONS: Record<WinReason, true> = {
+// Rooms have no clock until S66, so running out of time (S65) is not a result they carry yet.
+const WIN_REASONS: Record<Exclude<WinReason, 'timeout'>, true> = {
   checkmate: true,
   stalemate: true,
   resignation: true,
-  // Out of time (S65): online clocks come in S66.
-  timeout: true,
   // 3-player results (S56); rooms are 2-player until S63.
   'king-capture': true,
   'dragon-captured': true,
   'exposed-king': true,
 };
-const DRAW_REASONS: Record<DrawReason | 'agreement' | TimeoutDraw, true> = {
+const DRAW_REASONS: Record<DrawReason | 'agreement', true> = {
   stalemate: true,
   'insufficient-material': true,
   repetition: true,
   'fifty-move': true,
   agreement: true,
-  'timeout-insufficient-material': true,
 };
 
 function isResult(v: unknown): v is GameResult {
