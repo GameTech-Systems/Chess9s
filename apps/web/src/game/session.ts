@@ -306,14 +306,26 @@ export interface Round {
   number: number;
   first: string;
   second?: string;
+  /** 3-player games: the third seat's move. */
+  third?: string;
 }
 
-/** The moves played, two to a round, as notation (`e2-e4`, `e5xd6`, `d8-d9=queen`). */
-export function rounds({ moves }: GameState): Round[] {
+/**
+ * The moves played, one round of the seats to a row (two in 2-player games, three in 3-player
+ * games), as notation (`e2-e4`, `e5xd6`, `d8-d9=queen`).
+ */
+export function rounds({ moves, order }: GameState): Round[] {
+  const per = order.length;
   const out: Round[] = [];
-  for (let i = 0; i < moves.length; i += 2) {
+  for (let i = 0; i < moves.length; i += per) {
     const second = moves[i + 1]?.notation;
-    out.push({ number: i / 2 + 1, first: moves[i]!.notation, ...(second && { second }) });
+    const third = per > 2 ? moves[i + 2]?.notation : undefined;
+    out.push({
+      number: i / per + 1,
+      first: moves[i]!.notation,
+      ...(second && { second }),
+      ...(third && { third }),
+    });
   }
   return out;
 }

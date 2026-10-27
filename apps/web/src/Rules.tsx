@@ -11,6 +11,20 @@ export const HOW_TO_PLAY = [
   'Undo takes back one move; Show legal moves and Show danger help you look ahead.',
 ];
 
+/** What every 3-player game shares (decision 0016); the ruleset's own settings follow. */
+export const HOW_TO_PLAY_3P = [
+  'Three sides take turns: Dark, Light, then the Dragon. Pick one of your pieces, then a marked square to move it.',
+  "Dark and Light each have a King. The Dragon has the Dragon Heads, the Sun and the Moon, and its Tail, which plays the role of the Dragon's King.",
+  'The board turns to the side to move. The panel names each seat, who is out and what the last move did.',
+  'A piece turned to stone stays where it is: it blocks, but never moves, attacks or is captured.',
+  'Show danger also marks a King that a Dragon piece attacks when that is not check: the Dragon may capture it on its turn.',
+  'Undo takes back one move. How the game ends, and what ends it in a draw, are among the settings below.',
+];
+
+/** The how-to-play lines for a game of this many players. */
+export const howToPlay = (players: 2 | 3): string[] =>
+  players === 3 ? HOW_TO_PLAY_3P : HOW_TO_PLAY;
+
 const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 /** Keep Tab and Shift+Tab inside the dialog while it is open. */
@@ -41,7 +55,7 @@ export function RulesScreen({
   ruleset: Pick<
     RulesetInfo,
     'name' | 'id' | 'version' | 'status' | 'description' | 'custom' | 'overrides'
-  >;
+  > & { players?: 2 | 3 };
   missing: string[];
   onClose: () => void;
 }) {
@@ -89,7 +103,7 @@ export function RulesScreen({
         {ruleset.description && <p>{ruleset.description}</p>}
         <h3>How to play</h3>
         <ul>
-          {HOW_TO_PLAY.map((line) => (
+          {howToPlay(ruleset.players ?? 2).map((line) => (
             <li key={line}>{line}</li>
           ))}
         </ul>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatElapsed, soundsFor } from './aids';
+import { addSpent, formatElapsed, soundsFor } from './aids';
 
 describe('formatElapsed', () => {
   it('shows minutes and seconds, then hours', () => {
@@ -24,5 +24,17 @@ describe('soundsFor', () => {
   it('is silent when no move was added (new game, undo)', () => {
     expect(soundsFor(3, 3, false)).toEqual([]);
     expect(soundsFor(3, 2, false)).toEqual([]);
+  });
+});
+
+describe('addSpent (3-player seat clocks, display only)', () => {
+  it('adds the time to the seat that had the move, without changing the rest or going negative', () => {
+    const one = addSpent({}, 'dark', 1500);
+    expect(one).toEqual({ dark: 1500 });
+    const two = addSpent(one, 'light', 400);
+    expect(two).toEqual({ dark: 1500, light: 400 });
+    expect(addSpent(two, 'dark', 500)).toEqual({ dark: 2000, light: 400 });
+    expect(addSpent(two, 'dark', -50)).toEqual(two);
+    expect(one).toEqual({ dark: 1500 });
   });
 });

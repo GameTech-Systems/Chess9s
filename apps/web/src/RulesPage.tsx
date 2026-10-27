@@ -7,7 +7,7 @@ import {
   type RulesetInfo,
   type Setting,
 } from './game/rules';
-import { HOW_TO_PLAY } from './Rules';
+import { howToPlay } from './Rules';
 import { RULES_DOC_URL, rulesPath, rulesetDataUrl } from './links';
 
 /** The registry's groups, in the order the page lists them. */
@@ -171,7 +171,7 @@ export function RulesPage({
       <section>
         <h3>How to play</h3>
         <ul>
-          {HOW_TO_PLAY.map((line) => (
+          {howToPlay(info.players).map((line) => (
             <li key={line}>{line}</li>
           ))}
         </ul>

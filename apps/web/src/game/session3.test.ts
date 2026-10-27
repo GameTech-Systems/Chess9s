@@ -9,6 +9,7 @@ import {
   click,
   fromGame,
   highlights,
+  rounds,
   statusLine,
   toggleDanger,
   type Model,
@@ -226,5 +227,28 @@ describe('the status line at the end of a 3-player game', () => {
     expect(
       line({ status: 'draw', reason: 'stalemate', between: ['dark', 'light', 'dragon'] }),
     ).toBe('Stalemate · draw between Dark, Light and Dragon');
+  });
+});
+
+describe('the move list in 3-player games', () => {
+  it('lists the moves three to a round, in turn order: dark, light, Dragon', () => {
+    const m = clicks(
+      start(
+        { e1: 'light king', e9: 'dark king', a5: 'dragon dragon-tail', b2: 'light pawn' },
+        'dark',
+      ),
+      'e9',
+      'e8',
+      'b2',
+      'b3',
+      'a5',
+      'a6',
+      'e8',
+      'e9',
+    );
+    expect(rounds(m.game)).toEqual([
+      { number: 1, first: 'e9-e8', second: 'b2-b3', third: 'a5-a6' },
+      { number: 2, first: 'e8-e9' },
+    ]);
   });
 });

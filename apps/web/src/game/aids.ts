@@ -48,3 +48,12 @@ export function play(sounds: Sound[]): void {
 }
 
 let shared: AudioContext | undefined;
+
+/** The time each seat has had the move, plus `ms` for `side`. Display only; never negative. */
+export function addSpent(
+  spent: Record<string, number>,
+  side: string,
+  ms: number,
+): Record<string, number> {
+  return { ...spent, [side]: (spent[side] ?? 0) + Math.max(0, ms) };
+}

@@ -2,16 +2,18 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { unbuiltFeatures } from '@chess9s/engine';
 import { RulesScreen } from './Rules';
 import { JoinByCode } from './JoinByCode';
-import { formatElapsed, play, soundsFor } from './game/aids';
+import { addSpent, formatElapsed, play, soundsFor } from './game/aids';
 import { searchMove, type BotSearch } from './game/botClient';
 import { clearGuest, loadGuest, saveGuest, type Mode, type Store } from './game/guest';
 import { openRecord, saveRecordFile, type Opened } from './game/record';
 import { Board } from './board/Board';
 import { boardData, pieceLetters } from './board/data';
 import { DEFAULT_RULESET_ID, createRulesFor, listRulesets, type RulesetInfo } from './game/rules';
+import { noticeLines, phaseLine, resultCard, seatLines } from './game/threeText';
 import {
   canUndo,
   cancelPromotion,
+  choose,
   click,
   highlights,
   newModel,
@@ -26,11 +28,12 @@ import {
   type Model,
 } from './game/session';
 
-type View = 'light' | 'dark' | 'follow';
-const VIEWS: { id: View; label: string }[] = [
-  { id: 'light', label: 'Light' },
-  { id: 'dark', label: 'Dark' },
-  { id: 'follow', label: 'Follow turn' },
+type View = 'light' | 'dark' | 'dragon' | 'follow';
+const VIEWS: { id: View; label: string; players: 2 | 3 }[] = [
+  { id: 'light', label: 'Light', players: 2 },
+  { id: 'dark', label: 'Dark', players: 2 },
+  { id: 'dragon', label: 'Dragon', players: 3 },
+  { id: 'follow', label: 'Follow turn', players: 2 },
 ];
 
 const pretty = (id: string) => id.replace(/-/g, ' ');
@@ -92,9 +95,13 @@ export function Game({
     () => initial ?? (saved ? fromGame(saved.game) : newModel(rules, ruleset)),
   );
   const [mode, setMode] = useState<Mode>(saved?.mode ?? 'hot-seat');
-  const [view, setView] = useState<View>('light');
-  const { game, promoting } = model;
+  // 3-player games turn the board to the side to move (each seat's view, D34); 2-player games
+  // start on Light's view.
+  const three = rules.players === 3;
+  const [view, setView] = useState<View>(three ? 'follow' : 'light');
+  const { game, promoting, choosing } = model;
   const over = game.result.status !== 'ongoing';
+  const card = three ? resultCard(game) : null;
   const seat = view === 'follow' ? game.turn : view;
   const missing = unbuiltFeatures(rules);
   const lost = Object.entries(game.lost);
@@ -102,10 +109,13 @@ export function Game({
   const [sound, setSound] = useState(true);
   const [showRules, setShowRules] = useState(false);
   const [elapsed, setElapsed] = useState(0);
+  // 3-player games: the time each seat has had the move, for display only (untimed, decision 0017).
+  const [spent, setSpent] = useState<Record<string, number>>({});
   const started = useRef(Date.now());
   const moveCount = useRef(game.moves.length);
-  // Against the computer, the player has the side that moves first.
-  const botSide = mode === 'computer' ? game.order[1] : undefined;
+  // Against the computer, the player has the side that moves first (2 players; S58 adds the
+  // computer to 3-player games).
+  const botSide = !three && mode === 'computer' ? game.order[1] : undefined;
   const botTurn = botSide !== undefined && game.turn === botSide && !over;
   useEffect(() => {
     if (!botTurn) return;
@@ -157,8 +167,27 @@ export function Game({
     if (game.moves.length === 0) {
       started.current = Date.now();
       setElapsed(0);
+      setSpent({});
     }
   }, [game.moves.length]);
+  // Each second goes to the seat whose turn it is; the part second left when the turn changes
+  // or the game ends goes to that seat too.
+  useEffect(() => {
+    if (!three || over) return;
+    const side = game.turn;
+    let last = Date.now();
+    const take = () => {
+      const now = Date.now();
+      const ms = now - last;
+      last = now;
+      setSpent((s) => addSpent(s, side, ms));
+    };
+    const id = setInterval(take, 1000);
+    return () => {
+      clearInterval(id);
+      take();
+    };
+  }, [three, over, game.turn]);
   useEffect(() => {
     if (over) return;
     const id = setInterval(() => setElapsed(Date.now() - started.current), 1000);
@@ -176,6 +205,7 @@ export function Game({
           board={boardData}
           pieceLetters={pieceLetters}
           seat={seat}
+          players={rules.players}
           position={game.position}
           highlights={highlights(model)}
           onSquareClick={(at) => !botTurn && setModel((m) => click(m, at))}
@@ -192,8 +222,44 @@ export function Game({
           {statusLine(game)}
         </p>
 
+        {three && (
+          <ul className="seats" aria-label="Seats">
+            {seatLines(game).map((s) => (
+              <li
+                key={s.side}
+                data-seat={s.side}
+                data-turn={s.toMove ? 'true' : 'false'}
+                data-state={s.state}
+              >
+                <span className="seat-name">{s.name}</span>
+                <span className="seat-note">{s.text}</span>
+                <span className="seat-time" aria-label={`${s.name} time`}>
+                  {formatElapsed(spent[s.side] ?? 0)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {card && (
+          <section className="result-card" aria-label="Result" data-tone={card.tone}>
+            <h3>{card.heading}</h3>
+            <p>{card.detail}</p>
+          </section>
+        )}
+
+        {three &&
+          !over &&
+          noticeLines(game).map((line) => (
+            <p key={line} className="facts notice" role="status">
+              {line}
+            </p>
+          ))}
+        {three && phaseLine(game) && <p className="facts phase">{phaseLine(game)}</p>}
+
         <p className="facts">
           Time <strong aria-label="Elapsed time">{formatElapsed(elapsed)}</strong>
+          {three && ' · Untimed'}
           <button
             type="button"
             className="help"
@@ -218,10 +284,38 @@ export function Game({
           </div>
         )}
 
-        <p className="facts">
-          Coast: <strong>{game.coastOpen ? 'open' : 'closed'}</strong>
-          {!game.coastOpen && !over && ' · move the Dragon Tail from a5 to e5 to open it'}
-        </p>
+        {choosing && (
+          <div
+            className="promotion"
+            role="group"
+            aria-label={
+              choosing.kind === 'mate' ? 'Which piece checkmates the Tail' : 'The pawn becomes'
+            }
+          >
+            <span>
+              {choosing.kind === 'mate' ? 'Checkmate the Tail with' : 'The pawn swaps in as'}
+            </span>
+            {choosing.choices.map((c) => (
+              <button
+                key={c.value}
+                type="button"
+                onClick={() => setModel((m) => choose(m, c.value))}
+              >
+                {choosing.kind === 'mate' ? c.label : title(pretty(c.label))}
+              </button>
+            ))}
+            <button type="button" onClick={() => setModel(cancelPromotion)}>
+              Cancel
+            </button>
+          </div>
+        )}
+
+        {!three && (
+          <p className="facts">
+            Coast: <strong>{game.coastOpen ? 'open' : 'closed'}</strong>
+            {!game.coastOpen && !over && ' · move the Dragon Tail from a5 to e5 to open it'}
+          </p>
+        )}
 
         {lost.map(([side, pieces]) => (
           <p key={side} className="facts">
@@ -229,16 +323,18 @@ export function Game({
           </p>
         ))}
 
-        <div className="segmented" role="group" aria-label="Opponent">
-          {(['hot-seat', 'computer'] as const).map((id) => (
-            <button key={id} type="button" aria-pressed={mode === id} onClick={() => setMode(id)}>
-              {id === 'computer' ? 'Computer' : 'Hot-seat'}
-            </button>
-          ))}
-        </div>
+        {!three && (
+          <div className="segmented" role="group" aria-label="Opponent">
+            {(['hot-seat', 'computer'] as const).map((id) => (
+              <button key={id} type="button" aria-pressed={mode === id} onClick={() => setMode(id)}>
+                {id === 'computer' ? 'Computer' : 'Hot-seat'}
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className="segmented" role="group" aria-label="Board view">
-          {VIEWS.map((v) => (
+          {VIEWS.filter((v) => (three ? true : v.players === 2)).map((v) => (
             <button
               key={v.id}
               type="button"
@@ -278,6 +374,7 @@ export function Game({
             <li key={r.number} value={r.number}>
               <span>{r.first}</span>
               {r.second && <span>{r.second}</span>}
+              {r.third && <span>{r.third}</span>}
             </li>
           ))}
         </ol>
@@ -311,7 +408,7 @@ export function Game({
           </p>
         )}
 
-        {onPlayOnline && (
+        {onPlayOnline && !three && (
           <button type="button" className="again" onClick={onPlayOnline}>
             Play online
           </button>

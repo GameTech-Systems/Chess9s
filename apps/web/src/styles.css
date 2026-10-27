@@ -169,6 +169,76 @@ body {
   font-size: 0.8rem;
 }
 
+/* 3-player games: the seats in turn order, and the result card at the end. */
+.seats {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.seats li {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr auto;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--gold) 25%, transparent);
+  border-radius: 10px;
+}
+
+.seats li[data-turn='true'] {
+  border-color: var(--gold);
+  background: color-mix(in srgb, var(--gold) 18%, transparent);
+}
+
+.seats li[data-state='out'] {
+  opacity: 0.6;
+}
+
+.seat-name {
+  font-weight: 600;
+}
+
+.seat-note {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.seat-time {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.result-card {
+  padding: 0.7rem 0.9rem;
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--gold) 22%, transparent);
+  text-align: center;
+}
+
+.result-card[data-tone='draw'] {
+  border-color: color-mix(in srgb, var(--gold) 55%, transparent);
+}
+
+.result-card h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.3rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.result-card p {
+  margin: 0;
+}
+
+.panel .notice,
+.panel .phase {
+  color: var(--ink);
+}
+
 .promotion {
   display: flex;
   flex-wrap: wrap;
@@ -364,8 +434,29 @@ button {
 
   .panel > .status,
   .panel > .banner,
-  .panel > .promotion {
+  .panel > .promotion,
+  .panel > .result-card,
+  .panel > .seats {
     order: 0;
+  }
+
+  /* Three seats in one row above the board: name, note and clock stacked in each. */
+  .seats {
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: 0.4rem;
+  }
+
+  .seats li {
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding: 0.3rem 0.5rem;
+    text-align: center;
+  }
+
+  .seat-note {
+    min-height: 1.2em;
+    font-size: 0.78rem;
   }
 
   .table-board {
@@ -385,6 +476,8 @@ button {
   .panel > .facts,
   .panel > .segmented,
   .panel > .moves,
+  .panel > .result-card,
+  .panel > .seats,
   .panel > .again,
   .panel > .invite,
   .panel > .conduct,
