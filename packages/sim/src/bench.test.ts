@@ -1,5 +1,6 @@
 // The search benchmark (S35, decision 0009): positions come from data as games and plies, each
 // position is searched by the current and the S23 search, and the results are summed up.
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import data from '../bench/positions.json';
 import { benchPosition, benchStats, positionsOf, replay, type BenchPositions } from './bench';
@@ -39,6 +40,40 @@ describe('benchPosition', () => {
     expect(row.search.capped).toBe(true);
     expect(row.same).toBeUndefined();
   });
+});
+
+describe('the 2-player results', () => {
+  // S62 taught the search 3-player games; 2-player positions must search exactly as before: the
+  // same positions visited, move, score and depth as the recorded S35 reports, on every tenth one.
+  it.each([1, 2])(
+    'are unchanged at depth %i',
+    (depth) => {
+      const report = JSON.parse(
+        readFileSync(
+          new URL(`../../../docs/benchmarks/search-depth${depth}.json`, import.meta.url),
+          'utf8',
+        ),
+      ) as {
+        ruleset: unknown;
+        nodes: number;
+        rows: { name: string; search: Record<string, unknown> }[];
+      };
+      expect(report.ruleset).toEqual(ruleset);
+      const byName = new Map(positionsOf(data as BenchPositions).map((p) => [p.name, p.moves]));
+      const rows = report.rows.filter((_, i) => i % 10 === 0);
+      for (const row of rows) {
+        const state = replay(rules, ruleset, byName.get(row.name)!);
+        const now = benchPosition(state, row.name, {
+          depth,
+          nodes: report.nodes,
+          reference: false,
+        });
+        const { nodes, depth: d, capped, move, score } = row.search;
+        expect({ ...now.search, ms: 0 }).toEqual({ nodes, ms: 0, depth: d, capped, move, score });
+      }
+    },
+    60_000,
+  );
 });
 
 describe('benchStats', () => {
