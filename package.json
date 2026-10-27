@@ -16,6 +16,7 @@
     "lint": "eslint . && prettier --check .",
     "typecheck": "pnpm -r typecheck",
     "validate:rules": "node scripts/validate-rules.mjs",
+    "rules:index": "node scripts/rules-index.mjs",
     "sim": "pnpm --filter @chess9s/sim run sim",
     "bench": "pnpm --filter @chess9s/sim run bench",
     "sim:merge": "pnpm --filter @chess9s/sim run merge",
