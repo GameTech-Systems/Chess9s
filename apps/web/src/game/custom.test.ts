@@ -55,7 +55,8 @@ describe('starting from a preset', () => {
     expect(s.values['king.range']).toBe(2);
     expect(s.name).toBe('Mine');
     // Unknown or unplayable presets change nothing.
-    expect(builderReducer(s, { type: 'base', base: 'draft-3p' })).toBe(s);
+    // A preset of the other player count starts a draft of that count (S64).
+    expect(builderReducer(s, { type: 'base', base: 'draft-3p' }).players).toBe(3);
     expect(builderReducer(s, { type: 'base', base: 'nope' })).toBe(s);
   });
 });

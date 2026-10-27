@@ -59,7 +59,7 @@ export function searchMove(
   w.addEventListener('error', onError);
   const request: BotRequest = {
     id,
-    ruleset: game.ruleset,
+    ruleset: { ...game.ruleset, players: game.rules.players },
     moves: game.moves.map((m) => m.notation),
   };
   w.postMessage(request);

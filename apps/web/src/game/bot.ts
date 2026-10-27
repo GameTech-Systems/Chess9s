@@ -33,7 +33,7 @@ export function computerMove(
  * the ruleset is unknown, a move does not replay, or the game has no move.
  */
 export function computerReply(
-  ref: Pick<RulesetInfo, 'id' | 'version' | 'overrides'>,
+  ref: Pick<RulesetInfo, 'id' | 'version' | 'overrides'> & { players?: 2 | 3 },
   notations: string[],
   random: () => number = Math.random,
   nodes: number = BOT_NODES,

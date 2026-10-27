@@ -78,4 +78,41 @@ describe('readRulesetFile', () => {
       threeOnly.id,
     );
   });
+
+  it('reads a 3-player file only when the caller accepts 3 players (D64)', () => {
+    const three = { ...good, players: 3, overrides: { 'dragon.3p.givesCheck': true } };
+    expect(refused(read(three))).toMatch(/2-player/);
+    const r = readRulesetFile(JSON.stringify(three), registry, [2, 3]);
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.players).toBe(3);
+    expect(r.values['dragon.3p.givesCheck']).toBe(true);
+    expect(r.values['check.3p.exposedKing']).toBe('not-allowed');
+    expect(read(good)).toMatchObject({ ok: true, players: 2 });
+  });
+
+  it('refuses a 2-player-only key in a 3-player file and a 3-player key in a 2-player file', () => {
+    const twoOnly = registry.parameters.find(
+      (p) => p.players.length === 1 && p.players[0] === 2 && p.status !== 'deprecated',
+    );
+    const three = { ...good, players: 3, overrides: { 'castling.enabled': true } };
+    const r = readRulesetFile(JSON.stringify(three), registry, [2, 3]);
+    // castling.enabled applies to both counts, so it is fine; a key of one count only is not.
+    expect(r.ok).toBe(true);
+    if (twoOnly) {
+      const bad = { ...three, overrides: { [twoOnly.id]: twoOnly.default } };
+      expect(refused(readRulesetFile(JSON.stringify(bad), registry, [2, 3]))).toContain(twoOnly.id);
+    }
+    const crossed = { ...good, overrides: { 'dragon.3p.givesCheck': true } };
+    expect(refused(readRulesetFile(JSON.stringify(crossed), registry, [2, 3]))).toContain(
+      'dragon.3p.givesCheck',
+    );
+  });
+
+  it('applies a requirement: first-checkmate endings need the Dragon to give check', () => {
+    const file = { ...good, players: 3, overrides: { 'endings.3p': 'first-checkmate' } };
+    expect(refused(readRulesetFile(JSON.stringify(file), registry, [2, 3]))).toContain(
+      'dragon.3p.givesCheck',
+    );
+  });
 });
