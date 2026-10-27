@@ -238,7 +238,7 @@ A new workspace package `packages/online`: pure TypeScript with no DOM and no Cl
 Done when: the 80-move game plays through the protocol to the same result, every refusal has a test, and the web app still builds and plays with the shared rules library.
 Decisions: D51, D52, D54.
 
-### S52 — Rooms on Cloudflare · Opus 5.5 · high · `todo`
+### S52 — Rooms on Cloudflare · Opus 5.5 · high · `done`
 Read Cloudflare's current documentation first (Durable Objects on Workers Free with SQLite storage, the WebSocket Hibernation API, `run_worker_first`, and Worker Previews for a Worker with a Durable Object) and note anything that differs from this plan in the handoff.
 - **Worker** (D18, D50) in `apps/worker`: `wrangler.jsonc` gets `main`, `assets.run_worker_first: ["/api/*"]`, a Durable Object class `Room` with a `new_sqlite_classes` migration, and keeps static assets and the SPA fallback for every other path. Routes: `POST /api/rooms` (ruleset reference in, room code and the creator's seat token out; a new code on collision), `GET /api/rooms/<code>` (ruleset and open seats, no tokens), `GET /api/rooms/<code>/socket` (WebSocket upgrade; the `Origin` must be chess9s.com or a local dev origin).
 - **Room** Durable Object: a thin adapter over S51's room logic using the Hibernation API; moves are written to its storage as they are played, so a restart loses nothing; an alarm deletes the room per D53. Limits: message size, two seats and no spectators (D52), and an idle socket closed after a while. No names, IP addresses or user agents are stored, and nothing is logged beyond Cloudflare's own request logs.
