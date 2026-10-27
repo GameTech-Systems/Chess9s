@@ -150,6 +150,7 @@ const REASONS: Record<string, string> = {
   'insufficient-material': 'Insufficient material',
   'fifty-move': 'Fifty-move rule',
   repetition: 'Threefold repetition',
+  agreement: 'By agreement',
 };
 
 /** One line on the state of the game: whose move, check, or how it ended. */

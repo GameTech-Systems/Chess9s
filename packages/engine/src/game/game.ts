@@ -394,6 +394,22 @@ export function resign(state: GameState, side: string): GameState {
 export const agreeDraw = (state: GameState): GameState =>
   ended(state, { status: 'draw', reason: 'agreement' });
 
+/**
+ * A replayed game with a recorded result that no move gives: a resignation by one of its seats,
+ * or a draw by agreement. Null when the game is already over or the result is not one of those,
+ * so a record cannot claim either for a game that ended on the board.
+ */
+export function endedBy(state: GameState, result: GameResult): GameState | null {
+  if (state.result.status !== 'ongoing') return null;
+  if (result.status === 'win' && result.reason === 'resignation') {
+    if (!state.order.includes(result.loser)) return null;
+    const ended = resign(state, result.loser);
+    return ended.result.status === 'win' && ended.result.winner === result.winner ? ended : null;
+  }
+  if (result.status === 'draw' && result.reason === 'agreement') return agreeDraw(state);
+  return null;
+}
+
 /** What is kept with a game: the ruleset id and version, the moves and the result. */
 export function gameRecord(state: GameState): GameRecord {
   return {

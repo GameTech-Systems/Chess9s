@@ -1,6 +1,7 @@
 // The game record (S46): a game saved as JSON loads back and replays to the same result.
 import { describe, expect, it } from 'vitest';
-import { playMove, type GameState } from '@chess9s/engine';
+import { agreeDraw, playMove, resign, stateKey, toNotation, type GameState } from '@chess9s/engine';
+import hotSeatMate from '../../../../packages/engine/test/fixtures/games/hot-seat-mate.json';
 import { newModel } from './session';
 import { createRulesFor, customInfo, findRuleset } from './rules';
 import { openRecord, recordFile, recordJson } from './record';
@@ -86,6 +87,47 @@ describe('game record', () => {
       expect(input.ok).toBe(false);
       if (!input.ok) expect(input.problem.length).toBeGreaterThan(5);
     }
+  });
+
+  it('keeps a resignation and a draw by agreement (S51), and replays them', () => {
+    for (const game of [resign(played(fresh(), 7), 'light'), agreeDraw(played(fresh(), 10))]) {
+      const text = recordJson(game, '2026-10-27');
+      expect(JSON.parse(text).v).toBe(1);
+      const opened = openRecord(text);
+      if (!opened.ok) throw new Error(opened.problem);
+      expect(opened.game.result).toEqual(game.result);
+      expect(stateKey(opened.game)).toBe(stateKey(game));
+    }
+  });
+
+  it('refuses a resignation or agreement that the moves do not allow', () => {
+    const resigned = JSON.parse(recordJson(resign(played(fresh(), 3), 'dark'), '2026-10-27'));
+    const bad = (patch: object) => openRecord(JSON.stringify({ ...resigned, ...patch }));
+    // A seat the game does not have.
+    expect(
+      bad({ result: { status: 'win', winner: 'light', loser: 'dragon', reason: 'resignation' } })
+        .ok,
+    ).toBe(false);
+    // The winner must be the other seat.
+    expect(
+      bad({ result: { status: 'win', winner: 'dark', loser: 'dark', reason: 'resignation' } }).ok,
+    ).toBe(false);
+    // A game that ended on the board cannot also have been resigned or agreed.
+    const draft = findRuleset('draft-2p', hotSeatMate.ruleset.version)!;
+    let ended = newModel(createRulesFor(draft), draft).game;
+    for (const n of hotSeatMate.moves) {
+      ended = playMove(
+        ended,
+        ended.legal.find((m) => toNotation(m) === n)!,
+      );
+    }
+    expect(ended.result.status).toBe('win');
+    const over = JSON.parse(recordJson(ended, '2026-10-27'));
+    expect(openRecord(JSON.stringify(over)).ok).toBe(true);
+    const agreed = { ...over, result: { status: 'draw', reason: 'agreement' } };
+    expect(openRecord(JSON.stringify(agreed)).ok).toBe(false);
+    const result = { status: 'win', winner: 'dark', loser: 'light', reason: 'resignation' };
+    expect(openRecord(JSON.stringify({ ...over, result })).ok).toBe(false);
   });
 
   it('names the file after the ruleset and the date', () => {

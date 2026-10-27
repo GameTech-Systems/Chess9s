@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { newGame, type Position } from '@chess9s/engine';
+import { agreeDraw, newGame, resign, type Position } from '@chess9s/engine';
 import {
   cancelPromotion,
   canUndo,
@@ -312,6 +312,11 @@ describe('status line and move list', () => {
     const bare: Position = { f1: king('light'), f9: king('dark') };
     const drawn = newGame(createRules(), ruleset, { position: bare });
     expect(statusLine(drawn)).toBe('Insufficient material · draw');
+  });
+
+  it('names a resignation and a draw by agreement (S51)', () => {
+    expect(statusLine(resign(newModel().game, 'dark'))).toBe('Resignation · Light wins');
+    expect(statusLine(agreeDraw(newModel().game))).toBe('By agreement · draw');
   });
 
   it('castles when the King is clicked, then its Rook; the King’s own square stays a plain move', () => {
