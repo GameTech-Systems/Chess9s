@@ -21,7 +21,6 @@ import {
   type Online,
 } from './online';
 
-const TOKEN = 'A'.repeat(42) + '_';
 const CODE = 'K7RX2M';
 const DRAFT = { id: 'draft-2p', version: '0.2.0', name: 'Good Practice' };
 const MOVES: string[] = hotSeatMate.moves;

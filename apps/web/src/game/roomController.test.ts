@@ -3,86 +3,12 @@
 // an unknown room, a full one, a preview, joining, playing, a drop and a reconnect, a refused
 // move, resigning, a draw offer, game over, an app that is out of date.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  CLOSE_GONE,
-  CLOSE_REPLACED,
-  PING,
-  encode,
-  type ClientMessage,
-  type RoomInfo,
-  type ServerMessage,
-  type Snapshot,
-} from '@chess9s/online/protocol';
+import { CLOSE_GONE, CLOSE_REPLACED, type Snapshot } from '@chess9s/online/protocol';
 import { toNotation } from '@chess9s/engine';
 import hotSeatMate from '../../../../packages/engine/test/fixtures/games/hot-seat-mate.json';
-import type { SocketLike } from './connection';
-import type { Store } from './guest';
 import { ONLINE_KEY, loadSeat, saveSeat } from './onlineStore';
+import { CODE, DRAFT, FakeSocket, MOVES, TOKEN, info, memory, snap } from './roomFakes';
 import { RoomController, type Phase } from './roomController';
-
-const TOKEN = 'A'.repeat(42) + '_';
-const CODE = 'K7RX2M';
-const DRAFT = { id: 'draft-2p', version: '0.2.0', name: 'Good Practice' };
-const MOVES: string[] = hotSeatMate.moves;
-
-const info = (over: Partial<RoomInfo> = {}): RoomInfo => ({
-  v: 1,
-  code: CODE,
-  ruleset: DRAFT,
-  seats: { light: 'present', dark: 'open' },
-  result: { status: 'ongoing' },
-  ...over,
-});
-const snap = (over: Partial<Snapshot> = {}): Snapshot => ({
-  v: 1,
-  type: 'snapshot',
-  code: CODE,
-  seat: 'dark',
-  ruleset: DRAFT,
-  moves: [],
-  result: { status: 'ongoing' },
-  seats: { light: 'present', dark: 'present' },
-  drawOffer: null,
-  ...over,
-});
-
-class FakeSocket implements SocketLike {
-  onopen: (() => void) | null = null;
-  onmessage: ((e: { data: unknown }) => void) | null = null;
-  onclose: ((e: { code: number }) => void) | null = null;
-  onerror: (() => void) | null = null;
-  sent: string[] = [];
-  closed = false;
-  send(t: string) {
-    this.sent.push(t);
-  }
-  close() {
-    this.closed = true;
-  }
-  open() {
-    this.onopen?.();
-  }
-  say(m: ServerMessage) {
-    this.onmessage?.({ data: encode(m) });
-  }
-  drop(code = 1006) {
-    this.onclose?.({ code });
-  }
-  /** The messages the page sent, without keep-alives. */
-  get messages(): ClientMessage[] {
-    return this.sent.filter((t) => t !== PING).map((t) => JSON.parse(t));
-  }
-}
-
-const memory = (): Store & { data: Map<string, string> } => {
-  const data = new Map<string, string>();
-  return {
-    data,
-    getItem: (k) => data.get(k) ?? null,
-    setItem: (k, v) => void data.set(k, v),
-    removeItem: (k) => void data.delete(k),
-  };
-};
 
 function harness(opts: { peek?: () => Promise<Response>; code?: string } = {}) {
   const store = memory();
