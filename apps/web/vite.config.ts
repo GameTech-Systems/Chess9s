@@ -15,6 +15,6 @@ export default defineConfig({
   // The footer links to it (/third-party-licenses.txt).
   build: { license: { fileName: 'third-party-licenses.txt' } },
   resolve: {
-    alias: [{ find: /^.*\/schema-check$/, replacement: engineRules('schema-check.static.ts') }],
+    alias: [{ find: /^(.*\/|#)schema-check$/, replacement: engineRules('schema-check.static.ts') }],
   },
 });
