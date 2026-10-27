@@ -15,8 +15,7 @@ const TOKEN = 'A'.repeat(42) + '_';
 const CODE = 'K7RX2M';
 const json = (o: unknown) => JSON.stringify(o);
 
-const reasonOf = (r: Parsed<unknown>): Refusal | 'ok' =>
-  r.ok ? 'ok' : r.refused.reason;
+const reasonOf = (r: Parsed<unknown>): Refusal | 'ok' => (r.ok ? 'ok' : r.refused.reason);
 const client = (o: unknown) => reasonOf(parseClientMessage(json(o)));
 const server = (o: unknown) => reasonOf(parseServerMessage(json(o)));
 

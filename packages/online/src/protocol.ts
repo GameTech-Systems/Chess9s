@@ -196,29 +196,33 @@ const isSeats = (v: unknown): v is Record<string, SeatStatus> =>
   Object.keys(v).length > 0 &&
   Object.entries(v).every(([k, s]) => SIDE.test(k) && SEAT_STATUS.has(s as string));
 
-const REFUSALS = new Set<string>([
-  'too-large',
-  'malformed',
-  'version',
-  'unknown-type',
-  'no-room',
-  'room-exists',
-  'wrong-room',
-  'unknown-ruleset',
-  'invalid-ruleset',
-  'unknown-seat',
-  'room-full',
-  'bad-token',
-  'already-seated',
-  'not-seated',
-  'waiting-for-opponent',
-  'game-over',
-  'not-your-turn',
-  'illegal-move',
-  'offer-pending',
-  'offer-again-later',
-  'no-offer',
-] satisfies Refusal[]);
+// A record, so a reason added to Refusal fails to compile until it is listed here.
+const REFUSAL_RECORD: Record<Refusal, true> = {
+  'too-large': true,
+  malformed: true,
+  version: true,
+  'unknown-type': true,
+  'no-room': true,
+  'room-exists': true,
+  'wrong-room': true,
+  'unknown-ruleset': true,
+  'invalid-ruleset': true,
+  'unknown-seat': true,
+  'room-full': true,
+  'bad-token': true,
+  'already-seated': true,
+  'not-seated': true,
+  'waiting-for-opponent': true,
+  'game-over': true,
+  'not-your-turn': true,
+  'illegal-move': true,
+  'offer-pending': true,
+  'offer-again-later': true,
+  'no-offer': true,
+};
+/** Every reason a message can be refused. */
+export const REFUSALS = Object.keys(REFUSAL_RECORD) as Refusal[];
+const REFUSAL_SET = new Set<string>(REFUSALS);
 
 /** The checks of each client message type, after `v` and `type`. */
 const CLIENT: Record<ClientMessage['type'], (o: Obj) => boolean> = {
@@ -256,7 +260,7 @@ const SERVER: Record<ServerMessage['type'], (o: Obj) => boolean> = {
   refused: (o) =>
     keys(o, ['reason', 'message']) &&
     typeof o.reason === 'string' &&
-    REFUSALS.has(o.reason) &&
+    REFUSAL_SET.has(o.reason) &&
     typeof o.message === 'string' &&
     o.message.length <= 500,
   'game-over': (o) => keys(o, ['result']) && isResult(o.result) && o.result.status !== 'ongoing',
