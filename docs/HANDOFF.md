@@ -1,30 +1,29 @@
 # Handoff
 
-Updated 2026-10-27 by S67 (Sonnet 5.5 · high). `/end-session` rewrites this file; keep it under 40 lines.
+Updated 2026-10-27 by S64 (Sonnet 5.5 · medium). `/end-session` rewrites this file; keep it under 40 lines.
 
 ## State
-- Phase 6: S67 is done. A person can resign for any seat they play in a 3-player game (Resign button, confirm step): a Kinged seat turns to stone and the others play on, the last Kinged player or the Dragon in the duel ends the game, the Dragon with both Kings in turns all its pieces to stone. Resignation also works in Easy Start. `tail.capturable` now works in 3-player games: the capturing piece swaps with the Tail, which turns to stone, handled as a Tail checkmate. No preset turns it on.
-- Code: `resignedBy`, `stoneOut`, `tailCaptures` in `packages/engine/src/game/three.ts`; `resign`, `endedBy`, `replayResignations`, `GameState.resignations` in `game.ts`; record/guest keys `resignations` (`{side, after}`); `resignable`, `resignPrompt` in `apps/web/src/game/threeText.ts`; `Game.tsx`.
-- Done-when passed: `ONLY=resign node apps/web/scripts/e2e-3p.mjs` (after `pnpm build`) plays the recorded game in `apps/web/scripts/draft-3p-resigned.json` at desktop and Pixel 7 width; the whole script passes; 2084 tests. No 2-player test, parameter, ruleset or lock changed (only a description in `rules/parameters.json`).
+- Phase 6: S64 is done. The builder starts from a 3-player preset (a "2 players / 3 players" switch picks the count), has a control per 3-player setting, "what differs" and interaction flags for 3 players, and says Submit is 2-player only. `endings.3p` = first-checkmate turns `dragon.3p.givesCheck` on, holds it and says why. Export, load, share links and game records carry `players`; a custom 3-player ruleset is `proposed` and browser-only.
+- Code: `BuilderState.players`, `heldSettings`, `presets(players)` in `apps/web/src/game/custom.ts`; `CustomRuleset.players?`, `customFile`, `overridesOf(values, players)` in `rules.ts`; `readRulesetFile(text, registry, accept)` and `resolveFileOverrides(..., players)` in `packages/engine/src/rules/ruleset-file.ts`; share link key `p: 3`; `Builder.tsx`.
+- Done-when passed: `ONLY=build node apps/web/scripts/e2e-3p.mjs` (after `pnpm build`) builds, plays with a computer Dragon, exports, loads and opens the link at desktop and Pixel 7 width; whole script and 2099 tests pass. No parameter, ruleset or lock changed.
 
 ## Next session
-**S64 — 3-player rulesets in the builder** · Sonnet 5.5 · effort medium
-Why: next in the Phase 6 order (S67, S64, S65, S62, S59...); its builder lists `tail.capturable` now that it works.
-Start with: `/start-session S64`
+**S65 — Time controls for hot-seat games** · Sonnet 5.5 · effort high
+Why: next in the Phase 6 order (S65, S62, S59...).
+Start with: `/start-session S65`
 
 ## Decisions in effect for the next step
-- D64 (builder, export, load and share take 3-player rulesets; Submit stays 2-player): decided by the owner.
-- D68 (resignation, Tail capture): decided by the owner, Easy Start parts provisional (Claude); readings S67 chose are in decision 0018 under "How S67 built it".
+- D58 (untimed default; players may choose a time control, decision 0017): decided by the owner.
+- D66 (running out of time: the seat is out; Show only turns it off): default, provisional.
 
 ## Open questions for the owner
-- Easy Start (Claude's calls): resignation turns pieces to stone there, its Tail stays uncapturable, and with the option switched on the capturer wins at once. Say if any looks wrong.
-- Greedy Easy Start Dragon loses fast (all Tail checkmates, 5 to 28 plies); by design until S62's search; S59 should report it.
-- Carried over: S54 (owner) and the S53 defaults in its PR; the draw-offer default (S51), the Discussion form prefill check, the flag rule (0013), `coast.openToAll`, the I34 contact address, the favicon and the Ting Yang art.
+- The held-setting rule is general (any `requires` in the registry): a required setting shows as fixed while its option is chosen. Say if you would rather it switch off the option.
+- Carried over: Easy Start calls (S67), greedy Easy Start Dragon loses fast (S59 should report it), S54 (owner) and the S53 defaults, the draw-offer default (S51), the Discussion form prefill check, the flag rule (0013), `coast.openToAll`, the I34 contact address, the favicon and the Ting Yang art.
 
 ## Notes for Claude
-- A resignation is not a move: `moves` stays one entry per ply, so `rounds()` is unchanged. Anything that replays a game (records, guest saves, online later) must call `replayResignations` before the first move, after each move and at the end.
-- `tail.capturable` is a 2- and 3-player parameter; `three-params.test.ts` has its own 3-player cases because its loop covers 3-player-only parameters.
-- The Game screen's bot effect now depends on `game`, not the move count, so a resignation restarts a computer search.
+- Anything that rebuilds a custom game from a ruleset reference needs `players` too (the bot worker request now carries it); `createRulesFor` passes it to `rulesWith`.
+- Custom 3-player rulesets are never online (`online: false`) until S63; `settingsText` compares with Standard (3-player) for them.
+- Records read `players` from the top-level record field; old custom records have it as 2.
 - S63: online rooms still refuse 3-player rulesets; add resign (with `after`) to the room protocol then.
 - `coast.3p.exit` (first way out through A5) is not built; `unbuiltFeatures` lists it for every 3-player game.
-- Browser: `ONLY=resign node apps/web/scripts/e2e-3p.mjs` runs just the resignation game; `ONLY=computer` just the computer Dragon.
+- Browser: `ONLY=build`, `ONLY=resign`, `ONLY=computer` run one scenario of `apps/web/scripts/e2e-3p.mjs`.
