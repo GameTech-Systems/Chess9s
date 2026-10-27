@@ -12,6 +12,7 @@ import {
   cancelPromotion,
   choosePromotion,
   joinProblem,
+  onlineHighlights,
   onlineStatus,
   opponentOf,
   pressSquare,
@@ -326,5 +327,20 @@ describe('when joining fails', () => {
     expect(p.kind).toBe(kind);
     if (text) expect(p.text).toContain(text);
     else expect(p.text).toBe('The server says so.');
+  });
+});
+
+describe('what the board shows', () => {
+  it('marks the player’s movable pieces and moves only on their own turn', () => {
+    const mine = onlineHighlights(start());
+    expect(mine.movable.length).toBeGreaterThan(0);
+    const theirs = onlineHighlights(start({ seat: 'light' }));
+    expect(theirs.movable).toEqual([]);
+    expect(theirs.targets).toEqual([]);
+  });
+
+  it('shows the opponent’s last move and a check, whoever’s turn it is', () => {
+    const o = start({ seat: 'light', moves: MOVES.slice(0, 1) });
+    expect(onlineHighlights(o).lastMove).toEqual(['c9', 'b7']);
   });
 });

@@ -6,6 +6,7 @@ import {
   SHARE_PATH,
   exportFile,
   inviteMailto,
+  roomInviteMailto,
   matchingOfficial,
   parseRulesetFile,
   parseShareLink,
@@ -141,9 +142,11 @@ describe('invitation mail', () => {
     expect(q.get('body')).toMatch(/not a tournament ruleset/i);
   });
 
-  it('a tournament invitation says to play hot-seat or over the board until online play', () => {
+  it('a tournament invitation says games can be played online by room code, with the Official ruleset only (S53, D46)', () => {
     const q = new URLSearchParams(inviteMailto('tournament', mine(), origin).slice(8));
-    expect(q.get('body')).toMatch(/hot-seat or over the board/i);
+    expect(q.get('body')).toMatch(/online by room code/i);
+    expect(q.get('body')).toMatch(/Official ruleset only/);
+    expect(q.get('body')).not.toMatch(/not played online yet/i);
   });
 });
 
@@ -201,5 +204,45 @@ describe('submit for tournament consideration (S43)', () => {
     const q = new URL(submitUrl(long, origin, 1500)).searchParams;
     expect(q.get('ruleset')).toBeNull();
     expect(q.get('idea')).toMatch(/paste the exported file/i);
+  });
+});
+
+describe('invitation to a room (S53)', () => {
+  const origin = 'https://chess9s.com';
+  const body = (room: Parameters<typeof roomInviteMailto>[0]) => {
+    const url = roomInviteMailto(room, origin);
+    expect(url.startsWith('mailto:?')).toBe(true);
+    const q = new URLSearchParams(url.slice('mailto:?'.length));
+    return { subject: q.get('subject')!, text: q.get('body')! };
+  };
+
+  it('opens the mail app with the room link and code, and no address', () => {
+    const { subject, text } = body({
+      code: 'K7RX2M',
+      ruleset: { id: 'standard-2p', version: '0.1.0', name: 'Standard' },
+    });
+    expect(subject).toMatch(/game/i);
+    expect(text).toContain(`${origin}/room/K7RX2M`);
+    expect(text).toContain('K7RX2M');
+    expect(text).toContain('Standard');
+  });
+
+  it('says a custom ruleset is unofficial and what differs from Standard', () => {
+    const { text } = body({
+      code: 'K7RX2M',
+      ruleset: { id: 'custom', version: '1.0.0', name: 'Mine', overrides: { 'king.range': 3 } },
+    });
+    expect(text).toMatch(/unofficial/i);
+    expect(text).toContain('King range');
+    expect(text).toContain('“Mine”');
+    expect(text.length).toBeLessThan(1800);
+  });
+
+  it('says a bundled ruleset that is not Official is not yet Official', () => {
+    const { text } = body({
+      code: 'K7RX2M',
+      ruleset: { id: 'draft-2p', version: '0.2.0', name: 'Good Practice' },
+    });
+    expect(text).toMatch(/not (yet )?official|not fairness-checked/i);
   });
 });

@@ -2,6 +2,7 @@
 // file a player picked, a link someone sent), so it is size-capped, checked key by key, and
 // resolved against the registry with `resolveRuleset` before it becomes a draft. Nothing is
 // sent anywhere: an invitation is a `mailto:` link the player's own mail app opens.
+import type { RoomRuleset } from '@chess9s/online/protocol';
 import { MAX_RULESET_FILE_BYTES, readRulesetFile, resolveFileOverrides } from '@chess9s/engine';
 import registry from '../../../../rules/parameters.json';
 import { REPO_URL } from '../links';
@@ -18,6 +19,8 @@ import {
 import {
   CUSTOM_VERSION,
   DEFAULT_RULESET_ID,
+  customValues,
+  findRuleset,
   listRulesets,
   overridesOf,
   rulesetValues,
@@ -162,7 +165,7 @@ export function inviteMailto(kind: InviteKind, state: BuilderState, origin: stri
       : []),
     ...(kind === 'tournament'
       ? [
-          'Tournaments are not played online yet: play hot-seat or over the board with the link.',
+          'Tournament games can be played online by room code, with the Official ruleset only.',
           `Tournament rules: ${origin}/tournament`,
         ]
       : []),
@@ -176,6 +179,44 @@ export function inviteMailto(kind: InviteKind, state: BuilderState, origin: stri
   // Mail apps cut very long links; keep the draft well under the usual limit.
   if (body.length > 1700) body = `${body.slice(0, 1690)}\n…`;
   return `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+/** The path of a room's page: the link a joiner opens. */
+export const roomPath = (code: string) => `/room/${code}`;
+
+/**
+ * A `mailto:` link inviting someone to a room: the link, the code, which ruleset it plays and
+ * whether it is Official, and for a ruleset other than Standard what differs. No address, like
+ * the builder's invitations: the player picks who to write to in their own mail app.
+ */
+export function roomInviteMailto(
+  room: { code: string; ruleset: RoomRuleset },
+  origin: string,
+): string {
+  const { ruleset } = room;
+  const bundled = ruleset.overrides ? undefined : findRuleset(ruleset.id, ruleset.version);
+  const values = ruleset.overrides
+    ? customValues({ id: ruleset.id, name: ruleset.name, overrides: ruleset.overrides })
+    : bundled
+      ? rulesetValues(ruleset.id, ruleset.version)
+      : undefined;
+  const differs = values ? settingsText(values) : '';
+  const lines = [
+    `Come and play Chess Nines with me online, using the ruleset “${ruleset.name.slice(0, MAX_NAME)}”.`,
+    '',
+    `Open the room: ${origin}${roomPath(room.code)}`,
+    `Room code: ${room.code}`,
+    '',
+    bundled?.status === 'official'
+      ? `This is the Official ruleset ${bundled.name}.`
+      : bundled
+        ? `This ruleset is not Official yet (${bundled.status}).`
+        : 'This is an unofficial ruleset: it has not been fairness-checked.',
+    ...(differs ? ['', 'Differs from Standard:', differs] : []),
+  ];
+  let body = lines.join('\n');
+  if (body.length > 1700) body = `${body.slice(0, 1690)}\n…`;
+  return `mailto:?subject=${encodeURIComponent('Invitation to a Chess Nines game')}&body=${encodeURIComponent(body)}`;
 }
 
 /** The Rule proposals Discussion form (.github/DISCUSSION_TEMPLATE/rule-proposals.yml). */
