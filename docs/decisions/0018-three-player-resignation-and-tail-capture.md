@@ -1,6 +1,6 @@
 # 0018: 3-player resignation and capturing the Tail
 
-**Status:** Accepted (owner answers of 27 Oct 2026 to the S57 handoff questions; Claude decided the Easy Start parts, as the owner allowed). Neither is built yet: step S67 builds both. Until then 3-player games have no Resign button and no preset turns Tail capture on.
+**Status:** Accepted (owner answers of 27 Oct 2026 to the S57 handoff questions; Claude decided the Easy Start parts, as the owner allowed). Both are built (S67). No preset turns Tail capture on; Easy Start's Tail stays uncapturable.
 
 ## Resignation (owner)
 A player who resigns in a 3-player game turns its pieces to stone, and the others play on. This is the same thing that happens to a side whose King the Dragon captures (decision 0016 rules 10 and 11). Agreed draws stay refused in 3-player games.
@@ -34,3 +34,10 @@ Easy Start keeps its Tail uncapturable: `tail.capturable` is not offered there, 
 
 ## What S67 builds
 Engine `resign(state, side)` for 3 seats and `endedBy` for 3-player records; the Resign button and result card on the game screen (hot-seat and against the computer, where the computer never resigns); the Tail capture in `game/three.ts` as the same effect as a checkmate (the `tail.capturable` parameter's 3-player option, `requires` and tests at each option); online rooms take both in S63.
+
+## How S67 built it (readings the table left open)
+- A resignation is not a move. The game keeps `resignations` (the seat and how many moves had been played), the record carries them (`resignations`, left out when there are none) and replays each in its place; a game kept in the browser does the same. Undo takes a resignation back.
+- A seat that resigns while it is not the one to move leaves the turn where it is; a resigning seat that is to move passes it on. Stones from a resignation restart repetition and the fifty-move count, as any piece turned to stone does.
+- Tail capture, in the duel and in Easy Start's first-checkmate game (where a player may switch the option on): the swap and the stone happen on the board as well as the result, which is the one a Tail checkmate gives (`reason` `checkmate`, since the capture is not a second kind of result). Provisional reading: the decision says "same swap and stone" for Easy Start but not who wins there; the capturer wins, as for a checkmate.
+- A piece that may not stand on the Tail's square cannot be generated as a capture of it, so the "stays on its own square" case in practice is the Tail on the center square. The swap is part of the move, so a pinned piece may take the Tail: the stone fills the square it left.
+- The computer never resigns; a Resign button is offered for each seat a person plays, with a confirm step that says what will happen. Online rooms take both in S63.

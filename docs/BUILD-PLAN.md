@@ -306,7 +306,7 @@ The owner (26 Oct 2026, D59): the computer can play the Dragon in a game, starti
 Done when: two people can play a full hot-seat game against a computer Dragon in the browser, bots finish greedy games in all three presets, and the 2-player search and bench tests are unchanged.
 Decisions: D59.
 
-### S67 — 3-player resignation and Tail capture · Sonnet 5.5 · high · `todo`
+### S67 — 3-player resignation and Tail capture · Sonnet 5.5 · high · `done`
 Added in S58 from the owner's answers of 27 Oct 2026 ([decision 0018](decisions/0018-three-player-resignation-and-tail-capture.md)).
 - **Resign.** A seat that resigns turns its pieces to stone and the others play on; the table in 0018 gives each case (a Kinged player, the last Kinged player in the duel, the Dragon, Easy Start). `resign` and `endedBy` take 3 seats, the result reason is `resignation`, and records with a 3-player resignation open. Agreed draws stay refused.
 - **Tail capture.** `tail.capturable` in 3-player games: the capturing piece swaps places with the Tail and it turns to stone, handled as a Tail checkmate (0016 rule 9). Easy Start's Tail stays uncapturable.
