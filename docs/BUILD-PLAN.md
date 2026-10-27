@@ -248,7 +248,7 @@ Read Cloudflare's current documentation first (Durable Objects on Workers Free w
 Done when: `wrangler dev` serves the app and the rooms; two Node 22 WebSocket clients (built in, no dependency) play the 80-move game through the local Worker, one drops and reconnects with its token mid-game, and the result matches; a room past D53 is gone; `pnpm build` still produces the static app; the PR's Cloudflare preview build passes (or D50's fallback is applied and written down).
 Decisions: D18, D50, D53.
 
-### S53 — Play online in the browser · Sonnet 5.5 · high · `todo`
+### S53 — Play online in the browser · Sonnet 5.5 · high · `done`
 - **Create.** "Play online" on the game screen and the picker makes a room with the current ruleset (a custom one carries its overrides) and the creator's seat choice (D52). It shows the room code, a link `/room/<code>`, and the `mailto:` invitation from S42 with the link.
 - **Join.** By code or link. Before taking the seat the page shows the ruleset's name, version and badge, "Unofficial" and what differs for a custom one, and which side the player gets. A full, expired or unknown room says so plainly.
 - **Play.** The board turns to the player's side (D34). It shows whose turn it is, whether the opponent is connected, and buttons for resign and offer draw (D51). No undo, no computer opponent; the legal-move and danger aids stay, as they are local. Save game record (S46) works for online games.
