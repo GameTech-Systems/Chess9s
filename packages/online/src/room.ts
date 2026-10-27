@@ -283,7 +283,7 @@ function joinRoom(
 
 /** A seat's connection closed: the seat stays its own (D51: no forfeit for a disconnection). */
 export function leave(room: Room, seat: string): Step {
-  const s = room.seats[seat];
+  const s = Object.hasOwn(room.seats, seat) ? room.seats[seat]! : null;
   if (!s || !s.present) return { room, seat, out: [] };
   const next = withSeat(room, seat, { ...s, present: false });
   return {
@@ -387,7 +387,7 @@ export function receive(
       if (seat !== null) return refuse(room, seat, 'already-seated', 'You already hold a seat.');
       return joinRoom(ctx, room, msg);
     }
-    if (seat === null || !room.seats[seat]) {
+    if (seat === null || !Object.hasOwn(room.seats, seat)) {
       return refuse(room, seat, 'not-seated', 'Join the room before playing.');
     }
     return act(room, seat, msg);

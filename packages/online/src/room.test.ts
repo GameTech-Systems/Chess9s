@@ -436,6 +436,8 @@ describe('moves', () => {
     const t = seated();
     expect(refusal(t.send(null, move(firstMove(t.room))))).toBe('not-seated');
     expect(refusal(t.send('dragon', bare('resign')))).toBe('not-seated');
+    expect(refusal(t.send('constructor', bare('resign')))).toBe('not-seated');
+    expect(t.close('constructor').out).toEqual([]);
   });
 
   it('refuses every game message once the game is over', () => {
