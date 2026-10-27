@@ -1,0 +1,180 @@
+{
+  "date": "2026-10-27",
+  "players": 3,
+  "ruleset": {
+    "id": "standard-3p",
+    "version": "0.1.0"
+  },
+  "depth": 2,
+  "nodes": 100000,
+  "search": {
+    "moves": 12,
+    "nodes": {
+      "mean": 401,
+      "median": 133,
+      "p95": 1126,
+      "max": 1126
+    },
+    "capped": 0,
+    "cappedShare": 0,
+    "msPerMove": 952
+  },
+  "rows": [
+    {
+      "name": "seed 1 ply 8",
+      "plies": 8,
+      "legal": 25,
+      "search": {
+        "nodes": 111,
+        "ms": 187.972575,
+        "depth": 2,
+        "capped": false,
+        "move": "a2xb1",
+        "score": -7488
+      }
+    },
+    {
+      "name": "seed 1 ply 32",
+      "plies": 32,
+      "legal": 33,
+      "search": {
+        "nodes": 205,
+        "ms": 414.48128599999995,
+        "depth": 2,
+        "capped": false,
+        "move": "g1xg2",
+        "score": -2242
+      }
+    },
+    {
+      "name": "seed 1 ply 56",
+      "plies": 56,
+      "legal": 26,
+      "search": {
+        "nodes": 515,
+        "ms": 844.3049600000002,
+        "depth": 2,
+        "capped": false,
+        "move": "c6-c5",
+        "score": -6222
+      }
+    },
+    {
+      "name": "seed 2 ply 8",
+      "plies": 8,
+      "legal": 17,
+      "search": {
+        "nodes": 115,
+        "ms": 497.97891900000013,
+        "depth": 2,
+        "capped": false,
+        "move": "a8xb9",
+        "score": -7488
+      }
+    },
+    {
+      "name": "seed 2 ply 32",
+      "plies": 32,
+      "legal": 30,
+      "search": {
+        "nodes": 1126,
+        "ms": 5786.737459,
+        "depth": 2,
+        "capped": false,
+        "move": "a6-a1",
+        "score": -6308
+      }
+    },
+    {
+      "name": "seed 2 ply 56",
+      "plies": 56,
+      "legal": 28,
+      "search": {
+        "nodes": 120,
+        "ms": 222.2244959999989,
+        "depth": 2,
+        "capped": false,
+        "move": "b1xd1",
+        "score": -4387
+      }
+    },
+    {
+      "name": "seed 3 ply 8",
+      "plies": 8,
+      "legal": 27,
+      "search": {
+        "nodes": 133,
+        "ms": 193.44441000000006,
+        "depth": 2,
+        "capped": false,
+        "move": "a8xb9",
+        "score": -7488
+      }
+    },
+    {
+      "name": "seed 3 ply 32",
+      "plies": 32,
+      "legal": 49,
+      "search": {
+        "nodes": 487,
+        "ms": 704.0220520000003,
+        "depth": 2,
+        "capped": false,
+        "move": "a9-e5",
+        "score": -1604
+      }
+    },
+    {
+      "name": "seed 3 ply 56",
+      "plies": 56,
+      "legal": 23,
+      "search": {
+        "nodes": 646,
+        "ms": 511.973602,
+        "depth": 2,
+        "capped": false,
+        "move": "c5-c4",
+        "score": -22
+      }
+    },
+    {
+      "name": "seed 4 ply 8",
+      "plies": 8,
+      "legal": 25,
+      "search": {
+        "nodes": 111,
+        "ms": 234.1770400000005,
+        "depth": 2,
+        "capped": false,
+        "move": "a8xb8",
+        "score": -7488
+      }
+    },
+    {
+      "name": "seed 4 ply 32",
+      "plies": 32,
+      "legal": 26,
+      "search": {
+        "nodes": 122,
+        "ms": 179.41874400000052,
+        "depth": 2,
+        "capped": false,
+        "move": "b1xd1",
+        "score": -4429
+      }
+    },
+    {
+      "name": "seed 4 ply 56",
+      "plies": 56,
+      "legal": 25,
+      "search": {
+        "nodes": 1124,
+        "ms": 1645.4546640000008,
+        "depth": 2,
+        "capped": false,
+        "move": "c8-c6",
+        "score": 1068
+      }
+    }
+  ]
+}

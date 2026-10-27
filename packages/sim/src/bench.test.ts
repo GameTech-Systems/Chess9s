@@ -3,8 +3,10 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import data from '../bench/positions.json';
+import data3 from '../bench/positions-3p.json';
 import { benchPosition, benchStats, positionsOf, replay, type BenchPositions } from './bench';
 import { loadSource, rulesFor } from './load';
+import { MEASURES } from './measures';
 
 const source = loadSource(new URL('../../../', import.meta.url).pathname);
 const { rules, ruleset } = rulesFor(source, 'draft-2p');
@@ -74,6 +76,33 @@ describe('the 2-player results', () => {
     },
     60_000,
   );
+});
+
+describe('3-player positions (S62)', () => {
+  const three = rulesFor(source, 'standard-3p');
+  const positions = positionsOf(data3 as BenchPositions);
+
+  it('are for standard-3p as it is now, and replay legally', () => {
+    expect((data3 as BenchPositions).ruleset).toEqual(three.ruleset);
+    expect(positions.length).toBeGreaterThan(5);
+    for (const p of positions) {
+      expect(replay(three.rules, three.ruleset, p.moves).result.status).toBe('ongoing');
+    }
+  });
+
+  it('are searched to depth 2 within the positions cap', () => {
+    for (const p of positions) {
+      const state = replay(three.rules, three.ruleset, p.moves);
+      const row = benchPosition(state, p.name, {
+        depth: 2,
+        nodes: MEASURES.nodes,
+        reference: false,
+      });
+      // A forced mate found at depth 1 ends the search there.
+      expect(row.search.capped, p.name).toBe(false);
+      expect(row.search.depth === 2 || Math.abs(row.search.score) > 900_000, p.name).toBe(true);
+    }
+  }, 600_000);
 });
 
 describe('benchStats', () => {
