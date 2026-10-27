@@ -22,10 +22,10 @@ export interface RulesData {
   find(id: string, version?: string): { ruleset: Ruleset; archived: boolean } | undefined;
   /** Every value of a ruleset, resolved; an archived version from its lock. */
   values(id: string, version?: string): Record<string, ParamValue>;
-  /** The rules a game plays on a ruleset. Refuses an unknown ruleset and one with 3 players. */
+  /** The rules a game plays on a ruleset, for its own player count. Refuses an unknown ruleset. */
   rules(id: string, version?: string): MoveRules;
-  /** The rules of a 2-player game with these values (a custom ruleset, already resolved). */
-  rulesWith(values: Record<string, ParamValue>): MoveRules;
+  /** The rules of a game with these values (a custom ruleset, already resolved); 2 players by default. */
+  rulesWith(values: Record<string, ParamValue>, players?: 2 | 3): MoveRules;
 }
 
 const filesIn = <T>(files: RulesFiles, dir: RegExp): T[] =>
@@ -66,7 +66,11 @@ export function loadRules(files: RulesFiles): RulesData {
     return resolveVersion(registry, library, id, version).values;
   };
 
-  const rulesWith: RulesData['rulesWith'] = (v) => ({ ...boardAndPieces(), values: v, players: 2 });
+  const rulesWith: RulesData['rulesWith'] = (v, players = 2) => ({
+    ...boardAndPieces(),
+    values: v,
+    players,
+  });
 
   return {
     registry,
@@ -77,8 +81,7 @@ export function loadRules(files: RulesFiles): RulesData {
     rules(id, version) {
       const found = find(id, version);
       if (!found) throw new RulesError(`Unknown ruleset: ${named(id, version)}`);
-      if (found.ruleset.players !== 2) throw new RulesError(`Ruleset ${id} is not playable yet`);
-      return rulesWith(values(id, version));
+      return rulesWith(values(id, version), found.ruleset.players);
     },
   };
 }

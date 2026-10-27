@@ -75,10 +75,18 @@ describe('loadRules', () => {
     expect(rules.values['turn.firstMove']).toBe('dark');
   });
 
-  it('refuses an unknown ruleset and one the engine cannot play (3 players)', () => {
+  it('refuses an unknown ruleset', () => {
     expect(() => data.rules('nothing')).toThrow(RulesError);
-    expect(() => data.rules('draft-3p')).toThrow(/not playable/);
     expect(() => data.values('nothing')).toThrow(RulesError);
+  });
+
+  it('gives the rules of a 3-player ruleset: three players, the 3-player values (S57)', () => {
+    for (const id of ['standard-3p', 'draft-3p', 'easy-3p']) {
+      const rules = data.rules(id);
+      expect(rules.players, id).toBe(3);
+      expect(rules.values['endings.3p'], id).toBeDefined();
+    }
+    expect(data.rules('easy-3p').values['endings.3p']).toBe('first-checkmate');
   });
 
   it('plays an archived version from its lock, not from the registry', () => {
