@@ -288,7 +288,7 @@ Builds decision 0016; no brief beyond `/start-session S56`. The six new paramete
 Done when: the three 3-player presets play from the start to every end in their tables; every 3-player parameter is tested at its default and each option; `RULES.md` and the registry match decision 0016; the 2-player tests and locks are unchanged.
 Decisions: D55, D56, D57, D62, D63, D65.
 
-### S57 — 3-player hot-seat in the browser · Sonnet 5.5 · high · `todo`
+### S57 — 3-player hot-seat in the browser · Sonnet 5.5 · high · `done`
 - **Picker.** The three 3-player presets, Standard first and marked Default for 3 players (D63), each with its Experimental badge and its rules page (`/rules/<id>`, which lists every 3-player setting).
 - **Board.** It turns to the side to move, using each side's `view` from the board data (D34 for dark; the Dragon's view is the board's own). It shows whose turn it is among the three, stones drawn as stone, a side that is out, and the Tail in stone. The danger aid also shows a King that a Dragon piece attacks when that isn't check (0016 rule 2). The legal-move aid, last move and undo work as in 2-player. A two-attacker Tail checkmate asks which piece swaps, like the promotion picker.
 - **End.** A result screen for every 3-player result in both end tables: a win, the duel starting, the Dragon out, and a draw with the players who share it. Save game record works for 3-player games.
