@@ -10,6 +10,9 @@
 // Then a game in which Light resigns (S67): a cancelled and a confirmed Resign, a reload, and Dark
 // and the Dragon play on to the Dragon's checkmate; the saved record opens again with the
 // resignation in it. Desktop and Pixel 7 width.
+// Then a 3-player ruleset built from Standard (3-player) in the builder (S64): changed, played
+// hot-seat with a computer Dragon, exported, loaded back and opened from its share link.
+// Desktop and Pixel 7 width.
 // Needs Playwright with Chromium (not a dependency of this repo):
 //   pnpm build && node apps/web/scripts/e2e-3p.mjs      (SHOTS=<directory> saves screenshots)
 import { spawn } from 'node:child_process';
@@ -464,10 +467,117 @@ async function playResignation(browser, options, size) {
   await context.close();
 }
 
+/** Build a 3-player ruleset, play it with a computer Dragon, export it, load it, open its link. */
+async function playBuilt(browser, options, size) {
+  const label = `${size} · built 3-player ruleset`;
+  const context = await browser.newContext({ ...options, acceptDownloads: true });
+  const page = await context.newPage();
+  page.on('pageerror', (e) => console.error(`${label} page error:`, e.message));
+  await page.goto(`${BASE}/build`);
+  await page.getByRole('button', { name: '3 players', exact: true }).click();
+  check(
+    (await page
+      .getByRole('button', { name: 'Standard (3-player)' })
+      .getAttribute('aria-pressed')) === 'true',
+    `${label}: Standard (3-player) is the starting preset`,
+  );
+  await page.getByLabel('Ruleset name').fill('Quick Dragon');
+  await page.getByRole('button', { name: 'Raise Dragon Head range' }).waitFor();
+  await page.getByRole('button', { name: 'Lower Dragon Head range' }).click();
+  await page
+    .locator('[data-setting="endings.3p"]')
+    .getByRole('radio', { name: 'The first checkmate wins' })
+    .click();
+  check(
+    (await page.locator('[data-held="dragon.3p.givesCheck"]').innerText()).includes('stays on'),
+    `${label}: first-checkmate turns the Dragon's check on and says why`,
+  );
+  check(
+    (await page.getByText('A 3-player ruleset cannot be submitted').count()) === 1 &&
+      (await page.getByText('Submit for consideration').count()) === 0,
+    `${label}: Submit is not offered for 3 players`,
+  );
+  await noSidewaysScroll(page, `${label} (builder)`);
+  await shot(page, `${size.replace(/\W+/g, '')}-built-1-builder`);
+
+  // Export, then the link.
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByRole('button', { name: 'Export as file' }).click(),
+  ]);
+  const path = await download.path();
+  const file = JSON.parse(readFileSync(path, 'utf8'));
+  check(
+    file.players === 3 &&
+      file.overrides['endings.3p'] === 'first-checkmate' &&
+      file.overrides['dragon.3p.givesCheck'] === true &&
+      file.overrides['dragonHead.range'] === 7,
+    `${label}: the exported file is a 3-player ruleset with the changes`,
+  );
+  const link = await page.getByLabel('Share link').inputValue();
+
+  // Play it.
+  await page.getByRole('button', { name: 'Save and play', exact: true }).click();
+  await page.locator('ul[aria-label="Seats"]').waitFor({ timeout: TIMEOUT });
+  const seats = page.getByRole('group', { name: 'Computer seats' });
+  await seats.getByRole('button', { name: 'Dragon', exact: true }).click();
+  let played = 0;
+  let dragonMoves = 0;
+  while (played < 6 && (await page.getByRole('region', { name: 'Result' }).count()) === 0) {
+    const to = await page.locator('[data-seat][data-turn="true"]').getAttribute('data-seat');
+    if (to !== 'dragon') await anyMove(page, to);
+    else dragonMoves++;
+    played++;
+    await page.waitForFunction(
+      (n) => document.querySelectorAll('ol.moves span').length >= n,
+      played,
+      {
+        timeout: TIMEOUT,
+      },
+    );
+  }
+  check(dragonMoves > 0, `${label}: the computer Dragon moved ${dragonMoves} times`);
+  await shot(page, `${size.replace(/\W+/g, '')}-built-2-played`);
+
+  // The saved ruleset loads back from the file, in a fresh browser.
+  const fresh = await browser.newContext(options);
+  const other = await fresh.newPage();
+  other.on('pageerror', (e) => console.error(`${label} page error:`, e.message));
+  await other.goto(`${BASE}/build`);
+  await other.getByLabel('Ruleset file').setInputFiles(path);
+  await other.getByRole('button', { name: '3 players', exact: true }).waitFor();
+  check(
+    (await other.getByLabel('Ruleset name').inputValue()) === 'Quick Dragon' &&
+      (await other
+        .getByRole('button', { name: '3 players', exact: true })
+        .getAttribute('aria-pressed')) === 'true' &&
+      (await other.locator('[data-diff="dragonHead.range"]').count()) === 1,
+    `${label}: the file loads back as the same 3-player ruleset`,
+  );
+  const third = await fresh.newPage();
+  await third.goto(link);
+  check(
+    (await third.getByLabel('Ruleset name').inputValue()) === 'Quick Dragon' &&
+      (await third
+        .getByRole('button', { name: '3 players', exact: true })
+        .getAttribute('aria-pressed')) === 'true' &&
+      (await third.locator('[data-diff="endings.3p"]').count()) === 1,
+    `${label}: the share link opens the same 3-player ruleset`,
+  );
+  await fresh.close();
+  await context.close();
+}
+
 async function main() {
   await waitForServer();
   const browser = await chromium.launch();
   try {
+    if (process.env.ONLY === 'build') {
+      await playBuilt(browser, { viewport: { width: 1280, height: 900 } }, 'desktop');
+      await playBuilt(browser, { ...devices['Pixel 7'] }, 'Pixel 7');
+      console.log('3-player browser check passed');
+      return;
+    }
     if (process.env.ONLY === 'resign') {
       await playResignation(browser, { viewport: { width: 1280, height: 900 } }, 'desktop');
       await playResignation(browser, { ...devices['Pixel 7'] }, 'Pixel 7');
@@ -482,6 +592,8 @@ async function main() {
     await playComputerDragon(browser, { ...devices['Pixel 7'] }, 'Pixel 7');
     await playResignation(browser, { viewport: { width: 1280, height: 900 } }, 'desktop');
     await playResignation(browser, { ...devices['Pixel 7'] }, 'Pixel 7');
+    await playBuilt(browser, { viewport: { width: 1280, height: 900 } }, 'desktop');
+    await playBuilt(browser, { ...devices['Pixel 7'] }, 'Pixel 7');
     console.log('3-player browser check passed');
   } finally {
     await browser.close();

@@ -7,6 +7,7 @@ import {
   customFrom,
   differences,
   flaggedInteractions,
+  heldSettings,
   nameProblem,
   newCustomId,
   presets,
@@ -81,7 +82,19 @@ const nameOf = (s: Setting, option: string | number | boolean) =>
   s.optionLabels[String(option)] ?? String(option);
 
 /** The control for one setting, by the kind of parameter it is. */
-function Control({ s, dispatch }: { s: Setting; dispatch: Dispatch }) {
+function Control({
+  s,
+  dispatch,
+  held,
+}: {
+  s: Setting;
+  dispatch: Dispatch;
+  /** Another setting needs this one as it is, so it cannot change. */
+  held?: boolean;
+}) {
+  if (held && controlKind(s) !== 'fixed') {
+    return <span className="fixed">Fixed: {s.valueLabel}</span>;
+  }
   switch (controlKind(s)) {
     case 'switch':
       return (
@@ -223,18 +236,23 @@ export function Builder({
   const [loadProblem, setLoadProblem] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const picker = useRef<HTMLInputElement>(null);
-  const settings = useMemo(() => settingsFor(state.values), [state.values]);
-  const base = presets().find((r) => r.id === state.base);
+  const { players } = state;
+  const settings = useMemo(() => settingsFor(state.values, players), [state.values, players]);
+  const held = useMemo(() => heldSettings(state.values), [state.values]);
+  const base = presets(players).find((r) => r.id === state.base);
   const baseValues = useMemo(() => rulesetValues(state.base), [state.base]);
-  const diff = useMemo(() => differences(baseValues, state.values), [baseValues, state.values]);
-  const flags = useMemo(
-    () => flaggedInteractions(baseValues, state.values),
-    [baseValues, state.values],
+  const diff = useMemo(
+    () => differences(baseValues, state.values, players),
+    [baseValues, state.values, players],
   );
-  const unbuilt = useMemo(() => unbuiltIn(state.values), [state.values]);
+  const flags = useMemo(
+    () => flaggedInteractions(baseValues, state.values, players),
+    [baseValues, state.values, players],
+  );
+  const unbuilt = useMemo(() => unbuiltIn(state.values, players), [state.values, players]);
   const changed = new Set(diff.map((d) => d.id));
   const problem = nameProblem(state.name);
-  const fingerprint = JSON.stringify([state.name.trim(), state.base, state.values]);
+  const fingerprint = JSON.stringify([state.name.trim(), state.base, players, state.values]);
   const isSaved = kept === fingerprint;
   const keep = (): CustomRuleset => {
     const c = customFrom(state, id ?? newCustomId(taken));
@@ -244,7 +262,7 @@ export function Builder({
     return c;
   };
 
-  const official = useMemo(() => matchingOfficial(state.values), [state.values]);
+  const official = useMemo(() => matchingOfficial(state.values, players), [state.values, players]);
   const link = `${originNow()}${shareLink(state)}`;
   const loadFile = async (file: File | undefined) => {
     if (!file) return;
@@ -282,8 +300,22 @@ export function Builder({
 
       <section aria-labelledby="builder-start">
         <h3 id="builder-start">Start from</h3>
+        <div className="segmented" role="group" aria-label="Number of players">
+          {([2, 3] as const).map((n) => (
+            <button
+              key={n}
+              type="button"
+              aria-pressed={players === n}
+              onClick={() => {
+                if (players !== n) dispatch({ type: 'base', base: presets(n)[0]!.id });
+              }}
+            >
+              {n} players
+            </button>
+          ))}
+        </div>
         <div className="segmented" role="group" aria-label="Starting preset">
-          {presets().map((r) => (
+          {presets(players).map((r) => (
             <button
               key={r.id}
               type="button"
@@ -342,6 +374,16 @@ export function Builder({
               ))}
             </ul>
           </div>
+        )}
+        {held.length > 0 && (
+          <ul className="flags" role="note">
+            {held.map((h) => (
+              <li key={`${h.id}+${h.by}`} data-held={h.id}>
+                {settings.find((s) => s.id === h.id)?.label ?? h.id} stays on because {h.label}{' '}
+                needs it.
+              </li>
+            ))}
+          </ul>
         )}
         {unbuilt.length > 0 && (
           <p className="flags" role="note">
@@ -446,19 +488,26 @@ export function Builder({
         <div className="builder-actions">
           {invite('game', 'Invite to a game')}
           {invite('tournament', 'Invite to a tournament')}
-          <a
-            className="again"
-            target="_blank"
-            rel="noopener noreferrer"
-            {...(problem === null
-              ? { href: submitUrl(state, originNow()) }
-              : { 'aria-disabled': true })}
-          >
-            Submit for consideration
-          </a>
+          {players === 2 && (
+            <a
+              className="again"
+              target="_blank"
+              rel="noopener noreferrer"
+              {...(problem === null
+                ? { href: submitUrl(state, originNow()) }
+                : { 'aria-disabled': true })}
+            >
+              Submit for consideration
+            </a>
+          )}
         </div>
         {problem && (
           <p className="meta">Name the ruleset to export it, invite someone or submit it.</p>
+        )}
+        {players === 3 && (
+          <p className="meta" data-submit-note>
+            A 3-player ruleset cannot be submitted: tournament rulesets are 2-player.
+          </p>
         )}
         <p className="meta">
           A custom ruleset is never a tournament ruleset: the tournament invitation says so (see the{' '}
@@ -486,7 +535,7 @@ export function Builder({
                 >
                   <div className="control-label">{s.label}</div>
                   {s.description && <div className="desc">{s.description}</div>}
-                  <Control s={s} dispatch={dispatch} />
+                  <Control s={s} dispatch={dispatch} held={held.some((h) => h.id === s.id)} />
                 </div>
               ))}
             </div>

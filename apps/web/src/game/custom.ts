@@ -1,5 +1,5 @@
-// The ruleset builder (S41): pure functions over a draft. The draft holds every value of a
-// 2-player ruleset; a control changes one value through `builderReducer`, which accepts only
+// The ruleset builder (S41, S64): pure functions over a draft. The draft holds every value of a
+// 2- or 3-player ruleset (which one follows the preset it started from); a control changes one value through `builderReducer`, which accepts only
 // what the registry lists as an option. A custom ruleset is saved in the player's browser only,
 // as its name, the preset it started from and its full overrides (every value that differs from
 // the registry default), so a saved game replays without anything else.
@@ -7,6 +7,7 @@ import { parameterInteractions, unbuiltFeatures, type ParamValue } from '@chess9
 import registry from '../../../../rules/parameters.json';
 import type { Store } from './guest';
 import {
+  DEFAULT_3P_RULESET_ID,
   DEFAULT_RULESET_ID,
   createRulesFor,
   customInfo,
@@ -29,6 +30,8 @@ export const MAX_NAME = 40;
 /** What the player is editing. `id` is set when an already saved ruleset is being changed. */
 export interface BuilderState {
   base: string;
+  /** The player count of the ruleset being built: that of its starting preset. */
+  players: 2 | 3;
   name: string;
   values: Values;
   id?: string;
@@ -43,10 +46,13 @@ export type BuilderAction =
   /** A draft that was loaded from a file or a link, already checked. */
   | { type: 'replace'; state: BuilderState };
 
-/** The presets a draft can start from: the playable 2-player rulesets in rules/rulesets/. */
-export const presets = () => listRulesets().filter((r) => r.playable && r.players === 2);
+/** The presets a draft can start from: the playable rulesets in rules/rulesets/ (all 2 players if none is given). */
+export const presets = (players: 2 | 3 = 2) =>
+  listRulesets().filter((r) => r.playable && r.players === players);
 
-const isPreset = (id: string) => presets().some((r) => r.id === id);
+const allPresets = () => listRulesets().filter((r) => r.playable);
+
+const presetOf = (id: string) => allPresets().find((r) => r.id === id);
 
 /** A new draft from a preset, or the saved ruleset being edited. */
 export function startBuilder(
@@ -54,13 +60,48 @@ export function startBuilder(
   saved?: CustomRuleset,
 ): BuilderState {
   if (saved) {
-    return { base: saved.base, name: saved.name, values: customValues(saved), id: saved.id };
+    return {
+      base: saved.base,
+      players: saved.players ?? 2,
+      name: saved.name,
+      values: customValues(saved),
+      id: saved.id,
+    };
   }
-  return { base, name: '', values: { ...rulesetValues(base) } };
+  return {
+    base,
+    players: presetOf(base)?.players ?? 2,
+    name: '',
+    values: { ...rulesetValues(base) },
+  };
 }
 
-const settingOf = (values: Values, id: string): Setting | undefined =>
-  settingsFor(values).find((s) => s.id === id);
+const settingOf = (state: BuilderState, id: string): Setting | undefined =>
+  settingsFor(state.values, state.players).find((s) => s.id === id);
+
+type Registered = { id: string; requires?: Record<string, Record<string, ParamValue>> };
+const registered = (id: string) =>
+  (registry as { parameters: Registered[] }).parameters.find((p) => p.id === id);
+
+/**
+ * What a value needs: `requires` in the registry names settings that must take a value for an
+ * option to be allowed (the loader refuses a ruleset without them).
+ */
+const needs = (id: string, value: ParamValue): Record<string, ParamValue> =>
+  registered(id)?.requires?.[String(value)] ?? {};
+
+/** The settings a draft holds in place because another one in it needs them, with the reason. */
+export function heldSettings(values: Values): { id: string; by: string; label: string }[] {
+  const out: { id: string; by: string; label: string }[] = [];
+  const label = new Map(settingsFor(values, 3).map((s) => [s.id, s.label]));
+  for (const p of (registry as { parameters: Registered[] }).parameters) {
+    for (const [option, req] of Object.entries(p.requires ?? {})) {
+      if (!(p.id in values) || String(values[p.id]) !== option) continue;
+      for (const id of Object.keys(req)) out.push({ id, by: p.id, label: label.get(p.id) ?? p.id });
+    }
+  }
+  return out;
+}
 
 /** Which control a setting gets. Pawn safe zones are two switches; one-option settings are fixed. */
 export type ControlKind = 'switch' | 'stepper' | 'choice' | 'multi' | 'safe-zones' | 'fixed';
@@ -98,17 +139,32 @@ export function builderReducer(state: BuilderState, action: BuilderAction): Buil
     case 'replace':
       return action.state;
     case 'base':
-      if (!isPreset(action.base)) return state;
-      return { ...state, base: action.base, values: { ...rulesetValues(action.base) } };
+      return presetOf(action.base)
+        ? {
+            ...state,
+            base: action.base,
+            players: presetOf(action.base)!.players,
+            values: { ...rulesetValues(action.base) },
+          }
+        : state;
     case 'name':
       return { ...state, name: action.name };
     case 'set': {
-      const s = settingOf(state.values, action.id);
+      const s = settingOf(state, action.id);
       if (!s || s.type === 'enumSet' || !s.options.includes(action.value as Option)) return state;
-      return { ...state, values: { ...state.values, [action.id]: action.value } };
+      // A setting another one needs stays put (the control is disabled and says why).
+      const held = heldSettings(state.values).find((h) => h.id === action.id);
+      if (held && !same(needs(held.by, state.values[held.by]!)[action.id], action.value)) {
+        return state;
+      }
+      // An option that needs other settings switches them on, so the draft stays one the engine accepts.
+      return {
+        ...state,
+        values: { ...state.values, ...needs(action.id, action.value), [action.id]: action.value },
+      };
     }
     case 'step': {
-      const s = settingOf(state.values, action.id);
+      const s = settingOf(state, action.id);
       if (!s || s.type !== 'integer') return state;
       const options = stepOptions(s);
       const at = options.indexOf(state.values[action.id] as number);
@@ -117,7 +173,7 @@ export function builderReducer(state: BuilderState, action: BuilderAction): Buil
       return { ...state, values: { ...state.values, [action.id]: next } };
     }
     case 'toggle': {
-      const s = settingOf(state.values, action.id);
+      const s = settingOf(state, action.id);
       if (!s || s.type !== 'enumSet' || !s.options.includes(action.option)) return state;
       const now = new Set(state.values[action.id] as Option[]);
       if (!now.delete(action.option)) now.add(action.option);
@@ -137,9 +193,9 @@ export interface Difference {
 }
 
 /** Every setting whose value differs from the starting preset's, in registry order. */
-export function differences(base: Values, values: Values): Difference[] {
-  const was = new Map(settingsFor(base).map((s) => [s.id, s]));
-  return settingsFor(values)
+export function differences(base: Values, values: Values, players: 2 | 3 = 2): Difference[] {
+  const was = new Map(settingsFor(base, players).map((s) => [s.id, s]));
+  return settingsFor(values, players)
     .filter((s) => !same(s.value, was.get(s.id)?.value))
     .map((s) => ({
       id: s.id,
@@ -163,15 +219,15 @@ export interface Flag {
  * both are off the registry default, and at least one differs from the starting preset (a preset's
  * own pairs were checked, or are flagged by its status).
  */
-export function flaggedInteractions(base: Values, values: Values): Flag[] {
+export function flaggedInteractions(base: Values, values: Values, players: 2 | 3 = 2): Flag[] {
   const off = new Set(
-    settingsFor(values)
+    settingsFor(values, players)
       .filter((s) => s.changed)
       .map((s) => s.id),
   );
-  const moved = new Set(differences(base, values).map((d) => d.id));
-  const label = new Map(settingsFor(values).map((s) => [s.id, s.label]));
-  return parameterInteractions(registry, 2)
+  const moved = new Set(differences(base, values, players).map((d) => d.id));
+  const label = new Map(settingsFor(values, players).map((s) => [s.id, s.label]));
+  return parameterInteractions(registry, players)
     .filter((i) => off.has(i.a) && off.has(i.b) && (moved.has(i.a) || moved.has(i.b)))
     .map((i) => ({
       a: i.a,
@@ -183,8 +239,13 @@ export function flaggedInteractions(base: Values, values: Values): Flag[] {
 }
 
 /** Features a draft switches on that this build does not play yet. */
-export function unbuiltIn(values: Values): string[] {
-  const info = customInfo({ id: 'custom-draft', name: 'Draft', overrides: overridesOf(values) });
+export function unbuiltIn(values: Values, players: 2 | 3 = 2): string[] {
+  const info = customInfo({
+    id: 'custom-draft',
+    name: 'Draft',
+    players,
+    overrides: overridesOf(values, players),
+  });
   return unbuiltFeatures(createRulesFor(info)).map((f) => f.label);
 }
 
@@ -200,7 +261,13 @@ export function nameProblem(name: string): string | null {
 export function customFrom(state: BuilderState, id: string): CustomRuleset {
   const problem = nameProblem(state.name);
   if (problem) throw new Error(problem);
-  return { id, name: state.name.trim(), base: state.base, overrides: overridesOf(state.values) };
+  return {
+    id,
+    name: state.name.trim(),
+    base: state.base,
+    ...(state.players === 3 && { players: 3 as const }),
+    overrides: overridesOf(state.values, state.players),
+  };
 }
 
 /** The lowest `custom-<n>` not in use. */
@@ -220,10 +287,17 @@ function sound(raw: unknown): CustomRuleset | undefined {
   const { id, name, base } = raw;
   if (typeof id !== 'string' || !ID.test(id)) return undefined;
   if (typeof name !== 'string' || nameProblem(name) !== null) return undefined;
+  const players = raw.players === 3 ? 3 : 2;
   const entry: CustomRuleset = {
     id,
     name,
-    base: typeof base === 'string' && isPreset(base) ? base : DEFAULT_RULESET_ID,
+    base:
+      typeof base === 'string' && presetOf(base)?.players === players
+        ? base
+        : players === 3
+          ? DEFAULT_3P_RULESET_ID
+          : DEFAULT_RULESET_ID,
+    ...(players === 3 && { players: 3 as const }),
     overrides: raw.overrides as Values,
   };
   try {

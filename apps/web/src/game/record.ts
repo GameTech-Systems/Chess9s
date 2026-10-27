@@ -78,6 +78,7 @@ export function openRecord(text: string): Opened {
       ? customInfo({
           id: ref.id,
           name: ref.id,
+          players: saved.players === 3 ? 3 : 2,
           overrides: ref.overrides as NonNullable<RulesetInfo['overrides']>,
         })
       : findRuleset(ref.id, ref.version);

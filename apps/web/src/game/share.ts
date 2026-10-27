@@ -18,6 +18,7 @@ import {
 } from './custom';
 import {
   CUSTOM_VERSION,
+  DEFAULT_3P_RULESET_ID,
   DEFAULT_RULESET_ID,
   customValues,
   findRuleset,
@@ -41,22 +42,22 @@ const isRecord = (v: unknown): v is Record<string, unknown> =>
   typeof v === 'object' && v !== null && !Array.isArray(v);
 
 /** The preset a set of values is closest to, for the builder's "what differs" list. */
-function closestPreset(values: Values): string {
-  const count = (id: string) => differences(rulesetValues(id), values).length;
-  return presets()
+function closestPreset(values: Values, players: 2 | 3): string {
+  const count = (id: string) => differences(rulesetValues(id), values, players).length;
+  return presets(players)
     .map((r) => r.id)
     .reduce((best, id) => (count(id) < count(best) ? id : best));
 }
 
 /** A draft from a name and overrides, or why they cannot be used. */
-function draftFrom(name: unknown, overrides: unknown): Parsed {
+function draftFrom(name: unknown, overrides: unknown, players: 2 | 3 = 2): Parsed {
   if (typeof name !== 'string') return refuse('The ruleset has no name.');
   const problem = nameProblem(name);
   if (problem) return refuse(problem);
   if (!isRecord(overrides)) return refuse('The file has no “overrides” object.');
-  const r = resolveFileOverrides(registry, name.trim(), overrides);
+  const r = resolveFileOverrides(registry, name.trim(), overrides, undefined, players);
   if (!r.ok) return refuse(r.problem);
-  const state = startBuilder(closestPreset(r.values));
+  const state = startBuilder(closestPreset(r.values, players));
   return { ok: true, state: { ...state, name: r.name, values: r.values } };
 }
 
@@ -68,7 +69,7 @@ export function exportFile(c: CustomRuleset): string {
       name: c.name,
       version: CUSTOM_VERSION,
       status: 'proposed',
-      players: 2,
+      players: c.players ?? 2,
       description: 'A ruleset built by a player. Not fairness-checked; not a tournament ruleset.',
       overrides: c.overrides,
     },
@@ -88,15 +89,15 @@ export const exportName = (c: Pick<CustomRuleset, 'id' | 'name'>) =>
   }.json`;
 
 /**
- * A draft from a ruleset file. Only the 2-player ruleset format is accepted, with no new
+ * A draft from a ruleset file. The 2-player and 3-player ruleset format is accepted (D64), with no new
  * parameters: every override must be one the registry lists, at one of its options. The file's
  * id and status are ignored (a loaded ruleset is always `proposed`, and gets a free id on save).
  */
 export function parseRulesetFile(text: string): Parsed {
   // The same check the sim runs on a submitted file (`pnpm sim --ruleset-file`).
-  const file = readRulesetFile(text, registry);
+  const file = readRulesetFile(text, registry, [2, 3]);
   if (!file.ok) return refuse(file.problem);
-  return draftFrom(file.name, file.overrides);
+  return draftFrom(file.name, file.overrides, file.players);
 }
 
 const toBase64Url = (s: string) =>
@@ -111,8 +112,12 @@ const fromBase64Url = (s: string) =>
   );
 
 /** A path and hash that opens the builder with this ruleset: its name and its overrides. */
-export function shareLink(state: Pick<BuilderState, 'name' | 'values'>): string {
-  const payload = JSON.stringify({ n: state.name.trim(), o: overridesOf(state.values) });
+export function shareLink(state: Pick<BuilderState, 'name' | 'values' | 'players'>): string {
+  const payload = JSON.stringify({
+    n: state.name.trim(),
+    ...(state.players === 3 && { p: 3 }),
+    o: overridesOf(state.values, state.players),
+  });
   return `${SHARE_PATH}#${HASH_KEY}${toBase64Url(payload)}`;
 }
 
@@ -123,7 +128,7 @@ export function parseShareLink(hash: string): BuilderState | undefined {
   try {
     const data: unknown = JSON.parse(fromBase64Url(h.slice(HASH_KEY.length)));
     if (!isRecord(data)) return undefined;
-    const r = draftFrom(data.n, data.o);
+    const r = draftFrom(data.n, data.o, data.p === 3 ? 3 : 2);
     return r.ok ? r.state : undefined;
   } catch {
     return undefined;
@@ -131,25 +136,36 @@ export function parseShareLink(hash: string): BuilderState | undefined {
 }
 
 /** The Official ruleset these values equal, if any. Until then a ruleset is unofficial. */
-export function matchingOfficial(values: Values): { id: string; name: string } | undefined {
+export function matchingOfficial(
+  values: Values,
+  players: 2 | 3 = 2,
+): { id: string; name: string } | undefined {
   return listRulesets().find(
-    (r) => r.status === 'official' && r.playable && same(rulesetValues(r.id), values),
+    (r) =>
+      r.status === 'official' &&
+      r.playable &&
+      r.players === players &&
+      same(rulesetValues(r.id), values),
   );
 }
 
 /** What differs from Standard (the ruleset players know), in plain text, one setting per line. */
-export function settingsText(values: Values): string {
-  return differences(rulesetValues(DEFAULT_RULESET_ID), values)
+export function settingsText(values: Values, players: 2 | 3 = 2): string {
+  const standard = players === 3 ? DEFAULT_3P_RULESET_ID : DEFAULT_RULESET_ID;
+  return differences(rulesetValues(standard), values, players)
     .map((d) => `- ${d.label}: ${d.from} → ${d.to}`)
     .join('\n');
 }
+
+const differsFrom = (players: 2 | 3) =>
+  players === 3 ? 'Differs from Standard (3-player):' : 'Differs from Standard:';
 
 export type InviteKind = 'game' | 'tournament';
 
 /** A `mailto:` link with no address: the player picks who to write to in their own mail app. */
 export function inviteMailto(kind: InviteKind, state: BuilderState, origin: string): string {
   const name = state.name.trim() || 'my ruleset';
-  const open = matchingOfficial(state.values);
+  const open = matchingOfficial(state.values, state.players);
   const lines = [
     kind === 'game'
       ? `Come and play Chess Nines with me, using the ruleset “${name.slice(0, MAX_NAME)}”.`
@@ -170,8 +186,8 @@ export function inviteMailto(kind: InviteKind, state: BuilderState, origin: stri
         ]
       : []),
     '',
-    'Differs from Standard:',
-    settingsText(state.values) || '- None',
+    differsFrom(state.players),
+    settingsText(state.values, state.players) || '- None',
   ];
   const subject =
     kind === 'game' ? `Invitation to a Chess Nines game` : `Invitation to a Chess Nines tournament`;
@@ -245,8 +261,8 @@ export function submitUrl(
       fileNote,
       'Fairness check: save the file as a .json and run `pnpm sim --ruleset-file <file>`.',
       '',
-      'Differs from Standard:',
-      settingsText(state.values) || '- None',
+      differsFrom(state.players),
+      settingsText(state.values, state.players) || '- None',
     ].join('\n');
   const url = (fields: Record<string, string>) =>
     `${SUBMIT_FORM_URL}?${new URLSearchParams({

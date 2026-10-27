@@ -65,24 +65,28 @@ export interface CustomRuleset {
   name: string;
   /** The preset it was started from (for the "what differs" list only). */
   base: string;
+  /** 2 when absent: rulesets saved before 3-player rulesets could be built (S64). */
+  players?: 2 | 3;
   overrides: Record<string, ParamValue>;
 }
 
 /** Custom rulesets have no versions of their own: a changed ruleset has different overrides. */
 export const CUSTOM_VERSION = '1.0.0';
 
-const customFile = (c: Pick<CustomRuleset, 'id' | 'name' | 'overrides'>): Ruleset => ({
+const customFile = (c: Pick<CustomRuleset, 'id' | 'name' | 'overrides' | 'players'>): Ruleset => ({
   id: c.id,
   name: c.name,
   version: CUSTOM_VERSION,
   status: 'proposed',
-  players: 2,
+  players: c.players ?? 2,
   description: 'A ruleset built by the player. Not fairness-checked; not a tournament ruleset.',
   overrides: c.overrides,
 });
 
 /** The picker's and the game's view of a custom ruleset. */
-export const customInfo = (c: Pick<CustomRuleset, 'id' | 'name' | 'overrides'>): RulesetInfo => ({
+export const customInfo = (
+  c: Pick<CustomRuleset, 'id' | 'name' | 'overrides' | 'players'>,
+): RulesetInfo => ({
   ...infoOf(customFile(c)),
   custom: true,
   overrides: { ...c.overrides },
@@ -129,7 +133,8 @@ export function findRuleset(id: string, version?: string): RulesetInfo | undefin
 /** The default ruleset, as recorded with a game. */
 export const ruleset: RulesetInfo = infoOf(files.find((r) => r.id === DEFAULT_RULESET_ID)!);
 
-const rulesOf = (file: Ruleset): MoveRules => data.rulesWith(resolveRuleset(registry, file).values);
+const rulesOf = (file: Ruleset): MoveRules =>
+  data.rulesWith(resolveRuleset(registry, file).values, file.players);
 
 /** The rules of a bundled ruleset: the current version, or an archived one from its lock. */
 export const createRules = (id: string = DEFAULT_RULESET_ID, version?: string): MoveRules =>
@@ -149,14 +154,17 @@ export const rulesetValues = (id: string, version?: string): Record<string, Para
   data.values(id, version);
 
 /** The values a custom ruleset plays: the registry defaults with its overrides. */
-export const customValues = (c: Pick<CustomRuleset, 'id' | 'name' | 'overrides'>) =>
+export const customValues = (c: Pick<CustomRuleset, 'id' | 'name' | 'overrides' | 'players'>) =>
   resolveRuleset(registry, customFile(c)).values;
 
 /** The registry defaults that the given values differ from: a custom ruleset's overrides. */
-export function overridesOf(values: Record<string, ParamValue>): Record<string, ParamValue> {
+export function overridesOf(
+  values: Record<string, ParamValue>,
+  players: 2 | 3 = 2,
+): Record<string, ParamValue> {
   const out: Record<string, ParamValue> = {};
   for (const p of (registry as Registry).parameters) {
-    if (p.status === 'deprecated' || !p.players.includes(2) || !(p.id in values)) continue;
+    if (p.status === 'deprecated' || !p.players.includes(players) || !(p.id in values)) continue;
     if (!same(values[p.id], p.default)) out[p.id] = values[p.id]!;
   }
   return out;
@@ -224,10 +232,15 @@ export function settingsFor(values: Record<string, ParamValue>, players: 2 | 3 =
  * ruleset plays. Read from the data only. A custom ruleset is given as its info.
  */
 export function rulesetSettings(
-  id: string | (Pick<RulesetInfo, 'id' | 'name' | 'overrides'> & { version?: string }),
+  id:
+    | string
+    | (Pick<RulesetInfo, 'id' | 'name' | 'overrides'> & {
+        version?: string;
+        players?: 2 | 3;
+      }),
 ): Setting[] {
   if (typeof id !== 'string' && id.overrides)
-    return settingsFor(customValues({ ...id, overrides: id.overrides }));
+    return settingsFor(customValues({ ...id, overrides: id.overrides }), id.players ?? 2);
   const key = typeof id === 'string' ? id : id.id;
   const version = typeof id === 'string' ? undefined : id.version;
   const found = data.find(key, version);

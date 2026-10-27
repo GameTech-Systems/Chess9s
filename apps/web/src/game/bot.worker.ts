@@ -4,7 +4,8 @@ import type { RulesetInfo } from './rules';
 
 export interface BotRequest {
   id: number;
-  ruleset: Pick<RulesetInfo, 'id' | 'version' | 'overrides'>;
+  /** `players` tells a custom ruleset's overrides which game they are for (S64). */
+  ruleset: Pick<RulesetInfo, 'id' | 'version' | 'overrides'> & { players?: 2 | 3 };
   moves: string[];
 }
 

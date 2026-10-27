@@ -66,7 +66,7 @@ describe('export and load', () => {
     expect(refused(parseRulesetFile(raw))).toMatch(/__proto__/);
     expect(bad({ extends: 'standard-2p' })).toMatch(/extends/);
     expect(bad({ extra: 1 })).toMatch(/extra/);
-    expect(bad({ players: 3 })).toMatch(/2-player/);
+    expect(bad({ players: 4 })).toMatch(/2-player and 3-player/);
     expect(bad({ name: '' })).toMatch(/name/i);
     expect(bad({ name: 'x'.repeat(200) })).toMatch(/name/i);
     expect(bad({ overrides: [] })).toMatch(/overrides/);
@@ -244,5 +244,62 @@ describe('invitation to a room (S53)', () => {
       ruleset: { id: 'draft-2p', version: '0.2.0', name: 'Good Practice' },
     });
     expect(text).toMatch(/not (yet )?official|not fairness-checked/i);
+  });
+});
+
+describe('3-player rulesets (S64, D64)', () => {
+  const three = (): BuilderState => {
+    let s = startBuilder('standard-3p');
+    s = builderReducer(s, { type: 'name', name: 'Wild Dragon' });
+    s = builderReducer(s, { type: 'step', id: 'dragonHead.range', by: -1 });
+    s = builderReducer(s, {
+      type: 'set',
+      id: 'check.3p.exposedKing',
+      value: 'counts-as-checkmate',
+    });
+    return s;
+  };
+
+  it('exports as a 3-player file and loads back to the same draft', () => {
+    const state = three();
+    expect(state.players).toBe(3);
+    const text = exportFile(customFrom(state, 'custom-1'));
+    expect(JSON.parse(text).players).toBe(3);
+    const back = parseRulesetFile(text);
+    expect(back.ok).toBe(true);
+    if (!back.ok) return;
+    expect(back.state.players).toBe(3);
+    expect(back.state.base).toBe('standard-3p');
+    expect(back.state.values).toEqual(state.values);
+    expect(exportFile(customFrom(back.state, 'custom-1'))).toBe(text);
+  });
+
+  it('refuses a 3-player file with a 2-player-only key, and a 2-player file with a 3-player key', () => {
+    const file = JSON.parse(exportFile(customFrom(three(), 'custom-1')));
+    const keys = (players: number, overrides: object) =>
+      refused(parseRulesetFile(JSON.stringify({ ...file, players, overrides })));
+    // No parameter is 2-player only today, so the crossing is checked from the 3-player side.
+    expect(keys(2, { 'dragon.3p.givesCheck': true })).toContain('dragon.3p.givesCheck');
+    expect(keys(3, { 'made.up': true })).toContain('made.up');
+    expect(keys(3, { 'endings.3p': 'first-checkmate' })).toContain('dragon.3p.givesCheck');
+  });
+
+  it('the share link opens a 3-player ruleset', () => {
+    const state = three();
+    const link = shareLink(state);
+    const back = parseShareLink(link.slice(link.indexOf('#')));
+    expect(back?.players).toBe(3);
+    expect(back?.name).toBe('Wild Dragon');
+    expect(back?.values).toEqual(state.values);
+    // A 2-player link carries no player count and still opens as 2 players.
+    expect(parseShareLink(shareLink(mine()).slice(shareLink(mine()).indexOf('#')))?.players).toBe(
+      2,
+    );
+  });
+
+  it('invitations compare with Standard (3-player)', () => {
+    const body = decodeURIComponent(inviteMailto('game', three(), 'https://chess9s.com'));
+    expect(body).toContain('Differs from Standard (3-player):');
+    expect(body).toContain('A King left in check for an earlier player');
   });
 });

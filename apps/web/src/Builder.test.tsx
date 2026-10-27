@@ -6,7 +6,7 @@ import { Builder } from './Builder';
 import { shareLink } from './game/share';
 import { RulePicker } from './RulePicker';
 import { RulesScreen } from './Rules';
-import { computerReply } from './game/bot';
+import { computerMove, computerReply } from './game/bot';
 import {
   builderReducer,
   customFrom,
@@ -345,5 +345,119 @@ describe('privacy page covers the saved rulesets', () => {
     expect(html).toContain('chess9s.rulesets');
     expect(PRIVACY_UPDATED).toBe('27 October 2026');
     expect(html).toContain('Last updated 27 October 2026');
+  });
+});
+
+describe('3-player rulesets in the builder (S64, D64)', () => {
+  const three = (...actions: BuilderAction[]) => draftOf('standard-3p', ...actions);
+
+  it('offers the player count and the 3-player presets', () => {
+    const html = render(three());
+    expect(html).toMatch(/aria-pressed="true">3 players<\/button>/);
+    expect(html).toMatch(/aria-pressed="true">Standard \(3-player\)<\/button>/);
+    expect(html).not.toMatch(/>Standard<\/button>/);
+    expect(html).toContain('Nothing yet: this is Standard (3-player) as it is.');
+  });
+
+  it('has a control for every 3-player setting, of the right kind', () => {
+    const html = render(three());
+    const kinds: Record<string, string> = {
+      'dragonHead.range': 'stepper',
+      'sunMoon.3p.range': 'stepper',
+      'dragon.3p.givesCheck': 'switch',
+      'check.3p.exposedKing': 'choice',
+      'endings.3p': 'choice',
+      'draw.3p.stalemate': 'fixed',
+      'tail.capturable': 'switch',
+      'coast.3p.exit': 'choice',
+      'pawn.promotion.targets': 'multi',
+    };
+    for (const [id, kind] of Object.entries(kinds)) {
+      const m = control(html, id);
+      expect(m, id).not.toBeNull();
+      expect(m![0], id).toContain(`data-control="${kind}"`);
+    }
+    for (const group of [
+      'Dragon Heads',
+      'Dragon Tail',
+      'Sun and Moon',
+      'Coast',
+      'Turns and draws',
+    ]) {
+      expect(html).toContain(`aria-label="${group}"`);
+    }
+  });
+
+  it('starting from another player count replaces the draft; the 2-player settings stay out', () => {
+    const s = builderReducer(startBuilder('standard-2p'), { type: 'base', base: 'standard-3p' });
+    expect(s.players).toBe(3);
+    expect(control(render(s), 'dragon.3p.givesCheck')).not.toBeNull();
+    expect(control(render(), 'dragon.3p.givesCheck')).toBeNull();
+  });
+
+  it('the first-checkmate ending turns the Dragon’s check on, says why, and holds it', () => {
+    const s = three({ type: 'set', id: 'endings.3p', value: 'first-checkmate' });
+    expect(s.values['dragon.3p.givesCheck']).toBe(true);
+    const html = render(s);
+    expect(html).toMatch(/data-held="dragon\.3p\.givesCheck"[^>]*>[^<]*stays on because/);
+    expect(control(html, 'dragon.3p.givesCheck')![0]).toContain('data-control="switch"');
+    expect(html).toMatch(/data-setting="dragon\.3p\.givesCheck"[\s\S]*?Fixed: /);
+    // It cannot be switched off while first-checkmate needs it, but can once that is undone.
+    const same = builderReducer(s, { type: 'set', id: 'dragon.3p.givesCheck', value: false });
+    expect(same).toBe(s);
+    const undone = builderReducer(s, { type: 'set', id: 'endings.3p', value: 'stones-and-duel' });
+    expect(
+      builderReducer(undone, { type: 'set', id: 'dragon.3p.givesCheck', value: false }).values[
+        'dragon.3p.givesCheck'
+      ],
+    ).toBe(false);
+  });
+
+  it('flags 3-player interactions and says Submit is 2-player only', () => {
+    const html = render(
+      three({ type: 'set', id: 'check.3p.exposedKing', value: 'counts-as-checkmate' }),
+    );
+    expect(html).toContain('Not fairness-checked together');
+    expect(html).not.toContain('Submit for consideration');
+    expect(html).toContain('A 3-player ruleset cannot be submitted');
+    expect(render()).toContain('Submit for consideration');
+  });
+
+  it('saves with its player count, reloads, and plays 3 players', () => {
+    const state = builderReducer(three(), { type: 'name', name: 'Mine 3' });
+    const store = memory();
+    saveCustoms(store, [customFrom(state, 'custom-1')]);
+    const [loaded] = loadCustoms(store);
+    expect(loaded?.players).toBe(3);
+    expect(startBuilder(undefined, loaded).players).toBe(3);
+    const info = customInfo(loaded!);
+    expect(info.players).toBe(3);
+    expect(info.online).toBe(false);
+    expect(createRulesFor(info).players).toBe(3);
+  });
+
+  it('plays hot-seat with a computer Dragon and a saved game replays', () => {
+    const state = builderReducer(three(), { type: 'name', name: 'Mine 3' });
+    const info = customInfo(customFrom(state, 'custom-1'));
+    const rules = createRulesFor(info);
+    let game = newGame(rules, info);
+    for (let i = 0; i < 6 && game.result.status === 'ongoing'; i++) {
+      game = playMove(game, computerMove(game) ?? game.legal[0]!);
+    }
+    expect(game.moves.length).toBeGreaterThan(0);
+    const store = memory();
+    saveGuest(store, { game, mode: 'hot-seat' });
+    expect(loadGuest(store, rules, info)?.game.moves.length).toBe(game.moves.length);
+  });
+});
+
+describe('the computer worker plays a custom 3-player ruleset (S64)', () => {
+  it('rebuilds the game from the reference, with its player count', () => {
+    const state = builderReducer(draftOf('standard-3p'), { type: 'name', name: 'Mine 3' });
+    const info = customInfo(customFrom(state, 'custom-1'));
+    const game = newGame(createRulesFor(info), info);
+    const ref = { ...game.ruleset, players: game.rules.players };
+    const reply = computerReply(ref, []);
+    expect(game.legal.some((m) => toNotation(m) === reply)).toBe(true);
   });
 });
