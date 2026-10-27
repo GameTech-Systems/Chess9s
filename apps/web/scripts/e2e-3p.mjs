@@ -6,7 +6,8 @@
 //   Good Practice (draft-3p): one Kinged player checkmates the other.
 //   Easy Start (easy-3p): a Kinged player wins by checkmating the Tail.
 // Then a hot-seat game against a computer Dragon (S58): two people click their moves and the
-// greedy Dragon answers each round; undo takes its reply back too. Desktop and Pixel 7 width.
+// greedy Dragon answers each round; then it is switched to the Search level (S62) and answers a
+// round looking ahead; undo takes its reply back too. Desktop and Pixel 7 width.
 // Then a game in which Light resigns (S67): a cancelled and a confirmed Resign, a reload, and Dark
 // and the Dragon play on to the Dragon's checkmate; the saved record opens again with the
 // resignation in it. Desktop and Pixel 7 width.
@@ -290,12 +291,25 @@ async function playComputerDragon(browser, options, size) {
       (await page.locator('[data-seat="dragon"] .seat-bot').count()) === 1,
     `${label}: the Dragon seat is marked as the computer's`,
   );
+  const level = page.getByRole('group', { name: 'Dragon computer level' });
+  const pressed = (name) =>
+    level.getByRole('button', { name, exact: true }).getAttribute('aria-pressed');
+  check(
+    (await pressed('Greedy')) === 'true' && (await pressed('Search')) === 'false',
+    `${label}: the computer Dragon starts on the Greedy level, Search on offer`,
+  );
   await shot(page, `${size.replace(/\W+/g, '')}-computer-dragon-1-start`);
 
-  // Three rounds, or until the game ends: the people click, the Dragon answers by itself.
+  // Three rounds at Greedy, then one at Search, or until the game ends: the people click, the
+  // Dragon answers by itself.
   let played = 0;
   let dragonMoves = 0;
-  while (played < 9 && (await page.getByRole('region', { name: 'Result' }).count()) === 0) {
+  let searchMoves = 0;
+  while (played < 12 && (await page.getByRole('region', { name: 'Result' }).count()) === 0) {
+    if (played === 9) {
+      await level.getByRole('button', { name: 'Search', exact: true }).click();
+      check((await pressed('Search')) === 'true', `${label}: the Dragon is switched to Search`);
+    }
     const to = await page.locator('[data-seat][data-turn="true"]').getAttribute('data-seat');
     if (to !== 'dragon') {
       const board = await page.locator('svg.board').getAttribute('aria-label');
@@ -306,6 +320,7 @@ async function playComputerDragon(browser, options, size) {
       await anyMove(page, to);
     } else {
       dragonMoves++;
+      if (played >= 9) searchMoves++;
     }
     played++;
     await page
@@ -326,6 +341,9 @@ async function playComputerDragon(browser, options, size) {
     }
   }
   check(dragonMoves > 0, `${label}: the computer Dragon moved ${dragonMoves} times by itself`);
+  if (played === 12) {
+    check(searchMoves === 1, `${label}: the computer Dragon moved at the Search level`);
+  }
   await noSidewaysScroll(page, `${label} (after ${played} moves)`);
   await shot(page, `${size.replace(/\W+/g, '')}-computer-dragon-2-played`);
 
