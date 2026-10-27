@@ -9,3 +9,4 @@ export * from './rules/interactions';
 export * from './ai/search';
 export * from './ai/search-reference';
 export * from './rules/ruleset-file';
+export * from './rules/data';

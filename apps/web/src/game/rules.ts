@@ -1,39 +1,34 @@
 // The rules a hot-seat game plays: the real board, pieces and a ruleset from rules/, validated
 // and resolved by the engine when the game starts. Nothing is read from here but data.
 import {
-  findRulesetVersion,
+  loadRules,
   resolveRuleset,
-  resolveVersion,
-  validateBoardAndPieces,
-  type Lock,
   type MoveRules,
   type ParamValue,
   type Registry,
   type Ruleset,
 } from '@chess9s/engine';
-import board from '../../../../rules/boards/standard-9x9.json';
 import registry from '../../../../rules/parameters.json';
 
-const pieceFiles = import.meta.glob<unknown>('../../../../rules/pieces/*.json', {
-  eager: true,
-  import: 'default',
-});
+// Every rules file a game reads, keyed by its path under rules/, for the shared rules library
+// (S51). The schemas are left out: the build has already checked the data against them.
+const RULES = '../../../../rules/';
+const ruleFiles = import.meta.glob<unknown>(
+  [
+    '../../../../rules/parameters.json',
+    '../../../../rules/boards/*.json',
+    '../../../../rules/pieces/*.json',
+    '../../../../rules/rulesets/**/*.json',
+    '../../../../rules/locks/*.json',
+  ],
+  { eager: true, import: 'default' },
+);
 
-const rulesetFiles = import.meta.glob<Ruleset>('../../../../rules/rulesets/*.json', {
-  eager: true,
-  import: 'default',
-});
-
-// Earlier versions of a Candidate or Official ruleset (deprecated) and the locks they play from.
-const archiveFiles = import.meta.glob<Ruleset>('../../../../rules/rulesets/archive/*.json', {
-  eager: true,
-  import: 'default',
-});
-
-const lockFiles = import.meta.glob<Lock>('../../../../rules/locks/*.json', {
-  eager: true,
-  import: 'default',
-});
+const data = loadRules(
+  Object.fromEntries(
+    Object.entries(ruleFiles).map(([path, file]) => [path.slice(RULES.length), file]),
+  ),
+);
 
 /** The ruleset a new game starts on until another is picked (owner, 24 Oct 2026). */
 export const DEFAULT_RULESET_ID = 'standard-2p';
@@ -99,18 +94,12 @@ const infoOf = (r: Ruleset): RulesetInfo => ({
 });
 
 // The default first, then by player count, then by name.
-const files = Object.values(rulesetFiles).sort(
+const files = [...data.library.current].sort(
   (a, b) =>
     Number(b.id === DEFAULT_RULESET_ID) - Number(a.id === DEFAULT_RULESET_ID) ||
     a.players - b.players ||
     a.name.localeCompare(b.name),
 );
-
-const library = {
-  current: files,
-  archived: Object.values(archiveFiles),
-  locks: Object.values(lockFiles),
-};
 
 /** The current version of every ruleset in rules/rulesets/: the default first, then 2-player, then 3-player. */
 export function listRulesets(): RulesetInfo[] {
@@ -122,33 +111,19 @@ export function listRulesets(): RulesetInfo[] {
  * exact version, which may be an archived one (not listed in the picker).
  */
 export function findRuleset(id: string, version?: string): RulesetInfo | undefined {
-  const file = findRulesetVersion(library, id, version);
-  if (!file) return undefined;
-  return library.archived.includes(file) ? { ...infoOf(file), archived: true } : infoOf(file);
+  const found = data.find(id, version);
+  if (!found) return undefined;
+  return found.archived ? { ...infoOf(found.ruleset), archived: true } : infoOf(found.ruleset);
 }
 
 /** The default ruleset, as recorded with a game. */
 export const ruleset: RulesetInfo = infoOf(files.find((r) => r.id === DEFAULT_RULESET_ID)!);
 
-function rulesOf(file: Ruleset): MoveRules {
-  const resolved = resolveRuleset(registry, file);
-  return rulesWith(resolved.values);
-}
-
-function rulesWith(values: Record<string, ParamValue>): MoveRules {
-  const set = validateBoardAndPieces(board, Object.values(pieceFiles), registry as Registry);
-  return { ...set, values, players: 2 };
-}
+const rulesOf = (file: Ruleset): MoveRules => data.rulesWith(resolveRuleset(registry, file).values);
 
 /** The rules of a bundled ruleset: the current version, or an archived one from its lock. */
-export function createRules(id: string = DEFAULT_RULESET_ID, version?: string): MoveRules {
-  const file = findRulesetVersion(library, id, version);
-  if (!file) throw new Error(`Unknown ruleset: ${id}${version === undefined ? '' : ` ${version}`}`);
-  if (!infoOf(file).playable) throw new Error(`Ruleset ${id} is not playable yet`);
-  if (library.archived.includes(file))
-    return rulesWith(resolveVersion(registry as Registry, library, id, version).values);
-  return rulesOf(file);
-}
+export const createRules = (id: string = DEFAULT_RULESET_ID, version?: string): MoveRules =>
+  data.rules(id, version);
 
 /** The rules of a ruleset as the game records it: a bundled id, or a custom ruleset's overrides. */
 export function createRulesFor(
@@ -160,12 +135,8 @@ export function createRulesFor(
 }
 
 /** Every value of a bundled ruleset, resolved (an archived version from its lock). */
-export function rulesetValues(id: string, version?: string): Record<string, ParamValue> {
-  if (!findRulesetVersion(library, id, version)) {
-    throw new Error(`Unknown ruleset: ${id}${version === undefined ? '' : ` ${version}`}`);
-  }
-  return resolveVersion(registry as Registry, library, id, version).values;
-}
+export const rulesetValues = (id: string, version?: string): Record<string, ParamValue> =>
+  data.values(id, version);
 
 /** The values a custom ruleset plays: the registry defaults with its overrides. */
 export const customValues = (c: Pick<CustomRuleset, 'id' | 'name' | 'overrides'>) =>
@@ -249,8 +220,8 @@ export function rulesetSettings(
     return settingsFor(customValues({ ...id, overrides: id.overrides }));
   const key = typeof id === 'string' ? id : id.id;
   const version = typeof id === 'string' ? undefined : id.version;
-  const file = findRulesetVersion(library, key, version);
-  if (!file)
+  const found = data.find(key, version);
+  if (!found)
     throw new Error(`Unknown ruleset: ${key}${version === undefined ? '' : ` ${version}`}`);
-  return settingsFor(rulesetValues(key, version), file.players);
+  return settingsFor(rulesetValues(key, version), found.ruleset.players);
 }
