@@ -1,7 +1,9 @@
-// One 3-player self-play game (S58): a few random opening plies, then the greedy player plays every
-// seat until the game ends or reaches the safety cap. Deterministic for a given seed (decision
-// 0008). The full 3-player fairness report is S59; this counts each seat's results.
+// One 3-player self-play game (S58): a few random opening plies, then the greedy player, or the
+// paranoid search at a depth (S62), plays every seat until the game ends or reaches the safety cap.
+// Deterministic for a given seed (decision 0008). The full 3-player fairness report is S59; this
+// counts each seat's results.
 import {
+  bestMove,
   greedyMove,
   newGame,
   playMove,
@@ -21,6 +23,8 @@ export interface Play3Options {
   maxPlies: number;
   /** A start other than the board's start position (tests). */
   init?: GameInit;
+  /** Every seat searches at this depth with this many positions per move; greedy without it. */
+  search?: { depth: number; nodes: number };
 }
 
 export interface Summary3 {
@@ -49,7 +53,9 @@ export function playGame3(
     const move =
       state.moves.length < options.openingPlies
         ? state.legal[Math.floor(random() * state.legal.length)]
-        : greedyMove(state, { random });
+        : options.search
+          ? bestMove(state, { ...options.search, random }).move
+          : greedyMove(state, { random });
     if (!move) break;
     state = playMove(state, move);
   }
@@ -142,6 +148,8 @@ export function summarize3(games: Summary3[]): Run3Summary {
 
 export interface Report3 extends Run3Summary {
   ruleset: { id: string; version: string };
+  /** Every seat searched at this depth and budget; greedy players without it. */
+  search?: { depth: number; nodes: number };
   date: string;
 }
 
@@ -157,11 +165,13 @@ export function toMarkdown3(r: Report3): string {
       } |`,
   );
   return [
-    `# ${r.ruleset.id} ${r.ruleset.version}: greedy self-play`,
+    `# ${r.ruleset.id} ${r.ruleset.version}: ${r.search ? `search self-play, depth ${r.search.depth}` : 'greedy self-play'}`,
     '',
     `${r.date} · ${r.games} games · ${r.distinct} distinct · ${r.draws} drawn · ${r.unfinished} unfinished`,
     '',
-    'Greedy players on every seat (S58). Not a fairness report: the 3-player measures and the verdict are S59.',
+    r.search
+      ? `The paranoid search on every seat (S62), depth ${r.search.depth}, at most ${r.search.nodes} positions per move. Not a fairness report: the 3-player measures and the verdict are S59.`
+      : 'Greedy players on every seat (S58). Not a fairness report: the 3-player measures and the verdict are S59.',
     '',
     '| Seat | Wins | Losses | Win rate | Won by |',
     '| --- | --- | --- | --- | --- |',

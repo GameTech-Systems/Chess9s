@@ -1,5 +1,7 @@
 // S58: 3-player self-play with the greedy player: bots finish games in every preset, the same seed
-// gives the same game, and each seat's results are counted (the full report is S59).
+// gives the same game, and each seat's results are counted (the full report is S59). S62: the
+// search on every seat. Whole search games in every preset at depths 1 and 2 take minutes each:
+// `pnpm sim --players 3 --search --depths <d> --games 1` plays them (the S62 handoff has the runs).
 import { describe, expect, it } from 'vitest';
 import { loadSource, rulesFor } from './load';
 import { playGame3, summarize3, toMarkdown3, type Summary3 } from './play3';
@@ -27,6 +29,34 @@ describe('playGame3', () => {
     expect(play(5)).toEqual(play(5));
     expect(play(5).key).not.toBe(play(6).key);
   });
+
+  it('plays the paranoid search on every seat when asked, the same game for the same seed (S62)', () => {
+    const { rules, ruleset } = rulesFor(source, 'standard-3p');
+    const play = (depth: number) =>
+      playGame3(rules, ruleset, {
+        openingPlies: 4,
+        maxPlies: 10,
+        seed: 2,
+        search: { depth, nodes: 3_000 },
+      });
+    const greedy = playGame3(rules, ruleset, { openingPlies: 4, maxPlies: 10, seed: 2 });
+    for (const depth of [1, 2]) {
+      const game = play(depth);
+      expect(game.plies).toBe(10);
+      expect(game).toEqual(play(depth));
+      expect(game.key).not.toBe(greedy.key);
+    }
+  }, 120_000);
+
+  it('finishes a depth-1 search game from the start in easy-3p', () => {
+    const { rules, ruleset } = rulesFor(source, 'easy-3p');
+    const game = playGame3(rules, ruleset, {
+      ...options,
+      seed: 1,
+      search: { depth: 1, nodes: 100_000 },
+    });
+    expect(game.outcome).not.toBe('unfinished');
+  }, 60_000);
 
   it('stops at the safety cap and calls the game unfinished', () => {
     const { rules, ruleset } = rulesFor(source, 'standard-3p');
