@@ -212,9 +212,9 @@ describe('online play pages (S53)', () => {
     expect(html).toContain('Back to the game');
   });
 
-  it('the picker offers Play online for every playable ruleset, and joining by code', () => {
+  it('the picker offers Play online for every 2-player ruleset, and joining by code', () => {
     const html = renderToStaticMarkup(<App path="/" />);
-    const playable = listRulesets().filter((r) => r.playable).length;
+    const playable = listRulesets().filter((r) => r.online).length;
     expect(html.split('>Play online<')).toHaveLength(playable + 1);
     expect(html).toContain('Join a room');
     expect(html).toContain('aria-label="Room code"');

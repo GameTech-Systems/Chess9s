@@ -73,7 +73,7 @@ describe('Game screen', () => {
 });
 
 describe('Rule picker', () => {
-  it('opens on the picker: every ruleset with its status badge, 3-player not playable yet', () => {
+  it('opens on the picker: every ruleset with its status badge, the 3-player presets playable', () => {
     const html = renderToStaticMarkup(<App />);
     expect(html).toContain('Choose a ruleset');
     for (const name of ['Standard', 'Easy Start', 'Good Practice', 'Standard (3-player)']) {
@@ -82,11 +82,22 @@ describe('Rule picker', () => {
     // Standard comes first and is marked as the default.
     expect(html.indexOf('Standard')).toBeLessThan(html.indexOf('Good Practice'));
     expect(html).toMatch(/Standard<\/strong>[\s\S]*?class="default-tag"[^>]*>Default</);
+    // The 3-player presets: Standard first, marked Default for 3 players (D63), each experimental.
+    expect(html).toMatch(
+      /Standard \(3-player\)<\/strong>[\s\S]*?class="default-tag"[^>]*>Default for 3 players</,
+    );
+    expect(html.indexOf('Standard (3-player)')).toBeLessThan(html.indexOf('Easy Start (3-player)'));
+    expect(html.indexOf('Standard (3-player)')).toBeLessThan(
+      html.indexOf('Good Practice (3-player)'),
+    );
+    for (const id of ['standard-3p', 'easy-3p', 'draft-3p']) {
+      expect(html).toContain(`href="/rules/${id}"`);
+    }
     expect(html).toContain('href="/rules/standard-2p"');
     expect(html).toContain('href="/rules/draft-2p"');
     expect(html).toContain('data-status="candidate"');
     expect(html).toContain('data-status="experimental"');
-    expect(html).toMatch(/Not playable yet/);
+    expect(html).not.toMatch(/Not playable yet/);
     expect(html).toMatch(/<button[^>]*>Play<\/button>/);
     expect(html).not.toContain('aria-label="Moves"');
   });

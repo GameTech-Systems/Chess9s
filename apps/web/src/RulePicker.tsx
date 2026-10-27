@@ -3,7 +3,7 @@ import { listRulesets, type RulesetInfo } from './game/rules';
 import { rulesPath } from './links';
 import { JoinByCode } from './JoinByCode';
 
-/** Pick a ruleset before a game. A ruleset the engine cannot play yet is listed, not offered. */
+/** Pick a ruleset before a game. 3-player presets play hot-seat only until the 3-seat room (S63). */
 export function RulePicker({
   onPick,
   onPlayOnline,
@@ -38,7 +38,11 @@ export function RulePicker({
     >
       <div className="ruleset-head">
         <strong>{r.name}</strong>
-        {r.isDefault && <span className="default-tag">Default</span>}
+        {r.defaultFor && (
+          <span className="default-tag">
+            {r.defaultFor === 3 ? 'Default for 3 players' : 'Default'}
+          </span>
+        )}
         <span className="badge" data-status={r.status}>
           {r.status}
         </span>
@@ -55,7 +59,7 @@ export function RulePicker({
         ) : (
           <p className="facts small">Not playable yet</p>
         )}
-        {r.playable && onPlayOnline && (
+        {r.online && onPlayOnline && (
           <button type="button" className="again" onClick={() => onPlayOnline(r)}>
             Play online
           </button>
