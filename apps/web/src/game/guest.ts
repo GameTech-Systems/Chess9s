@@ -2,6 +2,7 @@
 // version (and a custom ruleset's full overrides), the mode and the moves are stored; a load replays them through the engine, so a saved
 // game can never hold an illegal position.
 import { playMove, toNotation, type GameState, type MoveRules } from '@chess9s/engine';
+import { MAX_BOT_SEATS } from './bots';
 import { newModel } from './session';
 import { same, type RulesetInfo } from './rules';
 
@@ -17,17 +18,27 @@ export interface Store {
 export interface Guest {
   game: GameState;
   mode: Mode;
+  /** 3-player games: the seats the computer plays (S58); none or absent for hot-seat. */
+  bots?: string[];
 }
 
 const KEY = 'chess9s.guest';
 
-export function saveGuest(store: Store, { game, mode }: Guest): void {
+export function saveGuest(store: Store, { game, mode, bots }: Guest): void {
   try {
     const { id, version, overrides } = game.ruleset;
     const moves = game.moves.map((m) => m.notation);
     store.setItem(
       KEY,
-      JSON.stringify({ v: 1, ruleset: id, version, ...(overrides && { overrides }), mode, moves }),
+      JSON.stringify({
+        v: 1,
+        ruleset: id,
+        version,
+        ...(overrides && { overrides }),
+        mode,
+        ...(bots && bots.length > 0 && { bots }),
+        moves,
+      }),
     );
   } catch {
     // Storage blocked or full: the game goes on, just not kept.
@@ -71,7 +82,15 @@ export function loadGuest(
       if (!move) return null;
       game = playMove(game, move);
     }
-    return { game, mode: saved.mode };
+    // The computer's seats: seats of this game, at most two, and only in 3-player games.
+    const seats = Array.isArray(saved.bots) ? (saved.bots as unknown[]) : [];
+    const bots =
+      rules.players === 3 &&
+      seats.length <= MAX_BOT_SEATS &&
+      seats.every((s) => typeof s === 'string' && game.order.includes(s))
+        ? (seats as string[])
+        : [];
+    return { game, mode: saved.mode, ...(bots.length > 0 && { bots }) };
   } catch {
     return null;
   }

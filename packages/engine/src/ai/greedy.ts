@@ -9,7 +9,7 @@
 // The weights below are playing heuristics, not rules, and provisional until S59 reports how the
 // seats fare (hundredths of a value unit, like `pieceValues`).
 import { attackMap } from '../moves/check';
-import { attacksFrom, type GeneratedMove } from '../moves/generate';
+import { attacksFrom, toNotation, type GeneratedMove } from '../moves/generate';
 import type { GameState } from '../game/game';
 import {
   activeKinged,
@@ -152,5 +152,7 @@ export function greedyMove(
   const pick = random
     ? ties[Math.min(ties.length - 1, Math.floor(random() * ties.length))]
     : ties[0];
-  return pick!.move;
+  // The same move object the game lists as legal, as `bestMove` returns.
+  const notation = toNotation(pick!.move);
+  return state.legal.find((m) => toNotation(m) === notation) ?? pick!.move;
 }
