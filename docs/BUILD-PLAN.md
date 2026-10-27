@@ -228,7 +228,7 @@ Found in planning: the web app reads `rules/` through Vite's `import.meta.glob`,
 ### S31 — Phase 5 planning · Opus 5.5 · high · `done`
 Wrote the steps below and the defaults D50 to D54.
 
-### S51 — Room logic and protocol · Opus 5.5 · high · `todo`
+### S51 — Room logic and protocol · Opus 5.5 · high · `done`
 A new workspace package `packages/online`: pure TypeScript with no DOM and no Cloudflare APIs, so Vitest tests it in Node and both the Worker and the web app import it.
 - **Protocol.** Versioned JSON messages (`v: 1`) for create, join, move (in notation), resign, offer draw, accept or decline a draw, snapshot, opponent present or away, refused (with a reason) and game over. Every message has a size cap and strict keys; anything else is refused, never thrown.
 - **Room.** A state machine over the engine: the ruleset fixed at creation (an id and version through the S45 lookup, so a Candidate, Official or archived version plays from its lock; a custom ruleset's overrides checked as untrusted input, as `readRulesetFile` does), two seats (D52), a random secret seat token per seat that reconnects it (compared in constant time, never sent to the other player), moves checked with `findMove`/`playMove` (refused out of turn, illegal, or after the end), and a snapshot (ruleset reference, moves, result, seat status) that a client replays to the same position.
