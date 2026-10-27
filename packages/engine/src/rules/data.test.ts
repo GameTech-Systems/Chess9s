@@ -46,7 +46,7 @@ function withArchive(): RulesFiles {
 describe('loadRules', () => {
   const data = loadRules(files);
 
-  it('reads every current ruleset, its locks, and no archive when there is none', () => {
+  it('reads every current ruleset, its locks, and the archive', () => {
     expect(data.library.current.map((r) => r.id).sort()).toEqual(
       readdirSync(join(rulesDir, 'rulesets'))
         .filter((f) => f.endsWith('.json'))
@@ -54,7 +54,10 @@ describe('loadRules', () => {
         .sort(),
     );
     expect(data.library.locks.length).toBeGreaterThan(0);
-    expect(data.library.archived).toEqual([]);
+    // draft-3p 0.2.0 was kept without a lock (S56): it is found, but it does not replay.
+    expect(data.library.archived.map((r) => `${r.id}@${r.version}`)).toEqual(['draft-3p@0.2.0']);
+    expect(data.find('draft-3p', '0.2.0')?.archived).toBe(true);
+    expect(() => data.values('draft-3p', '0.2.0')).toThrow(/no lock/);
   });
 
   it('finds a ruleset by id, and by id and version', () => {

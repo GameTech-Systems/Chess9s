@@ -109,7 +109,9 @@ describe('resolveRuleset options', () => {
   it('every option of every 3-player parameter resolves', () => {
     for (const p of applicable(3)) {
       for (const o of p.type === 'enumSet' ? (p.options as unknown[]).map((x) => [x]) : p.options) {
-        const rs: Ruleset = { ...draft3p, overrides: { [p.id]: o } };
+        // With the values the option requires (endings.3p = first-checkmate needs Dragon check).
+        const needs = p.requires?.[String(o)] ?? {};
+        const rs: Ruleset = { ...draft3p, overrides: { ...needs, [p.id]: o } };
         expect(same(resolveRuleset(registry, rs).values[p.id], o)).toBe(true);
       }
     }

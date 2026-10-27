@@ -15,15 +15,18 @@ import f11 from '../../../rules/pieces/pawn.json';
 import f12 from '../../../rules/pieces/queen.json';
 import f13 from '../../../rules/pieces/rook.json';
 import f14 from '../../../rules/pieces/sun.json';
-import f15 from '../../../rules/rulesets/draft-2p.json';
-import f16 from '../../../rules/rulesets/draft-3p.json';
-import f17 from '../../../rules/rulesets/easy-2p.json';
-import f18 from '../../../rules/rulesets/standard-2p.json';
-import f19 from '../../../rules/schema/board.schema.json';
-import f20 from '../../../rules/schema/lock.schema.json';
-import f21 from '../../../rules/schema/parameters.schema.json';
-import f22 from '../../../rules/schema/piece.schema.json';
-import f23 from '../../../rules/schema/ruleset.schema.json';
+import f15 from '../../../rules/rulesets/archive/draft-3p@0.2.0.json';
+import f16 from '../../../rules/rulesets/draft-2p.json';
+import f17 from '../../../rules/rulesets/draft-3p.json';
+import f18 from '../../../rules/rulesets/easy-2p.json';
+import f19 from '../../../rules/rulesets/easy-3p.json';
+import f20 from '../../../rules/rulesets/standard-2p.json';
+import f21 from '../../../rules/rulesets/standard-3p.json';
+import f22 from '../../../rules/schema/board.schema.json';
+import f23 from '../../../rules/schema/lock.schema.json';
+import f24 from '../../../rules/schema/parameters.schema.json';
+import f25 from '../../../rules/schema/piece.schema.json';
+import f26 from '../../../rules/schema/ruleset.schema.json';
 
 /** Every JSON file in rules/, keyed by its path under rules/. */
 export const rulesFiles: RulesFiles = {
@@ -42,13 +45,16 @@ export const rulesFiles: RulesFiles = {
   'pieces/queen.json': f12,
   'pieces/rook.json': f13,
   'pieces/sun.json': f14,
-  'rulesets/draft-2p.json': f15,
-  'rulesets/draft-3p.json': f16,
-  'rulesets/easy-2p.json': f17,
-  'rulesets/standard-2p.json': f18,
-  'schema/board.schema.json': f19,
-  'schema/lock.schema.json': f20,
-  'schema/parameters.schema.json': f21,
-  'schema/piece.schema.json': f22,
-  'schema/ruleset.schema.json': f23,
+  'rulesets/archive/draft-3p@0.2.0.json': f15,
+  'rulesets/draft-2p.json': f16,
+  'rulesets/draft-3p.json': f17,
+  'rulesets/easy-2p.json': f18,
+  'rulesets/easy-3p.json': f19,
+  'rulesets/standard-2p.json': f20,
+  'rulesets/standard-3p.json': f21,
+  'schema/board.schema.json': f22,
+  'schema/lock.schema.json': f23,
+  'schema/parameters.schema.json': f24,
+  'schema/piece.schema.json': f25,
+  'schema/ruleset.schema.json': f26,
 };

@@ -61,12 +61,21 @@ describe('the ruleset list', () => {
   it('has every ruleset in rules/rulesets/, with a status and a player count', () => {
     const list = listRulesets();
     // The default first, then the other 2-player presets by name, then 3-player.
-    expect(list.map((r) => r.id)).toEqual(['standard-2p', 'easy-2p', 'draft-2p', 'draft-3p']);
+    expect(list.map((r) => r.id)).toEqual([
+      'standard-2p',
+      'easy-2p',
+      'draft-2p',
+      'easy-3p',
+      'draft-3p',
+      'standard-3p',
+    ]);
     expect(list.map((r) => r.name)).toEqual([
       'Standard',
       'Easy Start',
       'Good Practice',
-      'Draft 3-Player Dragon Mode (experimental)',
+      'Easy Start (3-player)',
+      'Good Practice (3-player)',
+      'Standard (3-player)',
     ]);
     expect(list.filter((r) => r.isDefault).map((r) => r.id)).toEqual(['standard-2p']);
     for (const r of list) {

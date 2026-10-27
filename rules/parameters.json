@@ -1,6 +1,6 @@
 {
   "$schema": "./schema/parameters.schema.json",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "parameters": [
     {
       "id": "king.range",
@@ -1230,6 +1230,167 @@
         "game-end"
       ],
       "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
+    },
+    {
+      "id": "endings.3p",
+      "label": "How 3-player games end",
+      "description": "The full Dragon rules (stones, the Tail in stone and the duel), or the first checkmate wins: a Kinged player wins by checkmating the other King or the Tail, the Dragon by checkmating either King.",
+      "piece": null,
+      "players": [
+        3
+      ],
+      "type": "enum",
+      "default": "stones-and-duel",
+      "options": [
+        "stones-and-duel",
+        "first-checkmate"
+      ],
+      "group": "Turns and draws",
+      "optionLabels": {
+        "stones-and-duel": "Stones and the duel",
+        "first-checkmate": "The first checkmate wins"
+      },
+      "status": "experimental",
+      "affects": [
+        "game-end",
+        "check-detection"
+      ],
+      "requires": {
+        "first-checkmate": {
+          "dragon.3p.givesCheck": true
+        }
+      },
+      "source": "decision 0016 (S55, owner, 26 Oct 2026)",
+      "notes": "first-checkmate needs dragon.3p.givesCheck on; the loader refuses a ruleset that sets one without the other."
+    },
+    {
+      "id": "dragon.3p.lastKing",
+      "label": "The Dragon's win in the duel",
+      "description": "Once the Dragon has captured one King: Dragon attacks on the last King are check and the Dragon wins by checkmating it, or Dragon attacks follow dragon.3p.givesCheck and the Dragon wins by capturing it.",
+      "piece": null,
+      "players": [
+        3
+      ],
+      "type": "enum",
+      "default": "checkmate",
+      "options": [
+        "checkmate",
+        "capture"
+      ],
+      "group": "Dragon Heads",
+      "optionLabels": {
+        "checkmate": "Checkmate the last King",
+        "capture": "Capture the last King"
+      },
+      "status": "experimental",
+      "affects": [
+        "check-detection",
+        "game-end"
+      ],
+      "source": "decision 0016 (S55, owner, 26 Oct 2026)",
+      "notes": "Applies with endings.3p = stones-and-duel."
+    },
+    {
+      "id": "tail.3p.mateTiming",
+      "label": "When the Tail is checkmated",
+      "description": "Right after the move that checkmates it, or only if, at the start of the Dragon's turn, it is attacked and the Dragon has no move that ends the attack.",
+      "piece": "dragon-tail",
+      "players": [
+        3
+      ],
+      "type": "enum",
+      "default": "after-move",
+      "options": [
+        "after-move",
+        "dragon-turn"
+      ],
+      "group": "Dragon Tail",
+      "optionLabels": {
+        "after-move": "Right after the move",
+        "dragon-turn": "At the Dragon's turn"
+      },
+      "status": "experimental",
+      "affects": [
+        "game-end"
+      ],
+      "source": "decision 0016 (S55, owner, 26 Oct 2026)",
+      "notes": "Applies with endings.3p = stones-and-duel."
+    },
+    {
+      "id": "draw.3p.threefoldRepetition",
+      "label": "Threefold repetition (3-player)",
+      "description": "Whether the same position (stones and seat statuses included) with the same player to move, for the third time, is a draw.",
+      "piece": null,
+      "players": [
+        3
+      ],
+      "type": "boolean",
+      "default": true,
+      "options": [
+        true,
+        false
+      ],
+      "group": "Turns and draws",
+      "optionLabels": {
+        "true": "Repetition draw",
+        "false": "No repetition draw"
+      },
+      "status": "experimental",
+      "affects": [
+        "game-end"
+      ],
+      "source": "decision 0016 (S55, owner, 26 Oct 2026)"
+    },
+    {
+      "id": "draw.3p.fiftyMove",
+      "label": "Fifty-move rule (3-player)",
+      "description": "Whether 50 moves by every player still in the game, with no capture, pawn move, King captured or piece turned to stone, is a draw. Tail, Sun and Moon moves count as moves.",
+      "piece": null,
+      "players": [
+        3
+      ],
+      "type": "boolean",
+      "default": true,
+      "options": [
+        true,
+        false
+      ],
+      "group": "Turns and draws",
+      "optionLabels": {
+        "true": "Fifty-move draw",
+        "false": "No fifty-move draw"
+      },
+      "status": "experimental",
+      "affects": [
+        "game-end"
+      ],
+      "source": "decision 0016 (S55, owner, 26 Oct 2026)"
+    },
+    {
+      "id": "check.3p.exposedKing",
+      "label": "A King left in check for an earlier player",
+      "description": "Whether a move may leave a King in check from a player who moves before that King's owner can answer. If it may, the King's owner loses at once to the owner of the piece giving check.",
+      "piece": "king",
+      "players": [
+        3
+      ],
+      "type": "enum",
+      "default": "not-allowed",
+      "options": [
+        "not-allowed",
+        "counts-as-checkmate"
+      ],
+      "group": "King",
+      "optionLabels": {
+        "not-allowed": "Not allowed",
+        "counts-as-checkmate": "Counts as checkmate"
+      },
+      "status": "experimental",
+      "affects": [
+        "check-detection",
+        "game-end"
+      ],
+      "source": "decision 0016, rule 6 (D62, owner, 26 Oct 2026)"
     },
     {
       "id": "draw.threefoldRepetition",

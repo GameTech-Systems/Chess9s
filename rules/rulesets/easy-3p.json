@@ -1,0 +1,33 @@
+{
+  "$schema": "../schema/ruleset.schema.json",
+  "id": "easy-3p",
+  "name": "Easy Start (3-player)",
+  "version": "0.1.0",
+  "status": "experimental",
+  "players": 3,
+  "description": "A shorter Dragon game for learning (D65, decision 0016): Easy Start's piece settings, every attack on a King is check, the Tail is the Dragon's King on A5, E5 and I5, and the first checkmate wins. Casual play only; not fairness-checked.",
+  "overrides": {
+    "king.range": 1,
+    "castling.enabled": true,
+    "queen.canCrossVoid": true,
+    "queen.canStandOnVoid": true,
+    "pawn.safeZones": "off",
+    "pawn.canEnterCenter": true,
+    "center.occupants": "any",
+    "center.passThrough": [
+      "dragon-head",
+      "queen",
+      "king",
+      "sun-moon-pawn",
+      "knight",
+      "rook",
+      "bishop",
+      "pawn"
+    ],
+    "coast.3p.capturable": true,
+    "dragon.3p.givesCheck": true,
+    "tail.3p.movement": "two-player-path",
+    "tail.3p.captures": "none",
+    "endings.3p": "first-checkmate"
+  }
+}

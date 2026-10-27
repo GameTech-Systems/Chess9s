@@ -1,10 +1,10 @@
 {
   "$schema": "../schema/ruleset.schema.json",
   "id": "draft-3p",
-  "name": "Draft 3-Player Dragon Mode (experimental)",
-  "version": "0.2.0",
+  "name": "Good Practice (3-player)",
+  "version": "0.3.0",
   "status": "experimental",
   "players": 3,
-  "description": "The owner's 3-player Dragon mode rules, draft v0.2 (docs/RULES.md). Plays every 3-player parameter at its default. Experimental until bot self-play shows the seats are balanced.",
+  "description": "The full 3-player Dragon rules, rule set v0.3 (decision 0016, docs/RULES.md): every 3-player parameter at its default. Shown as Good Practice. Experimental until bot self-play shows the seats are balanced.",
   "overrides": {}
 }

@@ -76,7 +76,7 @@ describe('Rule picker', () => {
   it('opens on the picker: every ruleset with its status badge, 3-player not playable yet', () => {
     const html = renderToStaticMarkup(<App />);
     expect(html).toContain('Choose a ruleset');
-    for (const name of ['Standard', 'Easy Start', 'Good Practice', 'Draft 3-Player']) {
+    for (const name of ['Standard', 'Easy Start', 'Good Practice', 'Standard (3-player)']) {
       expect(html).toContain(name);
     }
     // Standard comes first and is marked as the default.

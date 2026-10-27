@@ -51,6 +51,11 @@
         "status": { "enum": ["proposed", "experimental", "candidate", "official", "deprecated"] },
         "affects": { "type": "array", "items": { "type": "string" } },
         "needsDecision": { "type": "boolean" },
+        "requires": {
+          "description": "Values other parameters must have while this one takes an option, keyed by String(option): { option: { parameterId: value } }. The loader refuses a ruleset that breaks one.",
+          "type": "object",
+          "additionalProperties": { "type": "object", "minProperties": 1 }
+        },
         "source": { "type": "string" },
         "notes": { "type": "string" }
       },
