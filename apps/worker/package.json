@@ -4,9 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "typecheck": "tsc --noEmit",
-    "check": "wrangler deploy --dry-run --config ../../wrangler.jsonc",
-    "e2e": "node scripts/e2e.mjs"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@chess9s/engine": "workspace:*",

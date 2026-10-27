@@ -25,3 +25,7 @@ jobs:
       - run: pnpm validate:rules
       - run: pnpm build
       - run: node scripts/check-dist.mjs
+      # The Worker (S52): a broken config or bundle fails the PR, and the rooms play a whole game
+      # through `wrangler dev`.
+      - run: pnpm worker:check
+      - run: pnpm worker:e2e
