@@ -1,6 +1,6 @@
-# Chess Nines rules (draft v0.2)
+# Chess Nines rules (draft v0.2, 3-player v0.3)
 
-This page explains the Chess Nines rules at their defaults (rule set v0.2): the 2-player ruleset `draft-2p` 0.2.0, shown in the game as **Good Practice** (a **Candidate** since the fairness check passed: [report](fairness/draft-2p.md), [decision 0010](decisions/0010-draft-2p-candidate.md)), and the experimental 3-player Dragon mode (ruleset `draft-3p` 0.2.0). None of it is **official**. Official tournament rules come only after public discussion and ratification ([Governance](GOVERNANCE.md)).
+This page explains the Chess Nines rules at their defaults (rule set v0.2): the 2-player ruleset `draft-2p` 0.2.0, shown in the game as **Good Practice** (a **Candidate** since the fairness check passed: [report](fairness/draft-2p.md), [decision 0010](decisions/0010-draft-2p-candidate.md)), and the experimental 3-player Dragon mode, rule set v0.3 (ruleset `draft-3p` 0.3.0, [decision 0016](decisions/0016-three-player-rules-v0.3.md)). None of it is **official**. Official tournament rules come only after public discussion and ratification ([Governance](GOVERNANCE.md)).
 
 ## Presets
 
@@ -11,6 +11,14 @@ The game offers these 2-player presets ([decision 0011](decisions/0011-presets.m
 | **Standard** (the default) | `standard-2p` | Candidate, since its fairness check passed ([report](fairness/standard-2p.md), [decision 0012](decisions/0012-standard-2p-candidate.md)) | The King moves one square in any direction, as in regular chess (`king.range` = 1) |
 | **Good Practice** | `draft-2p` | Candidate | Nothing: every setting at its default. The 2-square King makes checkmate harder to force, which is good practice |
 | **Easy Start** | `easy-2p` | Experimental, casual play | Closest to regular chess: light moves first, a 1-square King that may castle, the Queen may cross the void anywhere, e5 is an ordinary square for every piece but the Queen, and no pawn-safe zones |
+
+The 3-player presets are all experimental, and none is fairness-checked yet ([decision 0016](decisions/0016-three-player-rules-v0.3.md)):
+
+| Preset | Ruleset | What it plays |
+|---|---|---|
+| **Standard** (the 3-player default, D63) | `standard-3p` | Good Practice, except the King moves one square (`king.range` = 1), as in the 2-player Standard |
+| **Good Practice** | `draft-3p` | Every 3-player setting at its default: the full Dragon rules below |
+| **Easy Start** | `easy-3p` | Easy Start's piece settings and a shorter Dragon game: the first checkmate wins ([below](#easy-start-for-3-players-the-first-checkmate-wins)) |
 
 Every rule here is a parameter with a default and a list of options, so players can experiment. The data in [`rules/parameters.json`](../rules/parameters.json) and [`rules/rulesets/`](../rules/rulesets/) is what the engine reads; this page explains it. Where the two disagree, the data is a bug to report.
 
@@ -129,32 +137,68 @@ Only the 3 dragons (both Dragon Heads and the Dragon Tail) may ever stand on E5,
 - **Turn order**: in 2-player games the dark side moves first, then light. In 3-player games: dark, light, Dragon, repeating.
 - **Winning, 2-player**: checkmate wins.
 - **Draws, 2-player**: stalemate is a draw, as are threefold repetition, the 50-move rule and insufficient material, as in chess. Tail moves count as moves for the 50-move rule and repetition.
-- **Draws, 3-player**: a Kinged player who is not in check and has no legal move on their turn ends the game as a draw between the two Kinged players.
+- **Winning and draws, 3-player**: see [3-player Dragon mode](#3-player-dragon-mode-experimental).
 
 ## 3-player Dragon mode (experimental)
 
-The third player is the Dragon: it moves third each round and plays all 5 Coast pieces, each of which first emerges from the Coast through A5. 3-player stays experimental until bot self-play shows the seats are balanced. The two players with Kings are the **Kinged players**.
+The third player is the Dragon: it moves third each round (dark, light, Dragon) and plays all 5 Coast pieces, each of which first emerges from the Coast through A5. The two players with Kings are the **Kinged players**. 3-player stays experimental until bot self-play shows the seats are balanced. These are the full Dragon rules of Good Practice and Standard ([decision 0016](decisions/0016-three-player-rules-v0.3.md)).
 
 - **First Coast move**: the Sun or Moon one square, or the Tail off A5 to any legal square, which frees A5.
 - **Movement**: Dragon Heads and the Tail any distance in any direction; the Sun and Moon one square at a time on the Coast, then up to 2 squares in any direction. All in straight lines.
-- **Check**: Dragon pieces don't give check to Kings. A King attacked by a Dragon piece isn't forced to respond, but the Dragon may capture it on its turn. The two Kings still check each other as usual.
-- **The Tail**: it can capture any light or dark piece that isn't a Coast piece. It can't be captured, but it can be checkmated: a Kinged player's piece attacks it and the Dragon has no move that ends the attack. It plays the role of the Dragon's King.
-- **Tail turned to stone**: if the Tail is checkmated while both Kinged players are active, it switches places with the checkmating piece and turns to stone, blocking that square until a Kinged player checkmates the other King or the game ends in stalemate. If the Tail is on E5, no swap happens; it turns to stone where it stands. The Dragon plays on with its other pieces.
-- **Captured King**: when the Dragon captures a King, the King is removed like any captured piece, that side's turn is skipped, and its remaining pieces stay on the board in stone: they block, can't move, and can't be captured.
+- **The Tail** can capture any light or dark piece that isn't a Coast piece, and can't be captured.
 - Both Kinged sides may capture Dragon Heads and the Sun and Moon once they are off the Coast.
+
+### Check
+
+1. Kings check each other as usual. A Kinged player may never leave its own King in check from the other Kinged player.
+2. Dragon pieces don't give check (`dragon.3p.givesCheck` off). A Kinged player may leave its King on a square a Dragon piece attacks, or move it onto one, at its own risk: the Dragon may capture it on its turn.
+3. With `dragon.3p.givesCheck` on, attacks by the Dragon Heads, the Sun and the Moon are check, so a Kinged player must answer them. The Dragon then removes a King by checkmating it, which counts as capturing it. The Tail gives check only when `tail.canCheck` is also on; a King attacked only by a Tail that doesn't give check can still be captured by it.
+4. The Tail is the Dragon's King while it is active: the Dragon must end any attack on it when it can, and may not move the Tail onto an attacked square or make a move that leaves it attacked.
+5. **The duel.** Once the Dragon has captured one King, the last Kinged player and the Dragon play the game out. Dragon attacks on the last King are now check, whatever `dragon.3p.givesCheck` says, and the Dragon wins by checkmating that King. Option `dragon.3p.lastKing` = capture: Dragon attacks keep rule 2 or 3, and the Dragon wins by capturing the last King.
+6. No move may leave a King in check from a player who moves before that King's owner can answer: the Dragon may not leave light's King in check from dark, and with Dragon check on, light may not leave dark's King in check from the Dragon. Option `check.3p.exposedKing` = counts-as-checkmate: such a move is allowed, and the King's owner loses at once to the owner of the piece giving check.
+
+### Checkmate, the Tail and stones
+
+7. Every checkmate is judged right after the move that gives it, as if the checkmated side moved next: a checkmate between Kinged players ends the game at once, so the Dragon never gets a turn to rescue the King, and after dark checkmates the Tail, light gets no move to undo it. Option `tail.3p.mateTiming` = dragon-turn: the Tail is checkmated only if, at the start of the Dragon's turn, it is attacked and the Dragon has no move that ends the attack.
+8. The checkmating piece is the piece that just moved, if it gives the check; otherwise the only piece giving check; if two or more give check and none of them just moved, the player who made the move chooses one, as part of the move. The checkmate belongs to the owner of the checkmating piece.
+9. When the Tail is checkmated while both Kinged players are active, it switches places with the checkmating piece and turns to stone; on E5 it turns to stone where it stands, and so it does if the checkmating piece may not stand on the Tail's square. A pawn that swaps onto its last rank promotes at once, as part of the move. A move whose swap leaves the mover's King in check is not allowed.
+10. Stones only block: they never move, can't be captured, don't attack, don't give check and don't guard squares. No piece may move onto a stone.
+11. When the Dragon captures a King, that side's remaining pieces turn to stone and its turn is skipped. A side in stone, a Tail in stone and a Dragon that is out stay that way until the game ends.
+
+### Draws and stalls
+
+12. While both Kings are on the board, every draw is a draw between the two Kinged players. Threefold repetition and the 50-move rule apply (`draw.3p.threefoldRepetition`, `draw.3p.fiftyMove`, both on).
+13. Repetition: the same position, stones and seat statuses included, with the same player to move, for the third time. The 50-move rule: every player still in the game has made 50 moves with no capture, no pawn move, no King captured and no piece turned to stone. Tail, Sun and Moon moves count as moves.
+14. Insufficient material applies only once the Dragon is out.
+15. If the Dragon has no legal move while both Kings are on the board, and the Tail is not checkmated, its turn is skipped.
+16. In the duel, stalemate of either side, repetition and the 50-move rule are a draw between the last Kinged player and the Dragon.
+17. Once the Dragon is out, the Kinged players finish the game under the 2-player end rules: checkmate wins; stalemate, repetition, the 50-move rule and insufficient material are draws.
 
 ### How 3-player games end
 
 | What happened | Result |
 |---|---|
 | A Kinged player checkmates the other King | That player wins; the game ends at once |
-| The Dragon captures one King, then checkmates the other | The Dragon wins |
-| The Dragon captures one King; the other Kinged player then captures both Dragon Heads, the Sun and the Moon, or checkmates the Tail | That Kinged player wins |
-| The Tail is checkmated while both Kinged players are active | No winner yet: the Tail turns to stone, and the Dragon plays on and can still win by capturing a King and then checkmating the other |
-| A Kinged player captures both Dragon Heads, the Sun and the Moon while the Tail is in stone | The Dragon is out; the Kinged players play on |
-| A Kinged player is stalemated | Draw between the Kinged players |
+| The Dragon captures a King (or checkmates it, with Dragon check on) | That side turns to stone and its turn is skipped; the duel begins |
+| In the duel, the Dragon checkmates the last King (captures it, with `dragon.3p.lastKing` = capture) | The Dragon wins |
+| In the duel, the last Kinged player checkmates the Tail, or captures both Dragon Heads, the Sun and the Moon | That Kinged player wins |
+| The Tail is checkmated while both Kinged players are active | The Tail turns to stone; play goes on, and the Dragon can still win |
+| A Kinged player captures both Dragon Heads, the Sun and the Moon while the Tail is in stone | The Dragon is out; the Kinged players play on (rule 17) |
+| A draw while both Kings are on the board | Draw between the Kinged players |
+| A draw in the duel | Draw between the last Kinged player and the Dragon |
 
-**Fairness**: a checkmate between Kinged players ends the game immediately, whichever side delivers it, so the Dragon never gets a turn to rescue the mated King. The winner and the Dragon may then agree to continue in extended play.
+### Easy Start for 3 players: the first checkmate wins
+
+Easy Start (`easy-3p`, `endings.3p` = first-checkmate) is a shorter Dragon game:
+
+- **Pieces**: Easy Start's 2-player settings where they apply to 3 players: King range 1 with castling, the Queen may cross and stand on void squares, no pawn-safe zones, and any piece may stand on and pass over E5.
+- **Captures**: every piece except the Kings and the Tail can be captured anywhere, the Coast included.
+- **Check**: the Dragon Heads, the Sun and the Moon give check, and every King must get out of check, as in chess. No King is ever captured.
+- **The Tail is the Dragon's King**: it jumps among A5, E5 and I5, whichever is empty; it never captures, never gives check and can't be captured. The Dragon must get it out of check.
+- **The first checkmate wins**: a Kinged player wins by checkmating the other King or the Tail, and the Dragon wins by checkmating either King. There are no stones, no King captures and no duel. Rules 6, 7 and 8 apply.
+- **Draws**, shared by all three: the player to move is not in check and has no legal move, threefold repetition, or the 50-move rule. Insufficient material doesn't apply.
+
+`endings.3p` = first-checkmate needs `dragon.3p.givesCheck` on; a ruleset that sets one without the other is refused.
 
 ### Extended play (not in v1)
 
