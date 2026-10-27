@@ -1,27 +1,29 @@
 # Handoff
 
-Updated 2026-10-27 by S53 (Sonnet 5.5 · high). `/end-session` rewrites this file; keep it under 40 lines.
+Updated 2026-10-27 by S56 (Opus 5.5 · high). `/end-session` rewrites this file; keep it under 40 lines.
 
 ## State
-- Phase 5: S53 is done. The web app plays online: "Play online" (game screen and picker) makes a room with a seat choice (random preselected); `/room/<code>` previews a room (name, version, badge, "Unofficial" and differences for a custom one, your side), takes the seat, plays, reconnects with backoff after a drop or reload, takes back a refused move, resigns and offers draws. `chess9s.online` keeps one entry per room. Join by code or link from the picker and the game screen. Privacy (dated 27 Oct), `/tournament`, the builder note and the tournament invitation are updated.
-- Done-when passed: `node apps/worker/scripts/e2e-browser.mjs` plays the 80-move game in two Chromium contexts at desktop and Pixel 7 width (reload at move 40, no sideways scroll). Not in CI (needs Playwright). 1781 tests pass.
-- Phase 4 is still on hold (S47 to S50). Standard's discussion is #39 and closes 2026-11-15 (D20).
+- Phase 6: S56 is done. The engine plays 3-player games (decision 0016): `newGame`/`playMove` for 3 players, seat statuses (`GameState.seats`), stones (`PlacedPiece.stone`), check per attacker and King, rule 6 and `check.3p.exposedKing`, King capture and the duel, the Tail's checkmate (choice `#<square>`, swap promotion `=<piece>`), Dragon out, the skipped Dragon turn, and draws with `between`. Move `events` say what happened. Code: `packages/engine/src/game/three.ts`.
+- Data: registry 0.3.0 (six 0016 parameters, a new `requires` field), `draft-3p` 0.3.0, `standard-3p` 0.1.0, `easy-3p` 0.1.0; `draft-3p` 0.2.0 archived without a lock (the lock tool and test allow that for a version never locked). RULES.md and RULES-FRAMEWORK take 0016. No 2-player parameter, ruleset or lock changed.
+- Done-when passed: each preset reaches every end in its table from the start (recorded games), every 3-player parameter at each option in a game that ends, a record round trip; 1903 tests.
 
 ## Next session
-**S56 — 3-player game state and game end** · Opus 5.5 · effort high
-Why: S54 (go-live) is the owner's step; the next Claude step in Phase 6 order is S56.
-Start with: `/start-session S56`
+**S57 — 3-player hot-seat in the browser** · Sonnet 5.5 · effort high
+Why: next in the Phase 6 order; the engine side is in place.
+Start with: `/start-session S57`
 
 ## Decisions in effect for the next step
-- D55 to D57, D62, D65: as in the table (decided; decision 0016).
+- D34, D58 (untimed, decision 0017), D63 (Standard is the 3-player default): decided.
 
 ## Open questions for the owner
-- S54 (owner): follow `docs/BUILD-PLAN.md` S54 and the S52 rate-limit rule (`POST /api/rooms`, 5 per 10 s per IP, block 10 s). Also confirm D50 to D54, D60 (provisional).
-- New S53 defaults to confirm: a seat stays in the browser after the game ends until the room is deleted (so a reload shows the result); entries older than 8 days are dropped; keep-alive PING every 30 s; backoff 0.5 s to 30 s; two-step Resign; a draw offer shows "<Side> offers a draw" with Accept and Decline.
-- Carried over: the draw-offer default from S51, the Discussion form prefill check, the flag rule (decision 0013), how to read `coast.openToAll`, the I34 contact address, the favicon and the Ting Yang art.
+- In the duel with `dragon.3p.lastKing` = checkmate, the Tail (no check unless `tail.canCheck`) may still capture the last King; S56 counts that as a Dragon win (`king-capture`). Default: keep.
+- `tail.capturable` = true in 3-player games: 0016 says nothing about capturing the Tail; S56 lets the capture happen with no special result. Default: keep, and ask before S64 offers it.
+- Resigning and agreed draws with three seats are not in 0016; S56 refuses them. Default: 2-player only until decided.
+- A skipped Dragon turn counts as a turn for the 50-move rule (provisional reading of rule 13).
+- Carried over: S54 (owner) and the S53 defaults listed in its PR; the draw-offer default (S51), the Discussion form prefill check, the flag rule (0013), `coast.openToAll`, the I34 contact address, the favicon and the Ting Yang art.
 
 ## Notes for Claude
-- Web online code: `apps/web/src/game/` (`online.ts` pure session, `connection.ts` socket, `roomController.ts` page logic, `api.ts`, `onlineStore.ts`, `roomFakes.ts` test fakes) and `OnlineRoom.tsx`, `CreateRoom.tsx`, `JoinByCode.tsx`. The web imports `@chess9s/online/protocol` (subpath export, no rooms data in the bundle).
-- Known gap for S54 or later: a joiner whose socket drops before the first snapshot has taken the seat but never got its token, so the seat is stuck until the room expires (needs a server-side fix). `connect-src 'self'` covers `wss` in Chromium; watch Safari in S54.
-- `pnpm dev` proxies `/api` to `wrangler dev` on 8787. `exactOptionalPropertyTypes` is on: spread optional props as `...(x && { x })`.
-- A new file in `rules/` needs `pnpm rules:index`. A lock is never edited by hand.
+- S57 must let `loadRules().rules()` and the web picker (`apps/web/src/game/rules.ts`, `playable: players === 2`) take 3 players; the online room still refuses them (S63).
+- Rule 9's "piece that may not stand on the Tail's square" never arises: a piece attacks only squares it may stop on, so it can't check the Tail there. Only E5 keeps the Tail in place (tested with `center.occupants` = any).
+- Checkmate escapes are judged two levels deep (`MATE_DEPTH` in three.ts). 3-player turns cost about 5 to 10 ms; S62's search will need the incremental check of `check.ts`.
+- `coast.3p.exit` (first way out through A5) is not built; `unbuiltFeatures` lists it for every 3-player game.
