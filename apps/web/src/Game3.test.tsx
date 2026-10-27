@@ -351,14 +351,38 @@ describe('the computer in 3-player games (S58)', () => {
     };
   };
 
-  it('offers a person per seat to hand to the computer, none by default, at the Greedy level', () => {
+  it('offers a person per seat to hand to the computer, none by default', () => {
     const html = render(fresh());
     expect(html).toContain('aria-label="Computer seats"');
     for (const label of ['Dark', 'Light', 'Dragon']) {
       expect(html).toMatch(new RegExp(`aria-pressed="false"[^>]*>${label}<`));
     }
     expect(html).toContain('Greedy');
+    expect(html).toContain('Search');
+    expect(html).not.toContain('computer level"');
     expect(html).not.toContain('aria-label="Opponent"');
+  });
+
+  it("offers each computer seat's level: Greedy for the Dragon, Search for a Kinged seat (S62)", () => {
+    const { game } = fresh();
+    const store = memory();
+    saveGuest(store, { game, mode: 'hot-seat', bots: ['dragon', 'dark'] });
+    const html = renderToStaticMarkup(<Game store={store} ruleset={info('standard-3p')} />);
+    const group = (seat: string) =>
+      html.match(new RegExp(`aria-label="${seat} computer level">(.*?)</div>`))?.[1] ?? '';
+    expect(group('Dragon')).toMatch(/aria-pressed="true"[^>]*>Greedy</);
+    expect(group('Dragon')).toMatch(/aria-pressed="false"[^>]*>Search</);
+    expect(group('Dark')).toMatch(/aria-pressed="true"[^>]*>Search</);
+    expect(html).not.toContain('Light computer level');
+  });
+
+  it('restores a level chosen for a computer seat', () => {
+    const { game } = fresh();
+    const store = memory();
+    saveGuest(store, { game, mode: 'hot-seat', bots: ['dragon'], levels: { dragon: 'Search' } });
+    const html = renderToStaticMarkup(<Game store={store} ruleset={info('standard-3p')} />);
+    const dragon = html.match(/aria-label="Dragon computer level">(.*?)<\/div>/)?.[1] ?? '';
+    expect(dragon).toMatch(/aria-pressed="true"[^>]*>Search</);
   });
 
   it('restores a saved game with a computer Dragon, and marks that seat', () => {

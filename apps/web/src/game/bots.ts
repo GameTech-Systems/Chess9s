@@ -1,10 +1,23 @@
 // The computer's seats in a 3-player game (S58, decision D59): the Dragon is the usual one, and
-// at most two seats go to the computer so that a person is always playing.
-import type { GameState } from '@chess9s/engine';
+// at most two seats go to the computer so that a person is always playing. Each computer seat
+// plays at a level (S62): Greedy, or Search, the 2-player computer's search played paranoid.
+import { three, type GameState } from '@chess9s/engine';
 import { canUndo, undo, type Model } from './session';
 
-/** The only level so far; S62 adds the search. */
-export const BOT_LEVEL_3P = 'Greedy';
+/** The 3-player computer's levels, weakest first. */
+export const LEVELS_3P = ['Greedy', 'Search'] as const;
+export type Level3 = (typeof LEVELS_3P)[number];
+
+export const isLevel3 = (x: unknown): x is Level3 => LEVELS_3P.includes(x as Level3);
+
+/** A computer seat's level: as chosen, else Greedy for the Dragon (owner, D59) and Search for the others. */
+export function levelOf(
+  game: Pick<GameState, 'rules' | 'order'>,
+  levels: Readonly<Record<string, Level3>>,
+  seat: string,
+): Level3 {
+  return levels[seat] ?? (three(game.rules, game.order).dragon === seat ? 'Greedy' : 'Search');
+}
 
 /** Most seats the computer may play. */
 export const MAX_BOT_SEATS = 2;

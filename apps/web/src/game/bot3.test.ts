@@ -1,9 +1,9 @@
 // S58: the computer in 3-player games (decision D59): the greedy player, one or two computer
-// seats, the Dragon the usual one, kept with the saved guest game.
+// seats, the Dragon the usual one, kept with the saved guest game. S62: the Search level.
 import { describe, expect, it } from 'vitest';
-import { playMove, toNotation } from '@chess9s/engine';
-import { computerMove, computerReply } from './bot';
-import { BOT_LEVEL_3P, canToggleBot, followSeat, toggleBot, undoForHuman } from './bots';
+import { bestMove, greedyMove, playMove, toNotation } from '@chess9s/engine';
+import { BOT_NODES, computerMove, computerReply } from './bot';
+import { LEVELS_3P, canToggleBot, followSeat, levelOf, toggleBot, undoForHuman } from './bots';
 import { loadGuest, saveGuest, type Store } from './guest';
 import { createRules, listRulesets } from './rules';
 import { newModel, playFor } from './session';
@@ -64,8 +64,41 @@ describe('the 3-player computer move', () => {
     expect(next.game.moves).toHaveLength(1);
   });
 
-  it('names its level Greedy', () => {
-    expect(BOT_LEVEL_3P).toBe('Greedy');
+  it('plays the greedy move at the Greedy level and the search at the Search level', () => {
+    let { game } = fresh();
+    for (let i = 0; i < 3; i++) game = playMove(game, game.legal[0]!);
+    expect(computerMove(game, () => 0.4, BOT_NODES, 'Greedy')).toBe(
+      greedyMove(game, { random: () => 0.4 }),
+    );
+    const searched = computerMove(game, () => 0.4, BOT_NODES, 'Search');
+    expect(searched).toBe(bestMove(game, { nodes: BOT_NODES, random: () => 0.4 }).move);
+    expect(game.legal).toContain(searched);
+  });
+
+  it('answers at the level asked for in the Web Worker', () => {
+    const { game } = fresh();
+    const ref = { id: 'standard-3p', version: info('standard-3p').version };
+    const reply = computerReply(ref, [], () => 0.4, 200, 'Search');
+    expect(reply).toBe(toNotation(bestMove(game, { nodes: 200, random: () => 0.4 }).move!));
+  });
+});
+
+describe('the computer levels', () => {
+  it('are Greedy and Search, at the 2-player search budget', () => {
+    expect(LEVELS_3P).toEqual(['Greedy', 'Search']);
+  });
+
+  it('start on Greedy for the Dragon (D59) and on Search for the Kinged seats', () => {
+    const { game } = fresh();
+    expect(levelOf(game, {}, 'dragon')).toBe('Greedy');
+    expect(levelOf(game, {}, 'dark')).toBe('Search');
+    expect(levelOf(game, {}, 'light')).toBe('Search');
+  });
+
+  it('are what was chosen for a seat', () => {
+    const { game } = fresh();
+    expect(levelOf(game, { dragon: 'Search', dark: 'Greedy' }, 'dragon')).toBe('Search');
+    expect(levelOf(game, { dragon: 'Search', dark: 'Greedy' }, 'dark')).toBe('Greedy');
   });
 });
 
@@ -113,6 +146,17 @@ describe('guest play keeps the computer seats', () => {
     saveGuest(store, { game, mode: 'hot-seat', bots: ['dragon'] });
     const loaded = loadGuest(store, game.rules, info('standard-3p'));
     expect(loaded?.bots).toEqual(['dragon']);
+  });
+
+  it('saves and restores the levels chosen, and drops unknown seats and levels', () => {
+    const { game } = fresh();
+    const store = memory();
+    saveGuest(store, { game, mode: 'hot-seat', bots: ['dragon'], levels: { dragon: 'Search' } });
+    expect(loadGuest(store, game.rules, info('standard-3p'))?.levels).toEqual({ dragon: 'Search' });
+    const raw = JSON.parse(store.getItem('chess9s.guest')!);
+    raw.levels = { dragon: 'Search', dark: 'Expert', nobody: 'Greedy' };
+    store.setItem('chess9s.guest', JSON.stringify(raw));
+    expect(loadGuest(store, game.rules, info('standard-3p'))?.levels).toEqual({ dragon: 'Search' });
   });
 
   it('has none when none were saved, and ignores seats the game does not have', () => {

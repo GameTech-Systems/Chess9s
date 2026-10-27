@@ -6,7 +6,15 @@ import { addSpent, formatElapsed, formatLeft, play, soundsFor } from './game/aid
 import { clockSeats, controlText } from './game/clockText';
 import { controlById, hotSeatControls, timeControls } from './game/timeControls';
 import { searchMove, type BotSearch } from './game/botClient';
-import { BOT_LEVEL_3P, canToggleBot, followSeat, toggleBot, undoForHuman } from './game/bots';
+import {
+  LEVELS_3P,
+  canToggleBot,
+  followSeat,
+  levelOf,
+  toggleBot,
+  undoForHuman,
+  type Level3,
+} from './game/bots';
 import { clearGuest, loadGuest, saveGuest, type Mode, type Store } from './game/guest';
 import { openRecord, saveRecordFile, type Opened } from './game/record';
 import { Board } from './board/Board';
@@ -112,8 +120,9 @@ export function Game({
     () => initial ?? (saved ? fromGame(saved.game, saved.timed ?? null) : newModel(rules, ruleset)),
   );
   const [mode, setMode] = useState<Mode>(saved?.mode ?? 'hot-seat');
-  // 3-player games: the computer plays the seats in `bots`, at the Greedy level (S58).
+  // 3-player games: the computer plays the seats in `bots` (S58), each at its level (S62).
   const [bots, setBots] = useState<string[]>(saved?.bots ?? []);
+  const [levels, setLevels] = useState<Record<string, Level3>>(saved?.levels ?? {});
   // 3-player games turn the board to the side to move (each seat's view, D34); 2-player games
   // start on Light's view.
   const three = rules.players === 3;
@@ -152,28 +161,30 @@ export function Game({
     let search: BotSearch | undefined;
     const id = setTimeout(() => {
       // Search off-thread, and play the move only on the game it was found for.
-      search = searchMove(game, (move) =>
-        setModel((m) => (move && m.game === game ? playFor(m, move) : m)),
+      search = searchMove(
+        game,
+        (move) => setModel((m) => (move && m.game === game ? playFor(m, move) : m)),
+        three ? levelOf(game, levels, game.turn) : undefined,
       );
     }, BOT_DELAY_MS);
     return () => {
       clearTimeout(id);
       search?.cancel();
     };
-  }, [botTurn, game]);
+  }, [botTurn, game, levels]);
   // Keep the game in the browser, with its clock: it comes back paused.
-  const latest = useRef({ game, mode, bots, timed });
-  latest.current = { game, mode, bots, timed };
+  const latest = useRef({ game, mode, bots, levels, timed });
+  latest.current = { game, mode, bots, levels, timed };
   useEffect(() => {
-    if (store) saveGuest(store, { game, mode, bots, ...(timed && { timed }) });
+    if (store) saveGuest(store, { game, mode, bots, levels, ...(timed && { timed }) });
     // A resignation is not a move, so the game itself is the sign that something changed.
-  }, [game, mode, bots, timed]);
+  }, [game, mode, bots, levels, timed]);
   // Leaving the page keeps the time the running seat has used.
   useEffect(() => {
     if (!store || typeof window === 'undefined') return;
     const keep = () => {
-      const { game: g, mode: md, bots: b, timed: t } = latest.current;
-      saveGuest(store, { game: g, mode: md, bots: b, ...(t && { timed: t }) });
+      const { game: g, mode: md, bots: b, levels: l, timed: t } = latest.current;
+      saveGuest(store, { game: g, mode: md, bots: b, levels: l, ...(t && { timed: t }) });
     };
     const hidden = () => document.visibilityState === 'hidden' && keep();
     window.addEventListener('pagehide', keep);
@@ -529,7 +540,8 @@ export function Game({
         {three && (
           <>
             <p className="facts">
-              Computer plays: <strong>{BOT_LEVEL_3P}</strong> level, no look-ahead
+              Computer levels: <strong>Greedy</strong> takes the best move without looking ahead;{' '}
+              <strong>Search</strong> looks ahead, as the 2-player computer does.
             </p>
             <div className="segmented" role="group" aria-label="Computer seats">
               {game.order.map((side) => (
@@ -544,6 +556,28 @@ export function Game({
                 </button>
               ))}
             </div>
+            {game.order
+              .filter((side) => bots.includes(side))
+              .map((side) => (
+                <div
+                  key={side}
+                  className="segmented"
+                  role="group"
+                  aria-label={`${title(side)} computer level`}
+                >
+                  <span className="segmented-label">{title(side)}:</span>
+                  {LEVELS_3P.map((level) => (
+                    <button
+                      key={level}
+                      type="button"
+                      aria-pressed={levelOf(game, levels, side) === level}
+                      onClick={() => setLevels((l) => ({ ...l, [side]: level }))}
+                    >
+                      {level}
+                    </button>
+                  ))}
+                </div>
+              ))}
           </>
         )}
 
