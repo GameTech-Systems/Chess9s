@@ -183,20 +183,29 @@ function attacks(rules: MoveRules, position: Position, at: string): string[] {
  * any position, since other pieces only shorten its lines (as in check.ts, staysOutOfCheck).
  */
 const reachCache = new WeakMap<MoveRules, Map<string, Set<string>>>();
+/** The same, looked up by the piece object first (pieces are never changed in place either). */
+const reachByPiece = new WeakMap<MoveRules, WeakMap<PlacedPiece, Map<string, Set<string>>>>();
 function reach(rules: MoveRules, at: string, placed: PlacedPiece): Set<string> {
+  let byPiece = reachByPiece.get(rules);
+  if (!byPiece) reachByPiece.set(rules, (byPiece = new WeakMap()));
+  let byAt = byPiece.get(placed);
+  if (!byAt) byPiece.set(placed, (byAt = new Map()));
+  let found = byAt.get(at);
+  if (found) return found;
   let byKey = reachCache.get(rules);
   if (!byKey) reachCache.set(rules, (byKey = new Map()));
   const key = `${at}|${placed.side}|${placed.piece}|${placed.moved === true}|${placed.home ?? ''}`;
-  let found = byKey.get(key);
+  found = byKey.get(key);
   if (!found) byKey.set(key, (found = new Set(attacksFrom(rules, { [at]: placed }, at))));
+  byAt.set(at, found);
   return found;
 }
 
 /**
- * Squares of the pieces giving check to a royal piece of `target`, sorted; with `from`, only
- * pieces of those sides.
+ * Squares of the pieces attacking a royal piece of `target`, check or not, sorted; with `from`,
+ * only pieces of those sides.
  */
-export function checkersOn(
+export function attackersOn(
   g: Three,
   position: Position,
   seats: Seats,
@@ -212,10 +221,25 @@ export function checkersOn(
       if (from && !from.includes(p.side)) return false;
       const alone = reach(g.rules, at, p);
       if (![...kings].some((k) => alone.has(k))) return false;
-      if (!attacks(g.rules, position, at).some((k) => kings.has(k))) return false;
-      return counts(g, seats, at, p, target);
+      return attacks(g.rules, position, at).some((k) => kings.has(k));
     })
     .sort();
+}
+
+/**
+ * Squares of the pieces giving check to a royal piece of `target`, sorted; with `from`, only
+ * pieces of those sides.
+ */
+export function checkersOn(
+  g: Three,
+  position: Position,
+  seats: Seats,
+  target: string,
+  from?: readonly string[],
+): string[] {
+  return attackersOn(g, position, seats, target, from).filter((at) =>
+    counts(g, seats, at, position[at]!, target),
+  );
 }
 
 /** The seats that move after `mover` and before `target` (rule 6). */

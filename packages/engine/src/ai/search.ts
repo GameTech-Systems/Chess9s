@@ -4,6 +4,11 @@
 // under the resolved ruleset, so parameters that change how a piece moves change what it is
 // worth. These are playing heuristics, not rules. Deterministic: the search stops on a node
 // budget (no clock), and ties are broken only by the random source passed in.
+//
+// 3-player games (S62, decision D59) use the same search, paranoid: the seat to move maximizes its
+// own score (paranoid.ts) and the other two seats minimize it, so a node's score is the root
+// seat's score or its negation, and a move changes the sign only when it passes the turn between
+// the root seat and the others. Depth still counts plies, one per seat's move.
 import { playMove, stateKey, type GameState } from '../game/game';
 import {
   attacksFrom,
@@ -13,9 +18,8 @@ import {
   type GeneratedMove,
   type MoveRules,
 } from '../moves/generate';
+import { evaluateFor, MATE, overFor, terminalFor } from './paranoid';
 
-/** A checkmate's score, less one per ply it takes to reach, so a faster mate scores higher. */
-const MATE = 1_000_000;
 /** Most captures in a row the quiescence search follows past the nominal depth. */
 const QUIESCENCE_PLIES = 4;
 
@@ -147,6 +151,27 @@ export function bestMove(state: GameState, options: SearchOptions = {}): SearchR
     return { move: undefined, score: 0, depth: 0, nodes: 0, capped: false };
   }
   const values = pieceValues(state.rules);
+  // Scores from the side to move. In 3-player games, the root seat's score, negated when another
+  // seat is to move; `flips` says whether a move changes which of the two sides is to move.
+  const root = state.turn;
+  const three = state.rules.players === 3;
+  const sign = (s: GameState) => (s.turn === root ? 1 : -1);
+  const over = three
+    ? (s: GameState) => overFor(s, root)
+    : (s: GameState) => s.result.status !== 'ongoing';
+  const end = three ? (s: GameState, ply: number) => sign(s) * terminalFor(s, root, ply) : terminal;
+  const leaf = three
+    ? (s: GameState) => sign(s) * evaluateFor(s, root, values)
+    : (s: GameState) => evaluate(s, values);
+  const flips = (a: GameState, b: GameState) => !three || (a.turn === root) !== (b.turn === root);
+  // The child's score from the parent's side, searched with the parent's window (alpha, beta).
+  const child = (
+    s: GameState,
+    c: GameState,
+    search: (c: GameState, alpha: number, beta: number) => number,
+    alpha: number,
+    beta: number,
+  ) => (flips(s, c) ? -search(c, -beta, -alpha) : search(c, alpha, beta));
   let nodes = 0;
   const play = (s: GameState, m: GeneratedMove): GameState => {
     if (nodes >= budget) throw OUT_OF_NODES;
@@ -221,8 +246,8 @@ export function bestMove(state: GameState, options: SearchOptions = {}): SearchR
   };
 
   function quiesce(s: GameState, alpha: number, beta: number, ply: number, left: number): number {
-    if (s.result.status !== 'ongoing') return terminal(s, ply);
-    const stand = evaluate(s, values);
+    if (over(s)) return end(s, ply);
+    const stand = leaf(s);
     if (left === 0 || stand >= beta) return stand;
     const key = keyOf(s, ply, `q${left}`);
     const found = probe(key, alpha, beta);
@@ -233,7 +258,13 @@ export function bestMove(state: GameState, options: SearchOptions = {}): SearchR
     if (best > alpha) alpha = best;
     const captures = s.legal.filter((x) => x.capture !== undefined);
     for (const m of last ? orderedLast(captures, found.hint, ply) : ordered(captures)) {
-      const score = -quiesce(play(s, m), -beta, -alpha, ply + 1, left - 1);
+      const score = child(
+        s,
+        play(s, m),
+        (c, a, b) => quiesce(c, a, b, ply + 1, left - 1),
+        alpha,
+        beta,
+      );
       if (score > best) {
         best = score;
         bestMove = moveId(m);
@@ -246,8 +277,9 @@ export function bestMove(state: GameState, options: SearchOptions = {}): SearchR
   }
 
   function negamax(s: GameState, depth: number, alpha: number, beta: number, ply: number): number {
-    if (s.result.status !== 'ongoing') return terminal(s, ply);
+    if (over(s)) return end(s, ply);
     if (depth <= 0) return quiesce(s, alpha, beta, ply, QUIESCENCE_PLIES);
+    if (s.legal.length === 0) return leaf(s);
     const key = keyOf(s, ply, `d${depth}`);
     const found = probe(key, alpha, beta);
     if (found.score !== undefined) return found.score;
@@ -255,7 +287,13 @@ export function bestMove(state: GameState, options: SearchOptions = {}): SearchR
     let best = -Infinity;
     let bestMove: string | undefined;
     for (const m of last ? orderedLast(s.legal, found.hint, ply) : ordered(s.legal)) {
-      const score = -negamax(play(s, m), depth - 1, -beta, -alpha, ply + 1);
+      const score = child(
+        s,
+        play(s, m),
+        (c, a, b) => negamax(c, depth - 1, a, b, ply + 1),
+        alpha,
+        beta,
+      );
       if (score > best) {
         best = score;
         bestMove = moveId(m);
@@ -290,7 +328,13 @@ export function bestMove(state: GameState, options: SearchOptions = {}): SearchR
       let alpha = -Infinity;
       for (const m of ranked) {
         // Integer scores: a window just under the best so far scores equal moves exactly.
-        const s = -negamax(play(state, m), d - 1, -Infinity, -(alpha - 1), 1);
+        const s = child(
+          state,
+          play(state, m),
+          (c, a, b) => negamax(c, d - 1, a, b, 1),
+          alpha - 1,
+          Infinity,
+        );
         scored.push([m, s]);
         if (s > alpha) alpha = s;
       }
