@@ -315,7 +315,7 @@ Added in S58 from the owner's answers of 27 Oct 2026 ([decision 0018](decisions/
 Done when: Playwright plays a 3-player game in which one player resigns and the other two play on to a result, at desktop size and at Pixel 7 width; all checks pass, and the 2-player tests and locks are unchanged.
 Decisions: D68.
 
-### S64 — 3-player rulesets in the builder · Sonnet 5.5 · medium · `todo`
+### S64 — 3-player rulesets in the builder · Sonnet 5.5 · medium · `done`
 Added in S55 (D64): the owner wants the Dragon settings open for players to experiment with.
 - **Builder.** Start from a 3-player preset, with a control per 3-player setting (the Dragon Heads, Dragon Tail, Sun and Moon, Coast, endings and draws, and `check.3p.exposedKing`, which the owner wants players to be able to try, D62), what differs from the preset, and the `parameterInteractions` flags. `endings.3p` = first-checkmate turns `dragon.3p.givesCheck` on and says why.
 - **File and share.** Export, load and share links take 3-player rulesets (`players: 3`), checked by `readRulesetFile` as in S42. A 3-player custom ruleset is `proposed` and kept in the browser only, as S41 set out.
