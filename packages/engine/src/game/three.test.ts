@@ -20,14 +20,14 @@ const set = validateBoardAndPieces(
   registry,
 );
 
-export function rulesFor(id: string, overrides: Record<string, unknown> = {}): MoveRules {
+function rulesFor(id: string, overrides: Record<string, unknown> = {}): MoveRules {
   const base = read(`rules/rulesets/${id}.json`) as Ruleset;
   const ruleset = { ...base, overrides: { ...base.overrides, ...overrides } };
   return { ...set, values: resolveRuleset(registry, ruleset).values, players: 3 };
 }
 
 /** "<side> <piece>[ stone]" as a placed piece that has moved. */
-export function placed(text: string): PlacedPiece {
+function placed(text: string): PlacedPiece {
   const [side, piece, stone] = text.split(' ');
   return { piece: piece!, side: side!, moved: true, ...(stone === 'stone' && { stone: true }) };
 }
@@ -35,7 +35,7 @@ export function placed(text: string): PlacedPiece {
 const describePiece = (p: PlacedPiece | undefined) =>
   p && `${p.side} ${p.piece}${p.stone ? ' stone' : ''}`;
 
-export function play(g: GameState, notation: string): GameState {
+function play(g: GameState, notation: string): GameState {
   const move = g.legal.find((m) => toNotation(m) === notation);
   if (!move) {
     throw new Error(
@@ -68,6 +68,8 @@ interface Case {
   seats?: Seats;
   pieces: Record<string, string>;
   play?: string[];
+  repeat?: { moves: string[]; times: number };
+  after?: string[];
   expect: Expect;
 }
 
@@ -86,7 +88,8 @@ function start(c: Case): GameState {
 
 describe.each((fixture.cases as Case[]).map((c) => [c.name, c] as const))('%s', (_name, c) => {
   it('plays out as decision 0016 says', () => {
-    let g = (c.play ?? []).reduce(play, start(c));
+    const repeated = Array.from({ length: c.repeat?.times ?? 0 }, () => c.repeat!.moves).flat();
+    let g = [...(c.play ?? []), ...repeated, ...(c.after ?? [])].reduce(play, start(c));
     const e = c.expect;
     const legal = g.legal.map(toNotation);
     if (e.legal) expect(legal).toEqual(e.legal);

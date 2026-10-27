@@ -179,6 +179,20 @@ function attacks(rules: MoveRules, position: Position, at: string): string[] {
 }
 
 /**
+ * The squares a piece standing on `at` attacks on an empty board: a superset of what it attacks in
+ * any position, since other pieces only shorten its lines (as in check.ts, staysOutOfCheck).
+ */
+const reachCache = new WeakMap<MoveRules, Map<string, Set<string>>>();
+function reach(rules: MoveRules, at: string, placed: PlacedPiece): Set<string> {
+  let byKey = reachCache.get(rules);
+  if (!byKey) reachCache.set(rules, (byKey = new Map()));
+  const key = `${at}|${placed.side}|${placed.piece}|${placed.moved === true}|${placed.home ?? ''}`;
+  let found = byKey.get(key);
+  if (!found) byKey.set(key, (found = new Set(attacksFrom(rules, { [at]: placed }, at))));
+  return found;
+}
+
+/**
  * Squares of the pieces giving check to a royal piece of `target`, sorted; with `from`, only
  * pieces of those sides.
  */
@@ -196,6 +210,8 @@ export function checkersOn(
       const p = position[at]!;
       if (p.side === target || p.stone === true) return false;
       if (from && !from.includes(p.side)) return false;
+      const alone = reach(g.rules, at, p);
+      if (![...kings].some((k) => alone.has(k))) return false;
       if (!attacks(g.rules, position, at).some((k) => kings.has(k))) return false;
       return counts(g, seats, at, p, target);
     })

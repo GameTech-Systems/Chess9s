@@ -1,5 +1,5 @@
 {
-  "description": "S56: one position per numbered rule and per end-table row of decision 0016 (3-player rules v0.3), on the real board and pieces. Pieces are \"<side> <piece>\" (\"stone\" added for a stone); every piece has moved. ruleset defaults to standard-3p (King range 1). seats default to all active; turn is the side to move. play lists moves in notation; expect is checked after them (events: those of the last move).",
+  "description": "S56: one position per numbered rule and per end-table row of decision 0016 (3-player rules v0.3), on the real board and pieces. Pieces are \"<side> <piece>\" (\"stone\" added for a stone); every piece has moved. ruleset defaults to standard-3p (King range 1). seats default to all active; turn is the side to move. play lists moves in notation, then repeat plays its moves `times` times; expect is checked after them (events: those of the last move).",
   "cases": [
     {
       "name": "rule 1: Kings check each other; light may not leave its King in check from dark",
@@ -915,6 +915,153 @@
           "status": "draw",
           "reason": "stalemate",
           "between": ["dark", "light"]
+        }
+      }
+    },
+    {
+      "name": "rule 13: the same position, seats included, with the same player to move a third time: a draw between the Kinged players",
+      "rule": "13",
+      "turn": "dark",
+      "pieces": {
+        "h1": "light king",
+        "h9": "dark king",
+        "c3": "dragon moon",
+        "a5": "dragon dragon-tail"
+      },
+      "repeat": {
+        "moves": ["h9-g9", "h1-g1", "c3-c4", "g9-h9", "g1-h1", "c4-c3"],
+        "times": 2
+      },
+      "expect": {
+        "result": {
+          "status": "draw",
+          "reason": "repetition",
+          "between": ["dark", "light"]
+        }
+      }
+    },
+    {
+      "name": "rule 13, draw.3p.threefoldRepetition off: no repetition draw",
+      "rule": "13",
+      "overrides": {
+        "draw.3p.threefoldRepetition": false
+      },
+      "turn": "dark",
+      "pieces": {
+        "h1": "light king",
+        "h9": "dark king",
+        "c3": "dragon moon",
+        "a5": "dragon dragon-tail"
+      },
+      "repeat": {
+        "moves": ["h9-g9", "h1-g1", "c3-c4", "g9-h9", "g1-h1", "c4-c3"],
+        "times": 2
+      },
+      "expect": {
+        "result": {
+          "status": "ongoing"
+        }
+      }
+    },
+    {
+      "name": "rule 13: every seat has made 50 moves with no capture or pawn move: the fifty-move draw",
+      "rule": "13",
+      "overrides": {
+        "draw.3p.threefoldRepetition": false
+      },
+      "turn": "dark",
+      "pieces": {
+        "h1": "light king",
+        "h9": "dark king",
+        "c3": "dragon moon",
+        "a5": "dragon dragon-tail"
+      },
+      "repeat": {
+        "moves": ["h9-g9", "h1-g1", "c3-c4", "g9-h9", "g1-h1", "c4-c3"],
+        "times": 25
+      },
+      "expect": {
+        "result": {
+          "status": "draw",
+          "reason": "fifty-move",
+          "between": ["dark", "light"]
+        }
+      }
+    },
+    {
+      "name": "rule 13: one move short of 50 each: no draw yet",
+      "rule": "13",
+      "overrides": {
+        "draw.3p.threefoldRepetition": false
+      },
+      "turn": "dark",
+      "pieces": {
+        "h1": "light king",
+        "h9": "dark king",
+        "c3": "dragon moon",
+        "a5": "dragon dragon-tail"
+      },
+      "repeat": {
+        "moves": ["h9-g9", "h1-g1", "c3-c4", "g9-h9", "g1-h1", "c4-c3"],
+        "times": 24
+      },
+      "play": [],
+      "after": ["h9-g9", "h1-g1", "c3-c4", "g9-h9", "g1-h1"],
+      "expect": {
+        "result": {
+          "status": "ongoing"
+        }
+      }
+    },
+    {
+      "name": "rule 13, draw.3p.fiftyMove off: no fifty-move draw",
+      "rule": "13",
+      "overrides": {
+        "draw.3p.threefoldRepetition": false,
+        "draw.3p.fiftyMove": false
+      },
+      "turn": "dark",
+      "pieces": {
+        "h1": "light king",
+        "h9": "dark king",
+        "c3": "dragon moon",
+        "a5": "dragon dragon-tail"
+      },
+      "repeat": {
+        "moves": ["h9-g9", "h1-g1", "c3-c4", "g9-h9", "g1-h1", "c4-c3"],
+        "times": 25
+      },
+      "expect": {
+        "result": {
+          "status": "ongoing"
+        }
+      }
+    },
+    {
+      "name": "rule 16: in the duel, 50 moves each by the last Kinged player and the Dragon: a draw between them",
+      "rule": "16",
+      "overrides": {
+        "draw.3p.threefoldRepetition": false
+      },
+      "turn": "dark",
+      "seats": {
+        "light": "out"
+      },
+      "pieces": {
+        "e2": "light pawn stone",
+        "h9": "dark king",
+        "c3": "dragon moon",
+        "a5": "dragon dragon-tail"
+      },
+      "repeat": {
+        "moves": ["h9-g9", "c3-c4", "g9-h9", "c4-c3"],
+        "times": 25
+      },
+      "expect": {
+        "result": {
+          "status": "draw",
+          "reason": "fifty-move",
+          "between": ["dark", "dragon"]
         }
       }
     },

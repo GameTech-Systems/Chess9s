@@ -1,0 +1,108 @@
+// S56: 3-player games from the start: each preset played to every end in its table (decision
+// 0016), from recorded games (test/fixtures/games/three-player-ends.json), and a 3-player record
+// round trip. The parameters at each option: three-params.test.ts.
+import { readdirSync, readFileSync } from 'node:fs';
+import { describe, expect, it } from 'vitest';
+import ends from '../../test/fixtures/games/three-player-ends.json';
+import { toNotation, type MoveRules } from '../moves/generate';
+import { validateBoardAndPieces } from '../rules/formats';
+import { resolveRuleset, type Registry, type Ruleset } from '../rules/loader';
+import { gameRecord, newGame, playMove, type GameRecord, type GameState } from './game';
+
+const root = new URL('../../../../', import.meta.url).pathname;
+const read = (path: string): unknown => JSON.parse(readFileSync(root + path, 'utf8'));
+const registry = read('rules/parameters.json') as Registry;
+const set = validateBoardAndPieces(
+  read('rules/boards/standard-9x9.json'),
+  readdirSync(root + 'rules/pieces')
+    .filter((f) => f.endsWith('.json'))
+    .map((f) => read(`rules/pieces/${f}`)),
+  registry,
+);
+const ruleset = (id: string) => read(`rules/rulesets/${id}.json`) as Ruleset;
+
+function rulesFor(id: string, overrides: Record<string, unknown> = {}): MoveRules {
+  const base = ruleset(id);
+  const values = resolveRuleset(registry, {
+    ...base,
+    overrides: { ...base.overrides, ...overrides },
+  }).values;
+  return { ...set, values, players: 3 };
+}
+
+interface Recorded {
+  ruleset: string;
+  rows: string[];
+  moves: string[];
+  result: GameState['result'];
+  events: unknown[];
+}
+
+const replay = (id: string, moves: string[]): GameState =>
+  moves.reduce(
+    (g, notation) => {
+      const move = g.legal.find((m) => toNotation(m) === notation);
+      if (!move) throw new Error(`${notation} is not legal for ${g.turn} after ${g.moves.length}`);
+      return playMove(g, move);
+    },
+    newGame(rulesFor(id), { id, version: ruleset(id).version }),
+  );
+
+describe('each preset plays from the start to every end in its table', () => {
+  const games = ends.games as Recorded[];
+  const rows: Record<string, string[]> = {
+    'standard-3p': FULL_ROWS(),
+    'draft-3p': FULL_ROWS(),
+    'easy-3p': [
+      'kinged-checkmates-king',
+      'kinged-checkmates-tail',
+      'dragon-checkmates-king',
+      'draw',
+    ],
+  };
+
+  it.each(Object.entries(rows))('%s has a recorded game for every row', (id, want) => {
+    expect(
+      games
+        .filter((g) => g.ruleset === id)
+        .flatMap((g) => g.rows)
+        .sort(),
+    ).toEqual([...want].sort());
+  });
+
+  it.each(games.map((g) => [`${g.ruleset} ${g.rows.join(', ')}`, g] as const))(
+    '%s',
+    (_name, game) => {
+      const g = replay(game.ruleset, game.moves);
+      expect(g.result).toEqual(game.result);
+      expect(g.moves.flatMap((m) => m.events ?? [])).toEqual(game.events);
+    },
+  );
+});
+
+function FULL_ROWS(): string[] {
+  return [
+    'kinged-checkmates-king',
+    'dragon-captures-king',
+    'duel-dragon-wins',
+    'duel-kinged-wins',
+    'tail-stone',
+    'dragon-out',
+    'draw-both-kings',
+    'draw-duel',
+  ];
+}
+
+describe('a 3-player game record', () => {
+  it('round-trips: saved as JSON and replayed, it gives the same game', () => {
+    const recorded = (ends.games as Recorded[]).find((g) => g.events.length > 1)!;
+    const g = replay(recorded.ruleset, recorded.moves);
+    const record = JSON.parse(JSON.stringify(gameRecord(g))) as GameRecord;
+    expect(record.players).toBe(3);
+    expect(record.turnOrder).toEqual(['dark', 'light', 'dragon']);
+    const again = replay(record.ruleset.id, record.moves);
+    expect(again.result).toEqual(record.result);
+    expect(again.order).toEqual(record.turnOrder);
+    expect(gameRecord(again)).toEqual(record);
+  });
+});
