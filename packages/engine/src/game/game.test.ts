@@ -54,8 +54,14 @@ describe('a new game', () => {
     expect(newGame(rulesFor(2, { 'turn.firstMove': 'light' }), ID).turn).toBe('light');
   });
 
-  it('refuses a 3-player game (not playable yet)', () => {
-    expect(() => newGame(rulesFor(3), { id: 'draft-3p', version: '0.2.0' })).toThrow(RulesError);
+  it('starts a 3-player game: dark to move, every seat active, the Dragon on the Coast (S56)', () => {
+    const g = newGame(rulesFor(3), { id: 'draft-3p', version: '0.3.0' });
+    expect(g.order).toEqual(['dark', 'light', 'dragon']);
+    expect(g.turn).toBe('dark');
+    expect(g.seats).toEqual({ dark: 'active', light: 'active', dragon: 'active' });
+    expect(g.position.a5).toEqual({ piece: 'dragon-tail', side: 'dragon', home: 'a5' });
+    expect(g.result).toEqual({ status: 'ongoing' });
+    expect(g.legal.length).toBeGreaterThan(0);
   });
 
   it('refuses a ruleset with an undecided (null) value', () => {

@@ -63,6 +63,13 @@ export interface GeneratedMove {
   passes?: string[];
   /** Castling: the partner piece's move, made together with this one. */
   castle?: { from: string; to: string };
+  /**
+   * 3-player games: the square of the checkmating piece the mover chose, when the move checkmates
+   * with two or more pieces giving check and none of them just moved (decision 0016, rule 8).
+   */
+  mateBy?: string;
+  /** 3-player games: what a pawn swapped onto its last rank by a Tail checkmate becomes (rule 9). */
+  swapPromotion?: string;
 }
 
 /** What the last move left open to capture in passing: the squares it passed and where it landed. */
@@ -221,8 +228,14 @@ function holds(c: Condition, env: Env): boolean {
   return Array.isArray(v) && v.includes(c.has);
 }
 
+/** The choices a 3-player checkmate adds to a move: `#<checkmating square>` and `=<swap promotion>`. */
+const mateChoice = (m: GeneratedMove): string =>
+  m.mateBy === undefined && m.swapPromotion === undefined
+    ? ''
+    : `#${m.mateBy ?? ''}${m.swapPromotion !== undefined ? `=${m.swapPromotion}` : ''}`;
+
 export const toNotation = (m: GeneratedMove): string =>
-  `${m.from}${m.capture !== undefined ? 'x' : '-'}${m.to}${m.promotion !== undefined ? `=${m.promotion}` : ''}${m.castle ? `/${m.castle.from}-${m.castle.to}` : ''}`;
+  `${m.from}${m.capture !== undefined ? 'x' : '-'}${m.to}${m.promotion !== undefined ? `=${m.promotion}` : ''}${m.castle ? `/${m.castle.from}-${m.castle.to}` : ''}${mateChoice(m)}`;
 
 function pieceOf(rules: MoveRules, at: string, placed: PlacedPiece): Piece {
   const piece = rules.pieces[placed.piece];
@@ -422,6 +435,62 @@ function walk(
 }
 
 /**
+ * What the piece in this context becomes on reaching `to`: the sorted promotion targets, or
+ * [undefined] when it does not promote there.
+ */
+function promotionTargets(
+  rules: MoveRules,
+  ctx: Context,
+  from: string,
+  to: string,
+  lost: Lost | undefined,
+): (string | undefined)[] {
+  const { piece, placed, forward, env } = ctx;
+  const promo = piece.promotion;
+  if (!promo || (promo.when && !holds(promo.when, env))) return [undefined];
+  if (forward === undefined) {
+    throw new RulesError(
+      `${piece.id} on ${from} promotes, but side ${placed.side} has no forward direction`,
+    );
+  }
+  if (parse(to)[1] !== (forward === 'up' ? SIZE - 1 : 0)) return [undefined];
+  const target = promo.to;
+  let ids: string[];
+  if (Array.isArray(target)) ids = target;
+  else {
+    const v = value(rules, target.param);
+    if (!Array.isArray(v))
+      throw new RulesError(`Parameter ${target.param} must be a list of pieces`);
+    ids = v.map(String);
+  }
+  if (ids.includes(CAPTURED_PIECE)) {
+    ids = [...ids.filter((id) => id !== CAPTURED_PIECE), ...lostTargets(rules, placed.side, lost)];
+  }
+  // No targets means the piece does not promote: an empty list (decision 2026-10-19), or no
+  // lost piece to take back (decision 2026-10-19, section 5). The pawn stays a pawn.
+  return ids.length > 0 ? [...new Set(ids)].sort() : [undefined];
+}
+
+/**
+ * What the piece standing on `at` becomes when it is put on `to` other than by a move of its own
+ * (a Tail swap, decision 0016 rule 9): its promotion targets there, or [undefined].
+ */
+export const promotionsAt = (
+  rules: MoveRules,
+  at: string,
+  placed: PlacedPiece,
+  to: string,
+  lost?: Lost,
+): (string | undefined)[] => promotionTargets(rules, context(rules, at, placed), at, to, lost);
+
+/**
+ * Whether the piece standing on `at` may stand on `to` under its own square rules (not those of
+ * any one move), such as a Rook on the Coast or a Queen on a void square.
+ */
+export const mayStand = (rules: MoveRules, at: string, placed: PlacedPiece, to: string): boolean =>
+  access(rules, context(rules, at, placed)).mayStop(to);
+
+/**
  * Pseudo-legal moves of the piece on `from`, or none if the square is empty. `lost` lists the
  * pieces each side has lost; it is read only by a promotion under `captured-piece`. `passing`
  * is what the last move left open to capture in passing, if anything.
@@ -436,38 +505,11 @@ export function movesFrom(
   const placed = position[from];
   if (!placed || placed.stone === true) return [];
   const ctx = context(rules, from, placed);
-  const { piece, forward, env } = ctx;
+  const { piece } = ctx;
   const [f0, r0] = parse(from);
   const moves: GeneratedMove[] = [];
 
-  const promotions = (to: string): (string | undefined)[] => {
-    const promo = piece.promotion;
-    if (!promo || (promo.when && !holds(promo.when, env))) return [undefined];
-    if (forward === undefined) {
-      throw new RulesError(
-        `${piece.id} on ${from} promotes, but side ${placed.side} has no forward direction`,
-      );
-    }
-    if (parse(to)[1] !== (forward === 'up' ? SIZE - 1 : 0)) return [undefined];
-    const target = promo.to;
-    let ids: string[];
-    if (Array.isArray(target)) ids = target;
-    else {
-      const v = value(rules, target.param);
-      if (!Array.isArray(v))
-        throw new RulesError(`Parameter ${target.param} must be a list of pieces`);
-      ids = v.map(String);
-    }
-    if (ids.includes(CAPTURED_PIECE)) {
-      ids = [
-        ...ids.filter((id) => id !== CAPTURED_PIECE),
-        ...lostTargets(rules, placed.side, lost),
-      ];
-    }
-    // No targets means the piece does not promote: an empty list (decision 2026-10-19), or no
-    // lost piece to take back (decision 2026-10-19, section 5). The pawn stays a pawn.
-    return ids.length > 0 ? [...new Set(ids)].sort() : [undefined];
-  };
+  const promotions = (to: string) => promotionTargets(rules, ctx, from, to, lost);
 
   walk(rules, position, from, ctx, (to, move, step, n = 0) => {
     const mode = move.capture ?? 'move-or-capture';

@@ -5,6 +5,7 @@ export * from './moves/generate';
 export * from './moves/check';
 export * from './game/turns';
 export * from './game/game';
+export * from './game/three';
 export * from './rules/interactions';
 export * from './ai/search';
 export * from './ai/search-reference';
