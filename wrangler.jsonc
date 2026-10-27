@@ -1,13 +1,28 @@
-// Cloudflare Workers with Static Assets (decision 0003, D15). No Worker script: the built web app
-// is served as static files, and unknown paths (such as /privacy) fall back to index.html.
+// Cloudflare Workers with Static Assets (decision 0003, D15) and the rooms (S52, D18, D50): one
+// Worker serves the app and the rooms on one origin. The built web app is served as static files,
+// and unknown paths (such as /privacy) fall back to index.html; only /api/* runs the Worker script
+// first (apps/worker), which keeps each room in a Room Durable Object (SQLite storage, as Workers
+// Free requires).
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "chess9s",
+  "main": "./apps/worker/src/index.ts",
   "compatibility_date": "2026-10-22",
   "assets": {
     "directory": "./apps/web/dist",
+    "binding": "ASSETS",
     "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"],
   },
-  // Pull-request builds run `wrangler preview`, which needs this block (it may stay empty).
-  "previews": {},
+  "durable_objects": {
+    "bindings": [{ "name": "ROOMS", "class_name": "Room" }],
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Room"] }],
+  // Pull-request builds run `wrangler preview`, which needs this block. Previews do not inherit
+  // bindings: the Room binding is repeated here, and each Preview gets its own namespace of rooms.
+  "previews": {
+    "durable_objects": {
+      "bindings": [{ "name": "ROOMS", "class_name": "Room" }],
+    },
+  },
 }

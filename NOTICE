@@ -31,9 +31,11 @@ scripts/check-dist.mjs).
 
 Development dependencies, not shipped (MIT unless noted): TypeScript (Apache-2.0), Vite,
 Vitest, ESLint, typescript-eslint, Prettier, Ajv, ajv-formats, @vitejs/plugin-react,
-Wrangler (MIT OR Apache-2.0, deploy tooling only), and the @types packages for node,
-react, and react-dom. Ajv and ajv-formats validate the rules data in tests and at build
-time; the web app ships without them.
+Wrangler (MIT OR Apache-2.0, deploy tooling only), @cloudflare/workers-types (MIT OR
+Apache-2.0, type definitions for apps/worker), and the @types packages for node, react,
+and react-dom. Ajv and ajv-formats validate the rules data in tests and at build time;
+the web app and the Worker ship without them. The Worker (apps/worker) bundles only this
+repository's own code.
 
 Fonts: the app loads no font files. It uses fonts already installed on the player's
 device (a serif stack led by Iowan Old Style, Palatino and Georgia), so no font is
