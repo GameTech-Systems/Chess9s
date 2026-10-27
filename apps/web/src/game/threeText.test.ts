@@ -2,11 +2,18 @@
 // result for every row of both end tables. The games are the engine's recorded ones
 // (packages/engine/test/fixtures/games/three-player-ends.json), replayed from the start.
 import { describe, expect, it } from 'vitest';
-import { newGame, playMove, toNotation, type GameState } from '@chess9s/engine';
+import { newGame, playMove, resign, toNotation, type GameState } from '@chess9s/engine';
 import ends from '../../../../packages/engine/test/fixtures/games/three-player-ends.json';
 import { newModel } from './session';
 import { createRules, listRulesets } from './rules';
-import { phaseLine, resultCard, seatLines, noticeLines } from './threeText';
+import {
+  noticeLines,
+  phaseLine,
+  resignable,
+  resignPrompt,
+  resultCard,
+  seatLines,
+} from './threeText';
 import { statusLine } from './session';
 
 interface Recorded {
@@ -187,5 +194,117 @@ describe('notices and the phase of the game', () => {
     const g = replay('standard-3p', []);
     expect(noticeLines(g)).toEqual([]);
     expect(phaseLine(g)).toBeNull();
+  });
+});
+
+describe('a resignation (S67, decision 0018)', () => {
+  const info = listRulesets().find((r) => r.id === 'standard-3p')!;
+  const fresh = () => newModel(createRules('standard-3p'), info).game;
+
+  it('shows the seat that resigned as out, and says what became of it', () => {
+    const g = resign(fresh(), 'light');
+    expect(seatLines(g).find((s) => s.side === 'light')!.text).toBe('out · resigned');
+    expect(noticeLines(g)).toEqual([
+      'Light resigned. Its King leaves the board and its other pieces are stone.',
+    ]);
+    expect(phaseLine(g)).toBe('The duel: Dark against the Dragon.');
+  });
+
+  it('says the Dragon resigned: all its pieces, the Tail too, are stone', () => {
+    const g = resign(fresh(), 'dragon');
+    expect(seatLines(g).find((s) => s.side === 'dragon')!.text).toBe('out · resigned');
+    expect(noticeLines(g)).toEqual([
+      'The Dragon resigned. All its pieces, the Tail too, are stone.',
+    ]);
+  });
+
+  it('keeps the notice of the move before a resignation, then says who resigned', () => {
+    let g = fresh();
+    g = playMove(g, g.legal[0]!);
+    expect(noticeLines(resign(g, 'dragon'))).toHaveLength(1);
+  });
+
+  it('puts the result on the card when the resignation ends the game', () => {
+    const g = resign(resign(fresh(), 'light'), 'dark');
+    expect(resultCard(g)).toEqual({
+      tone: 'win',
+      heading: 'The Dragon wins',
+      detail: 'Dark resigned.',
+    });
+    expect(seatLines(g).find((s) => s.side === 'dark')!.text).toBe('resigned');
+  });
+});
+
+describe('capturing the Tail reads as a capture, not a checkmate (S67)', () => {
+  it('says the Tail was captured and turns to stone, and the duel win names the capture', () => {
+    const info = listRulesets().find((r) => r.id === 'standard-3p')!;
+    const piece = (side: string, name: string) => ({ piece: name, side, moved: true });
+    const base = createRules('standard-3p');
+    const rules = { ...base, values: { ...base.values, 'tail.capturable': true } };
+    const start = newGame(rules, info, {
+      turn: 'light',
+      position: {
+        a1: piece('dragon', 'dark-dragon-head'),
+        b7: piece('dark', 'king'),
+        e2: piece('light', 'king'),
+        g8: piece('light', 'knight'),
+        h8: piece('dragon', 'moon'),
+        i9: piece('dragon', 'dragon-tail'),
+      },
+    });
+    const g = playMove(
+      start,
+      start.legal.find((m) => toNotation(m) === 'g8xi9')!,
+    );
+    expect(noticeLines(g)).toEqual([
+      "Light captured the Dragon's Tail; it turns to stone on g8. The Dragon plays on without it.",
+    ]);
+    const duel = newGame(rules, info, {
+      turn: 'dark',
+      seats: { dark: 'active', light: 'out', dragon: 'active' },
+      position: {
+        a1: piece('dragon', 'dark-dragon-head'),
+        b7: piece('dark', 'king'),
+        g8: piece('dark', 'knight'),
+        h8: piece('dragon', 'moon'),
+        i9: piece('dragon', 'dragon-tail'),
+      },
+    });
+    const won = playMove(
+      duel,
+      duel.legal.find((m) => toNotation(m) === 'g8xi9')!,
+    );
+    expect(resultCard(won)!.detail).toBe("Dark captured the Dragon's Tail.");
+  });
+});
+
+describe('who can resign, and what the confirm step says (S67)', () => {
+  const info = listRulesets().find((r) => r.id === 'standard-3p')!;
+  const fresh = () => newModel(createRules('standard-3p'), info).game;
+
+  it('offers every seat a person plays that is still in; never the computer, never a seat that is out', () => {
+    expect(resignable(fresh(), [])).toEqual(['dark', 'light', 'dragon']);
+    expect(resignable(fresh(), ['dragon'])).toEqual(['dark', 'light']);
+    expect(resignable(fresh(), ['light', 'dragon'])).toEqual(['dark']);
+    expect(resignable(resign(fresh(), 'light'), [])).toEqual(['dark', 'dragon']);
+    expect(resignable(resign(resign(fresh(), 'light'), 'dark'), [])).toEqual([]);
+  });
+
+  it('tells a Kinged player its King leaves and its pieces turn to stone', () => {
+    expect(resignPrompt(fresh(), 'light')).toBe(
+      'Light resigns? Its King leaves the board and its other pieces turn to stone. Dark and the Dragon play on.',
+    );
+  });
+
+  it('tells the Dragon all its pieces, the Tail too, turn to stone', () => {
+    expect(resignPrompt(fresh(), 'dragon')).toBe(
+      'The Dragon resigns? All its pieces, the Tail too, turn to stone. Dark and Light play on.',
+    );
+  });
+
+  it('says the game ends when it does', () => {
+    const duel = resign(fresh(), 'light');
+    expect(resignPrompt(duel, 'dark')).toBe('Dark resigns? The game ends and the Dragon wins.');
+    expect(resignPrompt(duel, 'dragon')).toBe('The Dragon resigns? The game ends and Dark wins.');
   });
 });

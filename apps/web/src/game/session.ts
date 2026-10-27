@@ -7,6 +7,7 @@ import {
   checkersOn,
   newGame,
   playMove,
+  resign,
   three,
   type GameState,
   type GeneratedMove,
@@ -100,6 +101,16 @@ const played = (model: Model, move: GeneratedMove): Model => ({
 
 /** A move chosen outside the board (the computer's), recorded like a click-made one. */
 export const playFor = played;
+
+/** A seat resigns a 3-player game (decision 0018); undo takes it back like a move. */
+export const resignFor = (model: Model, side: string): Model => ({
+  ...model,
+  game: resign(model.game, side),
+  selected: null,
+  promoting: null,
+  choosing: null,
+  history: [...model.history, model.game],
+});
 
 export const canUndo = (model: Model): boolean => model.history.length > 0;
 

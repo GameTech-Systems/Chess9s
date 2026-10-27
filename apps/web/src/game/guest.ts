@@ -1,7 +1,14 @@
 // Guest play: the game in progress is kept in the browser (no account). Only the ruleset id and
 // version (and a custom ruleset's full overrides), the mode and the moves are stored; a load replays them through the engine, so a saved
 // game can never hold an illegal position.
-import { playMove, toNotation, type GameState, type MoveRules } from '@chess9s/engine';
+import {
+  playMove,
+  replayResignations,
+  toNotation,
+  type GameState,
+  type MoveRules,
+  type Resignation,
+} from '@chess9s/engine';
 import { MAX_BOT_SEATS } from './bots';
 import { newModel } from './session';
 import { same, type RulesetInfo } from './rules';
@@ -38,6 +45,7 @@ export function saveGuest(store: Store, { game, mode, bots }: Guest): void {
         mode,
         ...(bots && bots.length > 0 && { bots }),
         moves,
+        ...(game.resignations.length > 0 && { resignations: game.resignations }),
       }),
     );
   } catch {
@@ -76,12 +84,17 @@ export function loadGuest(
     ) {
       return null;
     }
+    // 3-player resignations (S67): each made after so many moves, replayed in its place.
+    const resigned = (saved.resignations ?? []) as Resignation[];
+    if (!Array.isArray(resigned)) return null;
     let { game } = newModel(rules, info);
+    game = replayResignations(game, resigned);
     for (const notation of saved.moves) {
       const move = game.legal.find((m) => toNotation(m) === notation);
       if (!move) return null;
-      game = playMove(game, move);
+      game = replayResignations(playMove(game, move), resigned);
     }
+    if (!same(resigned, game.resignations)) return null;
     // The computer's seats: seats of this game, at most two, and only in 3-player games.
     const seats = Array.isArray(saved.bots) ? (saved.bots as unknown[]) : [];
     const bots =

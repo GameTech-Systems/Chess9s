@@ -3,7 +3,15 @@
 // overrides), the turn order, the moves in notation, the result and the date; no names. A load
 // replays the moves through the engine, so a record can never hold an illegal position, and it is
 // refused when the replay does not give the recorded turn order and result.
-import { endedBy, gameRecord, playMove, toNotation, type GameState } from '@chess9s/engine';
+import {
+  endedBy,
+  gameRecord,
+  playMove,
+  replayResignations,
+  toNotation,
+  type GameState,
+  type Resignation,
+} from '@chess9s/engine';
 import { newModel } from './session';
 import { createRulesFor, customInfo, findRuleset, same, type RulesetInfo } from './rules';
 
@@ -75,11 +83,20 @@ export function openRecord(text: string): Opened {
       : findRuleset(ref.id, ref.version);
     if (!info)
       return refuse(`This game was played on ${ref.id} ${ref.version}, which is not known.`);
+    // 3-player resignations (S67): a resignation is not a move, so the record says after how
+    // many moves each was made.
+    const resigned = saved.resignations ?? [];
+    if (!Array.isArray(resigned))
+      return refuse('This game record has an invalid list of resignations.');
     let { game } = newModel(createRulesFor(info), info);
+    game = replayResignations(game, resigned as Resignation[]);
     for (const [i, notation] of moves.entries()) {
       const move = game.legal.find((m) => toNotation(m) === notation);
       if (!move) return refuse(`Move ${i + 1} (${notation}) is not legal in this game.`);
-      game = playMove(game, move);
+      game = replayResignations(playMove(game, move), resigned as Resignation[]);
+    }
+    if (!same(resigned, game.resignations)) {
+      return refuse('The resignations in this game record do not match its moves.');
     }
     // A resignation or a draw by agreement (S51) ends a game that its moves leave going.
     game = endedBy(game, saved.result as GameState['result']) ?? game;
