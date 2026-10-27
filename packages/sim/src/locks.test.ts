@@ -25,7 +25,7 @@ import {
   type Registry,
   type Ruleset,
 } from '@chess9s/engine';
-import { addLockKeys, archiveRuleset, writeLock } from './lock';
+import { UNLOCKED_NOTE, addLockKeys, archiveRuleset, writeLock } from './lock';
 import { loadLibrary, loadSource, rulesFor } from './load';
 import { seeded } from './play';
 
@@ -104,7 +104,10 @@ describe('archived versions in rules/rulesets/archive', () => {
   it.each(library.archived.map((r) => [names(r), r] as const))('%s is kept correctly', (_n, r) => {
     expect(r.status).toBe('deprecated');
     expect(existsSync(join(ROOT, 'rules/rulesets/archive', `${names(r)}.json`))).toBe(true);
-    expect(lockFor(r.id, r.version), `${names(r)} has no lock`).toBeDefined();
+    // A version that was never a Candidate or Official is kept without a lock, and says so.
+    if (r.notes !== UNLOCKED_NOTE) {
+      expect(lockFor(r.id, r.version), `${names(r)} has no lock`).toBeDefined();
+    } else expect(lockFor(r.id, r.version)).toBeUndefined();
     const current = library.current.find((c) => c.id === r.id);
     expect(current?.version, `${names(r)} is also the current version`).not.toBe(r.version);
   });
@@ -280,5 +283,17 @@ describe('the lock script', () => {
       status: 'deprecated',
     });
     expect(() => archiveRuleset(root, 'standard-2p')).toThrow(/already exists/);
+  });
+
+  it('archives a version that was never locked (experimental) without a lock, and says so', () => {
+    const root = copyRules();
+    const path = archiveRuleset(root, 'easy-2p');
+    expect(readJson<Ruleset>(path)).toEqual({
+      ...readJson<Ruleset>(join(root, 'rules/rulesets/easy-2p.json')),
+      $schema: '../../schema/ruleset.schema.json',
+      status: 'deprecated',
+      notes: UNLOCKED_NOTE,
+    });
+    expect(existsSync(join(root, 'rules/locks'))).toBe(false);
   });
 });

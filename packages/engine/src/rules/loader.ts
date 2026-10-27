@@ -22,6 +22,8 @@ export interface Parameter {
   status: Status;
   affects?: string[];
   needsDecision?: boolean;
+  /** Values other parameters must have while this one takes an option, keyed by String(option). */
+  requires?: Record<string, Record<string, ParamValue>>;
   source?: string;
   notes?: string;
 }
@@ -40,6 +42,8 @@ export interface Ruleset {
   status: Status;
   players: 2 | 3;
   description?: string;
+  /** Maintainers' notes, such as why an archived version has no lock. */
+  notes?: string;
   extends?: string;
   overrides: Record<string, unknown>;
   ratification?: { decisionRecord: string; date: string };
@@ -101,6 +105,22 @@ export function validateRegistry(registry: unknown): asserts registry is Registr
     if (p.default === null) continue;
     const problem = valueProblem(p, p.default);
     if (problem) issues.push(`${p.id}: default ${problem}`);
+  }
+  const byId = new Map(reg.parameters.map((p) => [p.id, p]));
+  for (const p of reg.parameters) {
+    for (const [option, needs] of Object.entries(p.requires ?? {})) {
+      if (!p.options.map(String).includes(option)) {
+        issues.push(`${p.id}: requires names ${JSON.stringify(option)}, which is not an option`);
+      }
+      for (const [id, value] of Object.entries(needs)) {
+        const other = byId.get(id);
+        if (!other) issues.push(`${p.id}: requires unknown parameter ${id}`);
+        else {
+          const problem = valueProblem(other, value);
+          if (problem) issues.push(`${p.id}: requires ${id} ${problem}`);
+        }
+      }
+    }
   }
   if (issues.length > 0) throw new RulesError('Parameter registry is inconsistent', issues);
 }
@@ -164,6 +184,18 @@ export function resolveRuleset(
     }
   }
   if (issues.length > 0) throw new RulesError(`Ruleset ${ruleset.id} has invalid overrides`, issues);
+
+  for (const p of live) {
+    const needs = p.requires?.[String(values[p.id])] ?? {};
+    for (const [id, value] of Object.entries(needs)) {
+      if (JSON.stringify(values[id]) !== JSON.stringify(value)) {
+        issues.push(
+          `${p.id} = ${JSON.stringify(values[p.id])} needs ${id} = ${JSON.stringify(value)}`,
+        );
+      }
+    }
+  }
+  if (issues.length > 0) throw new RulesError(`Ruleset ${ruleset.id} breaks a requirement`, issues);
 
   const nulls = live.filter((p) => values[p.id] === null).map((p) => p.id);
   return { ruleset, values, nulls };

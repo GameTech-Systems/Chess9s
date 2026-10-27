@@ -11,6 +11,7 @@
     "status": { "enum": ["proposed", "experimental", "candidate", "official", "deprecated"] },
     "players": { "enum": [2, 3] },
     "description": { "type": "string" },
+    "notes": { "type": "string" },
     "extends": { "type": "string" },
     "overrides": { "type": "object" },
     "ratification": {

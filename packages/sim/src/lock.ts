@@ -76,18 +76,29 @@ export function addLockKeys(root: string, id: string): { path: string; added: st
   return { path, added };
 }
 
+/** The note an archived version carries when it was kept without a lock. */
+export const UNLOCKED_NOTE =
+  'Kept without a lock: it was never a Candidate or Official, so it does not replay.';
+
 /**
  * Keep the current file of a ruleset as an archived version before its version is bumped: copies it
- * to rules/rulesets/archive/<id>@<version>.json with status `deprecated`. The version must be
- * locked already, so the archived version plays from its lock.
+ * to rules/rulesets/archive/<id>@<version>.json with status `deprecated`. A Candidate or Official
+ * version must be locked already, so the archived version plays from its lock; an earlier status
+ * has no lock and is kept with UNLOCKED_NOTE (S56: draft-3p 0.2.0, experimental).
  */
 export function archiveRuleset(root: string, id: string): string {
   const { library, ruleset } = currentOf(root, id);
-  if (!library.locks.some((l) => l.id === id && l.version === ruleset.version)) {
+  const locked = library.locks.some((l) => l.id === id && l.version === ruleset.version);
+  if (isLocked(ruleset) && !locked) {
     throw new RulesError(`Ruleset ${id} ${ruleset.version} has no lock; write it first`);
   }
   const path = join(root, 'rules/rulesets/archive', `${id}@${ruleset.version}.json`);
   if (existsSync(path)) throw new RulesError(`Archived file ${path} already exists`);
-  writeJson(path, { ...ruleset, $schema: RULESET_SCHEMA, status: 'deprecated' });
+  writeJson(path, {
+    ...ruleset,
+    $schema: RULESET_SCHEMA,
+    status: 'deprecated',
+    ...(!locked && { notes: UNLOCKED_NOTE }),
+  });
   return path;
 }
