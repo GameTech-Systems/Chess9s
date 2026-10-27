@@ -16,6 +16,8 @@ export const MAX_RULESET_NAME = 40;
 export const CODE_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
 export const CODE_LENGTH = 6;
 const CODE = new RegExp(`^[${CODE_ALPHABET}]{${CODE_LENGTH}}$`);
+/** Whether a string is a well-formed room code (the server routes rooms by it). */
+export const isRoomCode = (s: string): boolean => CODE.test(s);
 /** A seat token: 32 random bytes as base64url. */
 const TOKEN = /^[A-Za-z0-9_-]{43}$/;
 const SIDE = /^[a-z][a-z0-9-]{0,31}$/;
@@ -119,6 +121,22 @@ export const refused = (reason: Refusal, message: string): RefusedMessage => ({
   reason,
   message,
 });
+
+/**
+ * The keep-alive (S52): a client sends exactly PING now and then, and the server answers PONG
+ * without waking the room (Cloudflare's WebSocket auto-response). Neither is a protocol message:
+ * compare the text before parsing. A seated socket with no message and no ping for a while is
+ * closed as idle.
+ */
+export const PING = '{"v":1,"type":"ping"}';
+export const PONG = '{"v":1,"type":"pong"}';
+
+/** Close codes the server uses (S52). Idle: the client may reconnect with its seat token. */
+export const CLOSE_IDLE = 4000;
+/** The seat was taken back on another connection: reconnecting would take it back again. */
+export const CLOSE_REPLACED = 4001;
+/** The room was deleted (D53). */
+export const CLOSE_GONE = 4002;
 
 export const encode = (message: ClientMessage | ServerMessage): string => JSON.stringify(message);
 
