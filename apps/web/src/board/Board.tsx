@@ -31,6 +31,11 @@ const TOKENS: Record<string, { fill: string; stroke: string; ink: string }> = {
   [NEUTRAL]: { fill: '#8c939e', stroke: '#14161c', ink: '#14161c' },
 };
 
+/** A piece turned to stone (3-player games): a rough grey stone, whoever's it was. */
+const STONE = { fill: '#76736c', stroke: '#25241f', ink: '#25241f' };
+/** An irregular octagon around the token's center, so a stone does not read as a disc. */
+const STONE_SHAPE = '-36,-12 -22,-31 6,-36 29,-22 36,6 20,30 -8,36 -31,22';
+
 export interface BoardProps {
   board: BoardData;
   /** Piece id to the letter on its token. */
@@ -71,15 +76,22 @@ export function Board({
     ),
   );
   const setup = board.setups.find((s) => s.players === players);
-  const placed: { at: string; id: string; side: string; home?: string | undefined }[] = position
-    ? Object.entries(position).map(([at, p]) => ({ at, id: p.piece, side: p.side, home: p.home }))
+  type Placed = { at: string; id: string; side: string; home?: string | undefined; stone?: true };
+  const placed: Placed[] = position
+    ? Object.entries(position).map(([at, p]) => ({
+        at,
+        id: p.piece,
+        side: p.side,
+        home: p.home,
+        ...(p.stone === true && { stone: true as const }),
+      }))
     : Object.entries(setup?.pieces ?? {}).flatMap(([side, byAt]) =>
         Object.entries(byAt).map(([at, id]) => ({ at, id, side, home: at })),
       );
   // Pawns carry their starting file's color as a ring, so each player can find its safe zone.
-  const ringOf = (p: { id: string; side: string; home?: string | undefined }) =>
-    p.id === PAWN ? pawnColor(board, p.side, p.home) : undefined;
-  const nameOf = (p: { id: string; side: string; home?: string | undefined }) => {
+  const ringOf = (p: Placed) =>
+    p.id === PAWN && !p.stone ? pawnColor(board, p.side, p.home) : undefined;
+  const nameOf = (p: Placed) => {
     const ring = ringOf(p);
     const name = p.id.replace(/-/g, ' ');
     return ring ? `${ring.name.toLowerCase()} ${name}` : name;
@@ -220,7 +232,7 @@ export function Board({
       {placed.map((p) => {
         const { at, id, side } = p;
         const { x, y } = centerOf(at);
-        const tone = TOKENS[side] ?? TOKENS[NEUTRAL]!;
+        const tone = p.stone ? STONE : (TOKENS[side] ?? TOKENS[NEUTRAL]!);
         const letter = pieceLetters[id] ?? id.charAt(0).toUpperCase();
         const ring = ringOf(p);
         return (
@@ -229,17 +241,29 @@ export function Board({
             data-piece={id}
             data-at={at}
             data-side={side}
+            {...(p.stone && { 'data-stone': '' })}
             transform={`translate(${x} ${y})`}
             pointerEvents="none"
           >
-            <title>{`${at} · ${nameOf(p)}`}</title>
-            <circle
-              r="37"
-              fill={tone.fill}
-              stroke={tone.stroke}
-              strokeWidth="3"
-              filter={`url(#${uid}-shadow)`}
-            />
+            <title>{`${at} · ${nameOf(p)}${p.stone ? ', stone' : ''}`}</title>
+            {p.stone ? (
+              <polygon
+                points={STONE_SHAPE}
+                fill={tone.fill}
+                stroke={tone.stroke}
+                strokeWidth="3"
+                strokeLinejoin="round"
+                filter={`url(#${uid}-shadow)`}
+              />
+            ) : (
+              <circle
+                r="37"
+                fill={tone.fill}
+                stroke={tone.stroke}
+                strokeWidth="3"
+                filter={`url(#${uid}-shadow)`}
+              />
+            )}
             {ring ? (
               <g>
                 {/* A band in the pawn's color, edged in the token's outline so pale and dark
@@ -266,7 +290,7 @@ export function Board({
                   strokeWidth="1.2"
                 />
               </g>
-            ) : (
+            ) : p.stone ? null : (
               <circle
                 r="30"
                 fill="none"
@@ -282,6 +306,7 @@ export function Board({
               fontSize={letter.length > 1 ? 28 : 36}
               fontWeight="600"
               fill={tone.ink}
+              {...(p.stone && { fillOpacity: 0.45 })}
               fontFamily="Georgia, 'Times New Roman', serif"
             >
               {letter}
@@ -295,7 +320,9 @@ export function Board({
           {squares.map(({ at }) => {
             const { x, y } = centerOf(at);
             const piece = bySquare.get(at);
-            const name = piece ? `${at}, ${nameOf(piece)}, ${piece.side}` : at;
+            const name = piece
+              ? `${at}, ${nameOf(piece)}, ${piece.stone ? 'stone' : piece.side}`
+              : at;
             return (
               <rect
                 key={at}
@@ -332,6 +359,7 @@ const MARK = {
   capture: '#e0574b',
   check: '#e0574b',
   danger: '#e08a3c',
+  exposed: '#b98cf5',
 };
 
 /** Selection, move targets, the last move and check, drawn between the squares and the pieces. */
@@ -373,6 +401,18 @@ function Marks({
           />
         );
       })}
+      {highlights.exposed?.map((at) => (
+        <rect
+          key={`exposed-${at}`}
+          data-exposed={at}
+          {...box(at)}
+          fill={MARK.exposed}
+          fillOpacity="0.18"
+          stroke={MARK.exposed}
+          strokeWidth="5"
+          strokeDasharray="14 8"
+        />
+      ))}
       {highlights.check.map((at) => {
         const { x, y } = centerOf(at);
         return (
