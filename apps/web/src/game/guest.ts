@@ -11,7 +11,7 @@ import {
   type MoveRules,
   type Resignation,
 } from '@chess9s/engine';
-import { MAX_BOT_SEATS } from './bots';
+import { MAX_BOT_SEATS, isLevel3, type Level3 } from './bots';
 import { newModel } from './session';
 import { same, type RulesetInfo } from './rules';
 import { timedFromSaved, timedToSaved, type Timed } from './timed';
@@ -30,6 +30,8 @@ export interface Guest {
   mode: Mode;
   /** 3-player games: the seats the computer plays (S58); none or absent for hot-seat. */
   bots?: string[];
+  /** 3-player games: a level chosen for a computer seat (S62); seats without one play the default. */
+  levels?: Record<string, Level3>;
   /** The clock, when a time control was chosen (S65); it comes back paused. */
   timed?: Timed;
 }
@@ -39,7 +41,7 @@ const KEY = 'chess9s.guest';
 /** `now` is when the clock is read for the save, in the same units the clock runs on. */
 export function saveGuest(
   store: Store,
-  { game, mode, bots, timed }: Guest,
+  { game, mode, bots, levels, timed }: Guest,
   now = Date.now(),
 ): void {
   try {
@@ -54,6 +56,7 @@ export function saveGuest(
         ...(overrides && { overrides }),
         mode,
         ...(bots && bots.length > 0 && { bots }),
+        ...(levels && Object.keys(levels).length > 0 && { levels }),
         moves,
         ...(game.resignations.length > 0 && { resignations: game.resignations }),
         ...(timed && { timed: timedToSaved(timed, now) }),
@@ -126,9 +129,22 @@ export function loadGuest(
       seats.every((s) => typeof s === 'string' && game.order.includes(s))
         ? (seats as string[])
         : [];
+    // Their levels: known levels for seats of this game; anything else is dropped.
+    const levels: Record<string, Level3> = {};
+    if (rules.players === 3 && typeof saved.levels === 'object' && saved.levels !== null) {
+      for (const [seat, level] of Object.entries(saved.levels as Record<string, unknown>)) {
+        if (game.order.includes(seat) && isLevel3(level)) levels[seat] = level;
+      }
+    }
     // A clock that does not fit the game is dropped; the game is kept.
     const timed = saved.timed === undefined ? null : timedFromSaved(saved.timed, game);
-    return { game, mode: saved.mode, ...(bots.length > 0 && { bots }), ...(timed && { timed }) };
+    return {
+      game,
+      mode: saved.mode,
+      ...(bots.length > 0 && { bots }),
+      ...(Object.keys(levels).length > 0 && { levels }),
+      ...(timed && { timed }),
+    };
   } catch {
     return null;
   }

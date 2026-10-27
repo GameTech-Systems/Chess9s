@@ -1,6 +1,7 @@
 import { toNotation, type GameState, type GeneratedMove } from '@chess9s/engine';
 import { computerMove } from './bot';
 import type { BotRequest, BotResponse } from './bot.worker';
+import type { Level3 } from './bots';
 
 /** Asks for the computer's move without blocking the page; `cancel` drops a pending answer. */
 export interface BotSearch {
@@ -25,16 +26,18 @@ function getWorker(): Worker | null {
 }
 
 /**
- * Finds the computer's move for `game` and calls `done` with it. Uses a Web Worker; where there is
- * none (tests, old browsers) or it fails, it searches on the page's thread instead.
+ * Finds the computer's move for `game` and calls `done` with it, at `level` in 3-player games. Uses
+ * a Web Worker; where there is none (tests, old browsers) or it fails, it searches on the page's
+ * thread instead.
  */
 export function searchMove(
   game: GameState,
   done: (move: GeneratedMove | undefined) => void,
+  level?: Level3,
 ): BotSearch {
   let live = true;
   const finish = (move: GeneratedMove | undefined) => live && ((live = false), done(move));
-  const sync = () => finish(computerMove(game));
+  const sync = () => finish(computerMove(game, Math.random, undefined, level));
   const w = getWorker();
   if (!w) {
     sync();
@@ -61,6 +64,7 @@ export function searchMove(
     id,
     ruleset: { ...game.ruleset, players: game.rules.players },
     moves: game.moves.map((m) => m.notation),
+    ...(level && { level }),
   };
   w.postMessage(request);
   return {

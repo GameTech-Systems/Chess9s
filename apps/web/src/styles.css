@@ -95,6 +95,16 @@ body {
   outline-offset: -2px;
 }
 
+/* A label at the start of a group, such as the seat a computer level is for. */
+.segmented-label {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.8rem;
+  color: var(--ink);
+  font-size: 0.95rem;
+  border-right: 1px solid color-mix(in srgb, var(--gold) 30%, transparent);
+}
+
 /* The board is a square that fits both the width and the height of the screen. */
 .board {
   display: block;

@@ -6,6 +6,7 @@ import {
   type GameState,
   type GeneratedMove,
 } from '@chess9s/engine';
+import type { Level3 } from './bots';
 import { createRulesFor, findRuleset, type RulesetInfo } from './rules';
 import { newModel } from './session';
 
@@ -14,15 +15,17 @@ export const BOT_NODES = 800;
 
 /**
  * Computer opponent v1: the engine's search (negamax with alpha-beta over the selected ruleset),
- * with equally good moves picked at random. `random` returns [0, 1). In 3-player games it is the
- * greedy player for the seat to move (S58, decision D59), with `nodes` unused.
+ * with equally good moves picked at random. `random` returns [0, 1). In 3-player games the seat to
+ * move plays at `level` (decision D59): the greedy player (S58), or the same search, played
+ * paranoid (S62).
  */
 export function computerMove(
   game: GameState,
   random: () => number = Math.random,
   nodes: number = BOT_NODES,
+  level: Level3 = 'Greedy',
 ): GeneratedMove | undefined {
-  if (game.rules.players === 3) return greedyMove(game, { random });
+  if (game.rules.players === 3 && level === 'Greedy') return greedyMove(game, { random });
   return bestMove(game, { nodes, random }).move;
 }
 
@@ -37,6 +40,7 @@ export function computerReply(
   notations: string[],
   random: () => number = Math.random,
   nodes: number = BOT_NODES,
+  level: Level3 = 'Greedy',
 ): string | undefined {
   const info = ref.overrides ? { ...ref, name: ref.id } : findRuleset(ref.id, ref.version);
   if (!info) return undefined;
@@ -46,6 +50,6 @@ export function computerReply(
     if (!move) return undefined;
     game = playMove(game, move);
   }
-  const move = computerMove(game, random, nodes);
+  const move = computerMove(game, random, nodes, level);
   return move && toNotation(move);
 }
