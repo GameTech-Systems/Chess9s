@@ -32,7 +32,7 @@ Chess Nines is a 9×9 chess variant (custom pieces and special squares). 2-playe
 - **Naming.** Product text says "Chess Nines". Chess9s.com is the web address.
 
 ## Stack
-TypeScript, pnpm workspaces (`packages/engine`, `packages/sim`, `apps/web`), Vite + React static SPA, Vitest. See `docs/decisions/0002-stack.md`. Hosting: Cloudflare, provisional (`docs/decisions/0003-hosting.md`).
+TypeScript, pnpm workspaces (`packages/engine`, `packages/sim`, `packages/online`, `apps/web`), Vite + React static SPA, Vitest. See `docs/decisions/0002-stack.md`. Hosting: Cloudflare, provisional (`docs/decisions/0003-hosting.md`).
 
 ## Commands
 Node 22, pnpm 10 (pinned in `package.json`).
@@ -43,6 +43,7 @@ Node 22, pnpm 10 (pinned in `package.json`).
 - `pnpm lint`: ESLint and Prettier check.
 - `pnpm typecheck`: `tsc --noEmit` in every workspace.
 - `pnpm validate:rules`: Ajv-validate `rules/` against `rules/schema/`.
+- `pnpm rules:index`: rewrite `packages/online/src/rules-index.ts` after adding or removing a file in `rules/` (a test fails until you do).
 - `pnpm sim [--games n --depths 1,2 --sweep --set id=value --shard K/N --ruleset-file f]`: bot self-play; writes a fairness report to `docs/fairness/` (decision 0008). `--ruleset-file` checks a submitted ruleset file (GOVERNANCE, Submitted rulesets).
 - `pnpm sim:merge <shards> [--with report]`: builds the fairness report from shard files (decision 0009). The `Sim depth 2` workflow runs the shards on GitHub.
 - `pnpm lock write|add-keys|archive <ruleset id>`: ruleset locks and kept versions (RULES-FRAMEWORK, Locks and kept versions). Never overwrites a lock.
