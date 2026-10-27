@@ -267,19 +267,19 @@ Planned in S32 (2026-10-25); rules settled in S55 (2026-10-26, [decision 0016](d
 
 Already built: 3-player movement is data. The pieces read `coast.3p.exit`, `coast.3p.capturable`, `tail.3p.movement`, `tail.3p.captures`, `sunMoon.3p.range` and `dragon.3p.givesCheck`, the board has the 3-player setup and turn order (dark, light, Dragon), and `nextSide` skips seats that are out. Not built: `newGame` refuses 3 players, and nothing reads `draw.3p.stalemate`. There are no stones, no King capture, no Tail checkmate, no 3-player results, and no 3-player computer player (S23's negamax is 2-player). The web picker and the ruleset file (S42) are 2-player only.
 
-Phase 6 order: S56, S57, S58, S64, S62, S59, S60, S61. S63 (3-seat online rooms) needs S54 and S58 and is not part of the exit.
+Phase 6 order: S56, S57, S58, S64, S65, S62, S59, S60, S61. S63 (3-seat online rooms) needs S54 and S58, and S66 (clocks in online rooms) needs S54 and S65; neither is part of the exit.
 
 ### S32 — Phase 6 planning · Opus 5.5 · high · `done`
 Wrote the steps below and D55 to D61.
 
 ### S55 — Settle the 3-player rule gaps · Owner with Claude in chat · Opus 5.5 · high · `done`
-The owner asked (26 Oct 2026) for 3-player versions of the three presets: Good Practice and Standard fill the gaps from the owner's earlier notes on the third player, and Claude decides how the Dragon plays and wins in Easy Start. Decision 0016 records the rules: D55 to D57 answered (rules 1 to 17), Easy Start for 3 players (D65), new defaults D62 to D64, five new parameters, three 3-player rulesets, and the greedy computer Dragon first (D59). D58, the timer, stays open. Steps S62 to S64 added.
+The owner asked (26 Oct 2026) for 3-player versions of the three presets: Good Practice and Standard fill the gaps from the owner's earlier notes on the third player, and Claude decides how the Dragon plays and wins in Easy Start. Decision 0016 records the rules: D55 to D57 answered (rules 1 to 17), Easy Start for 3 players (D65), new defaults D62 to D64, five new parameters, three 3-player rulesets, and the greedy computer Dragon first (D59). Steps S62 to S64 added. Later the same day the owner confirmed D62 to D64 in the ledger (D62 also as the builder option `check.3p.exposedKing`) and answered D58 with time controls for players to choose ([decision 0017](decisions/0017-time-controls.md)): steps S65 and S66, default D66.
 
 ### S56 — 3-player game state and game end · Opus 5.5 · high · `todo`
-Builds decision 0016; no brief beyond `/start-session S56`. The five new parameters and three rulesets come from the owner's decision (0016), so adding them is not inventing rules.
-- **Data.** Registry 0.3.0 with the parameters in 0016 (`endings.3p`, `dragon.3p.lastKing`, `tail.3p.mateTiming`, `draw.3p.threefoldRepetition`, `draw.3p.fiftyMove`), each with a group, option labels, status `experimental` and source "decision 0016". `draft-3p` 0.3.0 (0.2.0 to the archive, S45; no lock, it is experimental), and new `standard-3p` 0.1.0 and `easy-3p` 0.1.0 with the overrides in 0016. The loader refuses `endings.3p` = first-checkmate without `dragon.3p.givesCheck` on. `docs/RULES.md` takes the 3-player rules, end tables and presets from 0016, so the page and the data match. No 2-player parameter, ruleset or lock changes.
+Builds decision 0016; no brief beyond `/start-session S56`. The six new parameters and three rulesets come from the owner's decisions (0016), so adding them is not inventing rules.
+- **Data.** Registry 0.3.0 with the parameters in 0016 (`endings.3p`, `dragon.3p.lastKing`, `tail.3p.mateTiming`, `draw.3p.threefoldRepetition`, `draw.3p.fiftyMove`, `check.3p.exposedKing`), each with a group, option labels, status `experimental` and source "decision 0016". `draft-3p` 0.3.0 (0.2.0 to the archive, S45; no lock, it is experimental), and new `standard-3p` 0.1.0 and `easy-3p` 0.1.0 with the overrides in 0016. The loader refuses `endings.3p` = first-checkmate without `dragon.3p.givesCheck` on. `docs/RULES.md` takes the 3-player rules, end tables and presets from 0016, so the page and the data match. No 2-player parameter, ruleset or lock changes.
 - **Game.** `newGame` plays 3 players. Each seat has a status: a Kinged seat is active or out (its King was captured); the Dragon is active, Tail in stone, or out. `stateKey`, undo and the record cover the seat statuses and the stones.
-- **Check and legality** (0016 rules 1 to 6): Kings check each other; Dragon attacks are check only where 0016 says (`dragon.3p.givesCheck`, `tail.canCheck`, the duel); the Tail is the Dragon's King; no move leaves a King in check from a player who moves before its owner (D62).
+- **Check and legality** (0016 rules 1 to 6): Kings check each other; Dragon attacks are check only where 0016 says (`dragon.3p.givesCheck`, `tail.canCheck`, the duel); the Tail is the Dragon's King; no move leaves a King in check from a player who moves before its owner (D62), or, with `check.3p.exposedKing` = counts-as-checkmate, such a move is allowed and that King's owner loses at once.
 - **Checkmate** (rules 7 to 9): judged right after each move (for the Tail, at the Dragon's turn under `tail.3p.mateTiming` = dragon-turn); the checkmating piece and its owner; the Tail swap, the no-swap squares and promotion on a swap. The choice between two attackers is part of the move, like a promotion choice.
 - **Stones** (rules 10 and 11): a piece flag in the position. A captured King's side turns to stone and its turn is skipped (`nextSide`).
 - **Results.** `GameResult` gains every row of both end tables in 0016 (full rules and first checkmate): the winning seat or the seats sharing a draw, and the reason. Game records (S46) carry 3-player games and replay them; the record format stays `v: 1`.
@@ -292,7 +292,7 @@ Decisions: D55, D56, D57, D62, D63, D65.
 - **Picker.** The three 3-player presets, Standard first and marked Default for 3 players (D63), each with its Experimental badge and its rules page (`/rules/<id>`, which lists every 3-player setting).
 - **Board.** It turns to the side to move, using each side's `view` from the board data (D34 for dark; the Dragon's view is the board's own). It shows whose turn it is among the three, stones drawn as stone, a side that is out, and the Tail in stone. The danger aid also shows a King that a Dragon piece attacks when that isn't check (0016 rule 2). The legal-move aid, last move and undo work as in 2-player. A two-attacker Tail checkmate asks which piece swaps, like the promotion picker.
 - **End.** A result screen for every 3-player result in both end tables: a win, the duel starting, the Dragon out, and a draw with the players who share it. Save game record works for 3-player games.
-- **Timer.** Per D58. Until the owner defines one, each seat's elapsed time is shown (display only, as in Phase 2).
+- **Timer.** Untimed, the default in decision 0017 (D58): each seat's elapsed time is shown, for display only, as in Phase 2. Time controls come in S65.
 - Tests first: the board and its turn indicator for each seat; a stone and an out side; each result screen; the rules page for each 3-player preset; the 3-player record download.
 Done when: Playwright plays a Good Practice hot-seat game that ends with the Dragon capturing a King and then checkmating the other, another that ends with one Kinged player checkmating the other, and an Easy Start game won by checkmating the Tail, at desktop size and at Pixel 7 width with no sideways scroll; all checks pass.
 Decisions: D34, D58, D63.
@@ -308,17 +308,28 @@ Decisions: D59.
 
 ### S64 — 3-player rulesets in the builder · Sonnet 5.5 · medium · `todo`
 Added in S55 (D64): the owner wants the Dragon settings open for players to experiment with.
-- **Builder.** Start from a 3-player preset, with a control per 3-player setting (the Dragon Heads, Dragon Tail, Sun and Moon, Coast, endings and draws), what differs from the preset, and the `parameterInteractions` flags. `endings.3p` = first-checkmate turns `dragon.3p.givesCheck` on and says why.
+- **Builder.** Start from a 3-player preset, with a control per 3-player setting (the Dragon Heads, Dragon Tail, Sun and Moon, Coast, endings and draws, and `check.3p.exposedKing`, which the owner wants players to be able to try, D62), what differs from the preset, and the `parameterInteractions` flags. `endings.3p` = first-checkmate turns `dragon.3p.givesCheck` on and says why.
 - **File and share.** Export, load and share links take 3-player rulesets (`players: 3`), checked by `readRulesetFile` as in S42. A 3-player custom ruleset is `proposed` and kept in the browser only, as S41 set out.
 - **Submit** stays 2-player: tournament rulesets are 2-player (D46). For a 3-player ruleset the builder says so instead of showing the button.
 - Tests first: every 3-player control type; export and load round-trip a 3-player ruleset; a 3-player file with a 2-player-only key is refused; the share link opens a 3-player ruleset.
 Done when: a player builds a 3-player ruleset from Standard, plays it hot-seat with a computer Dragon, exports it, loads it back and opens its share link; all checks pass.
 Decisions: D46, D64.
 
+### S65 — Time controls for hot-seat games · Sonnet 5.5 · high · `todo`
+The owner's answer to D58 ([decision 0017](decisions/0017-time-controls.md)): keep untimed as the default, and let players choose a time control, like Apex Chess.
+- **Data.** `rules/timeControls.json` with the presets in 0017 (default `untimed`) and a schema in `rules/schema/`; `validate:rules` checks it, and a test fails if the default is not one of the controls. The online-only controls (day-long moves, the abandonment rule) are marked so the hot-seat picker leaves them out.
+- **Clock.** Pure functions in the engine that take the time as `now` (start, time left, after a move, deadline), for Fischer and per-move controls and any number of seats. A seat that is out stops its clock.
+- **Play.** The game screen picks a time control before a hot-seat game (2 or 3 players, computer seats included), with a Show only switch. It shows each seat's clock, runs the clock of the seat to move, and has a Pause button. Undo is off while a clock is on. The guest game in local storage keeps the clocks and comes back paused after a reload.
+- **Time out** (D66): the seat is out, as 0017 describes for 2 players, the full 3-player rules and first checkmate, or nothing changes under Show only. Each case is a result the result screen shows.
+- **Record.** The game record carries the time control, Show only and each seat's time left after each move, as optional fields; old records still open.
+- Tests first: every control kind at each step (start, move, increment, per-move reset, flag fall, pause); each D66 case in 2 and 3 players; Show only; the record round trip with clocks; untimed games unchanged.
+Done when: a 2-player game at 3+2 and a 3-player game at 30 seconds per move are played in the browser to a flag fall with the right result, the clocks survive a reload, and all checks pass.
+Decisions: D58, D66.
+
 ### S62 — 3-player search · Opus 5.5 · high · `todo`
 The search part of the old S58 (D59), added as its own step in S55.
 - **Search:** paranoid search over S23's evaluation and S35's speedups (transposition table, killer moves, the position cap). Each seat searches as if the other two play against it, so alpha-beta still prunes. It is deterministic for a seed, as decision 0008 needs. The evaluation counts a seat's own material and its win conditions from decision 0016, with weights noted as provisional in a code comment.
-- **Levels.** In 3-player games the computer offers Greedy (S58) and Search, at the 2-player search levels. A computer Dragon starts on Greedy (owner, D59).
+- **Levels.** In 3-player games the computer offers Greedy (S58) and Search, at the 2-player search levels. A computer Dragon starts on Greedy (owner, D59). Under a time control its thinking time counts on its clock (decision 0017); the position cap stays the limit.
 - **Bench.** `pnpm bench --players 3` reports positions per move and capped moves for 3-player positions. A test keeps the 2-player bench results unchanged.
 - Tests first: each seat finds a mate in two the greedy player misses; the Dragon takes a King it may capture; the same seed gives the same moves; depth 2 stays under the cap on the bench positions.
 Done when: search bots finish 3-player games from the start at depths 1 and 2 in all three presets, the browser offers both levels, and the 2-player search equivalence tests still pass.
@@ -348,6 +359,16 @@ Added in S55: the ledger has D61 set to "Also 3-seat online rooms". Needs S54 (r
 - Tests first: the protocol with three seats (join, turn order, a seat skipped once out, the duel, game over); a computer seat played from the creator's session; the create and join screens with three seats.
 Done when: three Chromium contexts, or two and a computer Dragon, play a 3-player game through `wrangler dev` to an end in decision 0016, with a reload mid-game; all checks pass.
 Decisions: D51, D52, D53, D61.
+
+### S66 — Clocks in online rooms · Opus 5.5 · high · `todo`
+Added with decision 0017. Needs S54 (rooms live) and S65. Not part of the Phase 6 exit.
+- **Rooms.** The creator picks a time control from `rules/timeControls.json`, the online-only ones included, with Show only; it is fixed for the room and shown before a player takes a seat. Untimed stays the default (D51).
+- **Server clock.** The Room keeps the clocks with S65's functions, using its own time, never the client's. A flag falls by the Room's alarm even when nobody is connected; clocks keep running while a player is away. The abandonment control counts a player out after 5 minutes away while the others are connected.
+- **Results** per D66, in the protocol's game over and the record. 3-seat rooms (S63) use the same clocks.
+- **Pages.** The privacy page says the server keeps each seat's time left with the moves (D53); its date changes.
+- Tests first: a flag fall with nobody connected, a reconnect that shows the right time left, each control kind, the abandonment rule, Show only, and a clock that the client tries to set (refused).
+Done when: two browsers play a 3+2 room game through `wrangler dev` to a flag fall, one reloads mid-game and sees the right times, and all checks pass.
+Decisions: D51, D53, D58, D66.
 
 ## Later phases
 
@@ -392,21 +413,22 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D48 | Version of the ratified ruleset | Decided (ledger brief 25 Oct 2026, default kept): keep the version that was fairness-checked (Standard 0.1.0), as 0010 and 0012 kept versions on status changes | S50 |
 | D49 | New discussion after a change | Decided (ledger brief 25 Oct 2026, default kept): none; a ruleset changed by the discussion is re-checked at both depths and then ratified, with the change named in the decision record (GOVERNANCE, 2-player rules, step 3) | S50 |
 | D50 | Worker layout for rooms | Default: one Worker serves the app and the rooms (same origin, one deploy, no version skew); if Cloudflare's preview builds refuse a Worker with a Durable Object, the rooms move to a second Worker bound by `script_name` and the owner connects it in S54 | S52 |
-| D51 | Online results and conduct | Default: resign and draw by agreement (offer, accept, decline); no clock (D47), no takebacks, no forfeit for a disconnection: an abandoned game stays open until its room expires | S51 |
+| D51 | Online results and conduct | Default: resign and draw by agreement (offer, accept, decline); untimed by default (D58: time controls are a per-game choice, decision 0017; online clocks in S66), no takebacks, no forfeit for a disconnection: an abandoned game stays open until its room expires | S51 |
 | D52 | Seats | Default: the room's creator chooses light, dark or random (random preselected); two seats; no spectators in Phase 5 | S51 |
 | D53 | Room retention | Default: a room and its moves are deleted 24 hours after the game ends, or after 7 days with no move; the server keeps no other copy | S52 |
 | D54 | Room codes | Default: 6 characters from 31 letters and digits without look-alikes (no 0, O, 1, I, L); a code lets anyone see the ruleset and take an open seat, the seat token is the secret | S51 |
 | D55 | 3-player check and the Dragon's win | Decided (S55, from the owner's earlier notes): decision 0016, rules 1 to 6; adds `dragon.3p.lastKing` (checkmate, or capture as an option) | S56 |
 | D56 | Tail checkmate and stones | Decided (S55, from the owner's earlier notes): decision 0016, rules 7 to 11; adds `tail.3p.mateTiming` (after the move, or at the Dragon's turn as an option) | S56 |
 | D57 | 3-player draws and stalls | Decided (S55, from the owner's earlier notes): decision 0016, rules 12 to 17; adds `draw.3p.threefoldRepetition` and `draw.3p.fiftyMove` (on) | S56 |
-| D58 | 3-player timer | Open, a rule: no default. Until the owner defines one, each seat's elapsed time is shown, for display only | S57 |
+| D58 | Timer and time controls | Decided (owner, 26 Oct 2026): untimed stays the default (elapsed time shown); players may choose a time control like Apex Chess's: Fischer increment, time per move, and online the day-long and abandonment controls (decision 0017) | S65 |
 | D59 | 3-player computer | Decided (owner, 26 Oct 2026): a greedy heuristic first, as the computer Dragon (S58); paranoid search after it (S62) for every seat and for the balance runs; deterministic for a seed | S58 |
 | D60 | 3-player balance measure | Default: each seat scores between 28% and 38% (a third, plus or minus 5 points) over at least 2,000 bot games at depths 1 and 2. A win scores 1; a draw splits the point among the players who share it (½ each for two, ⅓ each for three; S55 widened this for the draws in decision 0016). Capped games are reported, not scored. Decision 0015 | S59 |
 | D61 | 3-player scope in Phase 6 | Decided in the ledger: hot-seat and computer play, plus 3-seat online rooms (S63, after S54). The builder and ruleset file: D64 | S57 |
-| D62 | A King left in check from a player who moves first | Default: not allowed; no move may leave a King in check from a player who moves before that King's owner can answer (decision 0016, rule 6) | S56 |
-| D63 | 3-player default preset | Default: Standard (`standard-3p`) starts 3-player games and gets the full balance runs (S59, S60); Good Practice and Easy Start get screens | S57 |
-| D64 | 3-player rulesets in the builder | Default: the builder, export, load and share links take 3-player rulesets (S64); Submit stays 2-player (D46) | S64 |
+| D62 | A King left in check from a player who moves first | Decided (owner, 26 Oct 2026): not allowed by default (decision 0016, rule 6), and offered as the option `check.3p.exposedKing` = counts-as-checkmate for players to try | S56 |
+| D63 | 3-player default preset | Decided (owner, 26 Oct 2026): Standard (`standard-3p`) starts 3-player games and gets the full balance runs (S59, S60); Good Practice and Easy Start get screens | S57 |
+| D64 | 3-player rulesets in the builder | Decided (owner, 26 Oct 2026): the builder, export, load and share links take 3-player rulesets (S64); Submit stays 2-player (D46) | S64 |
 | D65 | Easy Start for 3 players | Decided (Claude, at the owner's request): the first checkmate wins; every attack on a King is check; the Tail is the Dragon's King on A5, E5 and I5 (decision 0016) | S56 |
+| D66 | Running out of time | Default: the seat is out. In 2-player games it loses, or draws if the other player could not checkmate; in 3-player games its side turns to stone and the others play on, and in the duel it loses (decision 0017). Show only turns this off for a game | S65 |
 
 ## Ledger sync format
 

@@ -1,6 +1,6 @@
 # 0016: 3-player rules v0.3 and the 3-player presets
 
-**Status:** Accepted (S55, owner with Claude in chat, 26 Oct 2026). Answers ledger D55 to D57 and D65. D62 to D64 are defaults the owner can change in the ledger. D58 (the timer) stays open. S56 builds this record and moves its rules into [docs/RULES.md](../RULES.md) as `draft-3p` 0.3.0; until then RULES.md still shows rule set v0.2. Decision records 0014 (S50) and 0015 (S59) are reserved, so this one is 0016.
+**Status:** Accepted (S55, owner with Claude in chat, 26 Oct 2026). Answers ledger D55 to D57 and D65. The owner confirmed D62 to D64 in the ledger the same day, and asked for D62 to be a builder option too (rule 6). D58, the timer, is settled by [decision 0017](0017-time-controls.md). S56 builds this record and moves its rules into [docs/RULES.md](../RULES.md) as `draft-3p` 0.3.0; until then RULES.md still shows rule set v0.2. Decision records 0014 (S50) and 0015 (S59) are reserved, so this one is 0016.
 
 ## Context
 S32 found cases the 3-player rules (rule set v0.2, [0006](0006-rule-set-v0.2.md)) leave open (D55 to D58). On 26 Oct 2026 the owner asked for 3-player versions of the three presets ([0011](0011-presets.md)): Good Practice and Standard fill the gaps from the owner's earlier notes on the third player, and for Easy Start Claude decides how the Dragon plays and wins. The owner also said the Dragon settings may be options for players to experiment with, and that the computer can play the Dragon in a game, starting with a greedy heuristic.
@@ -29,7 +29,7 @@ Turn order is dark, light, Dragon in all three (D26). `turn.firstMove` is a 2-pl
 3. With `dragon.3p.givesCheck` on, attacks by the Dragon Heads, the Sun and the Moon are check, so a Kinged player must answer them. A King then can't be captured by those pieces; the Dragon removes it by checkmating it, which counts as capturing it. The Tail gives check only when `tail.canCheck` is also on; a King attacked only by a Tail that doesn't give check can still be captured by it. **(reading)**
 4. The Tail is the Dragon's King while it is active: the Dragon must end any attack on it when it can, and may not move the Tail onto an attacked square or make a move that leaves it attacked. **(notes:** "it plays the role of the Dragon's King"**)**
 5. **The duel.** Once the Dragon has captured one King, the last Kinged player and the Dragon play the game out. Dragon attacks on the last King are now check, whatever `dragon.3p.givesCheck` says, and the Dragon wins by checkmating that King. **(notes:** D27, "then tries to checkmate the other King"**)** Option `dragon.3p.lastKing` = `capture`: Dragon attacks keep the rule from 2 or 3, and the Dragon wins by capturing the last King (the owner's first reference had the Dragon capture both Kings).
-6. No move may leave a King in check from a player who moves before that King's owner can answer (D62). In practice: the Dragon may not make a move that leaves light's King in check from dark, since dark moves next; and with Dragon check on, light may not make a move that leaves dark's King in check from the Dragon. **(reading,** from the fairness rule**)**
+6. No move may leave a King in check from a player who moves before that King's owner can answer (D62). In practice: the Dragon may not make a move that leaves light's King in check from dark, since dark moves next; and with Dragon check on, light may not make a move that leaves dark's King in check from the Dragon. **(reading,** from the fairness rule; the owner kept it as the default, D62**)** Option `check.3p.exposedKing` = `counts-as-checkmate`, for players to try in the builder (owner, D62): such a move is allowed, and the King's owner loses at once to the owner of the piece giving check (rule 8).
 
 ### Checkmate, the Tail and stones (D56)
 7. Every checkmate is judged right after the move that gives it, as if the mated side moved next. This is the owner's fairness rule for King checkmates, applied to the Tail too: after dark checkmates the Tail, light gets no move to undo it. **(reading)** Option `tail.3p.mateTiming` = `dragon-turn`: the Tail is checkmated only if, at the start of the Dragon's turn, it is attacked and the Dragon has no move that ends the attack.
@@ -72,7 +72,7 @@ The owner left this preset's Dragon to Claude. The aim is rules a chess player c
 
 Why this design: one goal for every seat, the same check rule as chess, and a Dragon King small enough to hunt (three squares), so the Kinged players have a second target and the Dragon has something to guard. Not fairness-checked; S59 screens it.
 
-## New parameters (registry 0.3.0, all experimental)
+## New parameters (registry 0.3.0, all experimental, six in all)
 | Id | Group | Default | Other options | Applies |
 | --- | --- | --- | --- | --- |
 | `endings.3p` | Turns and draws | `stones-and-duel` (the full rules) | `first-checkmate` | 3 players |
@@ -80,6 +80,7 @@ Why this design: one goal for every seat, the same check rule as chess, and a Dr
 | `tail.3p.mateTiming` | Dragon Tail | `after-move` | `dragon-turn` | with `stones-and-duel` |
 | `draw.3p.threefoldRepetition` | Turns and draws | true | false | 3 players |
 | `draw.3p.fiftyMove` | Turns and draws | true | false | 3 players |
+| `check.3p.exposedKing` | King | `not-allowed` | `counts-as-checkmate` | 3 players |
 
 `endings.3p` = `first-checkmate` needs `dragon.3p.givesCheck` on; the engine refuses a ruleset that sets one without the other. Rulesets:
 
@@ -92,6 +93,6 @@ No 2-player parameter, ruleset or lock changes.
 ## The computer and the Dragon (D59)
 The owner (26 Oct 2026): the computer can play the Dragon in a game, starting with a greedy heuristic. S58 builds a greedy player for any seat: it plays a winning move first, then a King capture, then the move with the best immediate result by S23's piece values and evaluation, with no look-ahead and ties broken by the seed. Paranoid search (S62) follows as the stronger level and plays every seat in the balance runs (S59), so the seats are measured with equal play; games with a greedy Dragon are reported separately.
 
-## Open
-- D58, the timer: no rule yet. Each seat's elapsed time is shown, for display only.
-- D62 (rule 6), D63 (Standard as the 3-player default) and D64 (3-player rulesets in the builder) are defaults until the owner confirms them.
+## Settled after this record
+- D58, the timer: time controls are a per-game choice, untimed by default ([decision 0017](0017-time-controls.md)).
+- D62 (rule 6), D63 (Standard as the 3-player default) and D64 (3-player rulesets in the builder): confirmed by the owner in the ledger, 26 Oct 2026; D62 is also the option `check.3p.exposedKing`.
