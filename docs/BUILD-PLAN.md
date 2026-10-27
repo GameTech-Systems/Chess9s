@@ -335,7 +335,7 @@ The owner's answer to D58 ([decision 0017](decisions/0017-time-controls.md)): ke
 Done when: a 2-player game at 3+2 and a 3-player game at 30 seconds per move are played in the browser to a flag fall with the right result, the clocks survive a reload, and all checks pass.
 Decisions: D58, D66.
 
-### S62 — 3-player search · Opus 5.5 · high · `todo`
+### S62 — 3-player search · Opus 5.5 · high · `done`
 The search part of the old S58 (D59), added as its own step in S55.
 - **Search:** paranoid search over S23's evaluation and S35's speedups (transposition table, killer moves, the position cap). Each seat searches as if the other two play against it, so alpha-beta still prunes. It is deterministic for a seed, as decision 0008 needs. The evaluation counts a seat's own material and its win conditions from decision 0016, with weights noted as provisional in a code comment.
 - **Levels.** In 3-player games the computer offers Greedy (S58) and Search, at the 2-player search levels. A computer Dragon starts on Greedy (owner, D59). Under a time control its thinking time counts on its clock (decision 0017); the position cap stays the limit.
