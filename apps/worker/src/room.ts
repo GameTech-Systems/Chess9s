@@ -21,6 +21,7 @@ import {
   snapshotFor,
   type Outgoing,
   type Room as RoomData,
+  type RoomInfo,
   type RoomContext,
   type RoomRuleset,
   type SeatStatus,
@@ -101,15 +102,6 @@ interface Attachment {
   seat: string | null;
   /** When it last sent a message (or connected). */
   seen: number;
-}
-
-/** What `GET /api/rooms/<code>` shows: enough to decide to join (D54), never a token. */
-export interface RoomInfo {
-  v: 1;
-  code: string;
-  ruleset: RoomRuleset;
-  seats: Record<string, SeatStatus>;
-  result: GameResult;
 }
 
 const json = (status: number, body: unknown) =>

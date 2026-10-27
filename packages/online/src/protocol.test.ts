@@ -8,7 +8,9 @@ import {
   PONG,
   encode,
   isRoomCode,
+  isSeatToken,
   parseClientMessage,
+  parseRoomInfo,
   parseServerMessage,
   type Parsed,
   type Refusal,
@@ -273,5 +275,40 @@ describe('around the messages', () => {
     // The server answers PING with PONG itself, without waking the room; a room never sees it.
     expect(client(JSON.parse(PING))).toBe('unknown-type');
     expect(server(JSON.parse(PONG))).toBe('unknown-type');
+  });
+});
+
+describe('the room peek (S53)', () => {
+  const info = {
+    v: 1,
+    code: CODE,
+    ruleset: { id: 'standard-2p', version: '0.1.0', name: 'Standard' },
+    seats: { light: 'present', dark: 'open' },
+    result: { status: 'ongoing' },
+  };
+
+  it('reads what GET /api/rooms/<code> returns', () => {
+    expect(parseRoomInfo(json(info))).toEqual({ ok: true, info });
+    const custom = { ...info, ruleset: { ...info.ruleset, id: 'custom', overrides: {} } };
+    expect(parseRoomInfo(json(custom)).ok).toBe(true);
+  });
+
+  it.each([
+    ['not JSON', 'nope'],
+    ['an array', '[]'],
+    ['another version', json({ ...info, v: 2 })],
+    ['a bad code', json({ ...info, code: 'k7' })],
+    ['an extra key (a token)', json({ ...info, token: TOKEN })],
+    ['no seats', json({ ...info, seats: {} })],
+    ['a seat status that is unknown', json({ ...info, seats: { light: 'here' } })],
+    ['a result that is not one', json({ ...info, result: { status: 'won' } })],
+  ])('refuses %s', (_, text) => {
+    expect(parseRoomInfo(text).ok).toBe(false);
+  });
+
+  it('knows a seat token by its shape', () => {
+    expect(isSeatToken(TOKEN)).toBe(true);
+    for (const bad of ['', 'A'.repeat(42), 'A'.repeat(44), `${'A'.repeat(42)}=`, 7])
+      expect(isSeatToken(bad), String(bad)).toBe(false);
   });
 });

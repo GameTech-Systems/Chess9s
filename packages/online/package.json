@@ -9,5 +9,9 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./protocol": "./src/protocol.ts"
   }
 }
