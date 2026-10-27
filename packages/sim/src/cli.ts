@@ -2,6 +2,8 @@
 // to docs/fairness/<name>.json and .md. The report is rewritten as games finish, and on Ctrl-C,
 // so a long run that is stopped still leaves its games counted (flagged as too few).
 //
+//   --players <2|3>    3: greedy players on a 3-player ruleset (standard-3p, 100 games), reporting
+//                      each seat's results; depths, nodes, --sweep and --shard are 2-player only
 //   --ruleset <id>     ruleset in rules/rulesets (draft-2p)
 //   --ruleset-file <f> a ruleset file instead (one exported from the builder or submitted for
 //                      tournament consideration), checked as strictly as the builder loads it;
@@ -25,10 +27,12 @@ import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 import { readRulesetFile, type Ruleset } from '@chess9s/engine';
 import { loadSource, rulesFor, type RulesSource } from './load';
+import { DEFAULT_3P, plan3, report3 } from './cli3';
 import { MEASURES } from './measures';
 import { shardResult } from './merge';
 import type { GameSummary } from './play';
-import { runPool, type Job } from './pool';
+import { runPool, type Job, type Job3 } from './pool';
+import { toMarkdown3, type Summary3 } from './play3';
 import {
   buildReport,
   toMarkdown,
@@ -40,6 +44,8 @@ import { summarize } from './stats';
 import { combinations, playable, type Combination } from './sweep';
 
 export interface Options {
+  /** `3` plays greedy 3-player games (cli3.ts); unset follows the ruleset. */
+  players?: 2 | 3;
   ruleset: string;
   /** A ruleset file to play instead of a bundled ruleset; see `addRulesetFile`. */
   rulesetFile?: string;
@@ -83,9 +89,10 @@ export function options(argv: string[], cores: number): Options {
   const { values: v } = parseArgs({
     args: argv,
     options: {
+      players: { type: 'string' },
       ruleset: { type: 'string' },
       'ruleset-file': { type: 'string' },
-      games: { type: 'string', default: String(MEASURES.minGames) },
+      games: { type: 'string' },
       depths: { type: 'string', default: MEASURES.depths.join(',') },
       nodes: { type: 'string', default: String(MEASURES.nodes) },
       seed: { type: 'string', default: '1' },
@@ -102,7 +109,13 @@ export function options(argv: string[], cores: number): Options {
   if (file !== undefined && v.ruleset !== undefined) {
     throw new Error('Use --ruleset or --ruleset-file, not both');
   }
-  const ruleset = file === undefined ? (v.ruleset ?? 'draft-2p') : '';
+  if (v.players !== undefined && v.players !== '2' && v.players !== '3') {
+    throw new Error(`--players needs 2 or 3, not ${JSON.stringify(v.players)}`);
+  }
+  const players = v.players === undefined ? undefined : (Number(v.players) as 2 | 3);
+  if (players === 3 && file !== undefined) throw new Error('--ruleset-file is 2-player only');
+  const ruleset =
+    file === undefined ? (v.ruleset ?? (players === 3 ? DEFAULT_3P.ruleset : 'draft-2p')) : '';
   const overrides: Record<string, unknown> = {};
   for (const pair of v.set) {
     const at = pair.indexOf('=');
@@ -117,9 +130,13 @@ export function options(argv: string[], cores: number): Options {
     overrides[pair.slice(0, at)] = value;
   }
   return {
+    ...(players === undefined ? {} : { players }),
     ruleset,
     ...(file === undefined ? {} : { rulesetFile: file }),
-    games: whole('--games', v.games),
+    games: whole(
+      '--games',
+      v.games ?? String(players === 3 ? DEFAULT_3P.games : MEASURES.minGames),
+    ),
     depths: v.depths.split(',').map((d) => whole('--depths', d)),
     nodes: whole('--nodes', v.nodes),
     seed: whole('--seed', v.seed),
@@ -176,6 +193,12 @@ function rebuild(file: string): void {
   writeFileSync(file, JSON.stringify(report, null, 2) + '\n');
   writeFileSync(file.replace(/\.json$/, '.md'), toMarkdown(report));
   console.error(`Verdict: ${report.verdict}. Rebuilt ${file} and its .md`);
+}
+
+/** A 3-player run: greedy games on every seat (cli3.ts). */
+export interface Plan3 {
+  ruleset: { id: string; version: string };
+  job: Job3;
 }
 
 export type PlannedJob = Job & {
@@ -254,12 +277,61 @@ export function runReports(
   }));
 }
 
+/** Greedy self-play on a 3-player ruleset: the report is rewritten as games finish. */
+async function main3(o: Options, source: RulesSource, root: string, cwd: string): Promise<void> {
+  const plan = plan3(o, source);
+  const games: Summary3[] = [];
+  const date = new Date().toISOString().slice(0, 10);
+  const outDir = resolve(cwd, o.out);
+  mkdirSync(outDir, { recursive: true });
+  const base = join(outDir, `${o.name}.greedy`);
+  const write = () => {
+    const report = report3(plan, date, games);
+    writeFileSync(`${base}.json`, JSON.stringify(report, null, 2) + '\n');
+    writeFileSync(`${base}.md`, toMarkdown3(report));
+  };
+  const total = plan.job.seeds.length;
+  const started = Date.now();
+  console.error(`${total} greedy games of ${plan.ruleset.id} on ${o.workers} workers`);
+  const { done, stop } = runPool<Summary3>(
+    new URL('./worker.js', import.meta.url),
+    root,
+    [plan.job],
+    o.workers,
+    (p) => {
+      games.push(p.game);
+      if (games.length % 10 === 0 || games.length === total) {
+        write();
+        console.error(
+          `${games.length}/${total} games, ${((Date.now() - started) / 1000).toFixed(0)} s`,
+        );
+      }
+    },
+  );
+  for (const signal of ['SIGINT', 'SIGTERM'] as const) {
+    process.once(signal, () => {
+      console.error('Stopping: writing the games played so far');
+      void stop();
+    });
+  }
+  await done;
+  write();
+  console.error(`Wrote ${join(o.out, o.name)}.greedy.json and .md (${games.length} games)`);
+}
+
 async function main(): Promise<void> {
   const given = options(process.argv.slice(2), availableParallelism());
   const cwd = process.env['INIT_CWD'] ?? process.cwd();
   if (given.report !== undefined) return rebuild(resolve(cwd, given.report));
   const root = repoRoot(cwd);
   const source = loadSource(root);
+  const known = given.rulesetFile === undefined ? source.rulesets[given.ruleset]?.players : 2;
+  if (given.players !== undefined && given.players !== known) {
+    throw new Error(
+      `${given.rulesetFile ?? given.ruleset} is not a ${given.players}-player ruleset`,
+    );
+  }
+  if (known === 3) return main3(given, source, root, cwd);
   const o =
     given.rulesetFile === undefined
       ? given
