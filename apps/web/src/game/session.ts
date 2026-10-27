@@ -7,14 +7,27 @@ import {
   checkersOn,
   newGame,
   playMove,
+  flagFall,
   resign,
+  resumeClock,
   three,
+  timeLeft,
+  timeOut,
   type GameState,
   type GeneratedMove,
   type MoveRules,
+  type TimeControl,
 } from '@chess9s/engine';
 import type { Highlights } from '../board/view';
 import { createRules, ruleset, type RulesetInfo } from './rules';
+import {
+  beginTimed,
+  timedAfterLeave,
+  timedAfterMove,
+  timedFlag,
+  timedPause,
+  type Timed,
+} from './timed';
 
 export interface Promoting {
   from: string;
@@ -64,9 +77,11 @@ export interface Model {
   showMoves: boolean;
   /** Play aid: mark the side to move's pieces that the other side attacks (off by default, provisional). */
   showDanger: boolean;
+  /** The clock, when a time control was chosen (S65); null for an untimed game. */
+  timed: Timed | null;
 }
 
-export const fromGame = (game: GameState): Model => ({
+export const fromGame = (game: GameState, timed: Timed | null = null): Model => ({
   game,
   selected: null,
   promoting: null,
@@ -74,6 +89,7 @@ export const fromGame = (game: GameState): Model => ({
   history: [],
   showMoves: true,
   showDanger: false,
+  timed,
 });
 
 export function newModel(
@@ -90,42 +106,145 @@ const movesFrom = (game: GameState, from: string): GeneratedMove[] =>
 /** The square a move is chosen by: its to-square, or for castling the partner's (King onto Rook). */
 const pickedAt = (m: GeneratedMove): string => m.castle?.from ?? m.to;
 
-const played = (model: Model, move: GeneratedMove): Model => ({
-  ...model,
-  game: playMove(model.game, move),
-  selected: null,
-  promoting: null,
-  choosing: null,
-  history: [...model.history, model.game],
-});
+const cleared = { selected: null, promoting: null, choosing: null } as const;
+
+/** The game after `side` ran out of time (D66), with the clock told. */
+function timeOutFor(model: Model, side: string, now: number): Model {
+  const game = timeOut(model.game, side);
+  return {
+    ...model,
+    ...cleared,
+    game,
+    history: [...model.history, model.game],
+    ...(model.timed && { timed: timedAfterLeave(model.timed, side, game, now) }),
+  };
+}
+
+/**
+ * A move played at `now`. Against a running clock a move that comes after the time ran out is a
+ * flag fall instead, as at a board; while the clock is paused no move is played.
+ */
+const played = (model: Model, move: GeneratedMove, now = Date.now()): Model => {
+  const { timed } = model;
+  const mover = model.game.turn;
+  if (timed && !timed.showOnly && flagFall(timed.clock, now) === mover) {
+    return timeOutFor(model, mover, now);
+  }
+  if (isPaused(model)) return model;
+  const game = playMove(model.game, move);
+  return {
+    ...model,
+    ...cleared,
+    game,
+    history: [...model.history, model.game],
+    ...(timed && { timed: timedAfterMove(timed, mover, game, now) }),
+  };
+};
 
 /** A move chosen outside the board (the computer's), recorded like a click-made one. */
 export const playFor = played;
 
 /** A seat resigns a 3-player game (decision 0018); undo takes it back like a move. */
-export const resignFor = (model: Model, side: string): Model => ({
-  ...model,
-  game: resign(model.game, side),
-  selected: null,
-  promoting: null,
-  choosing: null,
-  history: [...model.history, model.game],
-});
+export const resignFor = (model: Model, side: string, now = Date.now()): Model => {
+  const game = resign(model.game, side);
+  return {
+    ...model,
+    ...cleared,
+    game,
+    history: [...model.history, model.game],
+    ...(model.timed && { timed: timedAfterLeave(model.timed, side, game, now) }),
+  };
+};
 
-export const canUndo = (model: Model): boolean => model.history.length > 0;
+/** Undo is off while a clock is on (decision 0017). */
+export const canUndo = (model: Model): boolean => model.history.length > 0 && !model.timed;
 
 /** Take back the last move (hot-seat only; online play will not offer it). */
 export function undo(model: Model): Model {
   const game = model.history.at(-1);
-  if (!game) return model;
+  if (!game || model.timed) return model;
   return {
     ...model,
+    ...cleared,
     game,
-    selected: null,
-    promoting: null,
-    choosing: null,
     history: model.history.slice(0, -1),
   };
+}
+
+/** The clock is stopped by the Pause button (and a saved game comes back that way). */
+export const isPaused = ({ timed, game }: Model): boolean =>
+  timed !== null && timed.clock.since === null && game.result.status === 'ongoing';
+
+/**
+ * Choose a time control for a game that has not begun: its clock starts running the seat to move
+ * from `now` (decision 0017). An untimed control, or a game with a move in it, changes nothing
+ * but removing the clock of a game that has not begun.
+ */
+export function startTimed(
+  model: Model,
+  control: TimeControl,
+  showOnly: boolean,
+  now = Date.now(),
+): Model {
+  const { game } = model;
+  if (game.moves.length > 0 || game.resignations.length > 0 || game.result.status !== 'ongoing') {
+    return model;
+  }
+  return { ...model, timed: beginTimed(control, showOnly, game, now) };
+}
+
+export const pauseTimed = (model: Model, now = Date.now()): Model =>
+  model.timed && !isPaused(model) && model.game.result.status === 'ongoing'
+    ? { ...model, timed: timedPause(model.timed, now) }
+    : model;
+
+export const resumeTimed = (model: Model, now = Date.now()): Model =>
+  model.timed && isPaused(model)
+    ? { ...model, timed: { ...model.timed, clock: resumeClock(model.timed.clock, now) } }
+    : model;
+
+/**
+ * Time passes: the seat whose time is up runs out (D66), or with Show only is shown as out of
+ * time and play goes on. The same model comes back when nothing changed.
+ */
+export function tick(model: Model, now = Date.now()): Model {
+  let m = model;
+  for (let i = 0; i < m.game.order.length; i++) {
+    const { timed } = m;
+    const side = timed && m.game.result.status === 'ongoing' ? flagFall(timed.clock, now) : null;
+    if (!timed || !side) break;
+    m = timed.showOnly ? { ...m, timed: timedFlag(timed, side) } : timeOutFor(m, side, now);
+  }
+  return m;
+}
+
+export interface ClockLine {
+  side: string;
+  /** Time left in milliseconds. */
+  ms: number;
+  /** The seat's clock is running. */
+  running: boolean;
+  /** Out of time, and play goes on (Show only). */
+  flagged: boolean;
+  /** Out of the game: its clock stopped. */
+  out: boolean;
+}
+
+/** Each seat's clock at `now`, in turn order; none for an untimed game. */
+export function clockLines({ timed, game }: Model, now = Date.now()): ClockLine[] {
+  if (!timed) return [];
+  const { clock } = timed;
+  return game.order.map((side) => {
+    const flagged = clock.flagged.includes(side);
+    const out = clock.out.includes(side);
+    return {
+      side,
+      ms: timeLeft(clock, side, now),
+      running: clock.since !== null && clock.turn === side && !flagged && !out,
+      flagged,
+      out,
+    };
+  });
 }
 
 export const toggleMoves = (model: Model): Model => ({ ...model, showMoves: !model.showMoves });
@@ -137,7 +256,7 @@ const unique = <T>(xs: T[]): T[] => [...new Set(xs)];
  * Play the move from `from` to `to` once everything it asks is answered, else ask the next
  * question: the promotion piece, then the checkmating piece, then the swap promotion.
  */
-function ask(model: Model, from: string, to: string, picked: Picked): Model {
+function ask(model: Model, from: string, to: string, picked: Picked, now: number): Model {
   const { game } = model;
   const moves = movesFrom(game, from).filter(
     (m) =>
@@ -166,17 +285,18 @@ function ask(model: Model, from: string, to: string, picked: Picked): Model {
     }));
     return { ...model, promoting: null, choosing: { from, to, kind: 'swap', choices, picked } };
   }
-  return played(model, moves[0]!);
+  return played(model, moves[0]!, now);
 }
 
 /** A click on a square: play a shown move, or select the piece standing there, or clear. */
-export function click(model: Model, at: string): Model {
+export function click(model: Model, at: string, now = Date.now()): Model {
   const { game, selected } = model;
   if (game.result.status !== 'ongoing' || model.promoting || model.choosing) return model;
+  if (isPaused(model)) return model;
 
   if (selected && at !== selected) {
     if (movesFrom(game, selected).some((m) => pickedAt(m) === at)) {
-      return ask(model, selected, at, {});
+      return ask(model, selected, at, {}, now);
     }
   }
   if (at !== selected && movesFrom(game, at).length > 0) return { ...model, selected: at };
@@ -184,14 +304,14 @@ export function click(model: Model, at: string): Model {
 }
 
 /** The player picked a promotion piece. A piece that is not a choice changes nothing. */
-export function promote(model: Model, piece: string): Model {
+export function promote(model: Model, piece: string, now = Date.now()): Model {
   const { promoting } = model;
   if (!promoting?.choices.includes(piece)) return model;
-  return ask(model, promoting.from, promoting.to, { promotion: piece });
+  return ask(model, promoting.from, promoting.to, { promotion: piece }, now);
 }
 
 /** The player answered a 3-player checkmate question. An answer that is not a choice changes nothing. */
-export function choose(model: Model, value: string): Model {
+export function choose(model: Model, value: string, now = Date.now()): Model {
   const { choosing } = model;
   if (!choosing?.choices.some((c) => c.value === value)) return model;
   const { from, to, kind, picked } = choosing;
@@ -200,6 +320,7 @@ export function choose(model: Model, value: string): Model {
     from,
     to,
     kind === 'mate' ? { ...picked, mateBy: value } : { ...picked, swapPromotion: value },
+    now,
   );
 }
 
@@ -286,6 +407,7 @@ const REASONS: Record<string, string> = {
   'fifty-move': 'Fifty-move rule',
   repetition: 'Threefold repetition',
   agreement: 'By agreement',
+  'timeout-insufficient-material': 'Out of time, the other side cannot checkmate',
 };
 
 /** Win reasons that title() would not read well (3-player games, decision 0016). */
@@ -293,6 +415,7 @@ const WINS: Record<string, string> = {
   'king-capture': 'King captured',
   'dragon-captured': 'Dragon pieces captured',
   'exposed-king': 'King left in check',
+  timeout: 'Out of time',
 };
 
 /** "Dark and Light", "Dark, Light and Dragon". */

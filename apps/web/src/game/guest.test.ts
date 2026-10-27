@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { playMove, resign } from '@chess9s/engine';
+import { playMove, resign, timeLeft } from '@chess9s/engine';
 import { clearGuest, loadGuest, saveGuest, type Store } from './guest';
-import { newModel } from './session';
+import { fromGame, isPaused, newModel, playFor, startTimed, tick } from './session';
+import { controlById } from './timeControls';
 import { createRules, listRulesets, ruleset } from './rules';
 
 const memory = (): Store & { data: Map<string, string> } => {
@@ -116,5 +117,74 @@ describe('a 3-player guest game with a resignation (S67)', () => {
     const store = memory();
     saveGuest(store, { game, mode: 'hot-seat' });
     expect(loadGuest(store, rules, info)!.game.result).toEqual(game.result);
+  });
+});
+
+describe('a guest game with a clock (S65)', () => {
+  const S = 1000;
+  const timedGame = () => {
+    let m = startTimed(newModel(), controlById('3+2')!, true, 0);
+    m = playFor(m, m.game.legal[0]!, 10 * S);
+    m = playFor(m, m.game.legal[0]!, 14 * S);
+    return m;
+  };
+
+  it('comes back paused, with the time each seat had left', () => {
+    const store = memory();
+    const m = timedGame();
+    saveGuest(store, { game: m.game, mode: 'hot-seat', timed: m.timed! }, 20 * S);
+    const back = loadGuest(store, createRules(), ruleset)!;
+    expect(back.game.moves).toHaveLength(2);
+    const timed = back.timed!;
+    expect(timed.control.id).toBe('3+2');
+    expect(timed.showOnly).toBe(true);
+    expect(timed.lefts).toEqual(m.timed!.lefts);
+    const model = fromGame(back.game, timed);
+    expect(isPaused(model)).toBe(true);
+    // The running seat was charged up to the moment of the save, and does not run on.
+    expect(timeLeft(timed.clock, m.game.turn, 999 * S)).toBe(
+      timeLeft(m.timed!.clock, m.game.turn, 20 * S),
+    );
+  });
+
+  it('keeps the game when the clock it saved is damaged', () => {
+    const store = memory();
+    const m = timedGame();
+    saveGuest(store, { game: m.game, mode: 'hot-seat', timed: m.timed! }, 20 * S);
+    const saved = JSON.parse(store.getItem('chess9s.guest')!);
+    store.setItem('chess9s.guest', JSON.stringify({ ...saved, timed: { control: 'nope' } }));
+    const back = loadGuest(store, createRules(), ruleset)!;
+    expect(back.game.moves).toHaveLength(2);
+    expect(back.timed).toBeUndefined();
+  });
+
+  it('saves nothing about a clock for an untimed game', () => {
+    const store = memory();
+    saveGuest(store, { game: twoMoves(), mode: 'hot-seat' });
+    expect(JSON.parse(store.getItem('chess9s.guest')!).timed).toBeUndefined();
+    expect(loadGuest(store, createRules(), ruleset)!.timed).toBeUndefined();
+  });
+
+  it('keeps a game that ended by running out of time', () => {
+    const store = memory();
+    const m = tick(startTimed(newModel(), controlById('1+0')!, false, 0), 61 * S);
+    saveGuest(store, { game: m.game, mode: 'hot-seat', timed: m.timed! }, 62 * S);
+    const back = loadGuest(store, createRules(), ruleset)!;
+    expect(back.game.result).toMatchObject({ status: 'win', reason: 'timeout' });
+    expect(isPaused(fromGame(back.game, back.timed!))).toBe(false);
+  });
+
+  it('keeps a 3-player game with a seat out of time, in its place', () => {
+    const info = listRulesets().find((r) => r.id === 'standard-3p')!;
+    const rules = createRules('standard-3p');
+    let m = startTimed(newModel(rules, info), controlById('move30s')!, false, 0);
+    m = tick(m, 30 * S);
+    m = playFor(m, m.game.legal[0]!, 35 * S);
+    const store = memory();
+    saveGuest(store, { game: m.game, mode: 'hot-seat', timed: m.timed! }, 36 * S);
+    const back = loadGuest(store, rules, info)!;
+    expect(back.game.resignations).toEqual([{ side: 'dark', after: 0, timeout: true }]);
+    expect(back.game.seats.dark).toBe('out');
+    expect(back.timed!.clock.out).toEqual(['dark']);
   });
 });

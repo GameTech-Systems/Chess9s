@@ -1,8 +1,17 @@
 // The game record (S46): a game saved as JSON loads back and replays to the same result.
 import { describe, expect, it } from 'vitest';
-import { agreeDraw, playMove, resign, stateKey, toNotation, type GameState } from '@chess9s/engine';
+import {
+  agreeDraw,
+  playMove,
+  resign,
+  stateKey,
+  timeLeft,
+  toNotation,
+  type GameState,
+} from '@chess9s/engine';
 import hotSeatMate from '../../../../packages/engine/test/fixtures/games/hot-seat-mate.json';
-import { newModel } from './session';
+import { fromGame, isPaused, newModel, playFor, startTimed, tick } from './session';
+import { controlById } from './timeControls';
 import { createRulesFor, customInfo, findRuleset } from './rules';
 import { openRecord, recordFile, recordJson } from './record';
 
@@ -182,5 +191,126 @@ describe('a 3-player record with resignations (S67)', () => {
     expect(bad({ resignations: [{ side: 'nobody', after: 1 }] })).toBe(false);
     expect(bad({ resignations: [{ side: 'light', after: 99 }] })).toBe(false);
     expect(bad({ resignations: 'light' })).toBe(false);
+  });
+});
+
+describe('a record with a clock (S65)', () => {
+  const S = 1000;
+  const timedModel = (control = '3+2', showOnly = false) => {
+    let m = startTimed(
+      newModel(createRulesFor(standard), standard),
+      controlById(control)!,
+      showOnly,
+      0,
+    );
+    m = playFor(m, m.game.legal[0]!, 10 * S);
+    m = playFor(m, m.game.legal[0]!, 14 * S);
+    return m;
+  };
+
+  it('carries the time control, Show only and each seat’s time left after each move', () => {
+    const m = timedModel('3+2', true);
+    const saved = JSON.parse(recordJson(m.game, '2026-10-27', m.timed));
+    expect(saved.v).toBe(1);
+    expect(saved.timeControl).toBe('3+2');
+    expect(saved.showOnly).toBe(true);
+    expect(saved.timeLeft).toEqual(m.timed!.lefts);
+    expect(saved.timeLeft).toHaveLength(2);
+  });
+
+  it('leaves the fields out for an untimed game, so old records and new ones look alike', () => {
+    const game = played(fresh(), 3);
+    const saved = JSON.parse(recordJson(game, '2026-10-27', null));
+    expect(Object.keys(saved)).not.toContain('timeControl');
+    expect(Object.keys(saved)).not.toContain('showOnly');
+    expect(Object.keys(saved)).not.toContain('timeLeft');
+    expect(recordJson(game, '2026-10-27')).toBe(recordJson(game, '2026-10-27', null));
+  });
+
+  it('opens with the clock back, paused, at the last time left', () => {
+    const m = timedModel();
+    const opened = openRecord(recordJson(m.game, '2026-10-27', m.timed));
+    if (!opened.ok) throw new Error(opened.problem);
+    expect(opened.game.moves).toHaveLength(2);
+    const timed = opened.timed!;
+    expect(timed.control.id).toBe('3+2');
+    expect(timed.lefts).toEqual(m.timed!.lefts);
+    expect(isPaused(fromGame(opened.game, timed))).toBe(true);
+    const last = m.timed!.lefts.at(-1)!;
+    for (const side of m.game.order) expect(timeLeft(timed.clock, side, 999 * S)).toBe(last[side]);
+  });
+
+  it('opens a record with no clock, as before', () => {
+    const opened = openRecord(recordJson(played(fresh(), 4), '2026-10-27'));
+    if (!opened.ok) throw new Error(opened.problem);
+    expect(opened.timed).toBeNull();
+  });
+
+  it('opens a game with no moves yet at the full time', () => {
+    const m = startTimed(
+      newModel(createRulesFor(standard), standard),
+      controlById('5+3')!,
+      false,
+      0,
+    );
+    const opened = openRecord(recordJson(m.game, '2026-10-27', m.timed));
+    if (!opened.ok) throw new Error(opened.problem);
+    expect(timeLeft(opened.timed!.clock, m.game.turn, 999 * S)).toBe(300 * S);
+  });
+
+  it('replays a game that ended on time, with the seat out of time at zero', () => {
+    const m = tick(timedModel('1+0'), 100 * S);
+    expect(m.game.result).toMatchObject({ reason: 'timeout' });
+    const opened = openRecord(recordJson(m.game, '2026-10-27', m.timed));
+    if (!opened.ok) throw new Error(opened.problem);
+    expect(opened.game.result).toEqual(m.game.result);
+    const result = m.game.result;
+    if (result.status !== 'win') throw new Error('expected a win');
+    expect(timeLeft(opened.timed!.clock, result.loser, 999 * S)).toBe(0);
+  });
+
+  it('replays a 3-player game with a seat out of time, in its place', () => {
+    const info = findRuleset('standard-3p')!;
+    let m = startTimed(newModel(createRulesFor(info), info), controlById('move30s')!, false, 0);
+    m = tick(m, 30 * S);
+    m = playFor(m, m.game.legal[0]!, 35 * S);
+    const text = recordJson(m.game, '2026-10-27', m.timed);
+    expect(JSON.parse(text).resignations).toEqual([{ side: 'dark', after: 0, timeout: true }]);
+    const opened = openRecord(text);
+    if (!opened.ok) throw new Error(opened.problem);
+    expect(stateKey(opened.game)).toBe(stateKey(m.game));
+    expect(opened.timed!.clock.out).toEqual(['dark']);
+  });
+
+  it('refuses a clock that does not fit the game, and a time out the moves do not allow', () => {
+    const m = timedModel();
+    const good = JSON.parse(recordJson(m.game, '2026-10-27', m.timed));
+    const bad = (patch: object) => openRecord(JSON.stringify({ ...good, ...patch }));
+    expect(bad({}).ok).toBe(true);
+    expect(bad({ timeLeft: [] }).ok).toBe(false);
+    expect(bad({ timeLeft: 'lots' }).ok).toBe(false);
+    expect(bad({ showOnly: 'yes' }).ok).toBe(false);
+    expect(bad({ timeControl: 7 }).ok).toBe(false);
+    // An unknown control opens as an untimed game.
+    const unknown = bad({ timeControl: 'move9y' });
+    expect(unknown.ok).toBe(true);
+    if (unknown.ok) expect(unknown.timed).toBeNull();
+    const timeout = { status: 'win', winner: 'dark', loser: 'light', reason: 'timeout' };
+    const ended = timedModel();
+    const flagged = JSON.parse(recordJson(tick(ended, 999 * S).game, '2026-10-27', null));
+    expect(openRecord(JSON.stringify(flagged)).ok).toBe(true);
+    expect(
+      openRecord(
+        JSON.stringify({ ...flagged, result: { ...timeout, winner: 'light', loser: 'light' } }),
+      ).ok,
+    ).toBe(false);
+    expect(
+      openRecord(
+        JSON.stringify({
+          ...flagged,
+          result: { status: 'draw', reason: 'timeout-insufficient-material' },
+        }),
+      ).ok,
+    ).toBe(false);
   });
 });

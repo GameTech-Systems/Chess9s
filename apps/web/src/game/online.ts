@@ -89,6 +89,7 @@ export function startOnline(
       history: [],
       showMoves: aids?.showMoves ?? true,
       showDanger: aids?.showDanger ?? false,
+      timed: null,
     },
     seats: snapshot.seats,
     drawOffer: snapshot.drawOffer,
