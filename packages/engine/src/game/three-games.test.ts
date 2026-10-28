@@ -1,9 +1,14 @@
 // S56: 3-player games from the start: each preset played to every end in its table (decision
 // 0016), from recorded games (test/fixtures/games/three-player-ends.json), and a 3-player record
-// round trip. The parameters at each option: three-params.test.ts.
-import { readdirSync, readFileSync } from 'node:fs';
+// round trip. The parameters at each option: three-params.test.ts. S68 recorded the games again
+// once the Coast pieces' first way out through A5 was built (decision 0019); the earlier games
+// replay under the archived versions they were played under.
+import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { join, relative } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import before from '../../test/fixtures/games/three-player-ends-before-s68.json';
 import ends from '../../test/fixtures/games/three-player-ends.json';
+import { loadRules, type RulesFiles } from '../rules/data';
 import { toNotation, type MoveRules } from '../moves/generate';
 import { validateBoardAndPieces } from '../rules/formats';
 import { resolveRuleset, type Registry, type Ruleset } from '../rules/loader';
@@ -104,5 +109,67 @@ describe('a 3-player game record', () => {
     expect(again.result).toEqual(record.result);
     expect(again.order).toEqual(record.turnOrder);
     expect(gameRecord(again)).toEqual(record);
+  });
+});
+
+describe('games recorded before S68 replay under the versions they were played under', () => {
+  // The rules files as the web app and the online server load them, archive and locks included.
+  const rulesDir = root + 'rules/';
+  const walk = (dir: string): string[] =>
+    readdirSync(dir).flatMap((f) => {
+      const path = join(dir, f);
+      return statSync(path).isDirectory() ? walk(path) : [path];
+    });
+  const files: RulesFiles = Object.fromEntries(
+    walk(rulesDir)
+      .filter((f) => f.endsWith('.json'))
+      .map((f) => [relative(rulesDir, f), JSON.parse(readFileSync(f, 'utf8'))]),
+  );
+  const data = loadRules(files);
+  const old = before.games as (Recorded & { version: string })[];
+
+  it('covers every preset at its pre-S68 version', () => {
+    expect([...new Set(old.map((g) => `${g.ruleset}@${g.version}`))].sort()).toEqual([
+      'draft-3p@0.3.0',
+      'easy-3p@0.1.0',
+      'standard-3p@0.1.0',
+    ]);
+  });
+
+  it.each(old.map((g) => [`${g.ruleset}@${g.version} ${g.rows.join(', ')}`, g] as const))(
+    '%s',
+    (_name, game) => {
+      const play = (rules: MoveRules) =>
+        game.moves.reduce(
+          (g, notation) => {
+            const move = g.legal.find((m) => toNotation(m) === notation);
+            if (!move) throw new Error(`${notation} is not legal after ${g.moves.length}`);
+            return playMove(g, move);
+          },
+          newGame(rules, { id: game.ruleset, version: game.version }),
+        );
+      const g = play(data.rules(game.ruleset, game.version));
+      expect(g.result).toEqual(game.result);
+      expect(g.moves.flatMap((m) => m.events ?? [])).toEqual(game.events);
+    },
+  );
+
+  it('most of them are not legal under the current versions, which bring the Dragon out through A5', () => {
+    const illegal = old.filter((game) => {
+      try {
+        game.moves.reduce(
+          (g, notation) => {
+            const move = g.legal.find((m) => toNotation(m) === notation);
+            if (!move) throw new Error(notation);
+            return playMove(g, move);
+          },
+          newGame(data.rules(game.ruleset), { id: game.ruleset, version: 'current' }),
+        );
+        return false;
+      } catch {
+        return true;
+      }
+    });
+    expect(illegal.length).toBeGreaterThan(old.length / 2);
   });
 });

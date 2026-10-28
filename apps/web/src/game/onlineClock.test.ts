@@ -20,7 +20,7 @@ import {
 
 const CODE = 'K7RX2M';
 const DRAFT = { id: 'draft-2p', version: '0.2.0', name: 'Good Practice' };
-const STANDARD_3P = { id: 'standard-3p', version: '0.1.0', name: 'Standard 3-player' };
+const STANDARD_3P = { id: 'standard-3p', version: '0.2.0', name: 'Standard 3-player' };
 const MIN = 60_000;
 const NOW = 1_000_000;
 const FULL = { light: 3 * MIN, dark: 3 * MIN };

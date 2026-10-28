@@ -175,7 +175,7 @@ describe('a result screen for every end', () => {
       /The Dragon checkmated Light&#x27;s King\./,
     ],
     ['draft-3p', 'kinged-checkmates-king', 'Dark wins', /Dark checkmated Light&#x27;s King\./],
-    ['draft-3p', 'duel-dragon-wins', 'The Dragon wins', /The Dragon captured Light&#x27;s King\./],
+    ['draft-3p', 'duel-dragon-wins', 'The Dragon wins', /The Dragon captured Dark&#x27;s King\./],
     [
       'standard-3p',
       'duel-dragon-wins',

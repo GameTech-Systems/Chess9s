@@ -14,6 +14,7 @@ import {
 import { describe, expect, it } from 'vitest';
 import hotSeatMate from '../../engine/test/fixtures/games/hot-seat-mate.json';
 import threeEnds from '../../engine/test/fixtures/games/three-player-ends.json';
+import threeEndsBefore from '../../engine/test/fixtures/games/three-player-ends-before-s68.json';
 import {
   CODE_ALPHABET,
   REFUSALS,
@@ -596,8 +597,8 @@ describe('room codes and seat tokens (D54)', () => {
 });
 
 // 3-seat rooms (S63, D61): the same state machine over a game with three seats.
-const STANDARD_3P = { id: 'standard-3p', version: '0.1.0' };
-const EASY_3P = { id: 'easy-3p', version: '0.1.0' };
+const STANDARD_3P = { id: 'standard-3p', version: '0.2.0' };
+const EASY_3P = { id: 'easy-3p', version: '0.2.0' };
 const recorded = (ruleset: string, row: string) =>
   threeEnds.games.find((g) => g.ruleset === ruleset && g.rows.includes(row))!;
 const dragonOf = (room: Room) => three(room.game.rules, room.game.order).dragon;
@@ -693,6 +694,17 @@ describe('a room with three seats (D61)', () => {
     const t = seated();
     const sent = t.close('dark').out;
     expect(sent.map((o) => o.message)).toEqual([{ v: 1, type: 'opponent', status: 'away' }]);
+  });
+
+  it('still plays a room of a version made before S68 by its lock (decision 0019)', () => {
+    // standard-3p 0.1.0 let the Dragon's pieces leave the Coast anywhere; its lock keeps that.
+    const game = threeEndsBefore.games.find(
+      (g) => g.ruleset === 'standard-3p' && g.rows.includes('kinged-checkmates-king'),
+    )!;
+    expect(game.version).toBe('0.1.0');
+    const t = seated3({ id: 'standard-3p', version: game.version });
+    playAll(t, game.moves);
+    expect(t.room.game.result).toEqual(game.result);
   });
 
   it('plays a recorded game in turn order; every move and the end go to all three', () => {
