@@ -1,0 +1,13 @@
+{
+  "$schema": "../../schema/ruleset.schema.json",
+  "id": "standard-3p",
+  "name": "Standard (3-player)",
+  "version": "0.1.0",
+  "status": "deprecated",
+  "players": 3,
+  "description": "The default 3-player game (D63): the full Dragon rules of Good Practice, except the King moves one square in any direction, as in the 2-player Standard (decision 0016). Experimental until bot self-play shows the seats are balanced.",
+  "overrides": {
+    "king.range": 1
+  },
+  "notes": "Played before S68 built coast.3p.exit, so every Coast piece could leave the Coast with any legal move. Kept with a lock (any-legal-move) so its games and fairness reports replay as they were played (decision 0019)."
+}

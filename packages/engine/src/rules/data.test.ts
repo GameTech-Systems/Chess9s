@@ -55,9 +55,26 @@ describe('loadRules', () => {
     );
     expect(data.library.locks.length).toBeGreaterThan(0);
     // draft-3p 0.2.0 was kept without a lock (S56): it is found, but it does not replay.
-    expect(data.library.archived.map((r) => `${r.id}@${r.version}`)).toEqual(['draft-3p@0.2.0']);
+    expect(data.library.archived.map((r) => `${r.id}@${r.version}`).sort()).toEqual([
+      'draft-3p@0.2.0',
+      'draft-3p@0.3.0',
+      'easy-3p@0.1.0',
+      'standard-3p@0.1.0',
+    ]);
     expect(data.find('draft-3p', '0.2.0')?.archived).toBe(true);
     expect(() => data.values('draft-3p', '0.2.0')).toThrow(/no lock/);
+  });
+
+  it('replays the 3-player versions played before S68 from their locks: any legal move off the Coast', () => {
+    for (const [id, version] of [
+      ['draft-3p', '0.3.0'],
+      ['standard-3p', '0.1.0'],
+      ['easy-3p', '0.1.0'],
+    ] as const) {
+      expect(data.find(id, version)?.archived, id).toBe(true);
+      expect(data.rules(id, version).values['coast.3p.exit'], id).toBe('any-legal-move');
+      expect(data.rules(id).values['coast.3p.exit'], id).toBe('a5-first-then-any');
+    }
   });
 
   it('finds a ruleset by id, and by id and version', () => {

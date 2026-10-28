@@ -2,9 +2,9 @@
   "$schema": "../schema/ruleset.schema.json",
   "id": "draft-3p",
   "name": "Good Practice (3-player)",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "status": "experimental",
   "players": 3,
-  "description": "The full 3-player Dragon rules, rule set v0.3 (decision 0016, docs/RULES.md): every 3-player parameter at its default. Shown as Good Practice. Experimental until bot self-play shows the seats are balanced.",
+  "description": "The full 3-player Dragon rules, rule set v0.3 (decision 0016, docs/RULES.md): every 3-player parameter at its default, with each Coast piece's first way off the Coast through A5 (coast.3p.exit, built in S68, decision 0019). Shown as Good Practice. Experimental until bot self-play shows the seats are balanced.",
   "overrides": {}
 }
