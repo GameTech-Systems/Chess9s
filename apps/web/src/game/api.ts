@@ -17,7 +17,11 @@ export type Fetch = (url: string, init?: RequestInit) => Promise<Response>;
 export type CreateMessage = Extract<ClientMessage, { type: 'create' }>;
 
 /** The message that makes a room for a ruleset: a bundled one by id and version, a custom one by its overrides. */
-export function createMessage(ruleset: RulesetInfo, seat: SeatChoice): CreateMessage {
+export function createMessage(
+  ruleset: RulesetInfo,
+  seat: SeatChoice,
+  computer: readonly string[] = [],
+): CreateMessage {
   return {
     v: PROTOCOL_VERSION,
     type: 'create',
@@ -25,6 +29,7 @@ export function createMessage(ruleset: RulesetInfo, seat: SeatChoice): CreateMes
       ? { name: ruleset.name, overrides: ruleset.overrides }
       : { id: ruleset.id, version: ruleset.version },
     seat,
+    ...(computer.length > 0 && { computer: [...computer] }),
   };
 }
 

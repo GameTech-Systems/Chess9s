@@ -44,6 +44,38 @@ describe('the create message', () => {
   });
 });
 
+describe('the create message with computer seats (S63)', () => {
+  const standard3 = findRuleset('standard-3p')!;
+
+  it('names the seats the computer plays, and leaves the key out when there are none', () => {
+    expect(createMessage(standard3, 'dark', ['dragon'])).toEqual({
+      v: 1,
+      type: 'create',
+      ruleset: { id: standard3.id, version: standard3.version },
+      seat: 'dark',
+      computer: ['dragon'],
+    });
+    expect('computer' in createMessage(standard3, 'dark', [])).toBe(false);
+    expect('computer' in createMessage(standard3, 'dark')).toBe(false);
+  });
+
+  it('hands back the computer seats’ tokens with the creator’s snapshot', async () => {
+    const snap3: Snapshot = {
+      ...snapshot,
+      ruleset: { id: standard3.id, version: standard3.version, name: standard3.name },
+      seat: 'dark',
+      seats: { dark: 'away', light: 'open', dragon: 'away' },
+      computer: ['dragon'],
+      computerTokens: { dragon: 'B'.repeat(43) },
+    };
+    const r = await createRoom(
+      async () => json(201, snap3),
+      createMessage(standard3, 'dark', ['dragon']),
+    );
+    expect(r).toEqual({ ok: true, snapshot: snap3 });
+  });
+});
+
 describe('making a room', () => {
   it('posts the create message to /api/rooms and returns the creator’s snapshot', async () => {
     const seen: { url: string; init?: RequestInit }[] = [];

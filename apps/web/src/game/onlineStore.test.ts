@@ -102,3 +102,43 @@ describe('the online store (chess9s.online)', () => {
     expect(loadSeat(null, 'K7RX2M', NOW)).toBeNull();
   });
 });
+
+describe('the computer seats of a 3-seat room (S63)', () => {
+  const dragon = { dragon: OTHER };
+
+  it('keeps their tokens with the entry, so a reload by the creator can play them again', () => {
+    const store = memory();
+    saveSeat(store, 'K7RX2M', { seat: 'dark', token: TOKEN, computer: dragon }, NOW);
+    expect(loadSeat(store, 'K7RX2M', NOW)).toEqual({
+      seat: 'dark',
+      token: TOKEN,
+      computer: dragon,
+    });
+    // An entry without any has no such key.
+    saveSeat(store, 'QQ2222', { seat: 'dark', token: TOKEN }, NOW);
+    expect(loadSeat(store, 'QQ2222', NOW)).toEqual({ seat: 'dark', token: TOKEN });
+  });
+
+  it('drops tokens that are not tokens, or too many, or for the creator’s own seat, and keeps the seat', () => {
+    const store = memory();
+    const put = (computer: unknown) =>
+      store.setItem(
+        ONLINE_KEY,
+        JSON.stringify({
+          v: 1,
+          rooms: { K7RX2M: { seat: 'dark', token: TOKEN, computer, at: NOW } },
+        }),
+      );
+    for (const bad of [
+      { dragon: 'short' },
+      { 'Not A Side': OTHER },
+      { dark: OTHER },
+      { a: OTHER, b: OTHER, c: OTHER },
+      'dragon',
+      [OTHER],
+    ]) {
+      put(bad);
+      expect(loadSeat(store, 'K7RX2M', NOW)).toEqual({ seat: 'dark', token: TOKEN });
+    }
+  });
+});
