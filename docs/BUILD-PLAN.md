@@ -353,10 +353,10 @@ Decisions: D59.
 Done when: the reports are committed, the sweep covers every 3-player option, and the 2-player report tests are unchanged. If more than 5% of games end at the move cap, report it to the owner rather than tuning the rules.
 Decisions: D59, D60, D63.
 
-### S60 — Depth-2 run for 3 players · Owner · `todo`
+### S60 — Depth-2 run for 3 players · Owner · `done`
 Actions → **Sim depth 2** → Run workflow, ruleset `standard-3p` (D63; shards 40, games 2000, depths 2), as in S37. S59 measured about 8 CPU-minutes per depth-2 game, so 40 shards take about 2 hours each; the merge keeps the depth-1 run from `docs/fairness/standard-3p.json`.
 
-### S61 — 3-player balance review · Owner with Claude in chat · Opus 5.5 · high · `todo`
+### S61 — 3-player balance review · Owner with Claude in chat · Opus 5.5 · high · `done`
 The owner reads both depths, the screens and the sweep, then chooses: keep the 3-player presets experimental as they are; change their defaults using options already in `rules/parameters.json`, which means a new version and a re-run of S59 and S60; or publish a 3-player Candidate, which a later Sonnet step carries out as S38 did. The owner also confirms or changes D60 and D62 to D65. Phase 6 exit.
 
 ### S63 — 3-seat online rooms · Sonnet 5.5 · high · `todo`
@@ -431,12 +431,12 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D57 | 3-player draws and stalls | Decided (S55, from the owner's earlier notes): decision 0016, rules 12 to 17; adds `draw.3p.threefoldRepetition` and `draw.3p.fiftyMove` (on) | S56 |
 | D58 | Timer and time controls | Decided (owner, 26 Oct 2026): untimed stays the default (elapsed time shown); players may choose a time control like Apex Chess's: Fischer increment, time per move, and online the day-long and abandonment controls (decision 0017) | S65 |
 | D59 | 3-player computer | Decided (owner, 26 Oct 2026): a greedy heuristic first, as the computer Dragon (S58); paranoid search after it (S62) for every seat and for the balance runs; deterministic for a seed | S58 |
-| D60 | 3-player balance measure | Default: each seat scores between 28% and 38% (a third, plus or minus 5 points) over at least 2,000 bot games at depths 1 and 2. A win scores 1; a draw splits the point among the players who share it (½ each for two, ⅓ each for three; S55 widened this for the draws in decision 0016). Capped games are reported, not scored. Decision 0015 | S59 |
+| D60 | 3-player balance measure | Decided (owner, S61, 28 Oct 2026; decision 0015 version 1 accepted unchanged): each seat scores between 28% and 38% (a third, plus or minus 5 points) over at least 2,000 bot games at depths 1 and 2. A win scores 1; a draw splits the point among the players who share it (½ each for two, ⅓ each for three; S55 widened this for the draws in decision 0016). Capped games are reported, not scored. Decision 0015 | S59 |
 | D61 | 3-player scope in Phase 6 | Decided in the ledger: hot-seat and computer play, plus 3-seat online rooms (S63, after S54). The builder and ruleset file: D64 | S57 |
-| D62 | A King left in check from a player who moves first | Decided (owner, 26 Oct 2026): not allowed by default (decision 0016, rule 6), and offered as the option `check.3p.exposedKing` = counts-as-checkmate for players to try | S56 |
-| D63 | 3-player default preset | Decided (owner, 26 Oct 2026): Standard (`standard-3p`) starts 3-player games and gets the full balance runs (S59, S60); Good Practice and Easy Start get screens | S57 |
-| D64 | 3-player rulesets in the builder | Decided (owner, 26 Oct 2026): the builder, export, load and share links take 3-player rulesets (S64); Submit stays 2-player (D46) | S64 |
-| D65 | Easy Start for 3 players | Decided (Claude, at the owner's request): the first checkmate wins; every attack on a King is check; the Tail is the Dragon's King on A5, E5 and I5 (decision 0016) | S56 |
+| D62 | A King left in check from a player who moves first | Decided (owner, 26 Oct 2026): not allowed by default (decision 0016, rule 6), and offered as the option `check.3p.exposedKing` = counts-as-checkmate for players to try; confirmed at S61 (Phase 6 exit) | S56 |
+| D63 | 3-player default preset | Decided (owner, 26 Oct 2026): Standard (`standard-3p`) starts 3-player games and gets the full balance runs (S59, S60); Good Practice and Easy Start get screens; confirmed at S61 (Phase 6 exit) | S57 |
+| D64 | 3-player rulesets in the builder | Decided (owner, 26 Oct 2026): the builder, export, load and share links take 3-player rulesets (S64); Submit stays 2-player (D46); confirmed at S61 (Phase 6 exit) | S64 |
+| D65 | Easy Start for 3 players | Decided (Claude, at the owner's request): the first checkmate wins; every attack on a King is check; the Tail is the Dragon's King on A5, E5 and I5 (decision 0016); confirmed at S61 (Phase 6 exit) | S56 |
 | D66 | Running out of time | Default: the seat is out. In 2-player games it loses, or draws if the other player could not checkmate; in 3-player games its side turns to stone and the others play on, and in the duel it loses (decision 0017). Show only turns this off for a game | S65 |
 | D68 | 3-player resignation and Tail capture | Decided (owner, 27 Oct 2026): a resigning seat's pieces turn to stone and the others play on; a captured Tail swaps with the capturing piece and turns to stone, as in a checkmate. Easy Start parts by Claude, provisional (decision 0018) | S67 |
 
