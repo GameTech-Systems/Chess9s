@@ -459,3 +459,98 @@ describe('joining by code', () => {
     expect(out).toContain('>Join<');
   });
 });
+
+describe('clocks in rooms (S66)', () => {
+  const MIN = 60_000;
+  const timed = (over: Partial<Snapshot['time']> = {}): Partial<Snapshot> => ({
+    time: { control: '3+2', left: { light: 3 * MIN, dark: 2 * MIN + 5000 }, lefts: [], ...over },
+  });
+
+  it('lets the creator pick any time control, the online-only ones too, untimed by default', () => {
+    const out = renderToStaticMarkup(
+      <CreateRoom
+        ruleset={findRuleset('standard-2p')!}
+        store={memory()}
+        onCancel={() => {}}
+        onCreated={() => {}}
+      />,
+    );
+    expect(out).toContain('aria-label="Time control"');
+    expect(out).toMatch(/<option value="untimed" selected="">Untimed</);
+    for (const name of ['3+2', '30 seconds per move', '1 day per move', '3 days per move']) {
+      expect(out).toContain(`>${name}<`);
+    }
+    expect(out).toContain('Untimed; away 5 minutes loses');
+    // Show only has no clock to show until a timed control is picked.
+    expect(out).toMatch(/<button[^>]*aria-pressed="false"[^>]*disabled=""[^>]*>Show only</);
+  });
+
+  it('shows the time control before the player takes a seat', async () => {
+    const s = setup(async () => new Response(JSON.stringify(info({ time: { control: '3+2' } }))));
+    await s.controller.start();
+    expect(s.html()).toMatch(/Time control[\s\S]*3\+2/);
+    const u = setup(
+      async () =>
+        new Response(JSON.stringify(info({ time: { control: 'move1d', showOnly: true } }))),
+    );
+    await u.controller.start();
+    expect(u.html()).toMatch(/Time control[\s\S]*1 day per move \(Show only\)/);
+    const w = setup();
+    await w.controller.start();
+    expect(w.html()).toMatch(/Time control[\s\S]*Untimed/);
+  });
+
+  it("shows each seat's time left, from the server, and the control", async () => {
+    const s = setup();
+    await s.play('light', timed());
+    const html = s.html();
+    expect(html).toContain('aria-label="Clocks"');
+    expect(html).toMatch(/aria-label="Dark time">2:05</);
+    expect(html).toMatch(/aria-label="Light time">3:00</);
+    expect(html).toMatch(/Time control[\s\S]*3\+2/);
+  });
+
+  it('shows a seat out of time with Show only, and the game going on', async () => {
+    const s = setup();
+    await s.play(
+      'light',
+      timed({ control: '1+0', showOnly: true, flagged: ['dark'], left: { light: MIN, dark: 0 } }),
+    );
+    const html = s.html();
+    expect(html).toContain('out of time');
+    expect(html).toMatch(/1\+0 \(Show only\)/);
+  });
+
+  it('shows how long an opponent away has under the abandonment control', async () => {
+    const s = setup();
+    await s.play('light', {
+      seats: { light: 'present', dark: 'away' },
+      time: { control: 'away5m', away: { dark: 4 * MIN } },
+    });
+    const html = s.html();
+    expect(html).toMatch(/out of time in 4:00/);
+    expect(html).not.toContain('aria-label="Clocks"');
+  });
+
+  it('gives each of three seats its clock', async () => {
+    const s = setup(async () => new Response(JSON.stringify(info())));
+    saveSeat(s.store, CODE, { seat: 'dark', token: TOKEN });
+    await s.controller.start();
+    s.socket.open();
+    s.socket.say(
+      snap({
+        seat: 'dark',
+        ruleset: { id: 'standard-3p', version: '0.1.0', name: 'Standard 3-player' },
+        seats: { dark: 'present', light: 'present', dragon: 'present' },
+        time: {
+          control: '5+0',
+          left: { dark: 5 * MIN, light: 4 * MIN, dragon: 3 * MIN },
+          lefts: [],
+        },
+      }),
+    );
+    const html = s.html();
+    expect(html).toMatch(/aria-label="Light time">4:00</);
+    expect(html).toMatch(/aria-label="Dragon time">3:00</);
+  });
+});
