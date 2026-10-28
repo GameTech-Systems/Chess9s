@@ -1,28 +1,28 @@
 # Handoff
 
-Updated 2026-10-28 by S63 (Sonnet 5.5 · high). `/end-session` rewrites this file; keep it under 40 lines.
+Updated 2026-10-28 by S66 (Opus 5.5 · high). `/end-session` rewrites this file; keep it under 40 lines.
 
 ## State
-- Phase 6 is done (S61). S63 added 3-seat online rooms (D61): a room has a seat per side of its game; `standard-3p`, `draft-3p` and `easy-3p` are playable online, custom 3-player rulesets are not (a create message carries no player count).
-- Protocol stays `v: 1`; 2-seat rooms are unchanged. New: `create.computer` (1 or 2 seats; their tokens come back once, in the creator's reply as `computerTokens`), `resigned`, `opponent.side` (3 seats only), snapshot `resignations`/`computer`, refusals `computer-seats`, `seat-out`, `draw-unavailable` (decision 0018 keeps agreed draws out). Snapshot `seats` now list in turn order.
-- Computer seats: the creator's browser joins each on its own socket (`game/computerSeat.ts`, S58/S62 levels as in hot-seat: Greedy Dragon, Search others) and the server checks every move. If that browser is away the seat is away (D51). `BotRequest` now carries `resignations`, which also fixes the hot-seat computer after a resignation.
-- Played through `wrangler dev` with `node apps/worker/scripts/e2e-browser-3p.mjs` (three people, reload at move 31, a King captured, Dragon checkmate; then a computer Dragon with a reload and two resignations), desktop and Pixel 7. It found the online move list dropping each round's third move (fixed).
-- The 2-player create screen listed a "Neutral" side (the stones' side); it now lists the board's turn order.
+- Phase 6 is done (S61); S66 added clocks to online rooms (decision 0017, D58, D66). The creator picks any control in `rules/timeControls.json` (online-only ones too) with Show only; untimed stays the default (D51). The preview shows it before a seat is taken.
+- The room keeps the clocks on the server's time with the engine's clock functions (`packages/engine/src/game/timed.ts`, moved from the web app). The Durable Object saves the clock with the record and sets its alarm for the deadline, so a flag falls with nobody connected. A move after the time ran out is the flag fall (refusal `out-of-time`). The abandonment control (`away5m`) counts a seat away while every other person is connected.
+- Protocol stays `v: 1`, additive: `create.time`, `RoomInfo.time`, snapshot `time` (left, lefts, flagged, away), `left` on `move`/`resigned`, new `out-of-time` and `away` messages, timeout results, resignation `timeout`, refusals `unknown-time-control`, `out-of-time`. A client message carrying a clock is refused as malformed.
+- Browser: clocks per seat (2 and 3 seats), the time away before a seat is out, the record carries the times. `node apps/worker/scripts/e2e-browser-clock.mjs` plays 3+2 rooms through `wrangler dev` (reload shows the same times; the alarm drops the flag), desktop and Pixel 7. Privacy page updated (28 October 2026).
 
 ## Next session
-**S66 — Clocks in online rooms** · Opus 5.5 · effort high
-Why: S54 is done (rooms are live), so S66 is the last Claude step outside Phase 7. Server clock with S65's functions; 3-seat rooms use the same clocks.
-Start with: `/start-session S66`. Read the S66 section of `docs/BUILD-PLAN.md`, `apps/worker/src/room.ts` (alarm, saved record) and `packages/online/src/room.ts` (3-seat rooms: out seats, `resigned`).
+**S33 — Phase 7: Growth (planning)** · Opus 5.5 · effort high
+Why: S66 was the last Claude step outside Phase 7; S48 and S50 wait on the owner's S47 decision. The Phase 7 placeholder needs its detailed steps.
+Start with: `/start-session S33`. Read only the S33 section of `docs/BUILD-PLAN.md`, the decision defaults table and `docs/decisions/0002-stack.md`.
 
 ## Decisions in effect for the next step
-- D51 to D54: defaults (Phase 5 rooms). D58 and D66: decided (clocks); 3-seat rooms use the same clocks.
+- D51 to D54: defaults (rooms). D58 and D66: decided (clocks); S66's readings in decision 0017 are provisional.
 
 ## Open questions for the owner
-- Computer seats in rooms use the default levels (Greedy Dragon, Search for the others); there is no level choice on the create screen. Default: leave it until asked.
-- Room Durable Objects' 3-seat socket cap is 6 (two per seat). Provisional; nothing live has tested it.
-- Online rooms for custom 3-player rulesets need a player count in the create message; none planned. Default: not offered.
+- S66 readings (0017, provisional): a room's clock starts when its last seat is taken; Show only only with a clock; the away count runs while every other person is connected and restarts in full; a person alone with computer seats is never counted out.
+- Computer seats in rooms use the default levels; no level choice on the create screen. Default: leave it until asked.
+- Room Durable Objects' 3-seat socket cap is 6 (two per seat). Provisional.
 - Carried over: why light collapses at depth 2, `coast.3p.exit`, the held-setting rule (S64), Easy Start calls (S67), the decision 0017 clock readings (S65), the S53 defaults, the draw-offer default (S51), the flag rule (0013), `coast.openToAll`, the I34 contact address, the favicon, the Ting Yang art.
 
 ## Notes for Claude
+- `RoomContext.now` and `leave(room, seat, now)` take the server's time; `snapshotFor(room, seat, now, { token, computerTokens })`. `expire(now, room)` and `roomDeadline(room)` drive the alarm.
+- `applyServer(o, msg, now)` takes a third argument: don't pass it to `reduce` directly (the index would be read as the time).
 - The `Sim depth 2` workflow's merge job uploads `fairness-report-<ruleset>` but doesn't commit it; download and commit it in a Claude session.
-- A resignation in a 3-seat room is not a move: the server saves `resignations` beside the moves and replays them with `replayResignations`; a 2-seat room never has any.
