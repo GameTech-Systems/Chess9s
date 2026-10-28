@@ -3,7 +3,7 @@
 // the object's storage on every move and replayed by the engine when the object wakes, so a
 // restart loses nothing. One alarm does two jobs: it closes idle sockets and deletes the room on
 // D53's schedule. Nothing about a player is kept: no names, IP addresses or user agents, only the
-// game and its two seat tokens, and nothing is logged.
+// game and its seat tokens (two, or three in a 3-player room), and nothing is logged.
 import { loadRules, type GameResult } from '@chess9s/engine';
 import {
   CLOSE_GONE,
