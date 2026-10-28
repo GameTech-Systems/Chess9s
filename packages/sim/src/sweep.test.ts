@@ -1,5 +1,6 @@
 // Parameter combinations (decision 0008): one 2-player parameter changed at a time from the
-// ruleset's values, each other option of it; enumSets add or remove one option.
+// ruleset's values, each other option of it; enumSets add or remove one option. S59: the same for
+// the 3-player parameters, with the values an option requires.
 import { describe, expect, it } from 'vitest';
 import type { Registry } from '@chess9s/engine';
 import { loadSource, rulesFor } from './load';
@@ -73,6 +74,30 @@ describe('combinations', () => {
       ['a.set+y', { 'a.set': ['x', 'y'] }],
     ]);
   });
+
+  it('changes the 3-player parameters for a 3-player ruleset (S59)', () => {
+    const values = { 'a.n': 2, 'a.flag': true, 'a.3p': 'p' };
+    expect(combinations(registry, values, 3).map((c) => c.id)).toEqual([
+      'default',
+      'a.n=1',
+      'a.n=3',
+      'a.3p=q',
+    ]);
+  });
+
+  it('adds the values an option requires', () => {
+    const needs: Registry = {
+      version: '1',
+      parameters: [
+        { ...registry.parameters[3]!, requires: { q: { 'a.n': 3 } } },
+        registry.parameters[0]!,
+      ],
+    };
+    expect(combinations(needs, { 'a.3p': 'p', 'a.n': 2 }, 3)[1]).toEqual({
+      id: 'a.3p=q',
+      overrides: { 'a.3p': 'q', 'a.n': 3 },
+    });
+  });
 });
 
 describe('playable', () => {
@@ -104,6 +129,32 @@ describe('playable', () => {
     for (const c of combinations(source.registry, values).filter((x) => added.includes(x.id))) {
       expect(playable(source, 'standard-2p', c.overrides), c.id).toBeUndefined();
     }
+  });
+
+  it('sweeps every 3-player option of standard-3p, each one playable (S59)', () => {
+    const { values } = rulesFor(source, 'standard-3p').rules;
+    const all = combinations(source.registry, values, 3);
+    const ids = all.map((c) => c.id);
+    for (const id of [
+      'dragonHead.range=3',
+      'dragonHead.range=4',
+      'endings.3p=first-checkmate',
+      'dragon.3p.lastKing=capture',
+      'tail.3p.mateTiming=dragon-turn',
+      'draw.3p.threefoldRepetition=false',
+      'draw.3p.fiftyMove=false',
+      'check.3p.exposedKing=counts-as-checkmate',
+    ]) {
+      expect(ids).toContain(id);
+    }
+    const skipped = all.flatMap((c) => {
+      const why = playable(source, 'standard-3p', c.overrides);
+      return why === undefined ? [] : [`${c.id}: ${why}`];
+    });
+    expect(
+      skipped.every((s) => /not built yet/.test(s)),
+      skipped.join('; '),
+    ).toBe(true);
   });
 
   it('every real combination is either playable or skipped with a reason', () => {

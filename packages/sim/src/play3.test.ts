@@ -1,10 +1,10 @@
-// S58: 3-player self-play with the greedy player: bots finish games in every preset, the same seed
-// gives the same game, and each seat's results are counted (the full report is S59). S62: the
-// search on every seat. Whole search games in every preset at depths 1 and 2 take minutes each:
-// `pnpm sim --players 3 --search --depths <d> --games 1` plays them (the S62 handoff has the runs).
+// S58: 3-player self-play with the greedy player: bots finish games in every preset and the same
+// seed gives the same game. S62: the search on every seat. S59: what each game records for the
+// balance report (stats3.ts), and the greedy Dragon against searching Kinged players. Whole search games in every preset at depths 1 and 2 take minutes each:
+// `pnpm sim --players 3 --depths <d> --games 1` plays them (the S62 handoff has the runs).
 import { describe, expect, it } from 'vitest';
 import { loadSource, rulesFor } from './load';
-import { playGame3, summarize3, toMarkdown3, type Summary3 } from './play3';
+import { playGame3 } from './play3';
 
 const source = loadSource(new URL('../../../', import.meta.url).pathname);
 const options = { openingPlies: 0, maxPlies: 1500 };
@@ -64,65 +64,39 @@ describe('playGame3', () => {
     expect(game).toMatchObject({ outcome: 'unfinished', plies: 6, winner: null });
   });
 
+  it('records the Dragon seat, the events and who shares a draw (S59)', () => {
+    const { rules, ruleset } = rulesFor(source, 'standard-3p');
+    const game = playGame3(rules, ruleset, { ...options, seed: 1 });
+    expect(game.dragon).toBe('dragon');
+    expect(Array.isArray(game.events)).toBe(true);
+    if (game.outcome === 'draw') expect(game.between!.length).toBeGreaterThanOrEqual(2);
+    else expect(game.between).toBeNull();
+    for (const e of game.events)
+      expect(e).toMatch(/^(king-captured:\w+|tail-stone:\w+|dragon-out)$/);
+  }, 60_000);
+
+  it('counts a King the Dragon captured among the events', () => {
+    // Greedy games in draft-3p: some seed in the first few has the Dragon take a King.
+    const { rules, ruleset } = rulesFor(source, 'draft-3p');
+    const games = [1, 2, 3, 4, 5, 6].map((seed) =>
+      playGame3(rules, ruleset, { openingPlies: 4, maxPlies: 1500, seed }),
+    );
+    const captured = games.filter((g) => g.events.some((e) => e.startsWith('king-captured:')));
+    expect(captured.length).toBeGreaterThan(0);
+  }, 120_000);
+
+  it('plays the Dragon greedy against searching Kinged players when asked (S59)', () => {
+    const { rules, ruleset } = rulesFor(source, 'standard-3p');
+    const base = { openingPlies: 4, maxPlies: 12, seed: 2, search: { depth: 1, nodes: 3_000 } };
+    const mixed = playGame3(rules, ruleset, { ...base, greedyDragon: true });
+    expect(mixed).toEqual(playGame3(rules, ruleset, { ...base, greedyDragon: true }));
+    expect(mixed.key).not.toBe(playGame3(rules, ruleset, base).key);
+    const greedy = playGame3(rules, ruleset, { openingPlies: 4, maxPlies: 12, seed: 2 });
+    expect(mixed.key).not.toBe(greedy.key);
+  }, 120_000);
+
   it('refuses a 2-player ruleset', () => {
     const { rules, ruleset } = rulesFor(source, 'draft-2p');
     expect(() => playGame3(rules, ruleset, { ...options, seed: 1 })).toThrow(/3-player/);
-  });
-});
-
-describe('summarize3', () => {
-  const game = (over: Partial<Summary3>): Summary3 => ({
-    seed: 1,
-    order: ['dark', 'light', 'dragon'],
-    outcome: 'win',
-    winner: 'dragon',
-    loser: 'light',
-    reason: 'checkmate',
-    plies: 10,
-    key: 'k',
-    ...over,
-  });
-  const games = [
-    game({ seed: 1 }),
-    game({ seed: 2, winner: 'dark', loser: 'light', plies: 20, key: 'a' }),
-    game({
-      seed: 3,
-      outcome: 'draw',
-      winner: null,
-      loser: null,
-      reason: 'fifty-move',
-      plies: 30,
-      key: 'b',
-    }),
-    game({
-      seed: 4,
-      outcome: 'unfinished',
-      winner: null,
-      loser: null,
-      reason: 'unfinished',
-      key: 'c',
-    }),
-  ];
-
-  it("counts each seat's wins, losses and the draws", () => {
-    const s = summarize3(games);
-    expect(s.games).toBe(4);
-    expect(s.draws).toBe(1);
-    expect(s.unfinished).toBe(1);
-    expect(s.seats['dragon']).toMatchObject({ wins: 1, losses: 0, winRate: 0.25 });
-    expect(s.seats['dark']).toMatchObject({ wins: 1, losses: 0 });
-    expect(s.seats['light']).toMatchObject({ wins: 0, losses: 2 });
-    expect(s.results).toEqual({ checkmate: 2, 'fifty-move': 1, unfinished: 1 });
-    expect(s.plies).toEqual({ mean: 17.5, median: 15, min: 10, max: 30 });
-  });
-
-  it('writes a table with a row per seat', () => {
-    const md = toMarkdown3({
-      ruleset: { id: 'standard-3p', version: '0.1.0' },
-      date: '2026-10-27',
-      ...summarize3(games),
-    });
-    expect(md).toContain('standard-3p');
-    for (const seat of ['dark', 'light', 'dragon']) expect(md).toContain(`| ${seat} |`);
   });
 });

@@ -1,6 +1,7 @@
-// Parameter combinations for a sweep (decision 0008): the ruleset as it is, then one 2-player
-// parameter changed at a time to each of its other options. An enumSet changes by one option,
-// removed or added.
+// Parameter combinations for a sweep (decision 0008): the ruleset as it is, then one parameter
+// for the ruleset's player count changed at a time to each of its other options. An enumSet
+// changes by one option, removed or added. An option that requires other values (`requires` in
+// the registry, such as endings.3p = first-checkmate) brings them with it.
 import {
   newGame,
   RulesError,
@@ -20,10 +21,11 @@ export interface Combination {
 export function combinations(
   registry: Registry,
   values: Record<string, ParamValue>,
+  players: 2 | 3 = 2,
 ): Combination[] {
   const all: Combination[] = [{ id: 'default', overrides: {} }];
   for (const p of registry.parameters) {
-    if (p.status === 'deprecated' || !p.players.includes(2) || !(p.id in values)) continue;
+    if (p.status === 'deprecated' || !p.players.includes(players) || !(p.id in values)) continue;
     const current = values[p.id];
     if (p.type === 'enumSet') {
       const set = Array.isArray(current) ? current : [];
@@ -37,8 +39,10 @@ export function combinations(
       continue;
     }
     for (const option of p.options) {
-      if (option !== current)
-        all.push({ id: `${p.id}=${String(option)}`, overrides: { [p.id]: option } });
+      if (option !== current) {
+        const needs = p.requires?.[String(option)] ?? {};
+        all.push({ id: `${p.id}=${String(option)}`, overrides: { [p.id]: option, ...needs } });
+      }
     }
   }
   return all;
