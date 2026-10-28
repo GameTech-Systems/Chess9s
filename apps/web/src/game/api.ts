@@ -1,6 +1,7 @@
 // The browser's three calls to the Worker (S52): make a room, look at a room, open its socket.
 // Everything that comes back is checked whole before it is used. No names or accounts are sent:
-// a create message holds the ruleset and the seat choice; the rest is the room code.
+// a create message holds the ruleset, the seat choice and the time control; the rest is the room
+// code.
 import {
   PROTOCOL_VERSION,
   parseRoomInfo,
@@ -9,8 +10,10 @@ import {
   type RoomInfo,
   type SeatChoice,
   type Snapshot,
+  type TimeChoice,
 } from '@chess9s/online/protocol';
 import type { RulesetInfo } from './rules';
+import { timeControls } from './timeControls';
 
 export type Fetch = (url: string, init?: RequestInit) => Promise<Response>;
 
@@ -21,6 +24,7 @@ export function createMessage(
   ruleset: RulesetInfo,
   seat: SeatChoice,
   computer: readonly string[] = [],
+  time?: TimeChoice,
 ): CreateMessage {
   return {
     v: PROTOCOL_VERSION,
@@ -30,6 +34,8 @@ export function createMessage(
       : { id: ruleset.id, version: ruleset.version },
     seat,
     ...(computer.length > 0 && { computer: [...computer] }),
+    // Untimed is the default (D51): it is sent as no time control at all.
+    ...(time && time.control !== timeControls.default && { time: { ...time } }),
   };
 }
 
