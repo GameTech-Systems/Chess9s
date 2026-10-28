@@ -267,7 +267,7 @@ Planned in S32 (2026-10-25); rules settled in S55 (2026-10-26, [decision 0016](d
 
 Already built: 3-player movement is data. The pieces read `coast.3p.exit`, `coast.3p.capturable`, `tail.3p.movement`, `tail.3p.captures`, `sunMoon.3p.range` and `dragon.3p.givesCheck`, the board has the 3-player setup and turn order (dark, light, Dragon), and `nextSide` skips seats that are out. S56 built the 3-player game (`game/three.ts`): seats, stones, check and rule 6, King capture, the Tail's checkmate and swap, the duel, draws and every end-table row. Not built: the Coast pieces' first way out through A5 (`coast.3p.exit`), a 3-player computer player (S23's negamax is 2-player), and 3-player play in the web app and rooms (`loadRules().rules` still refuses 3 players). The ruleset file (S42) is 2-player only.
 
-Phase 6 order: S56, S57, S58, S67, S64, S65, S62, S59, S60, S61. S63 (3-seat online rooms) needs S54 and S58, and S66 (clocks in online rooms) needs S54 and S65; neither is part of the exit.
+Phase 6 order: S56, S57, S58, S67, S64, S65, S62, S59, S60, S61. S63 (3-seat online rooms, done; built and played through `wrangler dev`, still to be played live in S54) needed S54 and S58, and S66 (clocks in online rooms) needs S54 and S65; neither is part of the exit.
 
 ### S32 — Phase 6 planning · Opus 5.5 · high · `done`
 Wrote the steps below and D55 to D61.
@@ -359,7 +359,7 @@ Actions → **Sim depth 2** → Run workflow, ruleset `standard-3p` (D63; shards
 ### S61 — 3-player balance review · Owner with Claude in chat · Opus 5.5 · high · `done`
 The owner reads both depths, the screens and the sweep, then chooses: keep the 3-player presets experimental as they are; change their defaults using options already in `rules/parameters.json`, which means a new version and a re-run of S59 and S60; or publish a 3-player Candidate, which a later Sonnet step carries out as S38 did. The owner also confirms or changes D60 and D62 to D65. Phase 6 exit.
 
-### S63 — 3-seat online rooms · Sonnet 5.5 · high · `todo`
+### S63 — 3-seat online rooms · Sonnet 5.5 · high · `done`
 Added in S55: the ledger has D61 set to "Also 3-seat online rooms". Needs S54 (rooms live) and S58. Not part of the Phase 6 exit.
 - **Rooms.** A room made with a 3-player ruleset has 3 seats, named from the board's turn order; the protocol stays `v: 1` and 2-player rooms don't change. The creator picks dark, light, Dragon or random, as D52 does for 2 seats.
 - **Computer seats.** The creator may give one or two seats to the computer. The creator's browser plays them with the S58 or S62 player and holds their seat tokens; the server checks every move as it does a person's. If the creator's browser is away, those seats wait, as a person's would (D51).

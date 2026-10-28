@@ -20,13 +20,15 @@ export function Privacy() {
           Online play: when you make or join a room, your browser sends the room code, the ruleset
           (for a ruleset you built, its name and settings), your moves, and a secret seat token that
           proves which seat is yours. That is all: no names or accounts. The server keeps the room,
-          which is its ruleset, its moves and the two seat tokens, so a player who drops can come
-          back; it keeps no other copy. It deletes the room and its moves 24 hours after the game
-          ends, or after 7 days with no move. Cloudflare handles the connection and sees the IP
-          address of each player under its own terms and policies; we do not receive or use it. Your
-          browser keeps the room code and your seat token in local storage under the key{' '}
-          <code>chess9s.online</code>, one entry per room, removed when the room ends or expires;
-          clearing your site data deletes them, and you then cannot take your seat back.
+          which is its ruleset, its moves (with any resignations) and its seat tokens (two, or three
+          in a 3-player room), so a player who drops can come back; it keeps no other copy. It
+          deletes the room and its moves 24 hours after the game ends, or after 7 days with no move.
+          Cloudflare handles the connection and sees the IP address of each player under its own
+          terms and policies; we do not receive or use it. Your browser keeps the room code and your
+          seat token (and the tokens of any seats you gave to the computer, which this browser
+          plays) in local storage under the key <code>chess9s.online</code>, one entry per room,
+          removed when the room ends or expires; clearing your site data deletes them, and you then
+          cannot take your seat back.
         </li>
         <li>
           A guest game lives only in your own browser, in local storage under the key{' '}
