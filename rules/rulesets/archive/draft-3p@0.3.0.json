@@ -1,0 +1,11 @@
+{
+  "$schema": "../../schema/ruleset.schema.json",
+  "id": "draft-3p",
+  "name": "Good Practice (3-player)",
+  "version": "0.3.0",
+  "status": "deprecated",
+  "players": 3,
+  "description": "The full 3-player Dragon rules, rule set v0.3 (decision 0016, docs/RULES.md): every 3-player parameter at its default. Shown as Good Practice. Experimental until bot self-play shows the seats are balanced.",
+  "overrides": {},
+  "notes": "Played before S68 built coast.3p.exit, so every Coast piece could leave the Coast with any legal move. Kept with a lock (any-legal-move) so its games and fairness reports replay as they were played (decision 0019)."
+}

@@ -1,6 +1,7 @@
 // S56: the 3-player data of decision 0016. Registry 0.3.0 with its six parameters, the three
 // 3-player rulesets (Good Practice, Standard, Easy Start), the kept 0.2.0 file, and the loader's
-// refusal of a first-checkmate ending without Dragon check (`requires`).
+// refusal of a first-checkmate ending without Dragon check (`requires`). S68 (decision 0019):
+// registry 0.4.0, new versions of the three rulesets, and their earlier versions kept with locks.
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { RulesError, resolveRuleset, validateRegistry, type Registry, type Ruleset } from './loader';
@@ -20,9 +21,9 @@ const NEW: [string, string, unknown, unknown[]][] = [
   ['check.3p.exposedKing', 'King', 'not-allowed', ['not-allowed', 'counts-as-checkmate']],
 ];
 
-describe('registry 0.3.0 (decision 0016)', () => {
-  it('has version 0.3.0', () => {
-    expect(registry.version).toBe('0.3.0');
+describe('registry 0.3.0 (decision 0016) and 0.4.0 (decision 0019)', () => {
+  it('has version 0.4.0', () => {
+    expect(registry.version).toBe('0.4.0');
   });
 
   it.each(NEW)('%s: group, default, options, 3 players, experimental', (id, group, def, options) => {
@@ -49,21 +50,21 @@ const resolve = (id: string, overrides: Record<string, unknown> = {}) => {
 };
 
 describe('the 3-player rulesets', () => {
-  it('draft-3p 0.3.0 (Good Practice) plays every parameter at its default', () => {
+  it('draft-3p 0.4.0 (Good Practice) plays every parameter at its default', () => {
     const rs = ruleset('draft-3p');
-    expect([rs.version, rs.status, rs.players]).toEqual(['0.3.0', 'experimental', 3]);
+    expect([rs.version, rs.status, rs.players]).toEqual(['0.4.0', 'experimental', 3]);
     expect(rs.overrides).toEqual({});
   });
 
-  it('standard-3p 0.1.0 (Standard) sets king.range = 1 only', () => {
+  it('standard-3p 0.2.0 (Standard) sets king.range = 1 only', () => {
     const rs = ruleset('standard-3p');
-    expect([rs.version, rs.status, rs.players]).toEqual(['0.1.0', 'experimental', 3]);
+    expect([rs.version, rs.status, rs.players]).toEqual(['0.2.0', 'experimental', 3]);
     expect(rs.overrides).toEqual({ 'king.range': 1 });
   });
 
-  it('easy-3p 0.1.0 (Easy Start) has the overrides of decision 0016', () => {
+  it('easy-3p 0.2.0 (Easy Start) has the overrides of decision 0016', () => {
     const rs = ruleset('easy-3p');
-    expect([rs.version, rs.status, rs.players]).toEqual(['0.1.0', 'experimental', 3]);
+    expect([rs.version, rs.status, rs.players]).toEqual(['0.2.0', 'experimental', 3]);
     expect(rs.overrides).toEqual({
       'king.range': 1,
       'castling.enabled': true,
@@ -89,6 +90,21 @@ describe('the 3-player rulesets', () => {
     expect([old.id, old.version, old.status]).toEqual(['draft-3p', '0.2.0', 'deprecated']);
     expect(existsSync(root + 'rules/locks/draft-3p@0.2.0.json')).toBe(false);
   });
+
+  it.each([
+    ['draft-3p', '0.3.0'],
+    ['standard-3p', '0.1.0'],
+    ['easy-3p', '0.1.0'],
+  ])(
+    'keeps %s %s, played before coast.3p.exit was built, with a lock of any-legal-move',
+    (id, version) => {
+      const old = read<Ruleset>(`rules/rulesets/archive/${id}@${version}.json`);
+      expect([old.id, old.version, old.status]).toEqual([id, version, 'deprecated']);
+      const lock = read<{ values: Record<string, unknown> }>(`rules/locks/${id}@${version}.json`);
+      const asPlayed = resolve(id, { 'coast.3p.exit': 'any-legal-move' });
+      expect(lock.values).toEqual(asPlayed);
+    },
+  );
 });
 
 describe('requires', () => {
