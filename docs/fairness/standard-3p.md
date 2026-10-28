@@ -11,6 +11,7 @@ Seat scores, with the 95% interval in brackets.
 | Combination | Depth | Games | dark | light | dragon | Draws | Capped | Plies: mean / median / range | Distinct games | Flags |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | default | 1 | 2000 | 26.3% (24.4–28.3%) | 38.3% (36.2–40.5%) | 35.4% (33.3–37.5%) | 496 | 0 | 233 / 192.5 / 7–921 | 2000 | dark score outside 28–38%, light score outside 28–38% |
+| default | 2 | 2000 | 21.2% (19.5–23.1%) | 3.0% (2.4–3.9%) | 75.7% (73.8–77.6%) | 118 | 0 | 186 / 158.5 / 7–874 | 2000 | dark score outside 28–38%, light score outside 28–38%, dragon score outside 28–38% |
 
 ## How the games ended
 
@@ -26,6 +27,19 @@ Seat scores, with the 95% interval in brackets.
 | A draw in the duel (the last Kinged player and the Dragon) | 257 |
 
 Wins by seat: dark 368 (checkmate 326, dragon-captured 42); light 557 (checkmate 414, dragon-captured 143); dragon 579 (checkmate 313, king-capture 266). Draws by who shares them: dark+dragon 77, dark+light 239, light+dragon 180. By reason: checkmate 1053, dragon-captured 185, fifty-move 293, insufficient-material 15, king-capture 266, repetition 185, stalemate 3. Games in which it happened: dragon-out 660, king-captured:dark 763, king-captured:light 367, tail-stone:dark 520, tail-stone:light 272. 46.6 s per game.
+
+### Depth 2
+
+| Ending (decision 0016) | Games |
+| --- | --- |
+| A Kinged player checkmates the other King | 243 |
+| In the duel, the Dragon checkmates (or captures) the last King | 1477 |
+| In the duel, the last Kinged player checkmates the Tail | 8 |
+| In the duel, the last Kinged player captures both Dragon Heads, the Sun and the Moon | 154 |
+| A draw while both Kings are on the board (between the Kinged players) | 43 |
+| A draw in the duel (the last Kinged player and the Dragon) | 75 |
+
+Wins by seat: dark 370 (checkmate 229, dragon-captured 141); light 35 (checkmate 22, dragon-captured 13); dragon 1477 (checkmate 451, king-capture 1026). Draws by who shares them: dark+dragon 66, dark+light 43, light+dragon 9. By reason: checkmate 702, dragon-captured 154, fifty-move 108, king-capture 1026, repetition 8, stalemate 2. Games in which it happened: dragon-out 104, king-captured:dark 186, king-captured:light 1528, tail-stone:dark 97, tail-stone:light 198. 578.5 s per game.
 
 ## Flagged combinations
 
