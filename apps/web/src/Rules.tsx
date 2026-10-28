@@ -15,6 +15,7 @@ export const HOW_TO_PLAY = [
 export const HOW_TO_PLAY_3P = [
   'Three sides take turns: Dark, Light, then the Dragon. Pick one of your pieces, then a marked square to move it.',
   "Dark and Light each have a King. The Dragon has the Dragon Heads, the Sun and the Moon, and its Tail, which plays the role of the Dragon's King.",
+  "The Dragon's pieces start on the Coast, the blue file. Unless the settings below say otherwise, each one first leaves the Coast from A5, the Tail's square: the Tail goes first, the Sun and Moon step along the Coast to A5, and the Heads follow once the way is clear.",
   'The board turns to the side to move. The panel names each seat, who is out and what the last move did.',
   'A piece turned to stone stays where it is: it blocks, but never moves, attacks or is captured.',
   'Show danger also marks a King that a Dragon piece attacks when that is not check: the Dragon may capture it on its turn.',
