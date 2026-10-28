@@ -5,6 +5,7 @@ import {
   newGame,
   playMove,
   stateKey,
+  three,
   toNotation,
   type Lock,
   type Ruleset,
@@ -12,16 +13,26 @@ import {
 } from '@chess9s/engine';
 import { describe, expect, it } from 'vitest';
 import hotSeatMate from '../../engine/test/fixtures/games/hot-seat-mate.json';
+import threeEnds from '../../engine/test/fixtures/games/three-player-ends.json';
 import {
   CODE_ALPHABET,
   REFUSALS,
   encode,
+  isSeatToken as isToken,
   parseServerMessage,
   type Refusal,
   type ServerMessage,
   type Snapshot,
 } from './protocol';
-import { leave, receive, replaySnapshot, type Outgoing, type Room, type Step } from './room';
+import {
+  leave,
+  receive,
+  replaySnapshot,
+  snapshotFor as roomSnapshot,
+  type Outgoing,
+  type Room,
+  type Step,
+} from './room';
 import { rulesFiles } from './rules-index';
 import { newRoomCode, newSeatToken, randomIndex, sameToken, type RandomBytes } from './secrets';
 
@@ -178,12 +189,6 @@ describe('creating a room', () => {
       'unknown-ruleset',
     );
     expect(t.room).toBeNull();
-  });
-
-  it('refuses a ruleset the engine cannot play online (3 players)', () => {
-    const step = table().send(null, create({ id: 'draft-3p', version: '0.2.0' }));
-    expect(refusal(step)).toBe('invalid-ruleset');
-    expect(step.room).toBeNull();
   });
 
   it('refuses a second create in the same room', () => {
@@ -576,6 +581,352 @@ describe('room codes and seat tokens (D54)', () => {
     expect(sameToken(a, a.slice(0, -1) + (a.endsWith('A') ? 'B' : 'A'))).toBe(false);
     expect(sameToken(a, a.slice(1))).toBe(false);
     expect(sameToken('', '')).toBe(true);
+  });
+});
+
+// 3-seat rooms (S63, D61): the same state machine over a game with three seats.
+const STANDARD_3P = { id: 'standard-3p', version: '0.1.0' };
+const EASY_3P = { id: 'easy-3p', version: '0.1.0' };
+const recorded = (ruleset: string, row: string) =>
+  threeEnds.games.find((g) => g.ruleset === ruleset && g.rows.includes(row))!;
+const dragonOf = (room: Room) => three(room.game.rules, room.game.order).dragon;
+
+/** A standard-3p room with all three seats taken; dark (the creator) holds the first token. */
+function seated3(ruleset: unknown = STANDARD_3P, seed = 1) {
+  const t = table(rulesFiles, seed);
+  const tokens: Record<string, string> = {};
+  const first = snapshotOf(t.send(null, create(ruleset, 'dark')));
+  tokens[first.seat] = first.token!;
+  for (let i = 0; i < 2; i++) {
+    const snap = snapshotOf(t.send(null, join()));
+    tokens[snap.seat] = snap.token!;
+  }
+  return Object.assign(t, { tokens });
+}
+type Seated3 = ReturnType<typeof seated3>;
+
+const playAll = (t: Seated3, notations: readonly string[]) => {
+  for (const notation of notations) {
+    const step = t.send(t.room.game.turn, move(notation));
+    expect(step.out[0]?.message).toMatchObject({ type: 'move', move: notation });
+  }
+};
+
+describe('a room with three seats (D61)', () => {
+  it('opens with three seats named from the turn order, the creator in the one they chose', () => {
+    const t = table();
+    const snap = snapshotOf(t.send(null, create(STANDARD_3P, 'light')));
+    expect(snap.seat).toBe('light');
+    expect(Object.keys(snap.seats).sort()).toEqual([...t.room.game.order].sort());
+    expect(Object.keys(snap.seats)).toHaveLength(3);
+    expect(snap.seats).toMatchObject({ light: 'present' });
+    expect(Object.values(snap.seats).filter((s) => s === 'open')).toHaveLength(2);
+    expect(snap.computer).toBeUndefined();
+    expect(snap.resignations).toBeUndefined();
+  });
+
+  it('picks one of the three seats at random when asked (D52)', () => {
+    const picked = new Set<string>();
+    for (let seed = 1; seed <= 30; seed++) {
+      picked.add(
+        snapshotOf(table(rulesFiles, seed).send(null, create(STANDARD_3P, 'random'))).seat,
+      );
+    }
+    expect([...picked].sort()).toEqual(['dark', 'dragon', 'light']);
+  });
+
+  it('refuses a seat the game does not have, and a fourth player', () => {
+    expect(refusal(table().send(null, create(STANDARD_3P, 'gold')))).toBe('unknown-seat');
+    const t = seated3();
+    expect(refusal(t.send(null, join()))).toBe('room-full');
+  });
+
+  it('seats joiners in turn order and waits for all three before any move', () => {
+    const t = table();
+    const mine = snapshotOf(t.send(null, create(STANDARD_3P, 'dark')));
+    expect(refusal(t.send('dark', move('a1-a2')))).toBe('waiting-for-opponent');
+    const second = snapshotOf(t.send(null, join()));
+    expect(second.seat).toBe(t.room.game.order.find((s) => s !== 'dark'));
+    // Both seats already taken are told when a third arrives.
+    expect(t.sent.at(-1)!.message).toMatchObject({ type: 'opponent', status: 'present' });
+    expect(refusal(t.send('dark', move('a1-a2')))).toBe('waiting-for-opponent');
+    const third = snapshotOf(t.send(null, join()));
+    expect(new Set([mine.seat, second.seat, third.seat]).size).toBe(3);
+    expect(third.seats).toEqual({ dark: 'present', light: 'present', dragon: 'present' });
+  });
+
+  it('names the seat in a presence message, so three seats can be told apart', () => {
+    const t = seated3();
+    const sent = t.close('light').out;
+    expect(sent).toHaveLength(2);
+    expect(sent.map((o) => o.message)).toEqual([
+      { v: 1, type: 'opponent', status: 'away', side: 'light' },
+      { v: 1, type: 'opponent', status: 'away', side: 'light' },
+    ]);
+    expect(
+      sent.map((o) => o.to).sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))),
+    ).toEqual([{ seat: 'dark' }, { seat: 'dragon' }]);
+    const back = t.send(null, join(t.tokens.light));
+    expect(back.out.filter((o) => o.message.type === 'opponent')).toHaveLength(2);
+  });
+
+  it('keeps 2-seat rooms as they were: presence messages carry no seat', () => {
+    const t = seated();
+    const sent = t.close('dark').out;
+    expect(sent.map((o) => o.message)).toEqual([{ v: 1, type: 'opponent', status: 'away' }]);
+  });
+
+  it('plays a recorded game in turn order; every move and the end go to all three', () => {
+    const game = recorded('standard-3p', 'kinged-checkmates-king');
+    const t = seated3();
+    playAll(t, game.moves);
+    expect(t.room.game.result).toEqual(game.result);
+    const over = t.sent.filter((o) => o.message.type === 'game-over');
+    expect(
+      over
+        .map((o) => o.to)
+        .map((to) => (to as { seat: string }).seat)
+        .sort(),
+    ).toEqual(['dark', 'dragon', 'light']);
+    expect(over[0]!.message).toEqual({ v: 1, type: 'game-over', result: game.result });
+    expect(t.sent.filter((o) => o.message.type === 'move')).toHaveLength(game.moves.length * 3);
+  });
+
+  it('refuses a move out of turn, and any message once the game is over', () => {
+    const t = seated3();
+    const turn = t.room.game.turn;
+    const other = t.room.game.order.find((s) => s !== turn)!;
+    expect(refusal(t.send(other, move(toNotation(t.room.game.legal[0]!))))).toBe('not-your-turn');
+    playAll(t, recorded('standard-3p', 'kinged-checkmates-king').moves);
+    expect(refusal(t.send('dark', bare('resign')))).toBe('game-over');
+  });
+
+  it('skips a seat that is out; it stays connected, sees the game and cannot move or resign', () => {
+    const game = recorded('standard-3p', 'dragon-captures-king');
+    const t = seated3();
+    let checked = false;
+    for (const [i, notation] of game.moves.entries()) {
+      t.send(t.room.game.turn, move(notation));
+      const out = Object.entries(t.room.game.seats).find(([, s]) => s === 'out')?.[0];
+      if (!out || checked || t.room.game.result.status !== 'ongoing') continue;
+      checked = true;
+      // The turn passes over the seat, and a move from it is refused as out of turn.
+      expect(t.room.game.turn).not.toBe(out);
+      expect(refusal(t.send(out, move(toNotation(t.room.game.legal[0]!))))).toBe('not-your-turn');
+      expect(refusal(t.send(out, bare('resign')))).toBe('seat-out');
+      // Its socket is still its seat's: it is told of every later move.
+      const rest = game.moves.slice(i + 1);
+      const before = t.sent.length;
+      playAll(t, rest);
+      const toOut = t.sent
+        .slice(before)
+        .filter((o) => typeof o.to === 'object' && o.to.seat === out && o.message.type === 'move');
+      expect(toOut).toHaveLength(rest.length);
+      expect(rest.length).toBeGreaterThan(0);
+      expect(t.room.game.moves.slice(i + 1).every((m) => m.side !== out)).toBe(true);
+      break;
+    }
+    expect(checked).toBe(true);
+    expect(t.room.game.result).toEqual(game.result);
+    expect(t.sent.filter((o) => o.message.type === 'game-over')).toHaveLength(3);
+  });
+
+  it('ends a duel in the results of decision 0016, with the reasons the game gives', () => {
+    for (const [ruleset, row] of [
+      [STANDARD_3P, 'duel-dragon-wins'],
+      [STANDARD_3P, 'dragon-captures-king'],
+      [STANDARD_3P, 'draw-duel'],
+      [EASY_3P, 'draw'],
+      [EASY_3P, 'kinged-checkmates-tail'],
+    ] as const) {
+      const game = recorded(ruleset.id, row);
+      const t = seated3(ruleset);
+      playAll(t, game.moves);
+      expect(t.room.game.result).toEqual(game.result);
+      expect(t.sent.filter((o) => o.message.type === 'game-over')[0]!.message).toEqual({
+        v: 1,
+        type: 'game-over',
+        result: game.result,
+      });
+    }
+  });
+
+  it('refuses draws by agreement: decision 0018 keeps them out of 3-player games', () => {
+    const t = seated3();
+    for (const type of ['offer-draw', 'accept-draw', 'decline-draw']) {
+      expect(refusal(t.send(t.room.game.turn, bare(type)))).toBe('draw-unavailable');
+    }
+    expect(t.room.drawOffer).toBeNull();
+  });
+
+  describe('resignation', () => {
+    it('puts the seat out and lets the others play on; all three are told', () => {
+      const t = seated3();
+      const dragon = dragonOf(t.room);
+      const kinged = t.room.game.order.filter((s) => s !== dragon);
+      const step = t.send(kinged[0]!, bare('resign'));
+      expect(step.out.map((o) => o.message)).toEqual([
+        { v: 1, type: 'resigned', side: kinged[0] },
+        { v: 1, type: 'resigned', side: kinged[0] },
+        { v: 1, type: 'resigned', side: kinged[0] },
+      ]);
+      expect(t.room.game.result.status).toBe('ongoing');
+      expect(t.room.game.seats[kinged[0]!]).toBe('out');
+      expect(t.room.game.turn).not.toBe(kinged[0]);
+      expect(refusal(t.send(kinged[0]!, bare('resign')))).toBe('seat-out');
+      // The game goes on between the other two.
+      t.send(t.room.game.turn, move(toNotation(t.room.game.legal[0]!)));
+      expect(t.room.game.moves.at(-1)!.side).not.toBe(kinged[0]);
+    });
+
+    it('ends the game when the last Kinged player resigns in the duel: the Dragon wins', () => {
+      const t = seated3();
+      const dragon = dragonOf(t.room);
+      const [a, b] = t.room.game.order.filter((s) => s !== dragon) as [string, string];
+      t.send(a, bare('resign'));
+      const step = t.send(b, bare('resign'));
+      expect(t.room.game.result).toEqual({
+        status: 'win',
+        winner: dragon,
+        loser: b,
+        reason: 'resignation',
+      });
+      const types = step.out.map((o) => o.message.type);
+      expect(types.filter((x) => x === 'resigned')).toHaveLength(3);
+      expect(types.filter((x) => x === 'game-over')).toHaveLength(3);
+    });
+
+    it('is in the snapshot, which replays to the same game, and survives a reconnect', () => {
+      const t = seated3();
+      const dragon = dragonOf(t.room);
+      const kinged = t.room.game.order.filter((s) => s !== dragon);
+      playAll(t, recorded('standard-3p', 'kinged-checkmates-king').moves.slice(0, 4));
+      const resigner = kinged.find((s) => s !== t.room.game.turn)!;
+      t.send(resigner, bare('resign'));
+      t.send(t.room.game.turn, move(toNotation(t.room.game.legal[0]!)));
+      t.close(resigner);
+      const back = snapshotOf(t.send(null, join(t.tokens[resigner])));
+      expect(back.resignations).toEqual([{ side: resigner, after: 4 }]);
+      const replay = replaySnapshot(data, back);
+      expect(replay.ok).toBe(true);
+      if (replay.ok) expect(stateKey(replay.game)).toBe(stateKey(t.room.game));
+      if (replay.ok) expect(replay.game.seats[resigner]).toBe('out');
+    });
+
+    it('refuses a replay whose resignations do not hold', () => {
+      const t = seated3();
+      const base = roomSnapshot(t.room, 'dark');
+      const dragon = dragonOf(t.room);
+      const kinged = t.room.game.order.filter((s) => s !== dragon);
+      const claims = (resignations: Snapshot['resignations']) =>
+        replaySnapshot(data, { ...base, ...(resignations && { resignations }) }).ok;
+      expect(claims([{ side: kinged[0]!, after: 0 }])).toBe(true);
+      // After moves nobody has played.
+      expect(claims([{ side: kinged[0]!, after: 5 }])).toBe(false);
+      // A seat that is not in the game.
+      expect(claims([{ side: 'gold', after: 0 }])).toBe(false);
+      // The same seat twice.
+      expect(
+        claims([
+          { side: kinged[0]!, after: 0 },
+          { side: kinged[0]!, after: 0 },
+        ]),
+      ).toBe(false);
+    });
+
+    it('does not exist in a 2-seat room: a resignation there ends the game, with no message but game-over', () => {
+      const t = seated();
+      const step = t.send('light', bare('resign'));
+      expect(step.out.map((o) => o.message.type)).toEqual(['game-over', 'game-over']);
+      const snap = roomSnapshot(t.room, 'light');
+      expect(snap.resignations).toBeUndefined();
+      expect(replaySnapshot(data, { ...snap, resignations: [{ side: 'dark', after: 0 }] }).ok).toBe(
+        false,
+      );
+    });
+  });
+
+  describe('seats played by the computer', () => {
+    const createWith = (computer: unknown, seat = 'dark', ruleset: unknown = STANDARD_3P) => ({
+      ...create(ruleset, seat),
+      computer,
+    });
+
+    it("are taken at once, away until the creator's browser connects, and handed to the creator alone", () => {
+      const t = table();
+      const snap = snapshotOf(t.send(null, createWith(['dragon'])));
+      expect(snap.seat).toBe('dark');
+      expect(snap.computer).toEqual(['dragon']);
+      expect(snap.seats).toEqual({ dark: 'present', light: 'open', dragon: 'away' });
+      expect(Object.keys(snap.computerTokens!)).toEqual(['dragon']);
+      expect(isToken(snap.computerTokens!.dragon)).toBe(true);
+      expect(snap.computerTokens!.dragon).not.toBe(snap.token);
+      // A friend takes the one seat that is left, and is told which is the computer's.
+      const friend = snapshotOf(t.send(null, join()));
+      expect(friend.seat).toBe('light');
+      expect(friend.computer).toEqual(['dragon']);
+      expect(friend.computerTokens).toBeUndefined();
+      expect(refusal(t.send(null, join()))).toBe('room-full');
+      // The seat cannot be taken without its token.
+      expect(refusal(t.send(null, join(newSeatToken(seeded(9)))))).toBe('bad-token');
+    });
+
+    it('play through the same checks as a person: the computer joins with its token and moves', () => {
+      const t = table();
+      const mine = snapshotOf(t.send(null, createWith(['dragon'])));
+      expect(refusal(t.send('dark', move('a1-a2')))).toBe('waiting-for-opponent');
+      const friend = snapshotOf(t.send(null, join()));
+      const bot = snapshotOf(t.send(null, join(mine.computerTokens!.dragon)));
+      expect(bot.seat).toBe('dragon');
+      expect(bot.token).toBeUndefined();
+      expect(bot.computerTokens).toBeUndefined();
+      expect(bot.seats).toEqual({ dark: 'present', light: 'present', dragon: 'present' });
+      const turn = t.room.game.turn;
+      const wrong = t.room.game.order.find((s) => s !== turn)!;
+      expect(refusal(t.send(wrong, move(toNotation(t.room.game.legal[0]!))))).toBe('not-your-turn');
+      expect(refusal(t.send(turn, move('a1-a1')))).toBe('illegal-move');
+      t.send(turn, move(toNotation(t.room.game.legal[0]!)));
+      expect(t.room.game.moves).toHaveLength(1);
+      expect(friend.seat).toBe('light');
+    });
+
+    it('may be two, leaving the creator alone with a seat', () => {
+      const t = table();
+      const snap = snapshotOf(t.send(null, createWith(['light', 'dragon'])));
+      expect(snap.computer).toEqual(['light', 'dragon']);
+      expect(Object.keys(snap.computerTokens!).sort()).toEqual(['dragon', 'light']);
+      expect(refusal(t.send(null, join()))).toBe('room-full');
+    });
+
+    it('leave a random creator in a seat that is not theirs to give away', () => {
+      for (let seed = 1; seed <= 20; seed++) {
+        const snap = snapshotOf(
+          table(rulesFiles, seed).send(null, createWith(['dark', 'dragon'], 'random')),
+        );
+        expect(snap.seat).toBe('light');
+      }
+    });
+
+    it("are refused in a 2-seat room, for the creator's own seat, and when none would be left for a person", () => {
+      expect(refusal(table().send(null, createWith(['dark'], 'light', DRAFT)))).toBe(
+        'computer-seats',
+      );
+      expect(refusal(table().send(null, createWith(['dark'], 'dark')))).toBe('computer-seats');
+      expect(refusal(table().send(null, createWith(['dark', 'light', 'dragon'], 'random')))).toBe(
+        'malformed',
+      );
+      expect(refusal(table().send(null, createWith(['gold'])))).toBe('unknown-seat');
+    });
+
+    it("send the computer's tokens only in the reply that makes the room", () => {
+      const t = table();
+      const mine = snapshotOf(t.send(null, createWith(['dragon'])));
+      t.close('dark');
+      const back = snapshotOf(t.send(null, join(mine.token)));
+      expect(back.computer).toEqual(['dragon']);
+      expect(back.computerTokens).toBeUndefined();
+      expect(roomSnapshot(t.room, 'dark', true).computerTokens).toBeUndefined();
+    });
   });
 });
 

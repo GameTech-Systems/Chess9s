@@ -330,3 +330,103 @@ describe('the room peek (S53)', () => {
       expect(isSeatToken(bad), String(bad)).toBe(false);
   });
 });
+
+describe('3-seat rooms (S63)', () => {
+  const create3 = {
+    v: 1,
+    type: 'create',
+    ruleset: { id: 'standard-3p', version: '0.1.0' },
+    seat: 'dark',
+  };
+  const snapshot3 = {
+    v: 1,
+    type: 'snapshot',
+    code: CODE,
+    seat: 'dark',
+    ruleset: { id: 'standard-3p', version: '0.1.0', name: 'Standard 3-player' },
+    moves: ['c9-b7'],
+    result: { status: 'ongoing' },
+    seats: { dark: 'present', light: 'open', dragon: 'away' },
+    drawOffer: null,
+  };
+
+  it('lets a create message name one or two seats for the computer', () => {
+    expect(client({ ...create3, computer: ['dragon'] })).toBe('ok');
+    expect(client({ ...create3, computer: ['light', 'dragon'] })).toBe('ok');
+  });
+
+  it('refuses a computer list that is empty, too long, repeated or not sides', () => {
+    expect(client({ ...create3, computer: [] })).toBe('malformed');
+    expect(client({ ...create3, computer: ['a', 'b', 'c'] })).toBe('malformed');
+    expect(client({ ...create3, computer: ['dragon', 'dragon'] })).toBe('malformed');
+    expect(client({ ...create3, computer: 'dragon' })).toBe('malformed');
+    expect(client({ ...create3, computer: [7] })).toBe('malformed');
+  });
+
+  it('reads a snapshot with resignations, computer seats and their tokens', () => {
+    expect(server({ ...snapshot3, resignations: [{ side: 'light', after: 4 }] })).toBe('ok');
+    expect(server({ ...snapshot3, computer: ['dragon'] })).toBe('ok');
+    expect(
+      server({
+        ...snapshot3,
+        token: TOKEN,
+        computer: ['dragon'],
+        computerTokens: { dragon: TOKEN },
+      }),
+    ).toBe('ok');
+  });
+
+  it('refuses resignations that are not whole, and computer tokens that are not tokens', () => {
+    expect(server({ ...snapshot3, resignations: [{ side: 'light' }] })).toBe('malformed');
+    expect(server({ ...snapshot3, resignations: [{ side: 'light', after: -1 }] })).toBe(
+      'malformed',
+    );
+    expect(server({ ...snapshot3, resignations: [{ side: 'light', after: 1.5 }] })).toBe(
+      'malformed',
+    );
+    // Rooms have no clock until S66: a time-out is not a resignation they carry.
+    expect(
+      server({ ...snapshot3, resignations: [{ side: 'light', after: 1, timeout: true }] }),
+    ).toBe('malformed');
+    expect(server({ ...snapshot3, computerTokens: { dragon: 'short' } })).toBe('malformed');
+    expect(server({ ...snapshot3, computer: ['dragon', 'dragon'] })).toBe('malformed');
+  });
+
+  it('reads the resigned message, and an opponent message that names the seat', () => {
+    expect(server({ v: 1, type: 'resigned', side: 'light' })).toBe('ok');
+    expect(server({ v: 1, type: 'resigned' })).toBe('malformed');
+    expect(server({ v: 1, type: 'opponent', status: 'away', side: 'dragon' })).toBe('ok');
+    expect(server({ v: 1, type: 'opponent', status: 'away', side: 7 })).toBe('malformed');
+  });
+
+  it('reads a game over that names the seats a 3-player draw is shared by', () => {
+    const between = ['dark', 'light', 'dragon'];
+    expect(
+      server({
+        v: 1,
+        type: 'game-over',
+        result: { status: 'draw', reason: 'stalemate', between },
+      }),
+    ).toBe('ok');
+    expect(
+      server({
+        v: 1,
+        type: 'game-over',
+        result: { status: 'win', winner: 'dragon', loser: 'dark', reason: 'king-capture' },
+      }),
+    ).toBe('ok');
+  });
+
+  it('shows the peek which seats are the computer', () => {
+    const peek = {
+      v: 1,
+      code: CODE,
+      ruleset: snapshot3.ruleset,
+      seats: snapshot3.seats,
+      result: snapshot3.result,
+      computer: ['dragon'],
+    };
+    expect(parseRoomInfo(json(peek)).ok).toBe(true);
+    expect(parseRoomInfo(json({ ...peek, computer: ['dragon', 'dragon'] })).ok).toBe(false);
+  });
+});
