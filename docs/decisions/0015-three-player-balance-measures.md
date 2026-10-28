@@ -22,7 +22,7 @@ Decision [0008](0008-fairness-measures.md) measures 2-player balance as the firs
 
 ## Parameter combinations
 - A sweep changes one 3-player parameter at a time from the ruleset's values, each other option of it, as 0008 does for 2 players. `dragonHead.range` is swept at every option, so 3 and 4 (the RULES.md fairness risk) are included. An option that requires other values in the registry brings them with it (`endings.3p` = `first-checkmate` with `dragon.3p.givesCheck` on).
-- `coast.3p.exit` is not built yet in any 3-player game (`unbuiltFeatures`), so every run plays without it, and the combination that changes it is listed as skipped. Other combinations the engine can't play yet are skipped with their reason.
+- `coast.3p.exit` is not built yet in any 3-player game (`unbuiltFeatures`), so every run plays without it, and the combination that changes it is listed as skipped. (S68 built it, [decision 0019](0019-three-player-coast-exit.md): runs of `standard-3p` 0.2.0 and later play it, and the sweep plays its other options.) Other combinations the engine can't play yet are skipped with their reason.
 - Sweeps with fewer than 2,000 games per combination are screening only: a combination is flagged when a seat's whole 95% interval lies outside 28–38%, as in 0008 version 2.
 
 ## Consequences
@@ -31,7 +31,7 @@ Decision [0008](0008-fairness-measures.md) measures 2-player balance as the firs
 - The 2-player measures, reports and tests (0008) don't change.
 
 ## S61 review (28 Oct 2026)
-Standard (`standard-3p` 0.1.0, D63), 2,000 games at each depth ([report](../fairness/standard-3p.md); depth 2 from workflow run 40617147007, S60):
+Standard (`standard-3p` 0.1.0, D63), 2,000 games at each depth ([report](../fairness/standard-3p@0.1.0.md); depth 2 from workflow run 40617147007, S60):
 
 | Depth | dark | light | Dragon | Verdict |
 | --- | --- | --- | --- | --- |

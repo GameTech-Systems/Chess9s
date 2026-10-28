@@ -1,6 +1,6 @@
 # Chess Nines rules (draft v0.2, 3-player v0.3)
 
-This page explains the Chess Nines rules at their defaults (rule set v0.2): the 2-player ruleset `draft-2p` 0.2.0, shown in the game as **Good Practice** (a **Candidate** since the fairness check passed: [report](fairness/draft-2p.md), [decision 0010](decisions/0010-draft-2p-candidate.md)), and the experimental 3-player Dragon mode, rule set v0.3 (ruleset `draft-3p` 0.3.0, [decision 0016](decisions/0016-three-player-rules-v0.3.md)). None of it is **official**. Official tournament rules come only after public discussion and ratification ([Governance](GOVERNANCE.md)).
+This page explains the Chess Nines rules at their defaults (rule set v0.2): the 2-player ruleset `draft-2p` 0.2.0, shown in the game as **Good Practice** (a **Candidate** since the fairness check passed: [report](fairness/draft-2p.md), [decision 0010](decisions/0010-draft-2p-candidate.md)), and the experimental 3-player Dragon mode, rule set v0.3 (ruleset `draft-3p` 0.4.0, [decision 0016](decisions/0016-three-player-rules-v0.3.md), with the Coast pieces' way out through A5 built in S68, [decision 0019](decisions/0019-three-player-coast-exit.md)). None of it is **official**. Official tournament rules come only after public discussion and ratification ([Governance](GOVERNANCE.md)).
 
 ## Presets
 
@@ -12,7 +12,7 @@ The game offers these 2-player presets ([decision 0011](decisions/0011-presets.m
 | **Good Practice** | `draft-2p` | Candidate | Nothing: every setting at its default. The 2-square King makes checkmate harder to force, which is good practice |
 | **Easy Start** | `easy-2p` | Experimental, casual play | Closest to regular chess: light moves first, a 1-square King that may castle, the Queen may cross the void anywhere, e5 is an ordinary square for every piece but the Queen, and no pawn-safe zones |
 
-The 3-player presets are all experimental, and none is fairness-checked yet ([decision 0016](decisions/0016-three-player-rules-v0.3.md)):
+The 3-player presets are all experimental, and none is fairness-checked yet ([decision 0016](decisions/0016-three-player-rules-v0.3.md)). In all three, each of the Dragon's pieces first leaves the Coast through A5 ([decision 0019](decisions/0019-three-player-coast-exit.md)):
 
 | Preset | Ruleset | What it plays |
 |---|---|---|
@@ -122,11 +122,14 @@ All Coast pieces move in straight lines and stop when blocked; none may turn a c
 
 ### Leaving the Coast: 3-player
 
-1. Each Coast piece's first emergence is through A5. After that, Coast pieces enter and leave the Coast with any legal move.
+1. Each Coast piece's first emergence is through A5 (`coast.3p.exit` = a5-first-then-any). Until a piece has left the Coast once, it moves only along the Coast, or off it from A5. After that, Coast pieces enter and leave the Coast with any legal move.
 2. The Dragon player's first Coast move is either the Sun or Moon one square, or the Tail off A5 to any legal square, which frees A5.
-3. The Sun and Moon move along the Coast one square at a time. Once the way is clear, a Dragon Head may move to A5 and then leave the Coast.
+3. The Sun and Moon move along the Coast one square at a time. Once the way is clear, a Dragon Head may move to A5 and then leave the Coast. Bringing all five pieces out takes at least 13 Dragon moves.
 4. From A5 a piece moves out along rank 5 toward E5, or diagonally to B4 or B6.
 5. Coast pieces can't be captured while they stand on the Coast.
+6. A Coast piece that has not left the Coast yet attacks no square off it except from A5: it can't capture there, and gives no check there when Dragon check is on. A piece leaves the Coast when it lands on a square off file A; moving along the Coast doesn't count.
+
+Two options, for players to try: `coast.3p.exit` = a5-always (every way off the Coast is from A5, for the whole game), and any-legal-move (Coast pieces leave with any legal move from the first turn, which is how every 3-player game played before S68; [decision 0019](decisions/0019-three-player-coast-exit.md)).
 
 ## Center square and general rules
 
@@ -192,6 +195,10 @@ The third player is the Dragon: it moves third each round (dark, light, Dragon) 
 Easy Start (`easy-3p`, `endings.3p` = first-checkmate) is a shorter Dragon game:
 
 - **Pieces**: Easy Start's 2-player settings where they apply to 3 players: King range 1 with castling, the Queen may cross and stand on void squares, no pawn-safe zones, and any piece may stand on and pass over E5.
+- **The Dragon's pieces** play as in the full rules, except that they give check, they can be captured on the Coast, and the Tail hops among three squares and never captures.
+  - They start on the Coast and first leave it through A5, as in the full rules ([Leaving the Coast: 3-player](#leaving-the-coast-3-player)). The Dragon's first move is the Tail's hop off A5 to E5 or I5, or the Sun or Moon one square along the Coast.
+  - The Dragon Heads move any distance in any straight line, and the Sun and Moon one square at a time on the Coast, then up to 2 squares in any direction. They capture like any piece, and their attacks on a King are check.
+  - The Tail hops among A5, E5 and I5 (below); it never captures and never gives check.
 - **Captures**: every piece except the Kings and the Tail can be captured anywhere, the Coast included.
 - **Check**: the Dragon Heads, the Sun and the Moon give check, and every King must get out of check, as in chess. No King is ever captured.
 - **The Tail is the Dragon's King**: it jumps among A5, E5 and I5, whichever is empty; it never captures, never gives check and can't be captured. The Dragon must get it out of check.
