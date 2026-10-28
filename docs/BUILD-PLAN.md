@@ -267,7 +267,7 @@ Planned in S32 (2026-10-25); rules settled in S55 (2026-10-26, [decision 0016](d
 
 Already built: 3-player movement is data. The pieces read `coast.3p.exit`, `coast.3p.capturable`, `tail.3p.movement`, `tail.3p.captures`, `sunMoon.3p.range` and `dragon.3p.givesCheck`, the board has the 3-player setup and turn order (dark, light, Dragon), and `nextSide` skips seats that are out. S56 built the 3-player game (`game/three.ts`): seats, stones, check and rule 6, King capture, the Tail's checkmate and swap, the duel, draws and every end-table row. Not built: the Coast pieces' first way out through A5 (`coast.3p.exit`), a 3-player computer player (S23's negamax is 2-player), and 3-player play in the web app and rooms (`loadRules().rules` still refuses 3 players). The ruleset file (S42) is 2-player only.
 
-Phase 6 order: S56, S57, S58, S67, S64, S65, S62, S59, S60, S61. S63 (3-seat online rooms, done; played through `wrangler dev`) needed S54 and S58, and S66 (clocks in online rooms) needs S54 and S65; neither is part of the exit.
+Phase 6 order: S56, S57, S58, S67, S64, S65, S62, S59, S60, S61. S63 (3-seat online rooms, done; played through `wrangler dev`) needed S54 and S58, and S66 (clocks in online rooms) needs S54 and S65; neither is part of the exit. Added after the exit (28 Oct 2026): S68 built the Coast pieces' first way out through A5, which no earlier 3-player game played ([decision 0019](decisions/0019-three-player-coast-exit.md)); S69 plays the balance runs again on it.
 
 ### S32 — Phase 6 planning · Opus 5.5 · high · `done`
 Wrote the steps below and D55 to D61.
@@ -378,6 +378,18 @@ Added with decision 0017. Needs S54 (rooms live) and S65. Not part of the Phase 
 - Tests first: a flag fall with nobody connected, a reconnect that shows the right time left, each control kind, the abandonment rule, Show only, and a clock that the client tries to set (refused).
 Done when: two browsers play a 3+2 room game through `wrangler dev` to a flag fall, one reloads mid-game and sees the right times, and all checks pass.
 Decisions: D51, D53, D58, D66.
+
+### S68 — 3-player Coast exit through A5 · Owner with Claude in chat · Opus 5.5 · high · `done`
+Added 28 Oct 2026, when the owner asked whether the A5 exit unbalanced the 3-player games. It had never been built (`unbuiltFeatures` listed `coast.3p.exit`), so the Dragon's pieces left the Coast anywhere from the first turn. The owner chose to build it as written, as the default, with any legal move as an option ([decision 0019](decisions/0019-three-player-coast-exit.md)).
+- **Engine:** the condition `hasLeft` and the per-piece `left` state (repetition key included); square rules for the five Coast pieces; `coast.3p.exit` gains `any-legal-move`; registry 0.4.0.
+- **Versions:** `draft-3p` 0.4.0, `standard-3p` 0.2.0, `easy-3p` 0.2.0; the earlier versions archived with locks at `any-legal-move`, so their games, room records and reports replay as played.
+- **Tests:** each option in each preset, attacks and check, the walk out through A5 and back, keys, the recorded end-table games played again under the new rules (the old ones replay under the archived versions).
+- **Browser:** the 3-player how-to-play lines say how the Dragon's pieces come out.
+Decisions: D55 to D57 as before; decision 0019.
+
+### S69 — 3-player balance runs on the A5 exit · Claude (workflow) · Opus 5.5 · medium · `todo`
+Run decision 0015's measures again for `standard-3p` 0.2.0: Actions → **Sim depth 2**, ruleset `standard-3p`, depths `1,2`, games 2000, shards 40; then the 40-game depth-1 sweep (sweep on, games 40, depths 1; it now plays `coast.3p.exit` at `a5-always` and `any-legal-move`) and screens of `draft-3p` and `easy-3p` (400 games, depths 1). Download each merged report and commit it to `docs/fairness/`; the earlier 3-player reports are kept as `<report>@<version>` (S68), so no merge picks one of them up. Compare with the 0.1.0 runs (same seeds) and say whether Light still collapses at depth 2. The owner then decides on the 3-player defaults as in S61.
+Done when: the reports for `standard-3p` 0.2.0 at both depths, the sweep and the two screens are committed, with a short comparison in the handoff.
 
 ## Later phases
 

@@ -96,3 +96,4 @@ The owner (26 Oct 2026): the computer can play the Dragon in a game, starting wi
 ## Settled after this record
 - D58, the timer: time controls are a per-game choice, untimed by default ([decision 0017](0017-time-controls.md)).
 - D62 (rule 6), D63 (Standard as the 3-player default) and D64 (3-player rulesets in the builder): confirmed by the owner in the ledger, 26 Oct 2026; D62 is also the option `check.3p.exposedKing`.
+- The Coast pieces' first way out through A5 (`coast.3p.exit`, RULES.md "Leaving the Coast: 3-player") applied to these presets on paper but was not built until S68 ([decision 0019](0019-three-player-coast-exit.md)): every game of `draft-3p` 0.3.0, `standard-3p` 0.1.0 and `easy-3p` 0.1.0 let the Coast pieces leave with any legal move. S68 built it and released `draft-3p` 0.4.0, `standard-3p` 0.2.0 and `easy-3p` 0.2.0.
