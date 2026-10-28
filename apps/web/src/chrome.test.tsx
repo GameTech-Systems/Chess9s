@@ -241,9 +241,15 @@ describe('online play pages (S53)', () => {
     expect(html).not.toContain('never sent anywhere');
   });
 
+  it('privacy says the server keeps each seat’s time left with the moves (S66, D53)', () => {
+    const html = renderToStaticMarkup(<App path="/privacy" />);
+    expect(html).toContain('time left after each move');
+    expect(html).toContain('the time control the room is made with');
+  });
+
   it('privacy’s date changed with the page', () => {
-    expect(PRIVACY_UPDATED).toBe('27 October 2026');
-    expect(renderToStaticMarkup(<App path="/privacy" />)).toContain('Last updated 27 October 2026');
+    expect(PRIVACY_UPDATED).toBe('28 October 2026');
+    expect(renderToStaticMarkup(<App path="/privacy" />)).toContain('Last updated 28 October 2026');
   });
 
   it('the tournament page, the builder note and the tournament invitation say games can be played online by room code, Official ruleset only (D46)', () => {

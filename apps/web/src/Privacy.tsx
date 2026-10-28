@@ -1,7 +1,7 @@
 import { CONTACT_ADDRESS, DISCUSSIONS_URL } from './links';
 
 /** When this page last changed. Update it with any change to what the app does with data. */
-export const PRIVACY_UPDATED = '27 October 2026';
+export const PRIVACY_UPDATED = '28 October 2026';
 
 /** What Chess Nines does and does not do with a visitor's data. Keep in step with the app. */
 export function Privacy() {
@@ -19,16 +19,18 @@ export function Privacy() {
         <li>
           Online play: when you make or join a room, your browser sends the room code, the ruleset
           (for a ruleset you built, its name and settings), your moves, and a secret seat token that
-          proves which seat is yours. That is all: no names or accounts. The server keeps the room,
-          which is its ruleset, its moves (with any resignations) and its seat tokens (two, or three
-          in a 3-player room), so a player who drops can come back; it keeps no other copy. It
-          deletes the room and its moves 24 hours after the game ends, or after 7 days with no move.
-          Cloudflare handles the connection and sees the IP address of each player under its own
-          terms and policies; we do not receive or use it. Your browser keeps the room code and your
-          seat token (and the tokens of any seats you gave to the computer, which this browser
-          plays) in local storage under the key <code>chess9s.online</code>, one entry per room,
-          removed when the room ends or expires; clearing your site data deletes them, and you then
-          cannot take your seat back.
+          proves which seat is yours, and the time control the room is made with. That is all: no
+          names or accounts. The server keeps the room, which is its ruleset, its moves (with any
+          resignations), its time control with each seat's time left after each move and when the
+          running clock started (or, under the away control, when a seat's time away began), and its
+          seat tokens (two, or three in a 3-player room), so a player who drops can come back; it
+          keeps no other copy. It deletes the room and its moves 24 hours after the game ends, or
+          after 7 days with no move. Cloudflare handles the connection and sees the IP address of
+          each player under its own terms and policies; we do not receive or use it. Your browser
+          keeps the room code and your seat token (and the tokens of any seats you gave to the
+          computer, which this browser plays) in local storage under the key{' '}
+          <code>chess9s.online</code>, one entry per room, removed when the room ends or expires;
+          clearing your site data deletes them, and you then cannot take your seat back.
         </li>
         <li>
           A guest game lives only in your own browser, in local storage under the key{' '}
@@ -46,8 +48,9 @@ export function Privacy() {
         </li>
         <li>
           Save game record downloads the game as a file on your device: the ruleset, the moves, the
-          result and the date, with no names. Open game record reads a file you pick, on your
-          device. Nothing is sent or stored by us.
+          result and the date (and for a game with a clock, the time control and each seat's time
+          left), with no names. Open game record reads a file you pick, on your device. Nothing is
+          sent or stored by us.
         </li>
         <li>
           The site is hosted by Cloudflare, which keeps standard request logs (such as IP address,
