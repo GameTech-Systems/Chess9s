@@ -23,6 +23,7 @@ import {
 } from '../game/three';
 import {
   CHECK,
+  development,
   KING_ATTACKED,
   KING_CAPTURE,
   KING_EXPOSED,
@@ -101,7 +102,8 @@ function rate(g: Three, o: Outcome, seat: string, values: Record<string, number>
     }
     // The rules keep the Tail out of attack unless it can't be helped.
     if (checkersOn(g, o.position, o.seats, seat).length > 0) score -= KING_EXPOSED;
-    return score;
+    // Its pieces come out through A5 (decision 0019).
+    return score + development(g.rules, o.position, seat);
   }
 
   for (const at of royalSquares(g, o, seat)) if (dragonAttacks.includes(at)) score -= KING_EXPOSED;

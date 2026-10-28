@@ -9,6 +9,7 @@
 // fare (hundredths of a value unit, like `pieceValues`). The greedy player (S58) uses them too.
 import type { GameState } from '../game/game';
 import { activeKinged, attackersOn, three, TAIL, type Three } from '../game/three';
+import { squareTypes, type MoveRules, type Position } from '../moves/generate';
 
 /** A Kinged seat is out: the Dragon captured (or checkmated) its King. */
 export const KING_CAPTURE = 20_000;
@@ -24,6 +25,13 @@ export const KING_ATTACKED = 600;
 export const CHECK = 150;
 /** Per square the Tail could go to that a Kinged player attacks, taken from the Dragon's score. */
 export const TAIL_SQUARE = 40;
+/**
+ * For the Dragon, while its pieces must leave the Coast through A5 (decision 0019): per Dragon
+ * Head, Sun or Moon that has left the Coast, and per square from A5 that one still to go out
+ * through it stands. Neither search depth sees far enough to walk a piece out on its own (S68).
+ */
+export const DEVELOPED = 150;
+export const COAST_STEP = 20;
 
 const roles = new WeakMap<GameState['rules'], Map<string, Three>>();
 
@@ -60,6 +68,52 @@ export function terminalFor(state: GameState, seat: string, ply: number): number
   return -(MATE - ply);
 }
 
+const COAST = 'coast';
+const GATE = 'coast-gate';
+const gates = new WeakMap<MoveRules, string[]>();
+
+/**
+ * How far out the Dragon's pieces are, for its own score (S68): DEVELOPED for each Head, Sun or
+ * Moon that has left the Coast, less COAST_STEP per square between A5 and each one that must still
+ * go out through it, and COAST_STEP if the Tail stands on A5 while one must. Nothing when Coast
+ * pieces may leave with any legal move, so those games play as before S68.
+ */
+export function development(rules: MoveRules, position: Position, dragon: string): number {
+  const exit = rules.values['coast.3p.exit'];
+  if (exit !== 'a5-first-then-any' && exit !== 'a5-always') return 0;
+  const types = squareTypes(rules.board);
+  let gate = gates.get(rules);
+  if (!gate)
+    gates.set(rules, (gate = [...types].filter(([, t]) => t.includes(GATE)).map(([at]) => at)));
+  const steps = (at: string) =>
+    Math.min(
+      ...gate!.map((g) =>
+        Math.max(
+          Math.abs(at.charCodeAt(0) - g.charCodeAt(0)),
+          Math.abs(Number(at.slice(1)) - Number(g.slice(1))),
+        ),
+      ),
+    );
+  let score = 0;
+  let waiting = false;
+  let tailOnGate = false;
+  for (const [at, p] of Object.entries(position)) {
+    if (p.side !== dragon || p.stone === true) continue;
+    const here = types.get(at) ?? [];
+    if (p.piece === TAIL) {
+      tailOnGate ||= here.includes(GATE);
+      continue;
+    }
+    const left = p.left?.includes(COAST) === true;
+    if (left || !here.includes(COAST)) score += DEVELOPED;
+    if (here.includes(COAST) && !here.includes(GATE) && (exit === 'a5-always' || !left)) {
+      score -= COAST_STEP * steps(at);
+      waiting = true;
+    }
+  }
+  return tailOnGate && waiting ? score - COAST_STEP : score;
+}
+
 /** How `seat` rates a 3-player position that is still going for it; higher is better. */
 export function evaluateFor(
   state: GameState,
@@ -81,7 +135,7 @@ export function evaluateFor(
     }
     if (seats[seat] === 'tail-stone') score -= TAIL_STONE;
     else if (attackersOn(g, position, seats, seat).length > 0) score -= KING_EXPOSED;
-    return score;
+    return score + development(state.rules, position, seat);
   }
   if (seats[g.dragon] === 'tail-stone') score += TAIL_STONE;
   else if (seats[g.dragon] === 'out') score += 2 * TAIL_STONE;
