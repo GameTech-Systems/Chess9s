@@ -10,16 +10,16 @@ Updated 2026-10-28 by S63 (Sonnet 5.5 · high). `/end-session` rewrites this fil
 - The 2-player create screen listed a "Neutral" side (the stones' side); it now lists the board's turn order.
 
 ## Next session
-**S54 — Go live with rooms** · Owner (no Claude session)
-Why: S66 (online clocks, the last Claude step outside Phase 7) needs S54. Then S66 (Opus 5.5 · high).
-Start with: the S54 checklist in `docs/BUILD-PLAN.md`. Optional extra: one 3-seat game with a computer Dragon on chess9s.com.
+**S66 — Clocks in online rooms** · Opus 5.5 · effort high
+Why: S54 is done (rooms are live), so S66 is the last Claude step outside Phase 7. Server clock with S65's functions; 3-seat rooms use the same clocks.
+Start with: `/start-session S66`. Read the S66 section of `docs/BUILD-PLAN.md`, `apps/worker/src/room.ts` (alarm, saved record) and `packages/online/src/room.ts` (3-seat rooms: out seats, `resigned`).
 
 ## Decisions in effect for the next step
 - D51 to D54: defaults (Phase 5 rooms). D58 and D66: decided (clocks); 3-seat rooms use the same clocks.
 
 ## Open questions for the owner
 - Computer seats in rooms use the default levels (Greedy Dragon, Search for the others); there is no level choice on the create screen. Default: leave it until asked.
-- Room Durable Objects' 3-seat socket cap is 6 (two per seat). Provisional.
+- Room Durable Objects' 3-seat socket cap is 6 (two per seat). Provisional; nothing live has tested it.
 - Online rooms for custom 3-player rulesets need a player count in the create message; none planned. Default: not offered.
 - Carried over: why light collapses at depth 2, `coast.3p.exit`, the held-setting rule (S64), Easy Start calls (S67), the decision 0017 clock readings (S65), the S53 defaults, the draw-offer default (S51), the flag rule (0013), `coast.openToAll`, the I34 contact address, the favicon, the Ting Yang art.
 
