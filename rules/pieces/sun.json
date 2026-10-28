@@ -432,6 +432,65 @@
     },
     {
       "type": "coast",
+      "outside": true,
+      "stop": false,
+      "notes": "coast.3p.exit = a5-first-then-any: a Coast piece's first way off the Coast is from A5 (decision 0019). Until it has left the Coast once, it neither moves nor attacks off it from another Coast square.",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "param": "coast.3p.exit",
+            "is": "a5-first-then-any"
+          },
+          {
+            "from": "coast"
+          },
+          {
+            "not": {
+              "from": "coast-gate"
+            }
+          },
+          {
+            "not": {
+              "hasLeft": "coast"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "coast",
+      "outside": true,
+      "stop": false,
+      "notes": "coast.3p.exit = a5-always: a Coast piece leaves the Coast only from A5.",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "param": "coast.3p.exit",
+            "is": "a5-always"
+          },
+          {
+            "from": "coast"
+          },
+          {
+            "not": {
+              "from": "coast-gate"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "coast",
       "capturable": {
         "param": "coast.2p.capturable"
       },
@@ -454,5 +513,5 @@
     }
   ],
   "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026.",
-  "notes": "Each capture option of sunMoon.capture is its own group of moves. Reading of diagonal-only: it moves as usual but captures only on diagonal moves. Coast opening is game state (S17). Ways off the Coast (coast.2p.exit) and capture on the Coast are square rules (S22a). Not expressed yet (engine features): the 3-player first emergence through A5 (coast.3p.exit) and promotion (sunMoon.canPromote: no promotion targets have been given). givesCheck follows the 2-player setting; in 3-player games the game reads dragon.3p.givesCheck and the duel instead (S56, src/game/three.ts, decision 0016)."
+  "notes": "Each capture option of sunMoon.capture is its own group of moves. Reading of diagonal-only: it moves as usual but captures only on diagonal moves. Coast opening is game state (S17). Ways off the Coast (coast.2p.exit, coast.3p.exit) and capture on the Coast are square rules (S22a; coast.3p.exit reads hasLeft, S68). Not expressed yet (engine feature): promotion (sunMoon.canPromote: no promotion targets have been given). givesCheck follows the 2-player setting; in 3-player games the game reads dragon.3p.givesCheck and the duel instead (S56, src/game/three.ts, decision 0016)."
 }

@@ -425,10 +425,15 @@ describe('features the game does not play yet', () => {
     expect(on).toEqual(['queen.pawnSwap']);
     const swap = unbuiltFeatures(rulesFor(2, { 'setup.swapKingQueen': true })).map((f) => f.id);
     expect(swap).toEqual(['setup.swapKingQueen']);
+    // S68: the Sun and Moon have no promotion targets yet, so the option is listed, not played.
+    for (const players of [2, 3] as const) {
+      const promote = unbuiltFeatures(rulesFor(players, { 'sunMoon.canPromote': true }));
+      expect(promote).toEqual([{ id: 'sunMoon.canPromote', label: 'Sun and Moon promotion' }]);
+    }
   });
 
-  it("lists the 3-player Coast pieces' first way out through A5 (coast.3p.exit, not built)", () => {
-    expect(unbuiltFeatures(rulesFor(3)).map((f) => f.id)).toEqual(['coast.3p.exit']);
+  it("lists none for 3 players: the Coast pieces' first way out through A5 is built (S68)", () => {
+    expect(unbuiltFeatures(rulesFor(3))).toEqual([]);
   });
 });
 

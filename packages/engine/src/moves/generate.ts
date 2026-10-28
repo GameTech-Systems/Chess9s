@@ -25,6 +25,12 @@ export interface PlacedPiece {
   /** The square it started the game on, read by `homeFile` square rules (pawn-safe zones). */
   home?: string;
   /**
+   * Square types it has moved off onto a square without them, sorted, for `hasLeft` conditions:
+   * a Coast piece that has left the Coast once (3-player first way out through A5, coast.3p.exit,
+   * decision 0019). Kept only for the types its own data reads, so other pieces never carry it.
+   */
+  left?: string[];
+  /**
    * Turned to stone (3-player games, decision 0016 rules 10 and 11): it only blocks. It never
    * moves, can't be captured, attacks nothing and gives no check, and no piece may move onto it.
    */
@@ -212,7 +218,11 @@ interface Env {
   /** Square types of the square the piece moves from. */
   fromTypes: string[];
   moved: boolean;
+  /** Square types the piece has left (`PlacedPiece.left`). */
+  left: readonly string[];
 }
+
+const NOTHING_LEFT: readonly string[] = [];
 
 /** Whether a condition holds. `any` and `all` stop at the first deciding branch. */
 function holds(c: Condition, env: Env): boolean {
@@ -222,6 +232,7 @@ function holds(c: Condition, env: Env): boolean {
   if ('players' in c) return c.players.includes(env.rules.players);
   if ('from' in c) return env.fromTypes.includes(c.from);
   if ('firstMove' in c) return c.firstMove === !env.moved;
+  if ('hasLeft' in c) return env.left.includes(c.hasLeft);
   const v = value(env.rules, c.param);
   if ('is' in c) return v === c.is;
   if ('in' in c) return !Array.isArray(v) && c.in.includes(v as Scalar);
@@ -294,14 +305,15 @@ function context(rules: MoveRules, from: string, placed: PlacedPiece): Context {
   const piece = pieceOf(rules, from, placed);
   let byRules = accessCache.get(rules);
   if (!byRules) accessCache.set(rules, (byRules = new Map()));
-  const key = `${piece.id}|${fromTypes.join('+')}|${placed.moved === true}|${placed.side}|${placed.home ?? ''}`;
+  const left = placed.left ?? NOTHING_LEFT;
+  const key = `${piece.id}|${fromTypes.join('+')}|${placed.moved === true}|${placed.side}|${placed.home ?? ''}|${left.join('+')}`;
   let access = byRules.get(key);
   if (!access) byRules.set(key, (access = new Map()));
   return {
     piece,
     placed,
     forward,
-    env: { rules, fromTypes, moved: placed.moved === true },
+    env: { rules, fromTypes, moved: placed.moved === true, left },
     access,
   };
 }
@@ -363,6 +375,7 @@ export function capturable(rules: MoveRules, at: string, placed: PlacedPiece): b
     rules,
     fromTypes: squareTypes(rules.board).get(at) ?? [],
     moved: placed.moved === true,
+    left: placed.left ?? NOTHING_LEFT,
   };
   return !(piece.squares ?? []).some(
     (r) =>
@@ -672,13 +685,37 @@ const readsFirstMove = (c: Condition | undefined): boolean =>
     ('all' in c && c.all.some(readsFirstMove)) ||
     ('any' in c && c.any.some(readsFirstMove)));
 
-/** Per piece id: whether its moved flag and its home square can change what it may do. */
-const keyCache = new WeakMap<MoveRules, Map<string, { moved: boolean; home: boolean }>>();
-function keyFacts(rules: MoveRules, id: string): { moved: boolean; home: boolean } {
+/** The square types a condition's `hasLeft` parts name. */
+const leftTypes = (c: Condition | undefined): string[] =>
+  c === undefined
+    ? []
+    : 'hasLeft' in c
+      ? [c.hasLeft]
+      : 'not' in c
+        ? leftTypes(c.not)
+        : 'all' in c
+          ? c.all.flatMap(leftTypes)
+          : 'any' in c
+            ? c.any.flatMap(leftTypes)
+            : [];
+
+interface KeyFacts {
+  moved: boolean;
+  home: boolean;
+  /** The square types its `hasLeft` conditions read, sorted. */
+  left: string[];
+}
+
+/**
+ * Per piece id: whether its moved flag and its home square can change what it may do, and which
+ * square types it must remember leaving.
+ */
+const keyCache = new WeakMap<MoveRules, Map<string, KeyFacts>>();
+function keyFacts(rules: MoveRules, id: string): KeyFacts {
   let facts = keyCache.get(rules);
   if (!facts) {
     facts = new Map();
-    const env: Env = { rules, fromTypes: [], moved: false };
+    const env: Env = { rules, fromTypes: [], moved: false, left: NOTHING_LEFT };
     const castles = Object.values(rules.pieces).filter(
       (p) => p.castle && (!p.castle.when || holds(p.castle.when, env)),
     );
@@ -689,21 +726,52 @@ function keyFacts(rules: MoveRules, id: string): { moved: boolean; home: boolean
         readsFirstMove(p.promotion?.when) ||
         p.moves.some((m) => readsFirstMove(m.when)) ||
         rulesOf.some((r) => readsFirstMove(r.when));
-      facts.set(p.id, { moved, home: rulesOf.some((r) => r.homeFile === true) });
+      const conditions = [
+        ...rulesOf.map((r) => r.when),
+        ...p.moves.map((m) => m.when),
+        p.promotion?.when,
+        p.castle?.when,
+      ];
+      const left = [...new Set(conditions.flatMap(leftTypes))].sort();
+      facts.set(p.id, { moved, home: rulesOf.some((r) => r.homeFile === true), left });
     }
     keyCache.set(rules, facts);
   }
-  return facts.get(id) ?? { moved: false, home: false };
+  return facts.get(id) ?? { moved: false, home: false, left: [] };
 }
 
 /**
- * A placed piece as the repetition rule compares it: its type and side, and its moved flag and
- * starting file only where they can change what it may do (first moves, castling, pawn-safe
- * zones), so a piece that moved away and came back is the same piece unless its rights changed.
+ * The `left` list of a piece moved from `from` to `to`: the square types its data reads that
+ * `from` has and `to` lacks are added (sorted). The same list when nothing is added, and none for
+ * a piece whose data reads no `hasLeft` condition.
+ */
+export function leftAfter(
+  rules: MoveRules,
+  placed: PlacedPiece,
+  from: string,
+  to: string,
+): string[] | undefined {
+  const tracked = keyFacts(rules, placed.piece).left;
+  if (tracked.length === 0) return placed.left;
+  const types = squareTypes(rules.board);
+  const fromTypes = types.get(from) ?? [];
+  const toTypes = types.get(to) ?? [];
+  const added = tracked.filter(
+    (t) => fromTypes.includes(t) && !toTypes.includes(t) && !(placed.left ?? []).includes(t),
+  );
+  return added.length === 0 ? placed.left : [...(placed.left ?? []), ...added].sort();
+}
+
+/**
+ * A placed piece as the repetition rule compares it: its type and side, and its moved flag,
+ * starting file and the square types it has left only where they can change what it may do (first
+ * moves, castling, pawn-safe zones, a Coast piece's first way out), so a piece that moved away and
+ * came back is the same piece unless its rights changed.
  */
 export function placedKey(rules: MoveRules, placed: PlacedPiece): string {
   const facts = keyFacts(rules, placed.piece);
-  return `${placed.side}:${placed.piece}${facts.moved && placed.moved ? '*' : ''}${facts.home ? `@${placed.home?.[0] ?? ''}` : ''}${placed.stone === true ? '~stone' : ''}`;
+  const left = facts.left.filter((t) => placed.left?.includes(t));
+  return `${placed.side}:${placed.piece}${facts.moved && placed.moved ? '*' : ''}${facts.home ? `@${placed.home?.[0] ?? ''}` : ''}${left.length > 0 ? `^${left.join('+')}` : ''}${placed.stone === true ? '~stone' : ''}`;
 }
 
 /** The board's start position for a player count. */

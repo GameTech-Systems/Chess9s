@@ -532,7 +532,7 @@ export function playMove(state: GameState, move: GeneratedMove): GameState {
       order: state.order,
       turn: nextSide(state.order, turn),
       seats: state.seats,
-      position: applyMove(state.position, legal),
+      position: applyMove(state.position, legal, rules),
       lost,
       coastOpen: state.coastOpen || opens,
       tailRun,
@@ -759,7 +759,12 @@ export function unbuiltFeatures(rules: MoveRules): UnbuiltFeature[] {
       { id: 'setup.swapKingQueen', label: 'King and Queen swapped at the start' },
       v['setup.swapKingQueen'] === true,
     ],
-    [{ id: 'coast.3p.exit', label: "Coast pieces' first way out through A5" }, rules.players === 3],
+    // No promotion targets have been given for the Sun and Moon (piece data notes), so the option
+    // plays as if it were off; say so rather than play it silently (S68).
+    [
+      { id: 'sunMoon.canPromote', label: 'Sun and Moon promotion' },
+      v['sunMoon.canPromote'] === true,
+    ],
   ];
   return all.filter(([, on]) => on).map(([f]) => f);
 }
