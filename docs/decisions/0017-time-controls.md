@@ -1,6 +1,6 @@
 # 0017: Time controls
 
-**Status:** Accepted (owner, ledger D58, 26 Oct 2026: keep the default, and add time controls for players to choose, such as the ones Apex Chess uses). The preset list is Claude's choice, provisional, taken from Apex Chess's `rules/timeControls.json` (its decision D19). What running out of time does is the default D66. S65 built it for hot-seat games (the readings below are provisional); S66 builds it for online rooms.
+**Status:** Accepted (owner, ledger D58, 26 Oct 2026: keep the default, and add time controls for players to choose, such as the ones Apex Chess uses). The preset list is Claude's choice, provisional, taken from Apex Chess's `rules/timeControls.json` (its decision D19). What running out of time does is the default D66. S65 built it for hot-seat games and S66 for online rooms (the readings below are provisional).
 
 ## Context
 The roadmap listed a timer for 3-player games, but no rule defined one (D58). Phase 2 shows each seat's elapsed time, for display only. Online rooms (Phase 5) were planned with no clock (D51), and the project publishes no tournament clock rules (D47).
@@ -44,3 +44,12 @@ Where 0017 left a detail open, S65 chose the following. None changes a rule para
 - **Per-move controls.** Each seat starts its turn with the full time; the record keeps what it had left when it moved.
 - **Reload.** The guest game keeps each seat's time left, and comes back paused; leaving the page saves the time the running seat has used. A computer seat's thinking time counts on its clock.
 - **Game record.** Optional top-level fields `timeControl` (the id), `showOnly` and `timeLeft` (one entry per move: every seat's milliseconds left after it). A control id this app does not know opens as an untimed game; fields that do not fit the moves refuse the record. A seat out of time in a 3-player game is a resignation entry with `timeout: true`.
+
+## Readings made in S66 (provisional)
+Online rooms keep the clocks on the server, with the same functions as hot-seat games. None changes a rule parameter, ruleset or lock.
+- **When the clock starts.** A room's clock starts when its last seat is taken (with the computer holding the other seats of a 3-seat room, when the room is made). Until then no seat's time runs.
+- **The server's time only.** The room charges each seat by its own time; a browser shows the times the server last sent, running from when they arrived, and can neither set a clock nor drop a flag. A move that arrives after the time ran out is the flag fall, as in S65, and the move is refused.
+- **Flag falls with nobody connected.** The room's alarm is set for the running seat's deadline, so the flag falls on time even when no player is connected.
+- **Show only** applies to the controls with a clock (Fischer and per move); the abandonment control has no clock to show, so a room refuses Show only with it.
+- **Abandonment.** A seat's time away counts while every other person still in the game is connected; when that stops (another person goes away too), the count starts again in full when it resumes. A person alone with the computer's seats is never counted out. A computer seat away while every person is connected is counted like a person.
+- **Record.** The room keeps the time control, each seat's time left after each move, and when the running clock started (or when a seat's time away began), with the moves (D53). A seat out of time in a 3-seat room is a resignation entry with `timeout: true`, as in the game record.
