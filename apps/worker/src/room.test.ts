@@ -5,11 +5,14 @@ import {
   CLOSE_GONE,
   CLOSE_IDLE,
   CLOSE_REPLACED,
+  rulesFiles,
   type ServerMessage,
   type Snapshot,
 } from '@chess9s/online';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { loadRules, newGame, playMove, toNotation } from '@chess9s/engine';
 import hotSeatMate from '../../../packages/engine/test/fixtures/games/hot-seat-mate.json';
+import threeEnds from '../../../packages/engine/test/fixtures/games/three-player-ends.json';
 import { FakeSocket, FakeSockets, FakeState } from './fakes';
 import {
   IDLE_MS,
@@ -329,5 +332,145 @@ describe('retention (D53)', () => {
     expect(h.state.alarmAt).toBe(START + KEEP_WITHOUT_MOVE_MS);
     await h.fireAlarm();
     expect((await h.info()).status).toBe(404);
+  });
+});
+
+describe('a room with three seats (S63, D61)', () => {
+  const STANDARD_3P = { id: 'standard-3p', version: '0.1.0' };
+  const make = (computer?: string[]) => ({
+    v: 1,
+    type: 'create',
+    ruleset: STANDARD_3P,
+    seat: 'dark',
+    ...(computer && { computer }),
+  });
+  const join = (token?: string) => ({ v: 1, type: 'join', code: CODE, ...(token && { token }) });
+
+  /** The three seats of a standard-3p room, each on its own socket. */
+  async function seated3(h: ReturnType<typeof harness>) {
+    const created = (await (await h.create(make())).json()) as Snapshot;
+    const sockets: Record<string, FakeSocket> = {};
+    const tokens: Record<string, string> = { dark: created.token! };
+    const first = await h.connect();
+    await h.send(first, join(created.token));
+    sockets.dark = first;
+    for (let i = 0; i < 2; i++) {
+      const ws = await h.connect();
+      await h.send(ws, join());
+      const snap = ws.messages()[0] as Snapshot;
+      sockets[snap.seat] = ws;
+      tokens[snap.seat] = snap.token!;
+    }
+    for (const ws of Object.values(sockets)) ws.take();
+    return { sockets, tokens };
+  }
+
+  it("creates a room with three seats, and the computer seats' tokens only in the reply", async () => {
+    const h = harness();
+    const res = await h.create(make(['dragon']));
+    expect(res.status).toBe(201);
+    const snap = (await res.json()) as Snapshot;
+    expect(snap.seats).toEqual({ dark: 'away', light: 'open', dragon: 'away' });
+    expect(snap.computer).toEqual(['dragon']);
+    expect(Object.keys(snap.computerTokens!)).toEqual(['dragon']);
+    // Anyone can see which seat is the computer's, but never a token.
+    const peek = await (await h.info()).text();
+    expect(JSON.parse(peek)).toMatchObject({ computer: ['dragon'], seats: snap.seats });
+    expect(peek).not.toContain(snap.token!);
+    expect(peek).not.toContain(snap.computerTokens!.dragon!);
+  });
+
+  it('keeps the computer seats and the resignations, and gives them back after a restart', async () => {
+    const h = harness();
+    const created = (await (await h.create(make(['dragon']))).json()) as Snapshot;
+    const saved = h.state.data.get('room') as { computer?: string[]; tokens: object };
+    expect(saved.computer).toEqual(['dragon']);
+    expect(Object.keys(saved.tokens).sort()).toEqual(['dark', 'dragon', 'light']);
+    // Creator, a friend, and the creator's browser for the computer.
+    const dark = await h.connect();
+    await h.send(dark, join(created.token));
+    const friend = await h.connect();
+    await h.send(friend, join());
+    const bot = await h.connect();
+    await h.send(bot, join(created.computerTokens!.dragon));
+    expect((bot.take()[0] as Snapshot).seat).toBe('dragon');
+    const friendToken = (friend.take()[0] as Snapshot).token!;
+    dark.take();
+    // The friend resigns at once: the other two are told, and the room keeps it.
+    await h.send(friend, { v: 1, type: 'resign' });
+    expect(types(dark.take())).toEqual(['resigned']);
+    expect(types(bot.take())).toEqual(['resigned']);
+    expect((h.state.data.get('room') as { resignations?: unknown }).resignations).toEqual([
+      { side: 'light', after: 0 },
+    ]);
+    h.restart();
+    const again = await h.connect();
+    await h.send(again, join(friendToken));
+    expect(again.take()).toMatchObject([
+      {
+        type: 'snapshot',
+        seat: 'light',
+        resignations: [{ side: 'light', after: 0 }],
+        computer: ['dragon'],
+        seats: { dark: 'present', light: 'present', dragon: 'present' },
+      },
+    ]);
+  });
+
+  it('does not save what a 2-seat room never had', async () => {
+    const h = harness();
+    await h.create(make());
+    expect(Object.keys(h.state.data.get('room') as object).sort()).toEqual(
+      [
+        'code',
+        'drawOffer',
+        'endedAt',
+        'lastMove',
+        'moves',
+        'offerWait',
+        'result',
+        'ruleset',
+        'tokens',
+        'v',
+      ].sort(),
+    );
+  });
+
+  it('plays a game through three sockets and ends it for all three', async () => {
+    const h = harness();
+    const { sockets } = await seated3(h);
+    const game = threeEnds.games.find(
+      (g) => g.ruleset === 'standard-3p' && g.rows.includes('kinged-checkmates-king'),
+    )!;
+    // A local copy of the game says whose turn each move is, as a browser's would.
+    let local = newGame(
+      loadRules(rulesFiles).rules(STANDARD_3P.id, STANDARD_3P.version),
+      STANDARD_3P,
+    );
+    for (const notation of game.moves) {
+      await h.send(sockets[local.turn]!, { v: 1, type: 'move', move: notation });
+      local = playMove(
+        local,
+        local.legal.find((m) => toNotation(m) === notation)!,
+      );
+    }
+    for (const ws of Object.values(sockets)) {
+      const msgs = ws.take();
+      expect(msgs.filter((m) => m.type === 'move')).toHaveLength(game.moves.length);
+      expect(msgs.at(-1)).toEqual({ v: 1, type: 'game-over', result: game.result });
+    }
+    expect(await (await h.info()).json()).toMatchObject({ result: game.result });
+    // The room is deleted 24 hours after the end, as for two seats (D53).
+    expect((h.state.data.get('room') as { endedAt: number }).endedAt).toBe(START);
+  });
+
+  it('holds six sockets, two for each seat', async () => {
+    const h = harness();
+    await h.create(make());
+    for (let i = 0; i < 6; i++) await h.connect();
+    const res = await h.room.fetch(
+      new Request('https://room/socket', { headers: { Upgrade: 'websocket' } }),
+    );
+    expect(res.status).toBe(429);
   });
 });
