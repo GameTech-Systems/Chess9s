@@ -344,7 +344,7 @@ The search part of the old S58 (D59), added as its own step in S55.
 Done when: search bots finish 3-player games from the start at depths 1 and 2 in all three presets, the browser offers both levels, and the 2-player search equivalence tests still pass.
 Decisions: D59.
 
-### S59 — 3-player balance simulations · Opus 5.5 · high · `todo`
+### S59 — 3-player balance simulations · Opus 5.5 · high · `done`
 - **Sim.** `pnpm sim --ruleset <3-player id>` reports each seat's score (dark, light, Dragon), wins by reason (each row of the end tables in decision 0016), draws and who shares them, games stopped at the move cap, and game length. Shards and `pnpm sim:merge` work as in decision 0009, and the `Sim depth 2` workflow takes a 3-player ruleset.
 - **Players.** S62's search plays every seat, so the seats are measured with equal play. A second run with the greedy Dragon (S58) against searching Kinged players is reported separately, as what players meet against the computer Dragon; it is not scored against D60.
 - **Variants.** `--sweep` runs every 3-player parameter at each option (the five from decision 0016 included), plus `dragonHead.range` at 3 and 4 (the RULES.md fairness risk), and reports the seat scores for each.
@@ -354,7 +354,7 @@ Done when: the reports are committed, the sweep covers every 3-player option, an
 Decisions: D59, D60, D63.
 
 ### S60 — Depth-2 run for 3 players · Owner · `todo`
-Actions → **Sim depth 2** → Run workflow, ruleset `standard-3p` (D63; shards 20, games 2000), as in S37.
+Actions → **Sim depth 2** → Run workflow, ruleset `standard-3p` (D63; shards 40, games 2000, depths 2), as in S37. S59 measured about 8 CPU-minutes per depth-2 game, so 40 shards take about 2 hours each; the merge keeps the depth-1 run from `docs/fairness/standard-3p.json`.
 
 ### S61 — 3-player balance review · Owner with Claude in chat · Opus 5.5 · high · `todo`
 The owner reads both depths, the screens and the sweep, then chooses: keep the 3-player presets experimental as they are; change their defaults using options already in `rules/parameters.json`, which means a new version and a re-run of S59 and S60; or publish a 3-player Candidate, which a later Sonnet step carries out as S38 did. The owner also confirms or changes D60 and D62 to D65. Phase 6 exit.
