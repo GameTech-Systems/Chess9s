@@ -1,6 +1,6 @@
 // S62: the 3-player search (decision D59). Paranoid: the seat to move plays against the other two
 // together. Each seat finds a mate in two the greedy player misses; the Dragon takes a King it may
-// capture; the same seed gives the same moves.
+// capture; the same seed gives the same moves. S68: the Dragon brings its pieces out through A5.
 import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { newGame, playMove, type GameState } from '../game/game';
@@ -13,7 +13,7 @@ import {
 import { validateBoardAndPieces } from '../rules/formats';
 import { resolveRuleset, type Registry, type Ruleset } from '../rules/loader';
 import { greedyMove } from './greedy';
-import { evaluateFor, terminalFor, MATE } from './paranoid';
+import { COAST_STEP, DEVELOPED, evaluateFor, terminalFor, MATE } from './paranoid';
 import { bestMove } from './search';
 
 const root = new URL('../../../../', import.meta.url).pathname;
@@ -199,5 +199,86 @@ describe('the score', () => {
     expect(terminalFor({ ...g, seats: { ...g.seats, light: 'out' } }, 'light', 1)).toBe(
       -(MATE - 1),
     );
+  });
+});
+
+describe('the Dragon brings its pieces out through A5 (S68, decision 0019)', () => {
+  // Kings far away; the Moon (which has not left the Coast yet) somewhere on file A.
+  const withMoon = (at: string, extra: Partial<PlacedPiece> = {}, id = 'standard-3p') => {
+    const g = from(id, 'dragon', {
+      i9: 'dark king',
+      i1: 'light king',
+      e5: 'dragon dragon-tail',
+    });
+    return { ...g, position: { ...g.position, [at]: { ...placed('dragon moon'), ...extra } } };
+  };
+  const values = { moon: 1000 };
+
+  it('scores a Coast piece nearer A5 higher, and one that has left the Coast higher still', () => {
+    const a2 = evaluateFor(withMoon('a2'), 'dragon', values);
+    const a3 = evaluateFor(withMoon('a3'), 'dragon', values);
+    const a5 = evaluateFor(withMoon('a5'), 'dragon', values);
+    const out = evaluateFor(withMoon('b4', { left: ['coast'] }), 'dragon', values);
+    const back = evaluateFor(withMoon('a3', { left: ['coast'] }), 'dragon', values);
+    expect(a3 - a2).toBe(COAST_STEP);
+    expect(a5 - a2).toBe(3 * COAST_STEP);
+    expect(out - a5).toBe(DEVELOPED);
+    // Back on the Coast after leaving it once, it may leave from anywhere: no way to walk.
+    expect(back).toBe(out);
+  });
+
+  it('does not change how the Kinged players score the position', () => {
+    for (const seat of ['dark', 'light']) {
+      expect(evaluateFor(withMoon('a3'), seat, values)).toBe(
+        evaluateFor(withMoon('b4', { left: ['coast'] }), seat, values),
+      );
+    }
+  });
+
+  it('plays as before S68 when Coast pieces may leave with any legal move', () => {
+    const any = (at: string, extra: Partial<PlacedPiece> = {}) => {
+      const g = withMoon(at, extra);
+      const rules = {
+        ...g.rules,
+        values: { ...g.rules.values, 'coast.3p.exit': 'any-legal-move' },
+      };
+      return { ...g, rules };
+    };
+    expect(evaluateFor(any('a2'), 'dragon', values)).toBe(evaluateFor(any('a5'), 'dragon', values));
+    expect(evaluateFor(any('a2'), 'dragon', values)).toBe(
+      evaluateFor(any('b4', { left: ['coast'] }), 'dragon', values),
+    );
+  });
+
+  it('the computer Dragon walks a piece out through A5 within eight turns', () => {
+    // At least five Dragon moves: the Tail off A5, then the Sun or Moon three steps and out.
+    for (const player of ['greedy', 'search'] as const) {
+      let g = newGame(rulesFor('standard-3p'), { id: 'standard-3p', version: '0' });
+      // Dark and light move a Knight on the far side to and fro, away from the Coast.
+      const shuffle: Record<string, string[]> = {
+        dark: ['h9-g7', 'g7-h9'],
+        light: ['h1-g3', 'g3-h1'],
+      };
+      let rnd = 7;
+      const random = () => (rnd = (rnd * 48271) % 2147483647) / 2147483647;
+      for (let round = 0; round < 8; round++) {
+        for (const side of ['dark', 'light']) {
+          const n = shuffle[side]![round % 2]!;
+          g = playMove(
+            g,
+            g.legal.find((m) => `${m.from}-${m.to}` === n)!,
+          );
+        }
+        const m =
+          player === 'greedy'
+            ? greedyMove(g, { random })!
+            : bestMove(g, { depth: 1, nodes: 20_000, random }).move!;
+        g = playMove(g, m);
+      }
+      const out = Object.values(g.position).filter(
+        (p) => p.side === 'dragon' && p.piece !== 'dragon-tail' && p.left?.includes('coast'),
+      );
+      expect(out.length, player).toBeGreaterThanOrEqual(1);
+    }
   });
 });
