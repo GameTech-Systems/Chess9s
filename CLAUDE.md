@@ -44,8 +44,8 @@ Node 22, pnpm 10 (pinned in `package.json`).
 - `pnpm typecheck`: `tsc --noEmit` in every workspace.
 - `pnpm validate:rules`: Ajv-validate `rules/` against `rules/schema/`.
 - `pnpm rules:index`: rewrite `packages/online/src/rules-index.ts` after adding or removing a file in `rules/` (a test fails until you do).
-- `pnpm sim [--games n --depths 1,2 --sweep --set id=value --shard K/N --ruleset-file f]`: bot self-play; writes a fairness report to `docs/fairness/` (decision 0008). `--ruleset-file` checks a submitted ruleset file (GOVERNANCE, Submitted rulesets).
-- `pnpm sim:merge <shards> [--with report]`: builds the fairness report from shard files (decision 0009). The `Sim depth 2` workflow runs the shards on GitHub.
+- `pnpm sim [--games n --depths 1,2 --sweep --set id=value --shard K/N --ruleset-file f]`: bot self-play; writes a fairness report to `docs/fairness/` (decision 0008). `--ruleset-file` checks a submitted ruleset file (GOVERNANCE, Submitted rulesets). A 3-player ruleset (`--ruleset standard-3p` or `--players 3`) gets the balance report of decision 0015 instead; `--greedy-dragon` plays the greedy Dragon against searching Kinged players (reported, not scored).
+- `pnpm sim:merge <shards> [--with report]`: builds the fairness report from shard files (decision 0009). The `Sim depth 2` workflow runs the shards on GitHub (inputs `depths`, `sweep` and `mode` too, S59).
 - `pnpm lock write|add-keys|archive <ruleset id>`: ruleset locks and kept versions (RULES-FRAMEWORK, Locks and kept versions). Never overwrites a lock.
 - `pnpm worker:check`: `wrangler deploy --dry-run` (bundles the Worker). `pnpm worker:e2e`: after `pnpm build`, plays a game through `wrangler dev` with two WebSocket clients.
 - `node apps/worker/scripts/e2e-browser.mjs` (after `pnpm build`): two Chromium contexts play the 80-move game through `wrangler dev` by clicking, with a reload at move 40, at desktop and Pixel 7 width. Needs Playwright (not a repo dependency); `SHOTS=<dir>` saves screenshots.
