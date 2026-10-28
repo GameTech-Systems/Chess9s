@@ -45,7 +45,7 @@ export interface RulesetInfo {
   description: string;
   /** The engine plays it in hot-seat: every bundled ruleset, 2 or 3 players. */
   playable: boolean;
-  /** An online room can play it: 2 players only until S63 adds the 3-seat room. */
+  /** An online room can play it: every bundled ruleset (S63 added the 3-seat room), not a custom 3-player one. */
   online: boolean;
   /** The ruleset a new game starts on. */
   isDefault: boolean;
@@ -88,6 +88,8 @@ export const customInfo = (
   c: Pick<CustomRuleset, 'id' | 'name' | 'overrides' | 'players'>,
 ): RulesetInfo => ({
   ...infoOf(customFile(c)),
+  // Rooms take a custom ruleset's overrides, which say nothing of a 3-player game (S63).
+  online: (c.players ?? 2) === 2,
   custom: true,
   overrides: { ...c.overrides },
 });
@@ -100,7 +102,7 @@ const infoOf = (r: Ruleset): RulesetInfo => ({
   players: r.players,
   description: r.description ?? '',
   playable: true,
-  online: r.players === 2,
+  online: true,
   isDefault: r.id === DEFAULT_RULESET_ID,
   ...(r.id === DEFAULT_RULESET_ID && { defaultFor: 2 as const }),
   ...(r.id === DEFAULT_3P_RULESET_ID && { defaultFor: 3 as const }),

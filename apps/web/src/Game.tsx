@@ -656,7 +656,7 @@ export function Game({
           </p>
         )}
 
-        {onPlayOnline && !three && (
+        {onPlayOnline && ruleset.online && (
           <button type="button" className="again" onClick={onPlayOnline}>
             Play online
           </button>
