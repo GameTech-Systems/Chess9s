@@ -18,6 +18,7 @@ import ends from '../../../packages/engine/test/fixtures/games/three-player-ends
 import { App } from './App';
 import { Game } from './Game';
 import { RulesPage } from './RulesPage';
+import { customInfo } from './game/rules';
 import { createRules, listRulesets, rulesetSettings } from './game/rules';
 import { openRecord, recordJson } from './game/record';
 import { saveGuest, type Store } from './game/guest';
@@ -238,13 +239,24 @@ describe('a move that asks a question', () => {
   });
 });
 
-describe('hot-seat only, until the computer and the room take 3 players', () => {
-  it('offers no Computer and no Play online on the game screen', () => {
+describe('the 3-player game screen and online play (S63)', () => {
+  it('offers Play online for a bundled 3-player ruleset, and no 2-player Opponent choice', () => {
     const html = renderToStaticMarkup(
       <Game initial={fresh()} ruleset={info('standard-3p')} onPlayOnline={() => {}} />,
     );
     expect(html).not.toContain('aria-label="Opponent"');
-    expect(html).not.toContain('>Play online<');
+    expect(html).toContain('>Play online<');
+  });
+
+  it('offers no Play online for a 3-player ruleset the player built: rooms play bundled ones', () => {
+    const custom = customInfo({
+      id: 'mine-3p',
+      name: 'Mine',
+      overrides: {},
+      players: 3,
+    });
+    expect(custom.online).toBe(false);
+    expect(customInfo({ id: 'mine-2p', name: 'Mine', overrides: {} }).online).toBe(true);
   });
 
   it('opens a 3-player game from the picker route', () => {

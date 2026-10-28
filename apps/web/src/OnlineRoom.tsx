@@ -11,6 +11,7 @@ import {
   RELOAD_TEXT,
   REPLACED_TEXT,
   canAct,
+  mySeatOut,
   onlineHighlights,
   onlineStatus,
   opponentOf,
@@ -20,6 +21,7 @@ import { saveRecordFile } from './game/record';
 import { RoomController, type Phase } from './game/roomController';
 import { roomInviteMailto, roomPath } from './game/share';
 import { rounds } from './game/session';
+import { noticeLines, phaseLine, resignPrompt, resultCard, seatLines } from './game/threeText';
 
 const title = (id: string) => id.charAt(0).toUpperCase() + id.slice(1);
 
@@ -102,6 +104,12 @@ function RoomPreview({
       <RoomRulesetCard ruleset={info.ruleset} linkTo={linkTo} />
       <p className="facts">
         You will play <strong>{title(side)}</strong>.
+        {(info.computer?.length ?? 0) > 0 && (
+          <>
+            {' '}
+            The computer plays <strong>{info.computer!.map(title).join(' and ')}</strong>.
+          </>
+        )}
       </p>
       <div className="ruleset-actions">
         <button type="button" className="again" onClick={onJoin}>
@@ -114,6 +122,7 @@ function RoomPreview({
 
 /** The room's link, its code and an invitation by email: shown while the other seat is open. */
 function Invite({ online, origin }: { online: Online; origin: string }) {
+  const open = Object.values(online.seats).filter((s) => s === 'open').length;
   const [copied, setCopied] = useState(false);
   const link = `${origin}${roomPath(online.code)}`;
   const copy = async () => {
@@ -127,7 +136,8 @@ function Invite({ online, origin }: { online: Online; origin: string }) {
   return (
     <div className="invite">
       <p className="facts">
-        Send this link, or the room code <strong>{online.code}</strong>, to your opponent.
+        Send this link, or the room code <strong>{online.code}</strong>, to{' '}
+        {open > 1 ? `the ${open} players still to join` : 'your opponent'}.
       </p>
       <input
         readOnly
@@ -163,8 +173,11 @@ function OnlineGame({
 }) {
   const { game, promoting } = online.model;
   const over = game.result.status !== 'ongoing';
+  const threeSeats = game.order.length > 2;
   const opponent = opponentOf(online);
-  const waiting = online.seats[opponent] === 'open';
+  const waiting = Object.values(online.seats).some((s) => s === 'open');
+  const out = mySeatOut(online);
+  const card = threeSeats ? resultCard(game) : null;
   const [resigning, setResigning] = useState(false);
   const [sound, setSound] = useState(true);
   const list = useRef<HTMLOListElement>(null);
@@ -192,6 +205,7 @@ function OnlineGame({
           board={boardData}
           pieceLetters={pieceLetters}
           seat={online.seat}
+          players={game.rules.players}
           position={game.position}
           highlights={onlineHighlights(online)}
           onSquareClick={(at) => controller.press(at)}
@@ -235,10 +249,58 @@ function OnlineGame({
           </p>
         )}
 
-        <p className="facts">
-          You play <strong>{title(online.seat)}</strong> · Opponent{' '}
-          <strong>{SEAT_WORDS[online.seats[opponent] ?? 'open']}</strong>
-        </p>
+        {threeSeats ? (
+          <ul className="seats" aria-label="Seats">
+            {seatLines(game).map((s) => (
+              <li
+                key={s.side}
+                data-seat={s.side}
+                data-turn={s.toMove ? 'true' : 'false'}
+                data-state={s.state}
+              >
+                <span className="seat-name">
+                  {s.name}
+                  {s.side === online.seat && ' (you)'}
+                </span>
+                <span className="seat-note">
+                  {online.computer.includes(s.side) && (
+                    <>
+                      <span className="seat-bot">Computer</span>
+                      {' · '}
+                    </>
+                  )}
+                  {SEAT_WORDS[online.seats[s.side] ?? 'open']}
+                  {s.text && ` · ${s.text}`}
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="facts">
+            You play <strong>{title(online.seat)}</strong> · Opponent{' '}
+            <strong>{SEAT_WORDS[online.seats[opponent] ?? 'open']}</strong>
+          </p>
+        )}
+
+        {card && (
+          <section className="result-card" aria-label="Result" data-tone={card.tone}>
+            <h3>{card.heading}</h3>
+            <p>{card.detail}</p>
+          </section>
+        )}
+        {threeSeats &&
+          !over &&
+          noticeLines(game).map((line) => (
+            <p key={line} className="facts notice" role="status">
+              {line}
+            </p>
+          ))}
+        {threeSeats && !over && phaseLine(game) && <p className="facts phase">{phaseLine(game)}</p>}
+        {out && !over && (
+          <p className="facts banner" role="status">
+            You are out of this game. You stay in the room and see the rest of it.
+          </p>
+        )}
 
         {promoting && (
           <div className="promotion" role="group" aria-label="Promote the pawn to">
@@ -261,11 +323,17 @@ function OnlineGame({
           </p>
         )}
 
-        {!over && !waiting && (
-          <div className="conduct" role="group" aria-label="Resign or draw">
+        {!over && !waiting && !out && (
+          <div
+            className="conduct"
+            role="group"
+            aria-label={threeSeats ? 'Resign' : 'Resign or draw'}
+          >
             {resigning ? (
               <>
-                <span className="facts">Resign this game?</span>
+                <span className="facts">
+                  {threeSeats ? resignPrompt(game, online.seat) : 'Resign this game?'}
+                </span>
                 <button
                   type="button"
                   disabled={!acts}
@@ -285,13 +353,15 @@ function OnlineGame({
                 <button type="button" disabled={!acts} onClick={() => setResigning(true)}>
                   Resign
                 </button>
-                {offer === null && (
+                {!threeSeats && offer === null && (
                   <button type="button" disabled={!acts} onClick={() => controller.offerDraw()}>
                     Offer draw
                   </button>
                 )}
-                {offer === online.seat && <span className="facts">Draw offered</span>}
-                {offer !== null && offer !== online.seat && (
+                {!threeSeats && offer === online.seat && (
+                  <span className="facts">Draw offered</span>
+                )}
+                {!threeSeats && offer !== null && offer !== online.seat && (
                   <>
                     <span className="facts">{title(offer)} offers a draw</span>
                     <button type="button" disabled={!acts} onClick={() => controller.acceptDraw()}>

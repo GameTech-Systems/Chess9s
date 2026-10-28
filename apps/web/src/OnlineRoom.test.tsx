@@ -13,6 +13,7 @@ import { RoomController } from './game/roomController';
 import { CODE, DRAFT, FakeSocket, MOVES, TOKEN, info, memory, snap } from './game/roomFakes';
 import { saveSeat } from './game/onlineStore';
 import hotSeatMate from '../../../packages/engine/test/fixtures/games/hot-seat-mate.json';
+import threeEnds from '../../../packages/engine/test/fixtures/games/three-player-ends.json';
 
 const ORIGIN = 'https://chess9s.com';
 
@@ -291,6 +292,25 @@ describe('making a room', () => {
     expect(out).toContain('>Create room<');
   });
 
+  it('lists the sides of a 2-player game in turn order, and no seat for the stones', () => {
+    const out = html();
+    expect(out).not.toContain('Neutral');
+    expect(out).not.toContain('aria-label="Computer plays"');
+    expect(out.indexOf('>Dark<')).toBeLessThan(out.indexOf('>Light<'));
+  });
+
+  it('for a 3-player ruleset lists three sides, and offers seats for the computer (S63)', () => {
+    const out = html(findRuleset('standard-3p')!);
+    expect(out).toMatch(/<button[^>]*aria-pressed="true"[^>]*>Random</);
+    for (const side of ['Dark', 'Light', 'Dragon']) {
+      expect(out).toMatch(new RegExp(`aria-pressed="false"[^>]*>${side}<`));
+    }
+    expect(out).toContain('aria-label="Computer plays"');
+    expect(out).toContain('keep the room open in this browser');
+    expect(out).toContain('the other players');
+    expect(out).toMatch(/no names or accounts/i);
+  });
+
   it('names the ruleset and its status, and says a custom one is unofficial', () => {
     expect(html()).toContain('Standard');
     expect(html()).toContain('data-status="candidate"');
@@ -311,6 +331,99 @@ describe('making a room', () => {
     const out = html();
     expect(out).toMatch(/no names or accounts/i);
     expect(out).toContain('href="/privacy"');
+  });
+});
+
+describe('a room with three seats (S63)', () => {
+  const STANDARD = { id: 'standard-3p', version: '0.1.0', name: 'Standard 3-player' };
+  const ALL = { dark: 'present', light: 'present', dragon: 'present' } as const;
+  const room = (over: Partial<Snapshot> = {}, seat = 'dark') => {
+    const s = setup(
+      async () =>
+        new Response(
+          JSON.stringify(
+            info({ ruleset: STANDARD, seats: { dark: 'present', light: 'open', dragon: 'open' } }),
+          ),
+        ),
+    );
+    return {
+      ...s,
+      async play() {
+        saveSeat(s.store, CODE, { seat, token: TOKEN });
+        await s.controller.start();
+        s.socket.open();
+        s.socket.say(snap({ seat, ruleset: STANDARD, seats: ALL, ...over }));
+        return s.html();
+      },
+    };
+  };
+
+  it('previews the first open seat, and says which seats are the computer’s', async () => {
+    const s = setup(
+      async () =>
+        new Response(
+          JSON.stringify(
+            info({
+              ruleset: STANDARD,
+              seats: { dark: 'present', light: 'open', dragon: 'away' },
+              computer: ['dragon'],
+            }),
+          ),
+        ),
+    );
+    await s.controller.start();
+    const html = s.html();
+    expect(html).toContain('Take the Light seat');
+    expect(html).toContain('The computer plays <strong>Dragon</strong>');
+  });
+
+  it('lists the three seats in turn order, with who is connected, who is the computer, and who moves', async () => {
+    const html = await room({
+      computer: ['dragon'],
+      seats: { dark: 'present', light: 'away', dragon: 'present' },
+    }).play();
+    expect(html).toContain('aria-label="Seats"');
+    expect(html.indexOf('data-seat="dark"')).toBeLessThan(html.indexOf('data-seat="light"'));
+    expect(html.indexOf('data-seat="light"')).toBeLessThan(html.indexOf('data-seat="dragon"'));
+    expect(html).toContain('Dark (you)');
+    expect(html).toMatch(/Light<\/span><span class="seat-note">away/);
+    expect(html).toContain('<span class="seat-bot">Computer</span>');
+    expect(html).toContain('Your move');
+    expect(html).toContain('data-turn="true"');
+  });
+
+  it('offers Resign with the engine’s own account of what it does, and no draw offer', async () => {
+    const html = await room().play();
+    expect(html).toContain('aria-label="Resign"');
+    expect(html).toContain('>Resign<');
+    expect(html).not.toContain('Offer draw');
+    expect(html).not.toContain('Resign or draw');
+  });
+
+  it('waits for the seats still open, with the link to send', async () => {
+    const html = await room({ seats: { dark: 'present', light: 'open', dragon: 'open' } }).play();
+    expect(html).toContain('Waiting for 2 more players to join');
+    expect(html).toContain('the 2 players still to join');
+    expect(html).toContain('Room link');
+  });
+
+  it('shows an out seat that it is out and still watching, with nothing to resign', async () => {
+    const html = await room({ resignations: [{ side: 'dark', after: 0 }] }).play();
+    expect(html).toContain('You are out of this game');
+    expect(html).toContain('resigned');
+    expect(html).not.toContain('>Resign<');
+    expect(html).toContain('You are out ·');
+  });
+
+  it('ends with a result card and the draw or win in the words of decision 0016', async () => {
+    const { moves, result } = threeEnds.games.find(
+      (g) => g.ruleset === 'standard-3p' && g.rows.includes('duel-dragon-wins'),
+    )!;
+    const html = await room({ moves, result: result as Snapshot['result'] }).play();
+    expect(html).toContain('aria-label="Result"');
+    expect(html).toContain('Dragon wins');
+    expect(html).not.toContain('you win');
+    expect(html).not.toContain('>Resign<');
   });
 });
 
