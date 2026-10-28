@@ -19,10 +19,12 @@ import {
   replayGame,
   rulesFiles,
   snapshotFor,
+  resignationsOf,
   type Outgoing,
   type Room as RoomData,
   type RoomInfo,
   type RoomContext,
+  type RoomResignation,
   type RoomRuleset,
 } from '@chess9s/online';
 
@@ -40,6 +42,8 @@ export const JOIN_WITHIN_MS = 60_000;
 export const IDLE_MS = 15 * 60_000;
 /** Two seats (D52: no spectators), with room for each seat's reconnect before the old one closes. */
 export const MAX_SOCKETS = 4;
+/** A 3-seat room (S63) has room for the same in each of its seats; the computer's seats connect from the creator's browser. */
+const socketCap = (seats: number) => (seats > 2 ? seats * 2 : MAX_SOCKETS);
 
 /** What the runtime gives a Room; the real DurableObjectState fits it. */
 export interface Socket {
@@ -91,6 +95,9 @@ interface Saved {
   result: GameResult;
   drawOffer: string | null;
   offerWait: string[];
+  /** 3-seat rooms only (S63): left out of a 2-seat room's record when there are none. */
+  resignations?: RoomResignation[];
+  computer?: string[];
   lastMove: number;
   endedAt: number | null;
 }
@@ -110,6 +117,10 @@ const json = (status: number, body: unknown) =>
   });
 const problem = (status: number, error: string, message: string) =>
   json(status, { error, message });
+
+/** Whether a seat has resigned since the saved record (it counts as a move for D53's seven days). */
+const resigned = (before: Saved, now: RoomResignation[]) =>
+  now.length !== (before.resignations?.length ?? 0);
 
 const keepUntil = (s: Saved) =>
   s.endedAt !== null ? s.endedAt + KEEP_AFTER_END_MS : s.lastMove + KEEP_WITHOUT_MOVE_MS;
@@ -138,7 +149,13 @@ export class Room {
     const saved = this.state.storage.kv.get<Saved>(KEY) ?? null;
     this.saved = saved;
     if (!saved) return (this.room = null);
-    const replay = replayGame(data, saved.ruleset, saved.moves, saved.result);
+    const replay = replayGame(
+      data,
+      saved.ruleset,
+      saved.moves,
+      saved.result,
+      saved.resignations ?? [],
+    );
     // A game that no longer replays is gone for play; D53's alarm still deletes its record.
     if (!replay.ok) return (this.room = null);
     const held = new Set(this.state.getWebSockets().map((ws) => this.attachment(ws).seat));
@@ -154,6 +171,7 @@ export class Room {
       ),
       drawOffer: saved.drawOffer,
       offerWait: saved.offerWait,
+      computer: saved.computer ?? [],
     };
     return this.room;
   }
@@ -162,6 +180,7 @@ export class Room {
   private save(room: RoomData, now: number): void {
     const before = this.saved;
     const moves = room.game.moves.map((m) => m.notation);
+    const resignations = resignationsOf(room.game);
     const ended = room.game.result.status !== 'ongoing';
     const next: Saved = {
       v: 1,
@@ -172,7 +191,12 @@ export class Room {
       result: room.game.result,
       drawOffer: room.drawOffer,
       offerWait: room.offerWait,
-      lastMove: before && moves.length === before.moves.length ? before.lastMove : now,
+      ...(resignations.length > 0 && { resignations }),
+      ...(room.computer.length > 0 && { computer: room.computer }),
+      lastMove:
+        before && moves.length === before.moves.length && !resigned(before, resignations)
+          ? before.lastMove
+          : now,
       endedAt: ended ? (before?.endedAt ?? now) : null,
     };
     if (before && JSON.stringify(before) === JSON.stringify(next)) return;
@@ -271,7 +295,7 @@ export class Room {
     this.room = room;
     this.save(room, Date.now());
     await this.schedule();
-    return json(201, snapshotFor(room, step.seat, true));
+    return json(201, snapshotFor(room, step.seat, true, true));
   }
 
   private info(): Response {
@@ -284,13 +308,15 @@ export class Room {
       ruleset: room.ruleset,
       seats: snap.seats,
       result: room.game.result,
+      ...(room.computer.length > 0 && { computer: room.computer }),
     };
     return json(200, body);
   }
 
   private async connect(): Promise<Response> {
-    if (!this.load()) return problem(404, 'no-room', 'There is no room with this code.');
-    if (this.state.getWebSockets().length >= MAX_SOCKETS) {
+    const room = this.load();
+    if (!room) return problem(404, 'no-room', 'There is no room with this code.');
+    if (this.state.getWebSockets().length >= socketCap(room.game.order.length)) {
       return problem(429, 'room-busy', 'This room has too many connections.');
     }
     const { server, response } = this.sockets.open();
