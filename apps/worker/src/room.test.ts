@@ -474,3 +474,141 @@ describe('a room with three seats (S63, D61)', () => {
     expect(res.status).toBe(429);
   });
 });
+
+describe('clocks (S66, decision 0017)', () => {
+  const MIN = 60_000;
+  const timedCreate = (control: string, showOnly?: true) => ({
+    v: 1,
+    type: 'create',
+    ruleset: DRAFT,
+    seat: 'light',
+    time: { control, ...(showOnly && { showOnly }) },
+  });
+  /** A 3+2 (or other) room with light and dark seated; dark moves first in draft-2p. */
+  async function seatedTimed(control = '3+2') {
+    const h = harness();
+    const created = (await (await h.create(timedCreate(control))).json()) as Snapshot;
+    const light = await h.connect();
+    await h.send(light, { v: 1, type: 'join', code: CODE, token: created.token });
+    const dark = await h.connect();
+    await h.send(dark, { v: 1, type: 'join', code: CODE });
+    const darkToken = (dark.messages()[0] as Snapshot).token!;
+    light.take();
+    dark.take();
+    return { h, light, dark, lightToken: created.token!, darkToken };
+  }
+  /** Fire the alarm until the game is over (an alarm with earlier work just sets the next). */
+  async function untilOver(h: ReturnType<typeof harness>) {
+    for (let i = 0; i < 10; i++) {
+      const saved = h.state.data.get('room') as { result: { status: string } };
+      if (saved.result.status !== 'ongoing') return;
+      await h.fireAlarm();
+    }
+    throw new Error('The game did not end.');
+  }
+  const firstMove = () => {
+    const game = newGame(loadRules(rulesFiles).rules(DRAFT.id, DRAFT.version), DRAFT);
+    return toNotation(game.legal[0]!);
+  };
+
+  it('shows the time control to anyone before they take a seat', async () => {
+    const h = harness();
+    await h.create(timedCreate('3+2'));
+    expect(await (await h.info()).json()).toMatchObject({ time: { control: '3+2' } });
+    const u = harness();
+    await u.create(timedCreate('5+3', true));
+    expect(await (await u.info()).json()).toMatchObject({
+      time: { control: '5+3', showOnly: true },
+    });
+    // Untimed rooms show none.
+    const w = harness();
+    await w.create();
+    expect(await (await w.info()).json()).not.toHaveProperty('time');
+  });
+
+  it('drops the flag by its alarm with nobody connected (D66)', async () => {
+    const { h, light, dark } = await seatedTimed();
+    await h.drop(light);
+    await h.drop(dark);
+    // The alarm wakes the room for dark's flag, three minutes away (an earlier wake sets the next).
+    h.restart();
+    await untilOver(h);
+    expect(Date.now()).toBe(START + 3 * MIN);
+    const saved = h.state.data.get('room') as { result: unknown; endedAt: number };
+    expect(saved.result).toEqual({
+      status: 'win',
+      winner: 'light',
+      loser: 'dark',
+      reason: 'timeout',
+    });
+    expect(saved.endedAt).toBe(START + 3 * MIN);
+    // Back later, the seat sees the game ended on time.
+    vi.setSystemTime(START + 10 * MIN);
+    h.restart();
+    const back = await h.connect();
+    const { tokens } = h.state.data.get('room') as { tokens: Record<string, string> };
+    await h.send(back, { v: 1, type: 'join', code: CODE, token: tokens.light });
+    const snap = back.messages()[0] as Snapshot;
+    expect(snap.result).toMatchObject({ reason: 'timeout', winner: 'light' });
+    expect(snap.time?.left).toEqual({ dark: 0, light: 3 * MIN });
+  });
+
+  it('shows a seat that reloads the right time left, through a restart', async () => {
+    const { h, light, dark, lightToken } = await seatedTimed();
+    vi.setSystemTime(START + 10_000);
+    await h.send(dark, { v: 1, type: 'move', move: firstMove() });
+    const moved = light.take().find((m) => m.type === 'move');
+    expect(moved).toMatchObject({ left: { dark: 3 * MIN - 8000, light: 3 * MIN } });
+    // Light reloads: its socket goes, the object restarts, and the clock keeps running.
+    await h.drop(light);
+    vi.setSystemTime(START + 40_000);
+    h.restart();
+    const again = await h.connect();
+    await h.send(again, { v: 1, type: 'join', code: CODE, token: lightToken });
+    const snap = again.messages()[0] as Snapshot;
+    expect(snap.time).toEqual({
+      control: '3+2',
+      left: { dark: 3 * MIN - 8000, light: 3 * MIN - 30_000 },
+      lefts: [{ dark: 3 * MIN - 8000, light: 3 * MIN }],
+    });
+    // The record keeps each seat's time left with the moves (D53), and nothing else new.
+    const saved = h.state.data.get('room') as { time: { lefts: unknown[] } };
+    expect(saved.time.lefts).toEqual([{ dark: 3 * MIN - 8000, light: 3 * MIN }]);
+  });
+
+  it('refuses a clock that a client tries to set', async () => {
+    const { h, dark } = await seatedTimed();
+    await h.send(dark, { v: 1, type: 'move', move: firstMove(), left: { dark: 9 * MIN } });
+    expect(dark.take()).toEqual([
+      expect.objectContaining({ type: 'refused', reason: 'malformed' }),
+    ]);
+    const saved = h.state.data.get('room') as { moves: unknown[] };
+    expect(saved.moves).toEqual([]);
+  });
+
+  it('counts a player out after 5 minutes away while the other is connected', async () => {
+    const { h, light, dark } = await seatedTimed('away5m');
+    vi.setSystemTime(START + 1000);
+    await h.drop(dark);
+    expect(light.take()).toEqual([
+      { v: 1, type: 'opponent', status: 'away' },
+      { v: 1, type: 'away', away: { dark: 5 * MIN } },
+    ]);
+    h.restart();
+    // Light pings to stay connected; the alarm counts dark out.
+    light.pinged = new Date(START + 4 * MIN);
+    await untilOver(h);
+    expect(Date.now()).toBe(START + 1000 + 5 * MIN);
+    expect(types(light.take())).toEqual(['out-of-time', 'game-over']);
+    expect((h.state.data.get('room') as { result: unknown }).result).toMatchObject({
+      winner: 'light',
+      reason: 'timeout',
+    });
+  });
+
+  it('keeps an untimed room as it was: no time saved', async () => {
+    const h = harness();
+    await h.seated();
+    expect(h.state.data.get('room')).not.toHaveProperty('time');
+  });
+});

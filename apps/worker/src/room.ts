@@ -3,8 +3,10 @@
 // the object's storage on every move and replayed by the engine when the object wakes, so a
 // restart loses nothing. One alarm does two jobs: it closes idle sockets and deletes the room on
 // D53's schedule. Nothing about a player is kept: no names, IP addresses or user agents, only the
-// game and its seat tokens (two, or three in a 3-player room), and nothing is logged.
-import { loadRules, type GameResult } from '@chess9s/engine';
+// game and its seat tokens (two, or three in a 3-player room), and nothing is logged. A room with a
+// time control (S66) also keeps its clock: each seat's time left with the moves, and the server's
+// time its clock started; the alarm drops a flag at its deadline, even with nobody connected.
+import { findControl, loadRules, type Clock, type GameResult, type Times } from '@chess9s/engine';
 import {
   CLOSE_GONE,
   CLOSE_IDLE,
@@ -12,15 +14,20 @@ import {
   PING,
   PONG,
   encode,
+  expire,
   leave,
   parseClientMessage,
   receive,
   refused,
   replayGame,
+  roomDeadline,
+  roomTimeControls,
   rulesFiles,
   snapshotFor,
   resignationsOf,
+  timeChoiceOf,
   type Outgoing,
+  type RoomClock,
   type Room as RoomData,
   type RoomInfo,
   type RoomContext,
@@ -98,10 +105,58 @@ interface Saved {
   /** 3-seat rooms only (S63): left out of a 2-seat room's record when there are none. */
   resignations?: RoomResignation[];
   computer?: string[];
+  /** Rooms with a time control (S66) only. */
+  time?: SavedTime;
   lastMove: number;
   endedAt: number | null;
 }
 const KEY = 'room';
+
+/** A room's clock as saved: the control by id, and the clock without it. */
+interface SavedTime {
+  control: string;
+  showOnly?: true;
+  clock?: Omit<Clock, 'control'>;
+  /** Each seat's time left after each move. */
+  lefts?: Times[];
+  away?: Record<string, number>;
+}
+
+function savedTime(time: RoomClock | null): SavedTime | undefined {
+  if (!time) return undefined;
+  const { timed } = time;
+  return {
+    control: time.control.id,
+    ...(time.showOnly && { showOnly: true as const }),
+    ...(timed && {
+      clock: {
+        left: timed.clock.left,
+        turn: timed.clock.turn,
+        since: timed.clock.since,
+        flagged: timed.clock.flagged,
+        out: timed.clock.out,
+      },
+      lefts: timed.lefts,
+    }),
+    ...(Object.keys(time.away).length > 0 && { away: time.away }),
+  };
+}
+
+/** The clock read back; undefined when its control is no longer one this server knows. */
+function timeFromSaved(saved: SavedTime | undefined): RoomClock | null | undefined {
+  if (!saved) return null;
+  const control = findControl(roomTimeControls, saved.control);
+  if (!control) return undefined;
+  const showOnly = saved.showOnly === true;
+  return {
+    control,
+    showOnly,
+    timed: saved.clock
+      ? { control, showOnly, clock: { ...saved.clock, control }, lefts: saved.lefts ?? [] }
+      : null,
+    away: saved.away ?? {},
+  };
+}
 
 /** What each socket carries through hibernation. */
 interface Attachment {
@@ -156,8 +211,9 @@ export class Room {
       saved.result,
       saved.resignations ?? [],
     );
+    const time = timeFromSaved(saved.time);
     // A game that no longer replays is gone for play; D53's alarm still deletes its record.
-    if (!replay.ok) return (this.room = null);
+    if (!replay.ok || time === undefined) return (this.room = null);
     const held = new Set(this.state.getWebSockets().map((ws) => this.attachment(ws).seat));
     this.room = {
       code: saved.code,
@@ -172,6 +228,7 @@ export class Room {
       drawOffer: saved.drawOffer,
       offerWait: saved.offerWait,
       computer: saved.computer ?? [],
+      time,
     };
     return this.room;
   }
@@ -182,6 +239,7 @@ export class Room {
     const moves = room.game.moves.map((m) => m.notation);
     const resignations = resignationsOf(room.game);
     const ended = room.game.result.status !== 'ongoing';
+    const time = savedTime(room.time);
     const next: Saved = {
       v: 1,
       code: room.code,
@@ -193,6 +251,7 @@ export class Room {
       offerWait: room.offerWait,
       ...(resignations.length > 0 && { resignations }),
       ...(room.computer.length > 0 && { computer: room.computer }),
+      ...(time && { time }),
       lastMove:
         before && moves.length === before.moves.length && !resigned(before, resignations)
           ? before.lastMove
@@ -204,9 +263,11 @@ export class Room {
     this.saved = next;
   }
 
-  /** The earliest time the alarm has work: a socket's idle limit, or the room's deletion. */
+  /** The earliest time the alarm has work: a flag to drop, a socket's idle limit, or the room's deletion. */
   private nextWake(): number | null {
     const times: number[] = this.saved ? [keepUntil(this.saved)] : [];
+    const due = this.room ? roomDeadline(this.room) : null;
+    if (due !== null) times.push(due);
     for (const ws of this.state.getWebSockets()) times.push(this.idleAt(ws));
     return times.length ? Math.min(...times) : null;
   }
@@ -263,8 +324,11 @@ export class Room {
       .getWebSockets()
       .some((ws) => ws !== gone && this.attachment(ws).seat === seat);
     if (held) return;
-    const step = leave(room, seat);
+    const now = Date.now();
+    const step = leave(room, seat, now);
     this.room = step.room;
+    // Under the abandonment control, the time away that counts is kept.
+    if (step.room) this.save(step.room, now);
     this.deliver(null, step.out);
   }
 
@@ -285,23 +349,25 @@ export class Room {
     if (parsed.message.type !== 'create') {
       return json(400, refused('malformed', 'Send a create message to open a room.'));
     }
-    const ctx: RoomContext = { data, random, code };
+    const now = Date.now();
+    const ctx: RoomContext = { data, random, code, now };
     const step = receive(ctx, null, null, text);
     if (!step.room || step.seat === null) {
       return json(400, step.out[0]?.message ?? refused('malformed', 'No room was made.'));
     }
     // The creator holds the seat once it connects with its token.
-    const room = leave(step.room, step.seat).room!;
+    const room = leave(step.room, step.seat, now).room!;
     this.room = room;
-    this.save(room, Date.now());
+    this.save(room, now);
     await this.schedule();
-    return json(201, snapshotFor(room, step.seat, true, true));
+    return json(201, snapshotFor(room, step.seat, now, { token: true, computerTokens: true }));
   }
 
   private info(): Response {
     const room = this.load();
     if (!room) return problem(404, 'no-room', 'There is no room with this code.');
-    const snap = snapshotFor(room, room.game.order[0]!);
+    const snap = snapshotFor(room, room.game.order[0]!, Date.now());
+    const time = timeChoiceOf(room);
     const body: RoomInfo = {
       v: 1,
       code: room.code,
@@ -309,6 +375,7 @@ export class Room {
       seats: snap.seats,
       result: room.game.result,
       ...(room.computer.length > 0 && { computer: room.computer }),
+      ...(time && { time }),
     };
     return json(200, body);
   }
@@ -337,7 +404,7 @@ export class Room {
         { to: 'sender', message: refused('malformed', 'Messages are JSON text.') },
       ]);
     }
-    const step = receive({ data, random, code: before.code }, before, a.seat, message);
+    const step = receive({ data, random, code: before.code, now }, before, a.seat, message);
     ws.serializeAttachment({ seat: step.seat, seen: now } satisfies Attachment);
     if (a.seat === null && step.seat !== null) {
       // The seat was taken back here: an older socket on it closes, and its seat stays present.
@@ -351,9 +418,8 @@ export class Room {
     this.room = room;
     this.save(room, now);
     this.deliver(ws, step.out);
-    if (before.game.result.status === 'ongoing' && room.game.result.status !== 'ongoing') {
-      await this.schedule();
-    }
+    // A move hands the clock on, and an end starts D53's day: the alarm may have earlier work.
+    await this.schedule();
   }
 
   async webSocketClose(ws: Socket): Promise<void> {
@@ -361,7 +427,10 @@ export class Room {
     this.load();
     const { seat } = this.attachment(ws);
     this.shut(ws, 1000, 'Closed.');
-    if (seat !== null) this.vacate(ws, seat);
+    if (seat !== null) {
+      this.vacate(ws, seat);
+      await this.schedule();
+    }
   }
 
   async webSocketError(ws: Socket): Promise<void> {
@@ -370,8 +439,15 @@ export class Room {
 
   async alarm(): Promise<void> {
     const now = Date.now();
-    this.load();
+    const room = this.load();
     if (!this.saved || now >= keepUntil(this.saved)) return this.remove();
+    if (room) {
+      // A flag that fell drops now, whether or not anyone is connected (S66).
+      const step = expire(now, room);
+      this.room = step.room;
+      this.save(step.room!, now);
+      this.deliver(null, step.out);
+    }
     for (const ws of this.state.getWebSockets()) {
       if (now < this.idleAt(ws)) continue;
       const { seat } = this.attachment(ws);
