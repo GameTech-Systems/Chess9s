@@ -258,7 +258,7 @@ Decisions: D18, D50, D53.
 Done when: in two Chromium contexts against `wrangler dev`, a room is created, joined by link, played to checkmate, and one tab reloaded mid-game resumes on the same position; the same game works at Pixel 7 width with no sideways scroll; all checks pass.
 Decisions: D34, D46, D51, D52, D53.
 
-### S54 — Go live with rooms · Owner · `todo`
+### S54 — Go live with rooms · Owner · `done`
 After S53 merges and Workers Builds deploys it: confirm in the Cloudflare dashboard that the Worker shows the `Room` Durable Object, add the free rate-limiting rule for `POST /api/rooms` with the setting from the S52 handoff, confirm Cloudflare's terms for Durable Objects on the free plan (decision 0003 is still provisional), and play one game between two devices on chess9s.com, with a reload in the middle. Phase 5 exit when that game finishes.
 
 ## Phase 6: 3-player Dragon mode (experimental)
@@ -267,7 +267,7 @@ Planned in S32 (2026-10-25); rules settled in S55 (2026-10-26, [decision 0016](d
 
 Already built: 3-player movement is data. The pieces read `coast.3p.exit`, `coast.3p.capturable`, `tail.3p.movement`, `tail.3p.captures`, `sunMoon.3p.range` and `dragon.3p.givesCheck`, the board has the 3-player setup and turn order (dark, light, Dragon), and `nextSide` skips seats that are out. S56 built the 3-player game (`game/three.ts`): seats, stones, check and rule 6, King capture, the Tail's checkmate and swap, the duel, draws and every end-table row. Not built: the Coast pieces' first way out through A5 (`coast.3p.exit`), a 3-player computer player (S23's negamax is 2-player), and 3-player play in the web app and rooms (`loadRules().rules` still refuses 3 players). The ruleset file (S42) is 2-player only.
 
-Phase 6 order: S56, S57, S58, S67, S64, S65, S62, S59, S60, S61. S63 (3-seat online rooms, done; built and played through `wrangler dev`, still to be played live in S54) needed S54 and S58, and S66 (clocks in online rooms) needs S54 and S65; neither is part of the exit.
+Phase 6 order: S56, S57, S58, S67, S64, S65, S62, S59, S60, S61. S63 (3-seat online rooms, done; played through `wrangler dev`) needed S54 and S58, and S66 (clocks in online rooms) needs S54 and S65; neither is part of the exit.
 
 ### S32 — Phase 6 planning · Opus 5.5 · high · `done`
 Wrote the steps below and D55 to D61.
