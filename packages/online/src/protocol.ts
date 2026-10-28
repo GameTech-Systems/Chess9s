@@ -44,8 +44,18 @@ export interface CustomRef {
 export type SeatChoice = string;
 export const RANDOM_SEAT = 'random';
 
+/** Most seats the computer may play in a room (S63, D61): a person always has a seat. */
+export const MAX_COMPUTER_SEATS = 2;
+
 export type ClientMessage =
-  | { v: 1; type: 'create'; ruleset: BundledRef | CustomRef; seat: SeatChoice }
+  | {
+      v: 1;
+      type: 'create';
+      ruleset: BundledRef | CustomRef;
+      seat: SeatChoice;
+      /** 3-seat rooms: seats the creator's browser plays for the computer (S63). */
+      computer?: string[];
+    }
   /** Take an open seat, or with a token, take back one's own seat (reconnect). */
   | { v: 1; type: 'join'; code: string; token?: string }
   | { v: 1; type: 'move'; move: string }
@@ -64,6 +74,12 @@ export interface RoomRuleset {
 
 export type SeatStatus = 'open' | 'present' | 'away';
 
+/** A seat that resigned a 3-player game, and how many moves had been played (decision 0018). */
+export interface RoomResignation {
+  side: string;
+  after: number;
+}
+
 export interface Snapshot {
   v: 1;
   type: 'snapshot';
@@ -78,6 +94,12 @@ export interface Snapshot {
   seats: Record<string, SeatStatus>;
   /** The seat whose draw offer stands, if any. */
   drawOffer: string | null;
+  /** 3-seat rooms: the seats that resigned, in order (a resignation is not a move). Left out when none. */
+  resignations?: RoomResignation[];
+  /** 3-seat rooms: the seats the creator's browser plays for the computer. Left out when none. */
+  computer?: string[];
+  /** Only in the reply that makes a room: the computer seats' secrets, for the creator alone. */
+  computerTokens?: Record<string, string>;
 }
 
 /** What `GET /api/rooms/<code>` shows (S52): enough to decide to join (D54), never a token. */
@@ -87,6 +109,7 @@ export interface RoomInfo {
   ruleset: RoomRuleset;
   seats: Record<string, SeatStatus>;
   result: GameResult;
+  computer?: string[];
 }
 
 export type Refusal =
@@ -110,14 +133,20 @@ export type Refusal =
   | 'illegal-move'
   | 'offer-pending'
   | 'offer-again-later'
-  | 'no-offer';
+  | 'no-offer'
+  | 'computer-seats'
+  | 'seat-out'
+  | 'draw-unavailable';
 
 export type Ended = Exclude<GameResult, { status: 'ongoing' }>;
 
 export type ServerMessage =
   | Snapshot
   | { v: 1; type: 'move'; move: string; side: string }
-  | { v: 1; type: 'opponent'; status: 'present' | 'away' }
+  /** Another seat came or went; `side` names it in rooms with three seats (2-seat rooms leave it out). */
+  | { v: 1; type: 'opponent'; status: 'present' | 'away'; side?: string }
+  /** 3-seat rooms: a seat resigned and is out; the others play on (the game-over follows if that ended it). */
+  | { v: 1; type: 'resigned'; side: string }
   | { v: 1; type: 'offer-draw'; side: string }
   | { v: 1; type: 'decline-draw'; side: string }
   | { v: 1; type: 'refused'; reason: Refusal; message: string }
@@ -167,7 +196,7 @@ const WIN_REASONS: Record<Exclude<WinReason, 'timeout'>, true> = {
   checkmate: true,
   stalemate: true,
   resignation: true,
-  // 3-player results (S56); rooms are 2-player until S63.
+  // 3-player results (S56), played in 3-seat rooms (S63).
   'king-capture': true,
   'dragon-captured': true,
   'exposed-king': true,
@@ -210,6 +239,35 @@ function isResult(v: unknown): v is GameResult {
       return false;
   }
 }
+
+/** One to MAX_COMPUTER_SEATS different sides. */
+const isSides = (v: unknown): v is string[] =>
+  Array.isArray(v) &&
+  v.length >= 1 &&
+  v.length <= MAX_COMPUTER_SEATS &&
+  v.every((s) => str(s, SIDE)) &&
+  new Set(v).size === v.length;
+
+const MAX_MOVES = 100_000;
+const isResignations = (v: unknown): v is RoomResignation[] =>
+  Array.isArray(v) &&
+  v.length >= 1 &&
+  v.length <= 2 &&
+  v.every(
+    (r) =>
+      isObj(r) &&
+      keys(r, ['side', 'after']) &&
+      str(r.side, SIDE) &&
+      Number.isInteger(r.after) &&
+      (r.after as number) >= 0 &&
+      (r.after as number) <= MAX_MOVES,
+  );
+
+const isTokens = (v: unknown): v is Record<string, string> =>
+  isObj(v) &&
+  Object.keys(v).length >= 1 &&
+  Object.keys(v).length <= MAX_COMPUTER_SEATS &&
+  Object.entries(v).every(([k, t]) => SIDE.test(k) && str(t, TOKEN));
 
 const isOverrides = (v: unknown): v is Obj => isObj(v) && !Object.hasOwn(v, '__proto__');
 
@@ -259,6 +317,9 @@ const REFUSAL_RECORD: Record<Refusal, true> = {
   'offer-pending': true,
   'offer-again-later': true,
   'no-offer': true,
+  'computer-seats': true,
+  'seat-out': true,
+  'draw-unavailable': true,
 };
 /** Every reason a message can be refused. */
 export const REFUSALS = Object.keys(REFUSAL_RECORD) as Refusal[];
@@ -267,9 +328,10 @@ const REFUSAL_SET = new Set<string>(REFUSALS);
 /** The checks of each client message type, after `v` and `type`. */
 const CLIENT: Record<ClientMessage['type'], (o: Obj) => boolean> = {
   create: (o) =>
-    keys(o, ['ruleset', 'seat']) &&
+    keys(o, ['ruleset', 'seat'], ['computer']) &&
     isRulesetRef(o.ruleset) &&
-    (o.seat === RANDOM_SEAT || str(o.seat, SIDE)),
+    (o.seat === RANDOM_SEAT || str(o.seat, SIDE)) &&
+    (o.computer === undefined || isSides(o.computer)),
   join: (o) =>
     keys(o, ['code'], ['token']) &&
     str(o.code, CODE) &&
@@ -283,7 +345,11 @@ const CLIENT: Record<ClientMessage['type'], (o: Obj) => boolean> = {
 
 const SERVER: Record<ServerMessage['type'], (o: Obj) => boolean> = {
   snapshot: (o) =>
-    keys(o, ['code', 'seat', 'ruleset', 'moves', 'result', 'seats', 'drawOffer'], ['token']) &&
+    keys(
+      o,
+      ['code', 'seat', 'ruleset', 'moves', 'result', 'seats', 'drawOffer'],
+      ['token', 'resignations', 'computer', 'computerTokens'],
+    ) &&
     str(o.code, CODE) &&
     str(o.seat, SIDE) &&
     (o.token === undefined || str(o.token, TOKEN)) &&
@@ -292,9 +358,16 @@ const SERVER: Record<ServerMessage['type'], (o: Obj) => boolean> = {
     o.moves.every((m) => str(m, NOTATION)) &&
     isResult(o.result) &&
     isSeats(o.seats) &&
-    (o.drawOffer === null || str(o.drawOffer, SIDE)),
+    (o.drawOffer === null || str(o.drawOffer, SIDE)) &&
+    (o.resignations === undefined || isResignations(o.resignations)) &&
+    (o.computer === undefined || isSides(o.computer)) &&
+    (o.computerTokens === undefined || isTokens(o.computerTokens)),
   move: (o) => keys(o, ['move', 'side']) && str(o.move, NOTATION) && str(o.side, SIDE),
-  opponent: (o) => keys(o, ['status']) && (o.status === 'present' || o.status === 'away'),
+  opponent: (o) =>
+    keys(o, ['status'], ['side']) &&
+    (o.status === 'present' || o.status === 'away') &&
+    (o.side === undefined || str(o.side, SIDE)),
+  resigned: (o) => keys(o, ['side']) && str(o.side, SIDE),
   'offer-draw': (o) => keys(o, ['side']) && str(o.side, SIDE),
   'decline-draw': (o) => keys(o, ['side']) && str(o.side, SIDE),
   refused: (o) =>
@@ -366,12 +439,13 @@ export function parseRoomInfo(text: string): { ok: true; info: RoomInfo } | { ok
   }
   if (
     !isObj(value) ||
-    !keys(value, ['v', 'code', 'ruleset', 'seats', 'result']) ||
+    !keys(value, ['v', 'code', 'ruleset', 'seats', 'result'], ['computer']) ||
     value.v !== PROTOCOL_VERSION ||
     !str(value.code, CODE) ||
     !isRoomRuleset(value.ruleset) ||
     !isSeats(value.seats) ||
-    !isResult(value.result)
+    !isResult(value.result) ||
+    (value.computer !== undefined && !isSides(value.computer))
   ) {
     return { ok: false };
   }

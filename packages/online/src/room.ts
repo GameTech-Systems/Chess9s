@@ -5,12 +5,17 @@
 //
 // Conduct (D51, provisional): resign and draw by agreement; no takebacks; untimed; a seat that
 // goes away keeps its seat and the game stays open. Seats (D52, provisional): the creator picks a
-// side or random; two seats; no spectators.
+// side or random; no spectators. A room has a seat for each side of its game: two, or three for a
+// 3-player ruleset (S63, D61). There, a resignation puts the seat out and the others play on, and
+// draws by agreement are not offered (decision 0018). The creator may give one or two seats to the
+// computer: the creator's browser holds their tokens and plays them, and the room checks those
+// moves as it checks a person's.
 import {
   agreeDraw,
   endedBy,
   newGame,
   playMove,
+  replayResignations,
   resign,
   resolveFileOverrides,
   RulesError,
@@ -29,6 +34,7 @@ import {
   type CustomRef,
   type Ended,
   type Refusal,
+  type RoomResignation,
   type RoomRuleset,
   type SeatStatus,
   type ServerMessage,
@@ -57,6 +63,8 @@ export interface Room {
   drawOffer: string | null;
   /** Seats whose last offer was declined: they may offer again once they have moved. */
   offerWait: string[];
+  /** Seats the creator's browser plays for the computer (3-seat rooms). */
+  computer: string[];
 }
 
 /** Who a message goes to: the connection it answers, or every connection of a seat. */
@@ -106,8 +114,8 @@ export function roomRules(
   }
   const found = data.find(ref.id, ref.version);
   if (!found) return no('unknown-ruleset', `There is no ruleset ${ref.id} ${ref.version}.`);
-  if (found.ruleset.players !== 2) {
-    return no('invalid-ruleset', `${found.ruleset.name} is not playable online yet.`);
+  if (found.ruleset.players !== 2 && found.ruleset.players !== 3) {
+    return no('invalid-ruleset', `${found.ruleset.name} is not playable online.`);
   }
   try {
     // An archived version plays from its lock (S45).
@@ -135,14 +143,16 @@ const startGame = (rules: MoveRules, ruleset: RoomRuleset): GameState =>
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 
 /**
- * A game replayed from its ruleset, moves and result (a snapshot, a saved room): every move
- * checked by the engine, and the result the replay gives must be the one given.
+ * A game replayed from its ruleset, moves, resignations (3-seat rooms) and result (a snapshot, a
+ * saved room): every move and resignation checked by the engine, each made where it was made,
+ * and the result the replay gives must be the one given.
  */
 export function replayGame(
   data: RulesData,
   ruleset: RoomRuleset,
   moves: readonly string[],
   result: GameResult,
+  resignations: readonly RoomResignation[] = [],
 ): Ok<{ game: GameState }> | { ok: false; problem: string } {
   const ref: BundledRef | CustomRef = ruleset.overrides
     ? { name: ruleset.name, overrides: ruleset.overrides }
@@ -151,10 +161,19 @@ export function replayGame(
   if (!read.ok) return { ok: false, problem: read.problem };
   try {
     let game = startGame(read.rules, read.ruleset);
+    // A resignation is a seat going out, which only a game with three seats has.
+    if (resignations.length > 0 && game.order.length !== 3) {
+      return { ok: false, problem: 'This game has no resignations to replay.' };
+    }
+    game = replayResignations(game, resignations);
     for (const [i, notation] of moves.entries()) {
       const move = game.legal.find((m) => toNotation(m) === notation);
       if (!move) return { ok: false, problem: `Move ${i + 1} (${notation}) is not legal.` };
       game = playMove(game, move);
+      game = replayResignations(game, resignations);
+    }
+    if (game.resignations.length !== resignations.length) {
+      return { ok: false, problem: 'The resignations do not match the moves.' };
     }
     game = endedBy(game, result) ?? game;
     if (!same(game.result, result)) {
@@ -168,14 +187,27 @@ export function replayGame(
 
 /** The game a snapshot describes, replayed: what a client shows after joining or reconnecting. */
 export const replaySnapshot = (data: RulesData, snapshot: Snapshot) =>
-  replayGame(data, snapshot.ruleset, snapshot.moves, snapshot.result);
+  replayGame(data, snapshot.ruleset, snapshot.moves, snapshot.result, snapshot.resignations);
 
 const statusOf = (seat: Seat): SeatStatus =>
   seat.token === null ? 'open' : seat.present ? 'present' : 'away';
 
-/** What a seat is shown of the room. The token goes only to its own seat, and only when asked. */
-export function snapshotFor(room: Room, seat: string, withToken = false): Snapshot {
+/** The seats that resigned a 3-seat game, as a snapshot and a saved room list them. */
+export const resignationsOf = (game: GameState): RoomResignation[] =>
+  game.resignations.map(({ side, after }) => ({ side, after }));
+
+/**
+ * What a seat is shown of the room. The token goes only to its own seat, and only when asked; the
+ * computer seats' tokens go only to the creator, in the reply that makes the room.
+ */
+export function snapshotFor(
+  room: Room,
+  seat: string,
+  withToken = false,
+  withComputerTokens = false,
+): Snapshot {
   const token = room.seats[seat]?.token;
+  const resignations = resignationsOf(room.game);
   return {
     v: 1,
     type: 'snapshot',
@@ -187,6 +219,14 @@ export function snapshotFor(room: Room, seat: string, withToken = false): Snapsh
     result: room.game.result,
     seats: Object.fromEntries(Object.entries(room.seats).map(([side, s]) => [side, statusOf(s)])),
     drawOffer: room.drawOffer,
+    ...(resignations.length > 0 && { resignations }),
+    ...(room.computer.length > 0 && { computer: room.computer }),
+    ...(withComputerTokens &&
+      room.computer.length > 0 && {
+        computerTokens: Object.fromEntries(
+          room.computer.map((side) => [side, room.seats[side]!.token!]),
+        ),
+      }),
   };
 }
 
@@ -195,6 +235,14 @@ const toSeat = (seat: string, message: ServerMessage): Outgoing => ({ to: { seat
 const toAll = (room: Room, message: ServerMessage): Outgoing[] =>
   room.game.order.map((seat) => toSeat(seat, message));
 const others = (room: Room, seat: string) => room.game.order.filter((s) => s !== seat);
+
+/** A seat came or went. With three seats the message names it; with two it is the other one. */
+const presence = (room: Room, seat: string, status: 'present' | 'away'): ServerMessage => ({
+  v: 1,
+  type: 'opponent',
+  status,
+  ...(room.game.order.length > 2 && { side: seat }),
+});
 
 const refuse = (
   room: Room | null,
@@ -219,14 +267,35 @@ function openRoom(ctx: RoomContext, msg: Extract<ClientMessage, { type: 'create'
     return refuse(null, null, 'invalid-ruleset', problem);
   }
   const sides = [...game.order].sort();
-  const seat = msg.seat === RANDOM_SEAT ? sides[randomIndex(ctx.random, sides.length)]! : msg.seat;
+  const computer = msg.computer ?? [];
+  if (computer.length > 0) {
+    if (sides.length < 3) {
+      return refuse(null, null, 'computer-seats', 'Only 3-player games can have computer seats.');
+    }
+    const unknown = computer.find((s) => !sides.includes(s));
+    if (unknown !== undefined) {
+      return refuse(null, null, 'unknown-seat', `This game has no seat ${unknown}.`);
+    }
+    if (computer.length >= sides.length) {
+      return refuse(null, null, 'computer-seats', 'A person must have a seat.');
+    }
+  }
+  const people = sides.filter((s) => !computer.includes(s));
+  const seat =
+    msg.seat === RANDOM_SEAT ? people[randomIndex(ctx.random, people.length)]! : msg.seat;
   if (!sides.includes(seat)) {
     return refuse(null, null, 'unknown-seat', `This game has no seat ${seat}.`);
+  }
+  if (computer.includes(seat)) {
+    return refuse(null, null, 'computer-seats', "Your own seat cannot be the computer's.");
   }
   const seats: Record<string, Seat> = Object.fromEntries(
     sides.map((s) => [s, { token: null, present: false }]),
   );
   seats[seat] = { token: newSeatToken(ctx.random), present: true };
+  // The computer's seats are taken now, so no one else can: they are away until the creator's
+  // browser connects to them with these tokens.
+  for (const side of computer) seats[side] = { token: newSeatToken(ctx.random), present: false };
   const room: Room = {
     code: ctx.code,
     ruleset: read.ruleset,
@@ -234,8 +303,9 @@ function openRoom(ctx: RoomContext, msg: Extract<ClientMessage, { type: 'create'
     seats,
     drawOffer: null,
     offerWait: [],
+    computer,
   };
-  return { room, seat, out: [toSender(snapshotFor(room, seat, true))] };
+  return { room, seat, out: [toSender(snapshotFor(room, seat, true, true))] };
 }
 
 const withSeat = (room: Room, seat: string, s: Seat): Room => ({
@@ -274,7 +344,7 @@ function joinRoom(
   if (!was.present) {
     for (const other of others(next, seat)) {
       if (next.seats[other]!.token !== null) {
-        out.push(toSeat(other, { v: 1, type: 'opponent', status: 'present' }));
+        out.push(toSeat(other, presence(next, seat, 'present')));
       }
     }
   }
@@ -291,7 +361,7 @@ export function leave(room: Room, seat: string): Step {
     seat,
     out: others(next, seat)
       .filter((other) => next.seats[other]!.token !== null)
-      .map((other) => toSeat(other, { v: 1, type: 'opponent', status: 'away' })),
+      .map((other) => toSeat(other, presence(next, seat, 'away'))),
   };
 }
 
@@ -334,9 +404,39 @@ function act(room: Room, seat: string, msg: GameMessage): Step {
       };
     }
     case 'resign': {
+      if (game.order.length > 2) {
+        if (game.seats[seat] === 'out') return fail('seat-out', 'You are already out of the game.');
+        // The seat's pieces turn to stone and the others play on, unless that ends the game.
+        const next: Room = { ...room, game: resign(game, seat) };
+        return {
+          room: next,
+          seat,
+          out: [...toAll(next, { v: 1, type: 'resigned', side: seat }), ...gameOver(next)],
+        };
+      }
       const next: Room = { ...room, game: resign(game, seat), drawOffer: null };
       return { room: next, seat, out: gameOver(next) };
     }
+    case 'offer-draw':
+    case 'accept-draw':
+    case 'decline-draw':
+      if (game.order.length > 2) {
+        // Decision 0018: agreed draws stay refused in 3-player games.
+        return fail('draw-unavailable', 'Draws by agreement are not offered in 3-player games.');
+      }
+      return drawMessage(room, seat, msg, fail);
+  }
+}
+
+/** A draw offer, acceptance or decline in a 2-seat room. */
+function drawMessage(
+  room: Room,
+  seat: string,
+  msg: Extract<GameMessage, { type: 'offer-draw' | 'accept-draw' | 'decline-draw' }>,
+  fail: (reason: Refusal, problem: string) => Step,
+): Step {
+  const { game } = room;
+  switch (msg.type) {
     case 'offer-draw': {
       if (room.drawOffer !== null) return fail('offer-pending', 'A draw offer already stands.');
       if (room.offerWait.includes(seat)) {
