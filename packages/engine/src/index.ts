@@ -13,4 +13,5 @@ export * from './ai/search-reference';
 export * from './rules/ruleset-file';
 export * from './rules/data';
 export * from './game/clock';
+export * from './game/timed';
 export * from './rules/time-controls';
