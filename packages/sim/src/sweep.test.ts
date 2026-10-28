@@ -147,14 +147,15 @@ describe('playable', () => {
     ]) {
       expect(ids).toContain(id);
     }
+    // coast.3p.exit is not built yet in any 3-player game (unbuiltFeatures), so it is known.
+    const known = new Set(['coast.3p.exit']);
+    expect(playable(source, 'standard-3p', {})).toMatch(/coast\.3p\.exit/);
+    expect(playable(source, 'standard-3p', {}, known)).toBeUndefined();
     const skipped = all.flatMap((c) => {
-      const why = playable(source, 'standard-3p', c.overrides);
-      return why === undefined ? [] : [`${c.id}: ${why}`];
+      const why = playable(source, 'standard-3p', c.overrides, known);
+      return why === undefined ? [] : [c.id];
     });
-    expect(
-      skipped.every((s) => /not built yet/.test(s)),
-      skipped.join('; '),
-    ).toBe(true);
+    expect(skipped).toEqual(['queen.pawnSwap=true', 'setup.swapKingQueen=true']);
   });
 
   it('every real combination is either playable or skipped with a reason', () => {

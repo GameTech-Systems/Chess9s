@@ -3,9 +3,18 @@
 import { describe, expect, it } from 'vitest';
 import { options, planJobs, runReports, type Options } from './cli';
 import { loadSource, rulesFor } from './load';
-import { mergeShards, shardResult, type ShardResult } from './merge';
+import { planJobs3, runReports3 } from './cli3';
+import {
+  mergeShards,
+  mergeShards3,
+  shardResult,
+  type ShardResult,
+  type ShardResult3,
+} from './merge';
 import { playGame, type GameSummary } from './play';
+import { playGame3, type Summary3 } from './play3';
 import { buildReport, type FairnessReport } from './report';
+import { buildReport3 } from './report3';
 
 const source = loadSource(new URL('../../../', import.meta.url).pathname);
 const DATE = '2026-10-20';
@@ -125,5 +134,66 @@ describe('sharded runs', { timeout: 30_000 }, () => {
       /different run/,
     );
     expect(() => mergeShards([])).toThrow(/No shard/);
+  });
+});
+
+describe('sharded 3-player runs (S59)', { timeout: 30_000 }, () => {
+  const three = (extra: string[] = []) =>
+    options(['--players', '3', '--greedy', '--games', '6', '--seed', '3', ...extra], 1);
+
+  function play3(o: Options) {
+    const plan = planJobs3(o, source);
+    const games: Summary3[][] = plan.jobs.map((j) => {
+      const { rules, ruleset } = rulesFor(source, j.rulesetId, j.overrides);
+      return j.seeds.map((seed) => playGame3(rules, ruleset, { ...j.options, maxPlies: 20, seed }));
+    });
+    return { plan, games };
+  }
+
+  const shards3 = (count: number): ShardResult3[] =>
+    Array.from({ length: count }, (_, i) => {
+      const o = three(['--shard', `${i + 1}/${count}`]);
+      const { plan, games } = play3(o);
+      return shardResult(
+        o,
+        plan,
+        games,
+        plan.jobs.map(() => 0),
+        DATE,
+      );
+    });
+
+  it('carry the player count and mode, and merge into the same balance report as one run', () => {
+    const all = shards3(2);
+    expect(all[0]).toMatchObject({ players: 3, mode: 'greedy', decision: '0015' });
+    const o = three();
+    const { plan, games } = play3(o);
+    const whole = buildReport3(
+      plan.ruleset,
+      DATE,
+      plan.mode,
+      runReports3(
+        o,
+        plan,
+        games,
+        plan.jobs.map(() => 0),
+      ),
+      plan.skipped,
+      o.overrides,
+    );
+    const { report, missing } = mergeShards3([all[1]!, all[0]!]);
+    expect(missing).toEqual([]);
+    expect(report).toEqual(whole);
+    expect(report.runs[0]!.summary.games).toBe(6);
+  });
+
+  it('keep an earlier report’s other runs, and refuse 2-player shards or another mode', () => {
+    const merged = mergeShards3(shards3(2)).report;
+    const earlier = { ...merged, runs: [{ ...merged.runs[0]!, depth: 2 }] };
+    expect(mergeShards3(shards3(2), earlier).report.runs.map((r) => r.depth)).toEqual([2, 0]);
+    expect(() => mergeShards3(shards3(2), { ...earlier, mode: 'search' })).toThrow(
+      /different ruleset, mode or measures/,
+    );
+    expect(() => mergeShards3(shards(2) as unknown as ShardResult3[])).toThrow(/decision 0008/);
   });
 });

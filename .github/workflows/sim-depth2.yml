@@ -2,6 +2,8 @@
 # Started by hand from the Actions tab. Each shard job plays a fixed, seeded slice of the games
 # (game i goes to shard i mod N + 1) and uploads its games; the merge job builds the fairness
 # report, keeping the depth-1 run from docs/fairness/<ruleset>.json, and uploads it.
+# S59: a 3-player ruleset gets the balance report of decision 0015 the same way; `depths`, `sweep`
+# and `mode` also run its depth-1 run, its screening sweep and the greedy-Dragon run on shards.
 name: Sim depth 2
 
 on:
@@ -19,12 +21,25 @@ on:
         description: Ruleset id in rules/rulesets.
         type: string
         default: draft-2p
+      depths:
+        description: Search depths, comma-separated (2 for the depth-2 run).
+        type: string
+        default: '2'
+      sweep:
+        description: Also change each parameter one at a time (a screening sweep, named <ruleset>-sweep).
+        type: boolean
+        default: false
+      mode:
+        description: 3-player rulesets only. greedy-dragon plays the Dragon greedy against searching Kinged players.
+        type: choice
+        options: [search, greedy-dragon]
+        default: search
 
 permissions:
   contents: read
 
 concurrency:
-  group: sim-depth2-${{ inputs.ruleset }}
+  group: sim-depth2-${{ inputs.ruleset }}-${{ inputs.depths }}-${{ inputs.sweep }}-${{ inputs.mode }}
   cancel-in-progress: false
 
 jobs:
@@ -32,11 +47,17 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       shards: ${{ steps.list.outputs.shards }}
+      name: ${{ steps.list.outputs.name }}
+      args: ${{ steps.list.outputs.args }}
     steps:
       - id: list
         env:
           SHARDS: ${{ inputs.shards }}
           GAMES: ${{ inputs.games }}
+          RULESET: ${{ inputs.ruleset }}
+          DEPTHS: ${{ inputs.depths }}
+          SWEEP: ${{ inputs.sweep }}
+          MODE: ${{ inputs.mode }}
         run: |
           if ! [[ "$SHARDS" =~ ^[1-9][0-9]*$ ]] || [ "$SHARDS" -gt 256 ]; then
             echo "::error::shards must be a whole number from 1 to 256, not $SHARDS"
@@ -46,7 +67,20 @@ jobs:
             echo "::error::games must be a positive whole number, not $GAMES"
             exit 1
           fi
+          if ! [[ "$DEPTHS" =~ ^[1-9][0-9]*(,[1-9][0-9]*)*$ ]]; then
+            echo "::error::depths must be whole numbers separated by commas, not $DEPTHS"
+            exit 1
+          fi
+          if ! [[ "$RULESET" =~ ^[a-z0-9-]+$ ]]; then
+            echo "::error::ruleset must be a ruleset id, not $RULESET"
+            exit 1
+          fi
+          name="$RULESET"; args="--depths $DEPTHS"
+          if [ "$SWEEP" = true ]; then name="$name-sweep"; args="$args --sweep"; fi
+          if [ "$MODE" = greedy-dragon ]; then name="$name.greedy-dragon"; args="$args --greedy-dragon"; fi
           echo "shards=[$(seq -s , 1 "$SHARDS")]" >> "$GITHUB_OUTPUT"
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "args=$args" >> "$GITHUB_OUTPUT"
 
   shard:
     needs: plan
@@ -75,10 +109,14 @@ jobs:
           SHARDS: ${{ inputs.shards }}
           GAMES: ${{ inputs.games }}
           RULESET: ${{ inputs.ruleset }}
+          NAME: ${{ needs.plan.outputs.name }}
+          ARGS: ${{ needs.plan.outputs.args }}
         run: |
           set +e
-          timeout -s INT 340m node packages/sim/dist/cli.js --ruleset "$RULESET" --depths 2 \
-            --games "$GAMES" --shard "$SHARD/$SHARDS" --out sim-out
+          # ARGS is built in the plan job from checked inputs only; split on spaces on purpose.
+          # shellcheck disable=SC2086
+          timeout -s INT 340m node packages/sim/dist/cli.js --ruleset "$RULESET" $ARGS \
+            --games "$GAMES" --shard "$SHARD/$SHARDS" --out sim-out --name "$NAME"
           code=$?
           set -e
           if [ "$code" -eq 124 ]; then
@@ -117,15 +155,15 @@ jobs:
           merge-multiple: true
       - name: Merge the shards into the fairness report
         env:
-          RULESET: ${{ inputs.ruleset }}
+          NAME: ${{ needs.plan.outputs.name }}
         run: |
           earlier=()
-          if [ -f "docs/fairness/$RULESET.json" ]; then earlier=(--with "docs/fairness/$RULESET.json"); fi
-          node packages/sim/dist/merge.js shards "${earlier[@]}" --out report --name "$RULESET"
-          cat "report/$RULESET.md" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f "docs/fairness/$NAME.json" ]; then earlier=(--with "docs/fairness/$NAME.json"); fi
+          node packages/sim/dist/merge.js shards "${earlier[@]}" --out report --name "$NAME"
+          cat "report/$NAME.md" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v7
         with:
-          name: fairness-report-${{ inputs.ruleset }}
+          name: fairness-report-${{ needs.plan.outputs.name }}
           path: report/
           if-no-files-found: error
           retention-days: 90
