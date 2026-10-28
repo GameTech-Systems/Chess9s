@@ -50,7 +50,8 @@ export function combinations(
 
 /**
  * Why a combination can't be played yet, or undefined when it can. Features in `known` are left
- * out: those not built yet in the ruleset as it is (S59: `coast.3p.exit` in every 3-player game).
+ * out: those not built yet in the ruleset as it is (S59 to S67: `coast.3p.exit` in every 3-player
+ * game; built in S68, decision 0019).
  */
 export function playable(
   source: RulesSource,

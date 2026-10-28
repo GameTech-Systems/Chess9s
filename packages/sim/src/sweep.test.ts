@@ -144,18 +144,22 @@ describe('playable', () => {
       'draw.3p.threefoldRepetition=false',
       'draw.3p.fiftyMove=false',
       'check.3p.exposedKing=counts-as-checkmate',
+      // Built in S68 (decision 0019): the sweep plays both other ways off the Coast.
+      'coast.3p.exit=a5-always',
+      'coast.3p.exit=any-legal-move',
     ]) {
       expect(ids).toContain(id);
     }
-    // coast.3p.exit is not built yet in any 3-player game (unbuiltFeatures), so it is known.
-    const known = new Set(['coast.3p.exit']);
-    expect(playable(source, 'standard-3p', {})).toMatch(/coast\.3p\.exit/);
-    expect(playable(source, 'standard-3p', {}, known)).toBeUndefined();
+    expect(playable(source, 'standard-3p', {})).toBeUndefined();
     const skipped = all.flatMap((c) => {
-      const why = playable(source, 'standard-3p', c.overrides, known);
+      const why = playable(source, 'standard-3p', c.overrides);
       return why === undefined ? [] : [c.id];
     });
-    expect(skipped).toEqual(['queen.pawnSwap=true', 'setup.swapKingQueen=true']);
+    expect(skipped).toEqual([
+      'queen.pawnSwap=true',
+      'sunMoon.canPromote=true',
+      'setup.swapKingQueen=true',
+    ]);
   });
 
   it('every real combination is either playable or skipped with a reason', () => {

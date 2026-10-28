@@ -11,7 +11,7 @@ import { RoomController } from './roomController';
 import { createRules } from './rules';
 
 const DRAGON_TOKEN = 'D'.repeat(43);
-const STANDARD = { id: 'standard-3p', version: '0.1.0', name: 'Standard 3-player' };
+const STANDARD = { id: 'standard-3p', version: '0.2.0', name: 'Standard 3-player' };
 const ALL = { dark: 'present', light: 'present', dragon: 'present' } as const;
 const recorded = threeEnds.games.find(
   (g) => g.ruleset === 'standard-3p' && g.rows.includes('kinged-checkmates-king'),
@@ -32,7 +32,7 @@ const snap = (over: Partial<Snapshot> = {}): Snapshot => ({
 
 /** The moves of the recorded game up to the first time `side` is to move (at least `from` moves in). */
 function movesUntil(side: string, from = 0): string[] {
-  let g: GameState = newGame(createRules('standard-3p', '0.1.0'), STANDARD);
+  let g: GameState = newGame(createRules('standard-3p', '0.2.0'), STANDARD);
   const played: string[] = [];
   for (const notation of recorded.moves) {
     if (g.turn === side && played.length >= from) return played;
@@ -44,7 +44,7 @@ function movesUntil(side: string, from = 0): string[] {
   }
   throw new Error(`${side} is never to move`);
 }
-const DRAGON = three(createRules('standard-3p', '0.1.0'), ['dark', 'light', 'dragon']).dragon;
+const DRAGON = three(createRules('standard-3p', '0.2.0'), ['dark', 'light', 'dragon']).dragon;
 
 function harness(seated?: { computer?: Record<string, string>; seat?: string }) {
   const store = memory();
@@ -138,7 +138,7 @@ describe('seats played by the computer from this browser', () => {
     const sent = bot.messages.filter((m) => m.type === 'move');
     expect(sent).toHaveLength(1);
     // A legal move of the seat to move, found by the search, sent as a person's would be.
-    let g = newGame(createRules('standard-3p', '0.1.0'), STANDARD);
+    let g = newGame(createRules('standard-3p', '0.2.0'), STANDARD);
     for (const n of moves)
       g = playMove(
         g,
@@ -180,7 +180,7 @@ describe('seats played by the computer from this browser', () => {
     bot.say(withBot({ seat: DRAGON }));
     const kinged = ['dark', 'light'];
     // The first mover resigns at the start: the turn passes, and the bot (if it is next) moves.
-    const first = newGame(createRules('standard-3p', '0.1.0'), STANDARD).turn;
+    const first = newGame(createRules('standard-3p', '0.2.0'), STANDARD).turn;
     bot.say({ v: 1, type: 'resigned', side: first });
     await vi.advanceTimersByTimeAsync(2000);
     const sent = bot.messages.filter((m) => m.type === 'move');

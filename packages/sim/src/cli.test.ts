@@ -227,9 +227,12 @@ describe('3 players (S58, S59)', () => {
     expect(plan.jobs[0]!.seeds).toEqual([2, 4]);
     expect(plan.skipped.map((s) => s.combination)).toEqual([
       'queen.pawnSwap=true',
-      'coast.3p.exit=a5-always',
+      'sunMoon.canPromote=true',
       'setup.swapKingQueen=true',
     ]);
+    // coast.3p.exit is built (S68): both other ways off the Coast are played.
+    expect(ids).toContain('coast.3p.exit=a5-always');
+    expect(ids).toContain('coast.3p.exit=any-legal-move');
     for (const s of plan.skipped) expect(s.reason).toMatch(/not built yet/);
   });
 

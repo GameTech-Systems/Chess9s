@@ -18,7 +18,7 @@ import {
 import { createRules } from './rules';
 
 const CODE = 'K7RX2M';
-const STANDARD = { id: 'standard-3p', version: '0.1.0', name: 'Standard 3-player' };
+const STANDARD = { id: 'standard-3p', version: '0.2.0', name: 'Standard 3-player' };
 const ALL_PRESENT = { dark: 'present', light: 'present', dragon: 'present' } as const;
 
 const snap = (over: Partial<Snapshot> = {}): Snapshot => ({
@@ -40,7 +40,7 @@ const start = (over: Partial<Snapshot> = {}): Online => {
 };
 const say = (online: Online, ...ms: ServerMessage[]) =>
   ms.reduce((o, m) => applyServer(o, m), online);
-const order = three(createRules('standard-3p', '0.1.0'), ['dark', 'light', 'dragon']);
+const order = three(createRules('standard-3p', '0.2.0'), ['dark', 'light', 'dragon']);
 const recorded = (row: string) =>
   threeEnds.games.find((g) => g.ruleset === 'standard-3p' && g.rows.includes(row))!;
 
