@@ -1,5 +1,5 @@
-// The D60 3-player balance measures as decision 0015 fixes them (provisional until the owner
-// confirms them). Change them only with a new version of that decision record.
+// The D60 3-player balance measures as decision 0015 fixes them (the owner confirmed them in
+// S61). Change them only with a new version of that decision record.
 export const MEASURES_3P = {
   decision: '0015',
   version: 1,
@@ -11,7 +11,7 @@ export const MEASURES_3P = {
   depths: [1, 2],
   /** Positions the search may visit per move, as in decision 0008. */
   nodes: 100_000,
-  /** Random plies that open each game, two per seat (provisional). */
+  /** Random plies that open each game, two per seat. */
   openingPlies: 6,
   /** Safety cap in plies, as in decision 0008. */
   maxPlies: 2000,

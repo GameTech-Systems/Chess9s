@@ -106,7 +106,8 @@ describe('toMarkdown3', () => {
   it('has the verdict, the measures and a score column per seat', () => {
     expect(md).toContain('# Balance report: standard-3p 0.1.0');
     expect(md).toContain('Verdict: **incomplete**');
-    expect(md).toContain('decision 0015');
+    expect(md).toContain('decision 0015 (version 1) sets out');
+    expect(md).not.toContain('provisional');
     expect(md).toContain('28–38%');
     expect(md).toMatch(/\| Combination \| Depth \| Games \| dark \| light \| dragon \|/);
     expect(md).toContain('| default | 1 | 40 |');

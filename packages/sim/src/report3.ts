@@ -108,7 +108,7 @@ export function toMarkdown3(report: FairnessReport3): string {
     '',
     `Verdict: **${report.verdict}** (${report.date}).`,
     '',
-    `Measured as decision ${report.decision} (version ${m.version}, provisional) sets out (ledger D60): each seat's score, a win counting 1 and a draw split among the seats that share it, must be ${band3Label(m)} over at least ${num(m.minGames)} games at each of depths ${m.depths.join(' and ')}. Games stopped at the cap (${num(m.maxPlies)} plies) are reported, not scored; more than ${Math.round(m.maxCapped * 100)}% of them flags the run for the owner. ${PLAYERS[report.mode]} Each game opens with ${m.openingPlies} random plies; at most ${num(m.nodes)} positions per move. Runs with fewer games are screening only: a sweep combination is flagged when a seat's whole 95% interval misses the band. Every 3-player ruleset stays experimental whatever these numbers show.`,
+    `Measured as decision ${report.decision} (version ${m.version}) sets out (ledger D60): each seat's score, a win counting 1 and a draw split among the seats that share it, must be ${band3Label(m)} over at least ${num(m.minGames)} games at each of depths ${m.depths.join(' and ')}. Games stopped at the cap (${num(m.maxPlies)} plies) are reported, not scored; more than ${Math.round(m.maxCapped * 100)}% of them flags the run for the owner. ${PLAYERS[report.mode]} Each game opens with ${m.openingPlies} random plies; at most ${num(m.nodes)} positions per move. Runs with fewer games are screening only: a sweep combination is flagged when a seat's whole 95% interval misses the band. Every 3-player ruleset stays experimental whatever these numbers show.`,
     '',
     '## Runs',
     '',
