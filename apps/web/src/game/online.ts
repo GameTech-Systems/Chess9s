@@ -4,13 +4,25 @@
 // the game is wrong. A move the player clicks is played on the board at once (so the game feels
 // as it does hot-seat) and sent; the server's echo confirms it, and a refusal takes it back with
 // the reason. React only draws this and wires the socket (connection.ts).
+//
+// Clocks (S66): the room keeps them on the server's time. The browser shows each seat's time left
+// as the server last sent it, running the seat to move from when that message arrived here; it
+// never sets a clock and never drops a flag. The server says when a seat ran out of time.
 import {
   endedBy,
+  isClocked,
+  outSeats,
   playMove,
   replayResignations,
   resign,
+  snapshot as timesAt,
+  timedFlag,
+  timeOut,
   toNotation,
   type GameState,
+  type TimeControl,
+  type Timed,
+  type Times,
 } from '@chess9s/engine';
 import type {
   ClientMessage,
@@ -32,6 +44,7 @@ import {
   statusLine,
   type Model,
 } from './session';
+import { controlById } from './timeControls';
 
 export type Closed = ClosedWhy | 'desync' | 'lost';
 
@@ -54,6 +67,12 @@ export interface Online {
   connection: Status;
   /** Set when the session cannot go on and why. */
   closed: Closed | null;
+  /** The room's time control (S66); null when untimed. A clocked one runs in `model.timed`. */
+  control: TimeControl | null;
+  /** Running out of time is shown and play goes on. */
+  showOnly: boolean;
+  /** The abandonment control: when (this browser's time) each seat away now would be out. */
+  away: Record<string, number>;
 }
 
 /** The game a room's ruleset, moves and result describe, replayed here; null when it does not replay. */
@@ -84,19 +103,78 @@ function replay(
   }
 }
 
+const until = (away: Times, now: number): Record<string, number> =>
+  Object.fromEntries(Object.entries(away).map(([side, ms]) => [side, now + ms]));
+
 /**
- * The session a snapshot starts, or null when this app cannot replay it (an unknown ruleset, a
- * move that is not legal here): the app is older than the server. `aids` keeps the player's
- * choices across a reconnect.
+ * The clock shown at `now` with each seat's time left `left` (the server's, just arrived), or as
+ * it reads now. The seat to move runs once every seat is taken, unless it is out of time or out.
+ */
+function retime(o: Online, now: number, left?: Times): Online {
+  const timed = o.model.timed;
+  if (!timed) return o;
+  const { game } = o.model;
+  const ongoing = game.result.status === 'ongoing';
+  const out = outSeats(game.seats);
+  const { flagged } = timed.clock;
+  const runs =
+    ongoing &&
+    Object.values(o.seats).every((s) => s !== 'open') &&
+    !flagged.includes(game.turn) &&
+    !out.includes(game.turn);
+  const clock = {
+    ...timed.clock,
+    left: left ?? timesAt(timed.clock, now),
+    turn: ongoing ? game.turn : null,
+    since: runs ? now : null,
+    out,
+  };
+  return { ...o, model: { ...o.model, timed: { ...timed, clock } } };
+}
+
+/** Each seat's time left after the move just played, kept for the game record. */
+const withLeft = (o: Online, left: Times | undefined): Online =>
+  left && o.model.timed
+    ? {
+        ...o,
+        model: { ...o.model, timed: { ...o.model.timed, lefts: [...o.model.timed.lefts, left] } },
+      }
+    : o;
+
+/**
+ * The session a snapshot starts at `now`, or null when this app cannot replay it (an unknown
+ * ruleset or time control, a move that is not legal here): the app is older than the server.
+ * `aids` keeps the player's choices across a reconnect.
  */
 export function startOnline(
   snapshot: Snapshot,
   aids?: Pick<Model, 'showMoves' | 'showDanger'>,
   connection: Status = 'connecting',
+  now = Date.now(),
 ): Online | null {
   const game = replay(snapshot.ruleset, snapshot.moves, snapshot.result, snapshot.resignations);
   if (!game) return null;
-  return {
+  const time = snapshot.time;
+  const control = time ? controlById(time.control) : null;
+  if (control === undefined) return null;
+  const showOnly = time?.showOnly === true;
+  const timed: Timed | null =
+    control && isClocked(control) && time?.left
+      ? {
+          control,
+          showOnly,
+          clock: {
+            control,
+            left: time.left,
+            turn: null,
+            since: null,
+            flagged: time.flagged ?? [],
+            out: [],
+          },
+          lefts: time.lefts ?? [],
+        }
+      : null;
+  const online: Online = {
     code: snapshot.code,
     seat: snapshot.seat,
     ruleset: snapshot.ruleset,
@@ -108,7 +186,7 @@ export function startOnline(
       history: [],
       showMoves: aids?.showMoves ?? true,
       showDanger: aids?.showDanger ?? false,
-      timed: null,
+      timed,
     },
     seats: snapshot.seats,
     drawOffer: snapshot.drawOffer,
@@ -117,8 +195,22 @@ export function startOnline(
     notice: null,
     connection,
     closed: null,
+    control,
+    showOnly,
+    away: until(time?.away ?? {}, now),
   };
+  return retime(online, now, time?.left);
 }
+
+/** For each seat whose time away counts (the abandonment control), how long until it is out. */
+export const awayLeft = (o: Online, now: number): Times =>
+  Object.fromEntries(Object.entries(o.away).map(([side, at]) => [side, Math.max(0, at - now)]));
+
+/** The clock for the game record: only when it has the times of every move played. */
+export const onlineTimed = (o: Online): Timed | null => {
+  const timed = o.model.timed;
+  return timed && timed.lefts.length === o.model.game.moves.length ? timed : null;
+};
 
 const ongoing = (o: Online) => o.model.game.result.status === 'ongoing';
 
@@ -167,10 +259,22 @@ function moved(o: Online, model: Model): { online: Online; send?: ClientMessage 
   return { online: { ...o, model } };
 }
 
+/**
+ * The board's click handling without the clock: online, the server keeps the time and decides a
+ * flag fall (a move that arrives late is refused there), so a click here only plays the move.
+ */
+const unclocked = (o: Online, act: (m: Model) => Model): Model => ({
+  ...act({ ...o.model, timed: null }),
+  timed: o.model.timed,
+});
+
 /** A click on a square. Only the player's own turn, on an open connection, does anything. */
 export function pressSquare(o: Online, at: string): { online: Online; send?: ClientMessage } {
   if (!canPlay(o)) return { online: o };
-  return moved(o, click(o.model, at));
+  return moved(
+    o,
+    unclocked(o, (m) => click(m, at)),
+  );
 }
 
 /** The player picked a promotion piece. */
@@ -179,8 +283,10 @@ export function choosePromotion(
   piece: string,
 ): { online: Online; send?: ClientMessage } {
   if (!canPlay(o) || !o.model.promoting) return { online: o };
-  const model = promote(o.model, piece);
-  return model === o.model ? { online: o } : moved(o, model);
+  const model = unclocked(o, (m) => promote(m, piece));
+  return model.game === o.model.game && model.promoting === o.model.promoting
+    ? { online: o }
+    : moved(o, model);
 }
 
 export const cancelPromotion = (o: Online): Online => ({ ...o, model: cancelPick(o.model) });
@@ -200,33 +306,48 @@ export const takeBack = (o: Online, notice: string): Online => ({ ...settled(o),
 
 const desync = (o: Online): Online => ({ ...o, closed: 'desync' });
 
-/** What a message from the server does to the session. */
-export function applyServer(o: Online, message: ServerMessage): Online {
+/** What a message from the server, arriving at `now`, does to the session. */
+export function applyServer(o: Online, message: ServerMessage, now = Date.now()): Online {
   switch (message.type) {
     case 'snapshot': {
-      const next = startOnline(message, o.model, o.connection);
+      const next = startOnline(message, o.model, o.connection, now);
       return next ? { ...next, closed: o.closed } : { ...o, closed: 'outdated' };
     }
     case 'move': {
       if (message.side === o.seat && o.pending) {
         // The echo of the move already on the board.
         const last = o.model.game.moves.at(-1)?.notation;
-        return last === message.move ? { ...o, pending: null } : desync(o);
+        if (last !== message.move) return desync(o);
+        return retime(withLeft({ ...o, pending: null }, message.left), now, message.left);
       }
       const game = o.model.game;
       const move = game.legal.find((m) => toNotation(m) === message.move);
       if (!move || message.side !== game.turn) return desync(o);
-      return {
+      const next: Online = {
         ...o,
         model: { ...o.model, game: playMove(game, move), selected: null, promoting: null },
         notice: null,
       };
+      return retime(withLeft(next, message.left), now, message.left);
     }
-    case 'opponent':
+    case 'opponent': {
       // With three seats the message names the seat; with two it is the one across the board.
-      return { ...o, seats: { ...o.seats, [message.side ?? opponentOf(o)]: message.status } };
+      const seats = { ...o.seats, [message.side ?? opponentOf(o)]: message.status };
+      // The last player to arrive starts the clock.
+      return retime({ ...o, seats }, now);
+    }
     case 'resigned':
-      return resigned(o, message.side);
+      return retime(seatOut(o, message.side, resign), now, message.left);
+    case 'out-of-time': {
+      const timed = o.model.timed;
+      if (o.showOnly && timed) {
+        const flagged = { ...o, model: { ...o.model, timed: timedFlag(timed, message.side) } };
+        return retime(flagged, now, message.left);
+      }
+      return retime(seatOut(o, message.side, timeOut), now, message.left);
+    }
+    case 'away':
+      return { ...o, away: until(message.away, now) };
     case 'offer-draw':
       return { ...o, drawOffer: message.side };
     case 'decline-draw':
@@ -234,24 +355,29 @@ export function applyServer(o: Online, message: ServerMessage): Online {
     case 'game-over': {
       const back = settled(o);
       const game = endedBy(back.model.game, message.result) ?? back.model.game;
-      return {
+      const over: Online = {
         ...back,
         model: { ...back.model, game, selected: null, promoting: null },
         drawOffer: null,
+        away: {},
       };
+      return retime(over, now);
     }
     case 'refused':
       return refusal(o, message.reason, message.message);
   }
 }
 
-/** A seat of a 3-seat game resigned: it is out, and the others play on (or the game ends). */
-function resigned(o: Online, side: string): Online {
-  // A move the player sent and the server has not confirmed is put back on the resigned game.
+/**
+ * A seat resigned a 3-seat game, or ran out of time (D66): it is out, and the others play on (or
+ * the game ends). With two seats running out of time ends the game here too; the game-over follows.
+ */
+function seatOut(o: Online, side: string, how: typeof resign): Online {
+  // A move the player sent and the server has not confirmed is put back on the changed game.
   const server = o.pending ?? o.model.game;
   let game: GameState;
   try {
-    game = resign(server, side);
+    game = how(server, side);
   } catch {
     return desync(o);
   }

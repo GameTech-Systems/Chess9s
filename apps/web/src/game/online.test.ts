@@ -42,7 +42,8 @@ const start = (over: Partial<Snapshot> = {}): Online => {
   if (!online) throw new Error('the snapshot did not replay');
   return setConnection(online, 'open');
 };
-const say = (online: Online, ...ms: ServerMessage[]) => ms.reduce(applyServer, online);
+const say = (online: Online, ...ms: ServerMessage[]) =>
+  ms.reduce((o, m) => applyServer(o, m), online);
 const moveMsg = (move: string, side: string): ServerMessage => ({ v: 1, type: 'move', move, side });
 
 /** A plain move the side to move can make by clicking two squares. */

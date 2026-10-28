@@ -38,7 +38,8 @@ const start = (over: Partial<Snapshot> = {}): Online => {
   if (!online) throw new Error('the snapshot did not replay');
   return setConnection(online, 'open');
 };
-const say = (online: Online, ...ms: ServerMessage[]) => ms.reduce(applyServer, online);
+const say = (online: Online, ...ms: ServerMessage[]) =>
+  ms.reduce((o, m) => applyServer(o, m), online);
 const order = three(createRules('standard-3p', '0.1.0'), ['dark', 'light', 'dragon']);
 const recorded = (row: string) =>
   threeEnds.games.find((g) => g.ruleset === 'standard-3p' && g.rows.includes(row))!;
