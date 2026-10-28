@@ -79,6 +79,7 @@ export type Condition =
   | { players: (2 | 3)[] }
   | { from: string }
   | { firstMove: boolean }
+  | { hasLeft: string }
   | { not: Condition }
   | { all: Condition[] }
   | { any: Condition[] };
@@ -254,6 +255,7 @@ export function validatePiece(piece: unknown, board: Board, registry: Registry):
     else if ('all' in c) for (const x of c.all) condition(path, x);
     else if ('any' in c) for (const x of c.any) condition(path, x);
     else if ('from' in c) squareType(path, c.from);
+    else if ('hasLeft' in c) squareType(path, c.hasLeft);
     else if ('param' in c) {
       const found = param(path, c.param);
       if (!found) return;

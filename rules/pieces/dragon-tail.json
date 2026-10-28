@@ -211,6 +211,67 @@
       }
     }
   ],
+  "squares": [
+    {
+      "type": "coast",
+      "outside": true,
+      "stop": false,
+      "notes": "coast.3p.exit = a5-first-then-any: a Coast piece's first way off the Coast is from A5 (decision 0019). Until it has left the Coast once, it neither moves nor attacks off it from another Coast square.",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "param": "coast.3p.exit",
+            "is": "a5-first-then-any"
+          },
+          {
+            "from": "coast"
+          },
+          {
+            "not": {
+              "from": "coast-gate"
+            }
+          },
+          {
+            "not": {
+              "hasLeft": "coast"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "coast",
+      "outside": true,
+      "stop": false,
+      "notes": "coast.3p.exit = a5-always: a Coast piece leaves the Coast only from A5.",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "param": "coast.3p.exit",
+            "is": "a5-always"
+          },
+          {
+            "from": "coast"
+          },
+          {
+            "not": {
+              "from": "coast-gate"
+            }
+          }
+        ]
+      }
+    }
+  ],
   "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026.",
-  "notes": "Game state, not piece data (S17, src/game/game.ts): its first move is a5 to e5, which opens the Coast (coast.2p.initiation); the repeat limit (tail.repeatLimit); either player may move it in 2-player games, and it never captures a piece of the player moving it. In 3-player games it is the Dragon's King while it is active, and turns to stone when checkmated: game state (S56, src/game/three.ts, decision 0016). In 3-player games all other Coast pieces are the Dragon's own, so non-coast-pieces captures any enemy piece."
+  "notes": "Game state, not piece data (S17, src/game/game.ts): its first move is a5 to e5, which opens the Coast (coast.2p.initiation); the repeat limit (tail.repeatLimit); either player may move it in 2-player games, and it never captures a piece of the player moving it. In 3-player games it is the Dragon's King while it is active, and turns to stone when checkmated: game state (S56, src/game/three.ts, decision 0016). In 3-player games all other Coast pieces are the Dragon's own, so non-coast-pieces captures any enemy piece. Its way off the Coast in 3-player games (coast.3p.exit) is a square rule, as for the other Coast pieces (S68); with tail.3p.movement = two-player-path it only stands on A5, E5 and I5, so the rule never stops it."
 }

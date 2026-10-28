@@ -209,6 +209,13 @@
         },
         {
           "type": "object",
+          "description": "The piece has moved off a square of this type onto one without it at least once (a Coast piece's first way out, decision 0019).",
+          "required": ["hasLeft"],
+          "properties": { "hasLeft": { "$ref": "#/$defs/id" } },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
           "required": ["not"],
           "properties": { "not": { "$ref": "#/$defs/condition" } },
           "additionalProperties": false

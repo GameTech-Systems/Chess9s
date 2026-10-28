@@ -478,7 +478,7 @@ function resolve(g: Three, t: Table, mover: string, move: GeneratedMove, depth: 
   if (victim) (lost[victim.side] ??= []).push(victim.piece);
   if (move.promotion !== undefined) giveBack(lost, mover, move.promotion);
   const start: Work = {
-    position: applyMove(t.position, move),
+    position: applyMove(t.position, move, g.rules),
     seats: t.seats,
     lost,
     events: [],
@@ -631,7 +631,7 @@ function castleAllowed(g: Three, t: Table, mover: string, move: GeneratedMove): 
     (at) =>
       checkersOn(
         g,
-        applyMove(t.position, { from: move.from, to: at, piece: move.piece }),
+        applyMove(t.position, { from: move.from, to: at, piece: move.piece }, g.rules),
         t.seats,
         mover,
       ).length === 0,

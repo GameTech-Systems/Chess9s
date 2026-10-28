@@ -1,6 +1,6 @@
 {
   "$schema": "./schema/parameters.schema.json",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "parameters": [
     {
       "id": "king.range",
@@ -562,7 +562,7 @@
     {
       "id": "coast.3p.exit",
       "label": "Leaving the Coast (3-player)",
-      "description": "How Coast pieces leave the Coast in 3-player games: first emergence through A5, then any legal move, or always through A5.",
+      "description": "How Coast pieces leave the Coast in 3-player games: each piece's first way off the Coast is from A5, then any legal move; always from A5; or any legal move from the start.",
       "piece": null,
       "players": [
         3
@@ -571,19 +571,23 @@
       "default": "a5-first-then-any",
       "options": [
         "a5-first-then-any",
-        "a5-always"
+        "a5-always",
+        "any-legal-move"
       ],
       "group": "Coast",
       "optionLabels": {
         "a5-first-then-any": "A5 first, then any move",
-        "a5-always": "Always through A5"
+        "a5-always": "Always through A5",
+        "any-legal-move": "Any legal move"
       },
       "status": "experimental",
       "affects": [
-        "movement"
+        "movement",
+        "check-detection",
+        "balance"
       ],
-      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)",
-      "notes": "While on the Coast, the Sun and Moon move one square at a time."
+      "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md); any-legal-move added and the rule built in S68 (owner, 28 Oct 2026, decision 0019)",
+      "notes": "Built in S68: until then no 3-player game played it, so every 3-player game and report before S68 played any-legal-move (their archived versions lock it). While on the Coast, the Sun and Moon move one square at a time. A Coast piece that has not left the Coast neither moves nor attacks off it except from A5 (piece data: hasLeft)."
     },
     {
       "id": "coast.openToAll",

@@ -10,6 +10,7 @@ import {
   castlePath,
   generateMoves,
   givesCheck,
+  leftAfter,
   toNotation,
   type GeneratedMove,
   type Lost,
@@ -49,9 +50,11 @@ export interface TurnOptions {
 
 /**
  * The position after a move: the piece moves (as its promotion, if any) and is marked moved; a
- * capture in passing removes the piece it takes; castling moves the partner too.
+ * capture in passing removes the piece it takes; castling moves the partner too. With `rules`,
+ * the piece also records the square types it has left, where its data reads them (`leftAfter`:
+ * a Coast piece's first way out, decision 0019); the engine always passes them.
  */
-export function applyMove(position: Position, move: GeneratedMove): Position {
+export function applyMove(position: Position, move: GeneratedMove, rules?: MoveRules): Position {
   const placed = position[move.from];
   if (!placed || placed.piece !== move.piece) {
     throw new RulesError(`${move.from} does not hold ${move.piece}`);
@@ -65,7 +68,13 @@ export function applyMove(position: Position, move: GeneratedMove): Position {
     delete next[move.castle.from];
     next[move.castle.to] = { ...partner, moved: true };
   }
-  next[move.to] = { ...placed, piece: move.promotion ?? placed.piece, moved: true };
+  const left = rules ? leftAfter(rules, placed, move.from, move.to) : placed.left;
+  next[move.to] = {
+    ...placed,
+    piece: move.promotion ?? placed.piece,
+    moved: true,
+    ...(left !== undefined && { left }),
+  };
   return next;
 }
 
@@ -145,7 +154,7 @@ function staysOutOfCheck(
   return (move, mover) => {
     // Castling and captures in passing change more than two squares: judge them in full.
     if (move.castle || move.captureAt !== undefined) {
-      const after = applyMove(position, move);
+      const after = applyMove(position, move, rules);
       return !inCheck(rules, after, side, lifts?.(move, mover) ? undefined : inert);
     }
     const placed = position[move.from]!;
@@ -168,7 +177,7 @@ function staysOutOfCheck(
         other.reads.has(move.from) ||
         (filled && other.reads.has(move.to) && hits(attacks))
       ) {
-        after ??= applyMove(position, move);
+        after ??= applyMove(position, move, rules);
         if (moved) at = move.to;
         piece = after[at]!;
         attacks = new Set(attacksFrom(rules, after, at));
@@ -198,7 +207,7 @@ function castleAllowed(
     (at) =>
       !inCheck(
         rules,
-        applyMove(position, { from: move.from, to: at, piece: move.piece }),
+        applyMove(position, { from: move.from, to: at, piece: move.piece }, rules),
         side,
         inert,
       ),
