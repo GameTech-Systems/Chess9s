@@ -369,7 +369,7 @@ Added in S55: the ledger has D61 set to "Also 3-seat online rooms". Needs S54 (r
 Done when: three Chromium contexts, or two and a computer Dragon, play a 3-player game through `wrangler dev` to an end in decision 0016, with a reload mid-game; all checks pass.
 Decisions: D51, D52, D53, D61.
 
-### S66 — Clocks in online rooms · Opus 5.5 · high · `todo`
+### S66 — Clocks in online rooms · Opus 5.5 · high · `done`
 Added with decision 0017. Needs S54 (rooms live) and S65. Not part of the Phase 6 exit.
 - **Rooms.** The creator picks a time control from `rules/timeControls.json`, the online-only ones included, with Show only; it is fixed for the room and shown before a player takes a seat. Untimed stays the default (D51).
 - **Server clock.** The Room keeps the clocks with S65's functions, using its own time, never the client's. A flag falls by the Room's alarm even when nobody is connected; clocks keep running while a player is away. The abandonment control counts a player out after 5 minutes away while the others are connected.
