@@ -233,7 +233,7 @@ describe('server messages', () => {
     ],
     [
       'a snapshot with an unknown win reason',
-      { ...snapshot, result: { status: 'win', winner: 'light', loser: 'dark', reason: 'timeout' } },
+      { ...snapshot, result: { status: 'win', winner: 'light', loser: 'dark', reason: 'forfeit' } },
     ],
     [
       'a snapshot where a side beats itself',
@@ -384,9 +384,9 @@ describe('3-seat rooms (S63)', () => {
     expect(server({ ...snapshot3, resignations: [{ side: 'light', after: 1.5 }] })).toBe(
       'malformed',
     );
-    // Rooms have no clock until S66: a time-out is not a resignation they carry.
+    // A seat out of time (S66) is a resignation entry marked timeout, and only `true` marks it.
     expect(
-      server({ ...snapshot3, resignations: [{ side: 'light', after: 1, timeout: true }] }),
+      server({ ...snapshot3, resignations: [{ side: 'light', after: 1, timeout: false }] }),
     ).toBe('malformed');
     expect(server({ ...snapshot3, computerTokens: { dragon: 'short' } })).toBe('malformed');
     expect(server({ ...snapshot3, computer: ['dragon', 'dragon'] })).toBe('malformed');
@@ -428,5 +428,105 @@ describe('3-seat rooms (S63)', () => {
     };
     expect(parseRoomInfo(json(peek)).ok).toBe(true);
     expect(parseRoomInfo(json({ ...peek, computer: ['dragon', 'dragon'] })).ok).toBe(false);
+  });
+});
+
+describe('clocks in rooms (S66)', () => {
+  const create = {
+    v: 1,
+    type: 'create',
+    ruleset: { id: 'standard-2p', version: '0.1.0' },
+    seat: 'light',
+  };
+  const left = { light: 179_000, dark: 180_000 };
+
+  it('lets a create message choose a time control, with Show only', () => {
+    expect(client({ ...create, time: { control: '3+2' } })).toBe('ok');
+    expect(client({ ...create, time: { control: 'move1d', showOnly: true } })).toBe('ok');
+    expect(client({ ...create, time: { control: 'away5m' } })).toBe('ok');
+  });
+
+  it('refuses a time control that is not shaped like one', () => {
+    expect(client({ ...create, time: '3+2' })).toBe('malformed');
+    expect(client({ ...create, time: {} })).toBe('malformed');
+    expect(client({ ...create, time: { control: '' } })).toBe('malformed');
+    expect(client({ ...create, time: { control: '3+2', showOnly: false } })).toBe('malformed');
+    expect(client({ ...create, time: { control: '3+2', left } })).toBe('malformed');
+  });
+
+  it('gives a client no way to set a clock', () => {
+    // The room keeps the time; a move, a join or any other message that carries one is refused.
+    expect(client({ v: 1, type: 'move', move: 'c1-b3', left })).toBe('malformed');
+    expect(client({ v: 1, type: 'move', move: 'c1-b3', clock: left })).toBe('malformed');
+    expect(client({ v: 1, type: 'join', code: CODE, left })).toBe('malformed');
+    expect(client({ v: 1, type: 'resign', left })).toBe('malformed');
+    expect(client({ v: 1, type: 'out-of-time', side: 'dark' })).toBe('unknown-type');
+    expect(client({ v: 1, type: 'away', away: {} })).toBe('unknown-type');
+  });
+
+  it("reads a snapshot with the room's clock", () => {
+    const time = { control: '3+2', left, lefts: [left, left] };
+    expect(server({ ...snapshot, time })).toBe('ok');
+    expect(server({ ...snapshot, time: { ...time, showOnly: true, flagged: ['dark'] } })).toBe(
+      'ok',
+    );
+    expect(server({ ...snapshot, time: { control: 'away5m', away: { dark: 120_000 } } })).toBe(
+      'ok',
+    );
+    expect(server({ ...snapshot, time: { control: 'away5m', away: {} } })).toBe('ok');
+  });
+
+  it('refuses a snapshot clock that does not fit its moves or its seats', () => {
+    const time = { control: '3+2', left, lefts: [left, left] };
+    expect(server({ ...snapshot, time: { ...time, lefts: [left] } })).toBe('malformed');
+    expect(server({ ...snapshot, time: { ...time, left: { light: -1, dark: 0 } } })).toBe(
+      'malformed',
+    );
+    expect(server({ ...snapshot, time: { ...time, left: { light: 'a lot' } } })).toBe('malformed');
+    expect(server({ ...snapshot, time: { ...time, flagged: ['dark', 'dark'] } })).toBe('malformed');
+    expect(server({ ...snapshot, time: { ...time, since: 5 } })).toBe('malformed');
+  });
+
+  it('reads the time left with a move and a resignation, and the clock messages', () => {
+    expect(server({ v: 1, type: 'move', move: 'c1-b3', side: 'light', left })).toBe('ok');
+    expect(server({ v: 1, type: 'resigned', side: 'light', left })).toBe('ok');
+    expect(server({ v: 1, type: 'out-of-time', side: 'dark' })).toBe('ok');
+    expect(server({ v: 1, type: 'out-of-time', side: 'dark', left })).toBe('ok');
+    expect(server({ v: 1, type: 'out-of-time' })).toBe('malformed');
+    expect(server({ v: 1, type: 'away', away: { dark: 300_000 } })).toBe('ok');
+    expect(server({ v: 1, type: 'away', away: {} })).toBe('ok');
+    expect(server({ v: 1, type: 'away', away: { dark: -5 } })).toBe('malformed');
+  });
+
+  it('reads the results of running out of time (D66)', () => {
+    expect(
+      server({
+        v: 1,
+        type: 'game-over',
+        result: { status: 'win', winner: 'light', loser: 'dark', reason: 'timeout' },
+      }),
+    ).toBe('ok');
+    expect(
+      server({
+        v: 1,
+        type: 'game-over',
+        result: { status: 'draw', reason: 'timeout-insufficient-material' },
+      }),
+    ).toBe('ok');
+  });
+
+  it('shows the peek the time control before a player takes a seat', () => {
+    const peek = {
+      v: 1,
+      code: CODE,
+      ruleset: snapshot.ruleset,
+      seats: snapshot.seats,
+      result: snapshot.result,
+    };
+    expect(parseRoomInfo(json({ ...peek, time: { control: '3+2' } })).ok).toBe(true);
+    expect(parseRoomInfo(json({ ...peek, time: { control: '3+2', showOnly: true } })).ok).toBe(
+      true,
+    );
+    expect(parseRoomInfo(json({ ...peek, time: { control: '3+2', left } })).ok).toBe(false);
   });
 });
