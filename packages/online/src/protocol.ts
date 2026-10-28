@@ -3,7 +3,14 @@
 // and exactly that type's keys with values of the right shape. Anything else becomes a `refused`
 // message; nothing here throws on input. Side ids (light, dark) come from the board's data, so
 // seats are checked against the game, not here.
-import type { DrawReason, GameResult, ParamValue, WinReason } from '@chess9s/engine';
+import type {
+  DrawReason,
+  GameResult,
+  ParamValue,
+  Times,
+  TimeoutDraw,
+  WinReason,
+} from '@chess9s/engine';
 
 export const PROTOCOL_VERSION = 1;
 /** A create message carries a custom ruleset's overrides, as large as a ruleset file (20 KB). */
@@ -27,6 +34,8 @@ const ID = /^[a-z0-9][a-z0-9-]{0,63}$/;
 const VERSION = /^\d+\.\d+\.\d+$/;
 /** Move notation: `e2-e4`, `e5xd6`, `d8-d9=queen`, `e1-g1/h1-f1`. */
 const NOTATION = /^[a-z0-9x=/-]{1,48}$/;
+/** A time control's id in rules/timeControls.json: `3+2`, `move30s`, `away5m`. */
+const CONTROL = /^[A-Za-z0-9+-]{1,24}$/;
 
 /** A ruleset in rules/rulesets/ (current or archived), by id and version. */
 export interface BundledRef {
@@ -47,6 +56,28 @@ export const RANDOM_SEAT = 'random';
 /** Most seats the computer may play in a room (S63, D61): a person always has a seat. */
 export const MAX_COMPUTER_SEATS = 2;
 
+/** The time control a room is made with (S66, decision 0017): an id, and Show only. */
+export interface TimeChoice {
+  control: string;
+  /** Running out of time is shown and play goes on. Left out when off. */
+  showOnly?: true;
+}
+
+/**
+ * A room's clock as a seat is shown it (S66). The room keeps the time; a browser only shows it.
+ * Times are milliseconds, as of when the message was sent.
+ */
+export interface RoomTime extends TimeChoice {
+  /** Fischer and per-move controls: each seat's time left. */
+  left?: Times;
+  /** Fischer and per-move controls: each seat's time left after each move, in move order. */
+  lefts?: Times[];
+  /** Show only: the seats that ran out of time and play on. */
+  flagged?: string[];
+  /** The abandonment control: for each seat whose time away is counting, how long until it is out. */
+  away?: Times;
+}
+
 export type ClientMessage =
   | {
       v: 1;
@@ -55,6 +86,8 @@ export type ClientMessage =
       seat: SeatChoice;
       /** 3-seat rooms: seats the creator's browser plays for the computer (S63). */
       computer?: string[];
+      /** The time control (S66); untimed when left out (D51). */
+      time?: TimeChoice;
     }
   /** Take an open seat, or with a token, take back one's own seat (reconnect). */
   | { v: 1; type: 'join'; code: string; token?: string }
@@ -78,6 +111,8 @@ export type SeatStatus = 'open' | 'present' | 'away';
 export interface RoomResignation {
   side: string;
   after: number;
+  /** The seat ran out of time (S66, D66): out as after a resignation. */
+  timeout?: true;
 }
 
 export interface Snapshot {
@@ -100,6 +135,8 @@ export interface Snapshot {
   computer?: string[];
   /** Only in the reply that makes a room: the computer seats' secrets, for the creator alone. */
   computerTokens?: Record<string, string>;
+  /** The room's clock (S66). Left out for an untimed room. */
+  time?: RoomTime;
 }
 
 /** What `GET /api/rooms/<code>` shows (S52): enough to decide to join (D54), never a token. */
@@ -110,6 +147,8 @@ export interface RoomInfo {
   seats: Record<string, SeatStatus>;
   result: GameResult;
   computer?: string[];
+  /** The time control, shown before a player takes a seat (S66). Left out when untimed. */
+  time?: TimeChoice;
 }
 
 export type Refusal =
@@ -136,17 +175,27 @@ export type Refusal =
   | 'no-offer'
   | 'computer-seats'
   | 'seat-out'
-  | 'draw-unavailable';
+  | 'draw-unavailable'
+  | 'unknown-time-control'
+  | 'out-of-time';
 
 export type Ended = Exclude<GameResult, { status: 'ongoing' }>;
 
 export type ServerMessage =
   | Snapshot
-  | { v: 1; type: 'move'; move: string; side: string }
+  /** A move; in a room with a clock, each seat's time left right after it (S66). */
+  | { v: 1; type: 'move'; move: string; side: string; left?: Times }
   /** Another seat came or went; `side` names it in rooms with three seats (2-seat rooms leave it out). */
   | { v: 1; type: 'opponent'; status: 'present' | 'away'; side?: string }
   /** 3-seat rooms: a seat resigned and is out; the others play on (the game-over follows if that ended it). */
-  | { v: 1; type: 'resigned'; side: string }
+  | { v: 1; type: 'resigned'; side: string; left?: Times }
+  /**
+   * A seat ran out of time (S66, D66). With Show only it plays on; otherwise it is out: with two
+   * seats the game-over follows, with three it is out as after a resignation.
+   */
+  | { v: 1; type: 'out-of-time'; side: string; left?: Times }
+  /** The abandonment control: the seats whose time away is counting now, and how long each has. */
+  | { v: 1; type: 'away'; away: Times }
   | { v: 1; type: 'offer-draw'; side: string }
   | { v: 1; type: 'decline-draw'; side: string }
   | { v: 1; type: 'refused'; reason: Refusal; message: string }
@@ -191,22 +240,24 @@ const isName = (v: unknown): v is string =>
   typeof v === 'string' && v.trim() !== '' && v.length <= MAX_RULESET_NAME;
 
 // Records keep the reason lists in step with the engine's types: a new reason fails to compile.
-// Rooms have no clock until S66, so running out of time (S65) is not a result they carry yet.
-const WIN_REASONS: Record<Exclude<WinReason, 'timeout'>, true> = {
+const WIN_REASONS: Record<WinReason, true> = {
   checkmate: true,
   stalemate: true,
   resignation: true,
+  // Running out of time (S65), in rooms with a clock (S66).
+  timeout: true,
   // 3-player results (S56), played in 3-seat rooms (S63).
   'king-capture': true,
   'dragon-captured': true,
   'exposed-king': true,
 };
-const DRAW_REASONS: Record<DrawReason | 'agreement', true> = {
+const DRAW_REASONS: Record<DrawReason | 'agreement' | TimeoutDraw, true> = {
   stalemate: true,
   'insufficient-material': true,
   repetition: true,
   'fifty-move': true,
   agreement: true,
+  'timeout-insufficient-material': true,
 };
 
 function isResult(v: unknown): v is GameResult {
@@ -256,8 +307,9 @@ const isResignations = (v: unknown): v is RoomResignation[] =>
   v.every(
     (r) =>
       isObj(r) &&
-      keys(r, ['side', 'after']) &&
+      keys(r, ['side', 'after'], ['timeout']) &&
       str(r.side, SIDE) &&
+      (r.timeout === undefined || r.timeout === true) &&
       Number.isInteger(r.after) &&
       (r.after as number) >= 0 &&
       (r.after as number) <= MAX_MOVES,
@@ -268,6 +320,41 @@ const isTokens = (v: unknown): v is Record<string, string> =>
   Object.keys(v).length >= 1 &&
   Object.keys(v).length <= MAX_COMPUTER_SEATS &&
   Object.entries(v).every(([k, t]) => SIDE.test(k) && str(t, TOKEN));
+
+/** The longest time a clock can hold (3 days per move is the longest control), with room to spare. */
+const MAX_TIME_MS = 30 * 24 * 3_600_000;
+/** Milliseconds by seat: one to three seats, each a whole number of milliseconds or more. */
+const isTimes = (v: unknown): v is Times =>
+  isObj(v) &&
+  Object.keys(v).length <= 3 &&
+  Object.entries(v).every(
+    ([k, t]) => SIDE.test(k) && typeof t === 'number' && t >= 0 && t <= MAX_TIME_MS,
+  );
+const isFilledTimes = (v: unknown): v is Times => isTimes(v) && Object.keys(v).length > 0;
+
+const isTimeChoice = (v: unknown): v is TimeChoice =>
+  isObj(v) &&
+  keys(v, ['control'], ['showOnly']) &&
+  str(v.control, CONTROL) &&
+  (v.showOnly === undefined || v.showOnly === true);
+
+/** A snapshot's clock: its per-move times must be one per move played. */
+const isRoomTime = (v: unknown, moves: number): v is RoomTime =>
+  isObj(v) &&
+  keys(v, ['control'], ['showOnly', 'left', 'lefts', 'flagged', 'away']) &&
+  isTimeChoice({
+    control: v.control,
+    ...(v.showOnly !== undefined && { showOnly: v.showOnly }),
+  }) &&
+  (v.left === undefined || isFilledTimes(v.left)) &&
+  (v.lefts === undefined ||
+    (Array.isArray(v.lefts) && v.lefts.length === moves && v.lefts.every(isFilledTimes))) &&
+  (v.flagged === undefined ||
+    (Array.isArray(v.flagged) &&
+      v.flagged.length <= 3 &&
+      v.flagged.every((s) => str(s, SIDE)) &&
+      new Set(v.flagged).size === v.flagged.length)) &&
+  (v.away === undefined || isTimes(v.away));
 
 const isOverrides = (v: unknown): v is Obj => isObj(v) && !Object.hasOwn(v, '__proto__');
 
@@ -320,6 +407,8 @@ const REFUSAL_RECORD: Record<Refusal, true> = {
   'computer-seats': true,
   'seat-out': true,
   'draw-unavailable': true,
+  'unknown-time-control': true,
+  'out-of-time': true,
 };
 /** Every reason a message can be refused. */
 export const REFUSALS = Object.keys(REFUSAL_RECORD) as Refusal[];
@@ -328,10 +417,11 @@ const REFUSAL_SET = new Set<string>(REFUSALS);
 /** The checks of each client message type, after `v` and `type`. */
 const CLIENT: Record<ClientMessage['type'], (o: Obj) => boolean> = {
   create: (o) =>
-    keys(o, ['ruleset', 'seat'], ['computer']) &&
+    keys(o, ['ruleset', 'seat'], ['computer', 'time']) &&
     isRulesetRef(o.ruleset) &&
     (o.seat === RANDOM_SEAT || str(o.seat, SIDE)) &&
-    (o.computer === undefined || isSides(o.computer)),
+    (o.computer === undefined || isSides(o.computer)) &&
+    (o.time === undefined || isTimeChoice(o.time)),
   join: (o) =>
     keys(o, ['code'], ['token']) &&
     str(o.code, CODE) &&
@@ -348,7 +438,7 @@ const SERVER: Record<ServerMessage['type'], (o: Obj) => boolean> = {
     keys(
       o,
       ['code', 'seat', 'ruleset', 'moves', 'result', 'seats', 'drawOffer'],
-      ['token', 'resignations', 'computer', 'computerTokens'],
+      ['token', 'resignations', 'computer', 'computerTokens', 'time'],
     ) &&
     str(o.code, CODE) &&
     str(o.seat, SIDE) &&
@@ -361,13 +451,26 @@ const SERVER: Record<ServerMessage['type'], (o: Obj) => boolean> = {
     (o.drawOffer === null || str(o.drawOffer, SIDE)) &&
     (o.resignations === undefined || isResignations(o.resignations)) &&
     (o.computer === undefined || isSides(o.computer)) &&
-    (o.computerTokens === undefined || isTokens(o.computerTokens)),
-  move: (o) => keys(o, ['move', 'side']) && str(o.move, NOTATION) && str(o.side, SIDE),
+    (o.computerTokens === undefined || isTokens(o.computerTokens)) &&
+    (o.time === undefined || isRoomTime(o.time, (o.moves as unknown[]).length)),
+  move: (o) =>
+    keys(o, ['move', 'side'], ['left']) &&
+    str(o.move, NOTATION) &&
+    str(o.side, SIDE) &&
+    (o.left === undefined || isFilledTimes(o.left)),
   opponent: (o) =>
     keys(o, ['status'], ['side']) &&
     (o.status === 'present' || o.status === 'away') &&
     (o.side === undefined || str(o.side, SIDE)),
-  resigned: (o) => keys(o, ['side']) && str(o.side, SIDE),
+  resigned: (o) =>
+    keys(o, ['side'], ['left']) &&
+    str(o.side, SIDE) &&
+    (o.left === undefined || isFilledTimes(o.left)),
+  'out-of-time': (o) =>
+    keys(o, ['side'], ['left']) &&
+    str(o.side, SIDE) &&
+    (o.left === undefined || isFilledTimes(o.left)),
+  away: (o) => keys(o, ['away']) && isTimes(o.away),
   'offer-draw': (o) => keys(o, ['side']) && str(o.side, SIDE),
   'decline-draw': (o) => keys(o, ['side']) && str(o.side, SIDE),
   refused: (o) =>
@@ -439,13 +542,14 @@ export function parseRoomInfo(text: string): { ok: true; info: RoomInfo } | { ok
   }
   if (
     !isObj(value) ||
-    !keys(value, ['v', 'code', 'ruleset', 'seats', 'result'], ['computer']) ||
+    !keys(value, ['v', 'code', 'ruleset', 'seats', 'result'], ['computer', 'time']) ||
     value.v !== PROTOCOL_VERSION ||
     !str(value.code, CODE) ||
     !isRoomRuleset(value.ruleset) ||
     !isSeats(value.seats) ||
     !isResult(value.result) ||
-    (value.computer !== undefined && !isSides(value.computer))
+    (value.computer !== undefined && !isSides(value.computer)) ||
+    (value.time !== undefined && !isTimeChoice(value.time))
   ) {
     return { ok: false };
   }
