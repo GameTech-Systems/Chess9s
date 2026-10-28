@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'reac
 import { RoomRulesetCard } from './RoomRulesetCard';
 import { Board } from './board/Board';
 import { boardData, pieceLetters } from './board/data';
-import { play, soundsFor } from './game/aids';
+import { formatLeft, play, soundsFor } from './game/aids';
+import { choiceText, clockSeats } from './game/clockText';
 import { socketUrl } from './game/api';
 import type { SocketLike } from './game/connection';
 import type { Store } from './game/guest';
@@ -10,17 +11,19 @@ import {
   DESYNC_TEXT,
   RELOAD_TEXT,
   REPLACED_TEXT,
+  awayLeft,
   canAct,
   mySeatOut,
   onlineHighlights,
   onlineStatus,
+  onlineTimed,
   opponentOf,
   type Online,
 } from './game/online';
 import { saveRecordFile } from './game/record';
 import { RoomController, type Phase } from './game/roomController';
 import { roomInviteMailto, roomPath } from './game/share';
-import { rounds } from './game/session';
+import { clockLines, rounds } from './game/session';
 import { noticeLines, phaseLine, resignPrompt, resultCard, seatLines } from './game/threeText';
 
 const title = (id: string) => id.charAt(0).toUpperCase() + id.slice(1);
@@ -102,6 +105,9 @@ function RoomPreview({
     <section className="picker" aria-labelledby="room-title">
       <h2 id="room-title">Join a game</h2>
       <RoomRulesetCard ruleset={info.ruleset} linkTo={linkTo} />
+      <p className="facts">
+        Time control: <strong>{choiceText(info.time)}</strong>
+      </p>
       <p className="facts">
         You will play <strong>{title(side)}</strong>.
         {(info.computer?.length ?? 0) > 0 && (
@@ -197,6 +203,21 @@ function OnlineGame({
   const offer = online.drawOffer;
   const { ruleset } = online;
   const status = online.model.game.ruleset.overrides ? 'proposed' : undefined;
+  // The room's clock (S66): shown from the server's times, redrawn while one runs.
+  const { timed } = online.model;
+  const [now, setNow] = useState(() => Date.now());
+  const away = awayLeft(online, now);
+  const ticking = !over && (timed?.clock.since != null || Object.keys(online.away).length > 0);
+  useEffect(() => {
+    if (!ticking) return;
+    setNow(Date.now());
+    const id = setInterval(() => setNow(Date.now()), 250);
+    return () => clearInterval(id);
+  }, [ticking]);
+  const clocks = clockLines(online.model, now);
+  const awayText = (side: string) =>
+    away[side] !== undefined ? ` · out of time in ${formatLeft(away[side])}` : '';
+  const flagged = (side: string) => clocks.find((c) => c.side === side)?.flagged === true;
 
   return (
     <div className="table">
@@ -270,8 +291,15 @@ function OnlineGame({
                     </>
                   )}
                   {SEAT_WORDS[online.seats[s.side] ?? 'open']}
+                  {awayText(s.side)}
                   {s.text && ` · ${s.text}`}
+                  {flagged(s.side) && !s.text.includes('out of time') && ' · out of time'}
                 </span>
+                {timed && (
+                  <span className="seat-time" aria-label={`${s.name} time`}>
+                    {formatLeft(clocks.find((c) => c.side === s.side)?.ms ?? 0)}
+                  </span>
+                )}
               </li>
             ))}
           </ul>
@@ -279,6 +307,40 @@ function OnlineGame({
           <p className="facts">
             You play <strong>{title(online.seat)}</strong> · Opponent{' '}
             <strong>{SEAT_WORDS[online.seats[opponent] ?? 'open']}</strong>
+            {awayText(opponent)}
+          </p>
+        )}
+
+        {!threeSeats && timed && (
+          <ul className="seats" aria-label="Clocks">
+            {clockSeats(clocks, over, game.turn).map((c) => (
+              <li
+                key={c.side}
+                data-seat={c.side}
+                data-turn={c.toMove ? 'true' : 'false'}
+                {...(c.flagged && { 'data-flag': 'true' })}
+              >
+                <span className="seat-name">
+                  {c.name}
+                  {c.side === online.seat && ' (you)'}
+                </span>
+                <span className="seat-note">{c.text}</span>
+                <span className="seat-time" aria-label={`${c.name} time`}>
+                  {formatLeft(c.ms)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+        {online.control && (
+          <p className="facts">
+            Time control:{' '}
+            <strong>
+              {choiceText({
+                control: online.control.id,
+                ...(online.showOnly && { showOnly: true }),
+              })}
+            </strong>
           </p>
         )}
 
@@ -411,7 +473,7 @@ function OnlineGame({
           <button
             type="button"
             disabled={game.moves.length === 0}
-            onClick={() => saveRecordFile(game, ruleset)}
+            onClick={() => saveRecordFile(game, ruleset, onlineTimed(online))}
           >
             Save game record
           </button>
