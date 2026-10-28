@@ -89,11 +89,11 @@ describe('the ruleset list', () => {
     }
   });
 
-  it('plays every ruleset in hot-seat; only the 2-player ones online (the room is S63)', () => {
+  it('plays every bundled ruleset in hot-seat and online (3-seat rooms, S63)', () => {
     const byId = Object.fromEntries(listRulesets().map((r) => [r.id, r]));
     for (const r of Object.values(byId)) expect(r.playable, r.id).toBe(true);
     expect(byId['draft-2p']!.online).toBe(true);
-    expect(byId['draft-3p']!.online).toBe(false);
+    expect(byId['draft-3p']!.online).toBe(true);
     expect(byId['draft-3p']!.players).toBe(3);
   });
 
