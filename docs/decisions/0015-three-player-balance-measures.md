@@ -1,6 +1,6 @@
 # 0015: Balance measures for 3-player rulesets
 
-**Status:** Provisional (ledger D60, default), version 1, written in S59 before the full runs were merged. The owner confirms or changes it in S61. The choices marked *provisional* are Claude's within D60; a change is a new version of this record, and earlier reports stay labeled with the version they used.
+**Status:** Accepted (owner, S61, 28 Oct 2026), version 1, unchanged from S59. The owner confirmed D60 and the choices Claude made within it (the 6 opening plies, capped games reported not scored, the 5% capped flag, 2,000 games per depth). A change is a new version of this record, and earlier reports stay labeled with the version they used; the S59 and S60 reports call version 1 provisional because they were played before S61.
 
 ## Context
 Decision [0008](0008-fairness-measures.md) measures 2-player balance as the first player's score. A 3-player game has three seats that play different armies (two Kinged players and the Dragon, [0016](0016-three-player-rules-v0.3.md)), and draws can be shared by two or three of them, so it needs its own measure. D60 sets it; this record fixes how it is measured, so the thresholds can't be adjusted to fit the results afterwards. Every 3-player ruleset stays experimental whatever the numbers show (BUILD-PLAN S59).
@@ -16,7 +16,7 @@ Decision [0008](0008-fairness-measures.md) measures 2-player balance as the firs
 ## How games are played
 - **Every seat** is played by the same paranoid search (`bestMove`, S62, D59), so the seats are measured with equal play. Depth counts plies, one per seat (S62).
 - **Budget:** at most 100,000 positions per move, as in 0008. The 3-player bench (`pnpm bench --players 3`) needed about 401 per move at depth 2, none capped.
-- **Variety (provisional):** each game opens with **6** random legal plies, two per seat (0008 uses 4, two per side), and the search breaks ties at random. Game *i* of a run uses seed *base + i*.
+- **Variety:** each game opens with **6** random legal plies, two per seat (0008 uses 4, two per side), and the search breaks ties at random. Game *i* of a run uses seed *base + i*.
 - **Safety cap:** 2,000 plies, as in 0008.
 - **Greedy Dragon (reported, not scored):** a second run plays the greedy Dragon (S58) against Kinged players who search, as players meet it against the computer Dragon. Its report carries the same tables and the verdict `not scored`.
 
@@ -29,3 +29,15 @@ Decision [0008](0008-fairness-measures.md) measures 2-player balance as the firs
 - `packages/sim` implements these measures (`src/measures3.ts` holds the numbers) and writes each 3-player report as JSON and Markdown to `docs/fairness/`, beside the 2-player ones. `pnpm sim` on a 3-player ruleset, `--sweep`, `--shard` and `pnpm sim:merge` work as for 2 players (0009); `--greedy-dragon` writes `<ruleset>.greedy-dragon`.
 - The `Sim depth 2` workflow takes a 3-player ruleset, and `depths`, `sweep` and `mode` inputs, so the depth-1 run, the sweep and the greedy-Dragon run can be played on shards too.
 - The 2-player measures, reports and tests (0008) don't change.
+
+## S61 review (28 Oct 2026)
+Standard (`standard-3p` 0.1.0, D63), 2,000 games at each depth ([report](../fairness/standard-3p.md); depth 2 from workflow run 40617147007, S60):
+
+| Depth | dark | light | Dragon | Verdict |
+| --- | --- | --- | --- | --- |
+| 1 | 26.3% | 38.3% | 35.4% | fail |
+| 2 | 21.2% | 3.0% | 75.7% | fail |
+
+At depth 2 the Dragon captured light's King in 1,528 games (367 at depth 1) and won 1,477. The depth-1 screens of Good Practice (Dragon 9.6%) and Easy Start (dark 70.8%) are far from the band, and the 40-game depth-1 sweep shows no option that would bring both depths into it.
+
+**Outcome (owner):** the three 3-player presets stay experimental as they are; no default changes and no 3-player Candidate. D62 to D65 are confirmed unchanged. This closes Phase 6. Why light collapses at depth 2 (the rules, or the depth-2 horizon, where each seat sees only the next seat's reply) is open, and should be looked into before any 3-player default is changed.
