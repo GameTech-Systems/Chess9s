@@ -392,6 +392,18 @@ describe('a room with three seats (S63)', () => {
     expect(html).toContain('data-turn="true"');
   });
 
+  it('lists the moves three to a round, the third seat’s too', async () => {
+    const { moves } = threeEnds.games.find(
+      (g) => g.ruleset === 'standard-3p' && g.rows.includes('kinged-checkmates-king'),
+    )!;
+    const html = await room({ moves: moves.slice(0, 7) }).play();
+    const items = html.match(/<li value="\d+">(?:<span>[^<]+<\/span>)+<\/li>/g) ?? [];
+    expect(items).toHaveLength(3);
+    expect(items[0]!.match(/<span>/g)).toHaveLength(3);
+    expect(items[2]!.match(/<span>/g)).toHaveLength(1);
+    expect(html.match(/<ol class="moves"[\s\S]*?<\/ol>/)![0].match(/<span>/g)).toHaveLength(7);
+  });
+
   it('offers Resign with the engine’s own account of what it does, and no draw offer', async () => {
     const html = await room().play();
     expect(html).toContain('aria-label="Resign"');

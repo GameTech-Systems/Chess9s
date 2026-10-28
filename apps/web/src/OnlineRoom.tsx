@@ -402,6 +402,7 @@ function OnlineGame({
             <li key={r.number} value={r.number}>
               <span>{r.first}</span>
               {r.second && <span>{r.second}</span>}
+              {r.third && <span>{r.third}</span>}
             </li>
           ))}
         </ol>
