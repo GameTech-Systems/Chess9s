@@ -14,7 +14,7 @@ export interface Job {
   seeds: number[];
 }
 
-/** A run of 3-player greedy games (S58). */
+/** A run of 3-player games (S58, S59): greedy, search, or a greedy Dragon against search. */
 export interface Job3 extends Omit<Job, 'options'> {
   players: 3;
   options: Omit<Play3Options, 'seed' | 'init'>;

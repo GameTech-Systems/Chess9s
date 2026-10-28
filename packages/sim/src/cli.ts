@@ -2,10 +2,12 @@
 // to docs/fairness/<name>.json and .md. The report is rewritten as games finish, and on Ctrl-C,
 // so a long run that is stopped still leaves its games counted (flagged as too few).
 //
-//   --players <2|3>    3: greedy players on a 3-player ruleset (standard-3p, 100 games), reporting
-//                      each seat's results; --sweep and --shard are 2-player only
-//   --search           with --players 3: every seat searches paranoid (S62) at the one depth in
-//                      --depths, with --nodes, instead of playing greedy
+// A 3-player ruleset gets the balance report of decision 0015 instead (cli3.ts).
+//
+//   --players <2|3>    3: a 3-player ruleset (standard-3p) unless --ruleset names one
+//   --greedy-dragon    3 players: the Dragon plays greedy against searching Kinged players; the
+//                      report is <name>.greedy-dragon, reported and not scored
+//   --greedy           3 players: the greedy player on every seat (S58); <name>.greedy
 //   --ruleset <id>     ruleset in rules/rulesets (draft-2p)
 //   --ruleset-file <f> a ruleset file instead (one exported from the builder or submitted for
 //                      tournament consideration), checked as strictly as the builder loads it;
@@ -29,12 +31,13 @@ import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 import { readRulesetFile, type Ruleset } from '@chess9s/engine';
 import { loadSource, rulesFor, type RulesSource } from './load';
-import { DEFAULT_3P, plan3, report3 } from './cli3';
+import { DEFAULT_3P, planJobs3, runReports3, type Plan3 } from './cli3';
 import { MEASURES } from './measures';
 import { shardResult } from './merge';
 import type { GameSummary } from './play';
-import { runPool, type Job, type Job3 } from './pool';
-import { toMarkdown3, type Summary3 } from './play3';
+import type { Summary3 } from './play3';
+import { runPool, type Job } from './pool';
+import { buildReport3, toMarkdown3, type FairnessReport3, type Mode3 } from './report3';
 import {
   buildReport,
   toMarkdown,
@@ -46,10 +49,10 @@ import { summarize } from './stats';
 import { combinations, playable, type Combination } from './sweep';
 
 export interface Options {
-  /** `3` plays greedy 3-player games (cli3.ts); unset follows the ruleset. */
+  /** `3` plays a 3-player ruleset (cli3.ts); unset follows the ruleset. */
   players?: 2 | 3;
-  /** 3-player games: every seat searches instead of playing greedy. */
-  search?: boolean;
+  /** 3-player games: who plays each seat (the search on every seat when unset). */
+  mode?: Mode3;
   ruleset: string;
   /** A ruleset file to play instead of a bundled ruleset; see `addRulesetFile`. */
   rulesetFile?: string;
@@ -107,7 +110,8 @@ export function options(argv: string[], cores: number): Options {
       name: { type: 'string' },
       report: { type: 'string' },
       shard: { type: 'string' },
-      search: { type: 'boolean', default: false },
+      greedy: { type: 'boolean', default: false },
+      'greedy-dragon': { type: 'boolean', default: false },
     },
   });
   const file = v['ruleset-file'];
@@ -119,7 +123,15 @@ export function options(argv: string[], cores: number): Options {
   }
   const players = v.players === undefined ? undefined : (Number(v.players) as 2 | 3);
   if (players === 3 && file !== undefined) throw new Error('--ruleset-file is 2-player only');
-  if (v.search && players !== 3) throw new Error('--search needs --players 3');
+  if (v.greedy && v['greedy-dragon']) throw new Error('Use --greedy or --greedy-dragon, not both');
+  const mode: Mode3 | undefined = v.greedy
+    ? 'greedy'
+    : v['greedy-dragon']
+      ? 'greedy-dragon'
+      : undefined;
+  if (mode && (players === 2 || file !== undefined)) {
+    throw new Error(`--${mode} is a 3-player option`);
+  }
   const ruleset =
     file === undefined ? (v.ruleset ?? (players === 3 ? DEFAULT_3P.ruleset : 'draft-2p')) : '';
   const overrides: Record<string, unknown> = {};
@@ -137,13 +149,10 @@ export function options(argv: string[], cores: number): Options {
   }
   return {
     ...(players === undefined ? {} : { players }),
-    ...(v.search && { search: true }),
+    ...(mode && { mode }),
     ruleset,
     ...(file === undefined ? {} : { rulesetFile: file }),
-    games: whole(
-      '--games',
-      v.games ?? String(players === 3 ? DEFAULT_3P.games : MEASURES.minGames),
-    ),
+    games: whole('--games', v.games ?? String(MEASURES.minGames)),
     depths: v.depths.split(',').map((d) => whole('--depths', d)),
     nodes: whole('--nodes', v.nodes),
     seed: whole('--seed', v.seed),
@@ -151,7 +160,7 @@ export function options(argv: string[], cores: number): Options {
     sweep: v.sweep,
     overrides,
     out: v.out,
-    name: v.name ?? ruleset,
+    name: v.name ?? (mode ? `${ruleset}.${mode}` : ruleset),
     ...(v.report === undefined ? {} : { report: v.report }),
     ...(v.shard === undefined ? {} : { shard: shardOf(v.shard) }),
   };
@@ -195,17 +204,27 @@ export function addRulesetFile(o: Options, source: RulesSource, text: string): O
 
 /** Rebuild a report from its runs, so a change to flags or wording needs no new games. */
 function rebuild(file: string): void {
-  const old = JSON.parse(readFileSync(file, 'utf8')) as FairnessReport;
-  const report = buildReport(old.ruleset, old.date, old.runs, old.skipped, old.overrides);
-  writeFileSync(file, JSON.stringify(report, null, 2) + '\n');
-  writeFileSync(file.replace(/\.json$/, '.md'), toMarkdown(report));
-  console.error(`Verdict: ${report.verdict}. Rebuilt ${file} and its .md`);
-}
-
-/** A 3-player run: greedy or search games on every seat (cli3.ts). */
-export interface Plan3 {
-  ruleset: { id: string; version: string };
-  job: Job3;
+  const old = JSON.parse(readFileSync(file, 'utf8')) as FairnessReport | FairnessReport3;
+  let verdict: string;
+  if ('players' in old) {
+    const report = buildReport3(
+      old.ruleset,
+      old.date,
+      old.mode,
+      old.runs,
+      old.skipped,
+      old.overrides,
+    );
+    writeFileSync(file, JSON.stringify(report, null, 2) + '\n');
+    writeFileSync(file.replace(/\.json$/, '.md'), toMarkdown3(report));
+    verdict = report.verdict;
+  } else {
+    const report = buildReport(old.ruleset, old.date, old.runs, old.skipped, old.overrides);
+    writeFileSync(file, JSON.stringify(report, null, 2) + '\n');
+    writeFileSync(file.replace(/\.json$/, '.md'), toMarkdown(report));
+    verdict = report.verdict;
+  }
+  console.error(`Verdict: ${verdict}. Rebuilt ${file} and its .md`);
 }
 
 export type PlannedJob = Job & {
@@ -284,50 +303,6 @@ export function runReports(
   }));
 }
 
-/** Greedy or search self-play on a 3-player ruleset: the report is rewritten as games finish. */
-async function main3(o: Options, source: RulesSource, root: string, cwd: string): Promise<void> {
-  const plan = plan3(o, source);
-  const games: Summary3[] = [];
-  const date = new Date().toISOString().slice(0, 10);
-  const outDir = resolve(cwd, o.out);
-  mkdirSync(outDir, { recursive: true });
-  const search = plan.job.options.search;
-  const players = search ? `search-d${search.depth}` : 'greedy';
-  const base = join(outDir, `${o.name}.${players}`);
-  const write = () => {
-    const report = report3(plan, date, games);
-    writeFileSync(`${base}.json`, JSON.stringify(report, null, 2) + '\n');
-    writeFileSync(`${base}.md`, toMarkdown3(report));
-  };
-  const total = plan.job.seeds.length;
-  const started = Date.now();
-  console.error(`${total} ${players} games of ${plan.ruleset.id} on ${o.workers} workers`);
-  const { done, stop } = runPool<Summary3>(
-    new URL('./worker.js', import.meta.url),
-    root,
-    [plan.job],
-    o.workers,
-    (p) => {
-      games.push(p.game);
-      if (games.length % 10 === 0 || games.length === total) {
-        write();
-        console.error(
-          `${games.length}/${total} games, ${((Date.now() - started) / 1000).toFixed(0)} s`,
-        );
-      }
-    },
-  );
-  for (const signal of ['SIGINT', 'SIGTERM'] as const) {
-    process.once(signal, () => {
-      console.error('Stopping: writing the games played so far');
-      void stop();
-    });
-  }
-  await done;
-  write();
-  console.error(`Wrote ${join(o.out, o.name)}.${players}.json and .md (${games.length} games)`);
-}
-
 async function main(): Promise<void> {
   const given = options(process.argv.slice(2), availableParallelism());
   const cwd = process.env['INIT_CWD'] ?? process.cwd();
@@ -340,15 +315,15 @@ async function main(): Promise<void> {
       `${given.rulesetFile ?? given.ruleset} is not a ${given.players}-player ruleset`,
     );
   }
-  if (known === 3) return main3(given, source, root, cwd);
+  if (known !== 3 && given.mode) throw new Error(`--${given.mode} is a 3-player option`);
   const o =
     given.rulesetFile === undefined
       ? given
       : addRulesetFile(given, source, readFileSync(resolve(cwd, given.rulesetFile), 'utf8'));
-  const plan = planJobs(o, source);
+  const plan: Plan | Plan3 = known === 3 ? planJobs3(o, source) : planJobs(o, source);
   const { jobs, skipped } = plan;
 
-  const games: GameSummary[][] = jobs.map(() => []);
+  const games: (GameSummary | Summary3)[][] = jobs.map(() => []);
   const ms: number[] = jobs.map(() => 0);
   const date = new Date().toISOString().slice(0, 10);
   const outDir = resolve(cwd, o.out);
@@ -358,14 +333,30 @@ async function main(): Promise<void> {
     : `${o.name}.json`;
   const write = () => {
     if (o.shard) {
-      const shard = shardResult(o, plan, games, ms, date);
+      const shard =
+        'players' in plan
+          ? shardResult(o, plan, games as Summary3[][], ms, date)
+          : shardResult(o, plan, games as GameSummary[][], ms, date);
       writeFileSync(join(outDir, file), JSON.stringify(shard, null, 2) + '\n');
       return undefined;
+    }
+    if ('players' in plan) {
+      const report = buildReport3(
+        plan.ruleset,
+        date,
+        plan.mode,
+        runReports3(o, plan, games as Summary3[][], ms),
+        skipped,
+        o.overrides,
+      );
+      writeFileSync(join(outDir, file), JSON.stringify(report, null, 2) + '\n');
+      writeFileSync(join(outDir, `${o.name}.md`), toMarkdown3(report));
+      return report;
     }
     const report = buildReport(
       plan.ruleset,
       date,
-      runReports(o, plan, games, ms),
+      runReports(o, plan, games as GameSummary[][], ms),
       skipped,
       o.overrides,
     );
@@ -380,7 +371,7 @@ async function main(): Promise<void> {
   console.error(
     `${total} games${o.shard ? ` (shard ${o.shard.index} of ${o.shard.count})` : ''}: ${jobs.length} runs on ${o.workers} workers; ${skipped.length} combinations skipped`,
   );
-  const { done, stop } = runPool(
+  const { done, stop } = runPool<GameSummary | Summary3>(
     new URL('./worker.js', import.meta.url),
     root,
     jobs,

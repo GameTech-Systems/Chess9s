@@ -48,15 +48,19 @@ export function combinations(
   return all;
 }
 
-/** Why a combination can't be played yet, or undefined when it can. */
+/**
+ * Why a combination can't be played yet, or undefined when it can. Features in `known` are left
+ * out: those not built yet in the ruleset as it is (S59: `coast.3p.exit` in every 3-player game).
+ */
 export function playable(
   source: RulesSource,
   rulesetId: string,
   overrides: Record<string, unknown>,
+  known: ReadonlySet<string> = new Set(),
 ): string | undefined {
   try {
     const { rules, ruleset } = rulesFor(source, rulesetId, overrides);
-    const unbuilt = unbuiltFeatures(rules);
+    const unbuilt = unbuiltFeatures(rules).filter((f) => !known.has(f.id));
     if (unbuilt.length > 0) return `not built yet: ${unbuilt.map((f) => f.id).join(', ')}`;
     newGame(rules, ruleset);
     return undefined;

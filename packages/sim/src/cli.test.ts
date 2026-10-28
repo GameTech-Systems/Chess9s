@@ -2,7 +2,7 @@
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { addRulesetFile, options, planJobs, repoRoot } from './cli';
-import { plan3, report3 } from './cli3';
+import { planJobs3, runReports3 } from './cli3';
 import { loadSource, rulesFor } from './load';
 
 describe('options', () => {
@@ -152,21 +152,24 @@ describe('--ruleset-file (S43)', () => {
   });
 });
 
-describe('3 players (S58)', () => {
+describe('3 players (S58, S59)', () => {
   const source = () => loadSource(repoRoot(fileURLToPath(new URL('.', import.meta.url))));
+  const three = (...args: string[]) => options(['--players', '3', ...args], 1);
 
-  it('--players 3 plays standard-3p, 100 greedy games by default', () => {
+  it('--players 3 plays standard-3p with the search at depths 1 and 2, 2,000 games', () => {
     expect(options(['--players', '3'], 2)).toMatchObject({
       players: 3,
       ruleset: 'standard-3p',
-      games: 100,
+      games: 2000,
+      depths: [1, 2],
       name: 'standard-3p',
     });
+    expect(options(['--players', '3'], 2)).not.toHaveProperty('mode');
   });
 
   it('keeps the 2-player defaults without --players, and takes --games as given', () => {
     expect(options([], 2)).not.toHaveProperty('players');
-    expect(options(['--players', '3', '--games', '7'], 2).games).toBe(7);
+    expect(three('--games', '7').games).toBe(7);
     expect(options(['--players', '2'], 2)).toMatchObject({
       players: 2,
       ruleset: 'draft-2p',
@@ -176,52 +179,82 @@ describe('3 players (S58)', () => {
 
   it('refuses a player count that is not 2 or 3, and a ruleset file for 3 players', () => {
     expect(() => options(['--players', '4'], 1)).toThrow(/--players needs 2 or 3/);
-    expect(() => options(['--players', '3', '--ruleset-file', 'x.json'], 1)).toThrow(/2-player/);
+    expect(() => three('--ruleset-file', 'x.json')).toThrow(/2-player/);
   });
 
-  it('plans one run with a seed per game', () => {
-    const o = options(
-      ['--players', '3', '--ruleset', 'easy-3p', '--games', '3', '--seed', '10'],
-      2,
-    );
-    const { job, ruleset } = plan3(o, source());
-    expect(ruleset.id).toBe('easy-3p');
-    expect(job).toMatchObject({ players: 3, rulesetId: 'easy-3p', seeds: [10, 11, 12] });
+  it('plans a search run per depth with a seed per game, under decision 0015', () => {
+    const o = three('--ruleset', 'easy-3p', '--games', '3', '--seed', '10', '--nodes', '500');
+    const plan = planJobs3(o, source());
+    expect(plan).toMatchObject({ players: 3, mode: 'search', ruleset: { id: 'easy-3p' } });
+    expect(plan.jobs.map((j) => [j.combination, j.depth, j.seeds])).toEqual([
+      ['default', 1, [10, 11, 12]],
+      ['default', 2, [10, 11, 12]],
+    ]);
+    expect(plan.jobs[1]!.options).toEqual({
+      openingPlies: 6,
+      maxPlies: 2000,
+      search: { depth: 2, nodes: 500 },
+    });
   });
 
-  it('--search: every seat searches at the one depth given, with --nodes (S62)', () => {
-    const o = options(['--players', '3', '--search', '--depths', '2', '--nodes', '500'], 2);
-    expect(plan3(o, source()).job.options).toMatchObject({ search: { depth: 2, nodes: 500 } });
-    expect(plan3(options(['--players', '3'], 2), source()).job.options).not.toHaveProperty(
-      'search',
-    );
-    expect(() => plan3(options(['--players', '3', '--search'], 2), source())).toThrow(/one depth/);
-    expect(() => options(['--search'], 2)).toThrow(/--players 3/);
+  it('--greedy-dragon and --greedy name their reports and say who plays', () => {
+    const mixed = three('--greedy-dragon', '--depths', '1');
+    expect(mixed).toMatchObject({ mode: 'greedy-dragon', name: 'standard-3p.greedy-dragon' });
+    const plan = planJobs3(mixed, source());
+    expect(plan.jobs.map((j) => j.options)).toEqual([
+      { openingPlies: 6, maxPlies: 2000, search: { depth: 1, nodes: 100000 }, greedyDragon: true },
+    ]);
+    const greedy = three('--greedy');
+    expect(greedy).toMatchObject({ mode: 'greedy', name: 'standard-3p.greedy' });
+    expect(planJobs3(greedy, source()).jobs.map((j) => [j.depth, j.options])).toEqual([
+      [0, { openingPlies: 6, maxPlies: 2000 }],
+    ]);
+    expect(() => three('--greedy', '--greedy-dragon')).toThrow(/not both/);
+    expect(() => options(['--players', '2', '--greedy'], 1)).toThrow(/3-player option/);
   });
 
-  it('refuses 2-player options and a 2-player ruleset', () => {
-    const src = source();
-    const three = (...args: string[]) => options(['--players', '3', ...args], 1);
-    expect(() => plan3(three('--sweep'), src)).toThrow(/2-player/);
-    expect(() => plan3(three('--shard', '1/2'), src)).toThrow(/2-player/);
-    expect(() => plan3(three('--ruleset', 'draft-2p'), src)).toThrow(/2-player ruleset/);
+  it('sweeps every 3-player parameter and shards the seeds as for 2 players', () => {
+    const o = three('--sweep', '--depths', '1', '--games', '5', '--shard', '2/2');
+    const plan = planJobs3(o, source());
+    const ids = plan.jobs.map((j) => j.combination);
+    expect(ids[0]).toBe('default');
+    expect(ids).toContain('dragonHead.range=3');
+    expect(ids).toContain('endings.3p=first-checkmate');
+    expect(plan.jobs.find((j) => j.combination === 'endings.3p=first-checkmate')!.own).toEqual({
+      'endings.3p': 'first-checkmate',
+      'dragon.3p.givesCheck': true,
+    });
+    expect(plan.jobs[0]!.seeds).toEqual([2, 4]);
+    expect(plan.skipped.map((s) => s.combination)).toEqual([
+      'queen.pawnSwap=true',
+      'coast.3p.exit=a5-always',
+      'setup.swapKingQueen=true',
+    ]);
+    for (const s of plan.skipped) expect(s.reason).toMatch(/not built yet/);
+  });
+
+  it('refuses a 2-player ruleset', () => {
+    expect(() => planJobs3(three('--ruleset', 'draft-2p'), source())).toThrow(/2-player ruleset/);
   });
 
   it('reports the games in seed order', () => {
-    const o = options(['--players', '3', '--games', '2'], 1);
-    const plan = plan3(o, source());
+    const o = three('--games', '2', '--depths', '1');
+    const plan = planJobs3(o, source());
     const game = (seed: number) => ({
       seed,
       order: ['dark', 'light', 'dragon'],
+      dragon: 'dragon',
       outcome: 'draw' as const,
       winner: null,
       loser: null,
       reason: 'stalemate' as const,
+      between: ['dark', 'light'],
+      events: [],
       plies: seed,
       key: String(seed),
     });
-    const report = report3(plan, '2026-10-27', [game(2), game(1)]);
-    expect(report).toMatchObject({ date: '2026-10-27', games: 2, draws: 2 });
-    expect(report.ruleset.id).toBe('standard-3p');
+    const [run] = runReports3(o, plan, [[game(2), game(1)]], [1500]);
+    expect(run).toMatchObject({ combination: 'default', depth: 1, seconds: 2 });
+    expect(run!.summary).toMatchObject({ games: 2, draws: 2, plies: { min: 1, max: 2 } });
   });
 });
