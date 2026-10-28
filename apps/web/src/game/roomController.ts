@@ -10,6 +10,7 @@ import {
   type ServerMessage,
 } from '@chess9s/online/protocol';
 import { fetchRoom, type Fetch } from './api';
+import { ComputerSeat } from './computerSeat';
 import { RoomConnection, type ClosedWhy, type SocketLike, type Status } from './connection';
 import type { Store } from './guest';
 import {
@@ -60,6 +61,10 @@ export class RoomController {
   private stopped = false;
   /** The seat token, held in memory too, in case the browser will not keep it. */
   private token: string | undefined;
+  /** 3-seat rooms made here with computer seats: their tokens, and the seats now being played. */
+  private computerTokens: Record<string, string> = {};
+  private computerSeats: ComputerSeat[] = [];
+  private computerStarted = false;
 
   constructor(private readonly deps: ControllerDeps) {}
 
@@ -81,12 +86,14 @@ export class RoomController {
   /** Look at the room: a seat kept in this browser goes straight back in, otherwise it is previewed. */
   async start(): Promise<void> {
     this.stopped = false;
+    this.stopComputerSeats();
     const { code, store } = this.deps;
     if (!isRoomCode(code)) return this.problem('gone', GONE_TEXT);
     this.set({ kind: 'loading' });
     const saved = loadSeat(store, code);
     if (saved) {
       this.token = saved.token;
+      this.computerTokens = saved.computer ?? {};
       return this.connect();
     }
     const peek = await fetchRoom(this.deps.fetch, code);
@@ -113,6 +120,37 @@ export class RoomController {
     this.stopped = true;
     this.conn?.stop();
     this.conn = null;
+    this.stopComputerSeats();
+  }
+
+  /** Play the seats the room names as the computer's and this browser holds the tokens of (once per visit). */
+  private startComputerSeats(computer: readonly string[]): void {
+    if (this.computerStarted) return;
+    this.computerStarted = true;
+    const { code } = this.deps;
+    for (const seat of computer) {
+      const token = this.computerTokens[seat];
+      if (!token) continue;
+      const bot = new ComputerSeat({
+        code,
+        seat,
+        token,
+        open: this.deps.open,
+        probe: async () => {
+          const peek = await fetchRoom(this.deps.fetch, code);
+          return !peek.ok && peek.gone ? 'gone' : 'ok';
+        },
+        onClosed: () => {},
+      });
+      this.computerSeats.push(bot);
+      bot.start();
+    }
+  }
+
+  private stopComputerSeats(): void {
+    for (const bot of this.computerSeats) bot.stop();
+    this.computerSeats = [];
+    this.computerStarted = false;
   }
 
   private connect(): void {
@@ -139,6 +177,8 @@ export class RoomController {
 
   private forget(): void {
     this.token = undefined;
+    this.computerTokens = {};
+    this.stopComputerSeats();
     forgetSeat(this.deps.store, this.deps.code);
   }
 
@@ -180,7 +220,8 @@ export class RoomController {
         this.token = message.token;
         saveSeat(this.deps.store, this.deps.code, { seat: message.seat, token: message.token });
       }
-      return this.set({ kind: 'playing', online });
+      this.set({ kind: 'playing', online });
+      return this.startComputerSeats(online.computer);
     }
     if (phase.kind !== 'playing') return;
     const online = applyServer(phase.online, message);
@@ -192,6 +233,9 @@ export class RoomController {
         : this.problem('lost', joinProblem('bad-token', '').text);
     }
     if (online.closed !== null) this.conn?.stop();
+    if (online.closed !== null || online.model.game.result.status !== 'ongoing') {
+      this.stopComputerSeats();
+    }
     this.set({ kind: 'playing', online });
   }
 
@@ -244,5 +288,6 @@ export class RoomController {
   /** The network is back or the page is visible again: reconnect now. */
   nudge(): void {
     this.conn?.nudge();
+    for (const bot of this.computerSeats) bot.nudge();
   }
 }
