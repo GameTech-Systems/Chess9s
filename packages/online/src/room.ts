@@ -217,7 +217,8 @@ export function snapshotFor(
     ruleset: room.ruleset,
     moves: room.game.moves.map((m) => m.notation),
     result: room.game.result,
-    seats: Object.fromEntries(Object.entries(room.seats).map(([side, s]) => [side, statusOf(s)])),
+    // In turn order, which is the order joiners are seated in: a preview shows the seat they get.
+    seats: Object.fromEntries(room.game.order.map((side) => [side, statusOf(room.seats[side]!)])),
     drawOffer: room.drawOffer,
     ...(resignations.length > 0 && { resignations }),
     ...(room.computer.length > 0 && { computer: room.computer }),

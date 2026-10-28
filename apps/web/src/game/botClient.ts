@@ -64,6 +64,7 @@ export function searchMove(
     id,
     ruleset: { ...game.ruleset, players: game.rules.players },
     moves: game.moves.map((m) => m.notation),
+    ...(game.resignations.length > 0 && { resignations: game.resignations }),
     ...(level && { level }),
   };
   w.postMessage(request);

@@ -2,8 +2,10 @@ import {
   bestMove,
   greedyMove,
   playMove,
+  replayResignations,
   toNotation,
   type GameState,
+  type Resignation,
   type GeneratedMove,
 } from '@chess9s/engine';
 import type { Level3 } from './bots';
@@ -32,8 +34,9 @@ export function computerMove(
 /**
  * The computer's reply from a ruleset reference and the moves played so far (notations), as the Web
  * Worker gets them: a game state does not travel between threads, so the worker replays the moves
- * itself. A custom ruleset arrives with its overrides; a bundled one is found by id. Undefined when
- * the ruleset is unknown, a move does not replay, or the game has no move.
+ * itself, and any resignations of a 3-player game (S63) where they were made. A custom ruleset
+ * arrives with its overrides; a bundled one is found by id. Undefined when the ruleset is unknown,
+ * a move or resignation does not replay, or the game has no move.
  */
 export function computerReply(
   ref: Pick<RulesetInfo, 'id' | 'version' | 'overrides'> & { players?: 2 | 3 },
@@ -41,15 +44,23 @@ export function computerReply(
   random: () => number = Math.random,
   nodes: number = BOT_NODES,
   level: Level3 = 'Greedy',
+  resignations: readonly Resignation[] = [],
 ): string | undefined {
   const info = ref.overrides ? { ...ref, name: ref.id } : findRuleset(ref.id, ref.version);
   if (!info) return undefined;
-  let { game } = newModel(createRulesFor(info), info);
-  for (const notation of notations) {
-    const move = game.legal.find((m) => toNotation(m) === notation);
-    if (!move) return undefined;
-    game = playMove(game, move);
+  try {
+    let { game } = newModel(createRulesFor(info), info);
+    game = replayResignations(game, resignations);
+    for (const notation of notations) {
+      const move = game.legal.find((m) => toNotation(m) === notation);
+      if (!move) return undefined;
+      game = playMove(game, move);
+      game = replayResignations(game, resignations);
+    }
+    if (game.resignations.length !== resignations.length) return undefined;
+    const move = computerMove(game, random, nodes, level);
+    return move && toNotation(move);
+  } catch {
+    return undefined;
   }
-  const move = computerMove(game, random, nodes, level);
-  return move && toNotation(move);
 }

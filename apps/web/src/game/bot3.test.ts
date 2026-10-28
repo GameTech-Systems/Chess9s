@@ -1,7 +1,7 @@
 // S58: the computer in 3-player games (decision D59): the greedy player, one or two computer
 // seats, the Dragon the usual one, kept with the saved guest game. S62: the Search level.
 import { describe, expect, it } from 'vitest';
-import { bestMove, greedyMove, playMove, toNotation } from '@chess9s/engine';
+import { bestMove, greedyMove, playMove, resign, toNotation } from '@chess9s/engine';
 import { BOT_NODES, computerMove, computerReply } from './bot';
 import { LEVELS_3P, canToggleBot, followSeat, levelOf, toggleBot, undoForHuman } from './bots';
 import { loadGuest, saveGuest, type Store } from './guest';
@@ -193,5 +193,27 @@ describe('the board follows the people, not the computer', () => {
 
   it('starts on the first person to move when the computer moves first', () => {
     expect(followSeat(fresh().game, ['dark', 'light'])).toBe('dragon');
+  });
+});
+
+describe('the computer after a resignation (S63)', () => {
+  it('replays the resignations of the game, so it answers for the game with a seat out', () => {
+    const { game } = fresh();
+    // The seat to move resigns before it has moved: the turn passes on to the next seat.
+    const resigned = resign(game, game.turn);
+    expect(resigned.turn).not.toBe(game.turn);
+    const ref = { id: 'standard-3p', version: info('standard-3p').version, players: 3 as const };
+    const reply = computerReply(ref, [], () => 0, 100, 'Search', resigned.resignations);
+    expect(resigned.legal.map(toNotation)).toContain(reply);
+    // Told only the moves, it would answer for the seat that is out.
+    expect(game.legal.map(toNotation)).toContain(computerReply(ref, [], () => 0, 100, 'Search'));
+    expect(computerReply(ref, [], () => 0, 100, 'Search')).not.toBe(reply);
+  });
+
+  it('refuses resignations that do not replay', () => {
+    const ref = { id: 'standard-3p', version: info('standard-3p').version, players: 3 as const };
+    expect(
+      computerReply(ref, [], () => 0, 100, 'Search', [{ side: 'gold', after: 0 }]),
+    ).toBeUndefined();
   });
 });

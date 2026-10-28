@@ -625,6 +625,14 @@ describe('a room with three seats (D61)', () => {
     expect(snap.resignations).toBeUndefined();
   });
 
+  it('lists the seats in turn order, which is the order joiners are seated in', () => {
+    const t = table();
+    const snap = snapshotOf(t.send(null, create(STANDARD_3P, 'dragon')));
+    expect(Object.keys(snap.seats)).toEqual(t.room.game.order);
+    const open = Object.keys(snap.seats).find((s) => snap.seats[s] === 'open');
+    expect(snapshotOf(t.send(null, join())).seat).toBe(open);
+  });
+
   it('picks one of the three seats at random when asked (D52)', () => {
     const picked = new Set<string>();
     for (let seed = 1; seed <= 30; seed++) {

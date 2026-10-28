@@ -4,7 +4,14 @@
 // the game is wrong. A move the player clicks is played on the board at once (so the game feels
 // as it does hot-seat) and sent; the server's echo confirms it, and a refusal takes it back with
 // the reason. React only draws this and wires the socket (connection.ts).
-import { endedBy, playMove, toNotation, type GameState } from '@chess9s/engine';
+import {
+  endedBy,
+  playMove,
+  replayResignations,
+  resign,
+  toNotation,
+  type GameState,
+} from '@chess9s/engine';
 import type {
   ClientMessage,
   Refusal,
@@ -38,6 +45,8 @@ export interface Online {
   seats: Record<string, SeatStatus>;
   /** The seat whose draw offer stands. */
   drawOffer: string | null;
+  /** 3-seat rooms: the seats the creator's browser plays for the computer. */
+  computer: string[];
   /** The game before a move that was sent and not yet confirmed. */
   pending: GameState | null;
   /** The last thing the server refused, in its words. */
@@ -48,16 +57,26 @@ export interface Online {
 }
 
 /** The game a room's ruleset, moves and result describe, replayed here; null when it does not replay. */
-function replay(ruleset: RoomRuleset, moves: readonly string[], result: Snapshot['result']) {
+function replay(
+  ruleset: RoomRuleset,
+  moves: readonly string[],
+  result: Snapshot['result'],
+  resignations: Snapshot['resignations'] = [],
+) {
   try {
     const { id, version, name, overrides } = ruleset;
     const info = { id, version, name, ...(overrides && { overrides }) };
     let { game } = newModel(createRulesFor(info), info);
+    // A resignation is a seat going out, which only a 3-seat game has.
+    if (resignations.length > 0 && game.order.length !== 3) return null;
+    game = replayResignations(game, resignations);
     for (const notation of moves) {
       const move = game.legal.find((m) => toNotation(m) === notation);
       if (!move) return null;
       game = playMove(game, move);
+      game = replayResignations(game, resignations);
     }
+    if (game.resignations.length !== resignations.length) return null;
     game = endedBy(game, result) ?? game;
     return same(game.result, result) ? game : null;
   } catch {
@@ -75,7 +94,7 @@ export function startOnline(
   aids?: Pick<Model, 'showMoves' | 'showDanger'>,
   connection: Status = 'connecting',
 ): Online | null {
-  const game = replay(snapshot.ruleset, snapshot.moves, snapshot.result);
+  const game = replay(snapshot.ruleset, snapshot.moves, snapshot.result, snapshot.resignations);
   if (!game) return null;
   return {
     code: snapshot.code,
@@ -93,6 +112,7 @@ export function startOnline(
     },
     seats: snapshot.seats,
     drawOffer: snapshot.drawOffer,
+    computer: snapshot.computer ?? [],
     pending: null,
     notice: null,
     connection,
@@ -106,6 +126,9 @@ const ongoing = (o: Online) => o.model.game.result.status === 'ongoing';
 export const opponentOf = (o: Online): string =>
   o.model.game.order.find((side) => side !== o.seat) ?? o.seat;
 
+/** The seat is out of a 3-seat game (resigned or its King captured): it watches the rest. */
+export const mySeatOut = (o: Online): boolean => o.model.game.seats[o.seat] === 'out';
+
 /** Whether a click on the board may start or finish a move now. */
 export const canPlay = (o: Online): boolean =>
   o.connection === 'open' &&
@@ -113,6 +136,7 @@ export const canPlay = (o: Online): boolean =>
   ongoing(o) &&
   o.pending === null &&
   o.model.game.turn === o.seat &&
+  !mySeatOut(o) &&
   Object.values(o.seats).every((s) => s !== 'open');
 
 /** Buttons that send something other than a move (resign, draw offers) wait for the same things. */
@@ -121,6 +145,7 @@ export const canAct = (o: Online): boolean =>
   o.closed === null &&
   ongoing(o) &&
   o.pending === null &&
+  !mySeatOut(o) &&
   Object.values(o.seats).every((s) => s !== 'open');
 
 export const setConnection = (o: Online, connection: Status, why?: ClosedWhy): Online => ({
@@ -198,7 +223,10 @@ export function applyServer(o: Online, message: ServerMessage): Online {
       };
     }
     case 'opponent':
-      return { ...o, seats: { ...o.seats, [opponentOf(o)]: message.status } };
+      // With three seats the message names the seat; with two it is the one across the board.
+      return { ...o, seats: { ...o.seats, [message.side ?? opponentOf(o)]: message.status } };
+    case 'resigned':
+      return resigned(o, message.side);
     case 'offer-draw':
       return { ...o, drawOffer: message.side };
     case 'decline-draw':
@@ -217,6 +245,30 @@ export function applyServer(o: Online, message: ServerMessage): Online {
   }
 }
 
+/** A seat of a 3-seat game resigned: it is out, and the others play on (or the game ends). */
+function resigned(o: Online, side: string): Online {
+  // A move the player sent and the server has not confirmed is put back on the resigned game.
+  const server = o.pending ?? o.model.game;
+  let game: GameState;
+  try {
+    game = resign(server, side);
+  } catch {
+    return desync(o);
+  }
+  let shown = game;
+  if (o.pending) {
+    const mine = o.model.game.moves.at(-1)?.notation;
+    const again = game.legal.find((m) => toNotation(m) === mine);
+    if (again) shown = playMove(game, again);
+  }
+  return {
+    ...o,
+    pending: o.pending ? game : null,
+    model: { ...o.model, game: shown, selected: null, promoting: null },
+    notice: null,
+  };
+}
+
 function refusal(o: Online, reason: Refusal, text: string): Online {
   if (reason === 'version') return { ...o, closed: 'outdated' };
   if (reason === 'no-room') return { ...o, closed: 'gone' };
@@ -228,16 +280,28 @@ function refusal(o: Online, reason: Refusal, text: string): Online {
 /** One line on the state of the room: connection, waiting, whose move, or how it ended. */
 export function onlineStatus(o: Online): string {
   const { game } = o.model;
+  const threeSeats = game.order.length > 2;
   if (game.result.status !== 'ongoing') {
     const { result } = game;
+    // With three seats the result card says who won and how; only two seats have "you lose".
     const mine =
-      result.status === 'win' ? (result.winner === o.seat ? ' · you win' : ' · you lose') : '';
+      !threeSeats && result.status === 'win'
+        ? result.winner === o.seat
+          ? ' · you win'
+          : ' · you lose'
+        : '';
     return `${statusLine(game)}${mine}`;
   }
   if (o.connection === 'connecting') return 'Connecting…';
   if (o.connection === 'reconnecting') return 'Reconnecting…';
-  if (Object.values(o.seats).some((s) => s === 'open')) return 'Waiting for an opponent to join';
+  const open = Object.values(o.seats).filter((s) => s === 'open').length;
+  if (open > 0) {
+    return threeSeats
+      ? `Waiting for ${open} more ${open === 1 ? 'player' : 'players'} to join`
+      : 'Waiting for an opponent to join';
+  }
   const title = (id: string) => id.charAt(0).toUpperCase() + id.slice(1);
+  if (mySeatOut(o)) return `You are out · ${title(game.turn)} to move`;
   return game.turn === o.seat
     ? `Your move${game.inCheck ? ' · in check' : ''}`
     : `Waiting for ${title(game.turn)} to move`;
@@ -247,7 +311,7 @@ export type JoinProblemKind = 'gone' | 'full' | 'lost' | 'outdated' | 'other';
 export const RELOAD_TEXT = 'Chess Nines has been updated. Reload to update.';
 export const GONE_TEXT =
   'This room no longer exists. It may have expired, or the code may be wrong.';
-export const FULL_TEXT = 'This room is full: both seats are taken.';
+export const FULL_TEXT = 'This room is full: every seat is taken.';
 export const REPLACED_TEXT =
   'You joined this room from another window or device, so this one stopped.';
 export const DESYNC_TEXT = 'This game and the server no longer agree. Reload to get back in sync.';
