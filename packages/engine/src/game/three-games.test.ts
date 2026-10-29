@@ -1,12 +1,14 @@
 // S56: 3-player games from the start: each preset played to every end in its table (decision
 // 0016), from recorded games (test/fixtures/games/three-player-ends.json), and a 3-player record
 // round trip. The parameters at each option: three-params.test.ts. S68 recorded the games again
-// once the Coast pieces' first way out through A5 was built (decision 0019); the earlier games
-// replay under the archived versions they were played under.
+// once the Coast pieces' first way out through A5 was built (decision 0019), and S71 the Standard
+// games once its pieces stopped attacking from the Coast (decision 0020); the earlier games replay
+// under the archived versions they were played under.
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import before from '../../test/fixtures/games/three-player-ends-before-s68.json';
+import beforeS71 from '../../test/fixtures/games/three-player-ends-before-s71.json';
 import ends from '../../test/fixtures/games/three-player-ends.json';
 import { loadRules, type RulesFiles } from '../rules/data';
 import { toNotation, type MoveRules } from '../moves/generate';
@@ -112,7 +114,7 @@ describe('a 3-player game record', () => {
   });
 });
 
-describe('games recorded before S68 replay under the versions they were played under', () => {
+describe('games recorded before S68 and S71 replay under the versions they were played under', () => {
   // The rules files as the web app and the online server load them, archive and locks included.
   const rulesDir = root + 'rules/';
   const walk = (dir: string): string[] =>
@@ -126,13 +128,14 @@ describe('games recorded before S68 replay under the versions they were played u
       .map((f) => [relative(rulesDir, f), JSON.parse(readFileSync(f, 'utf8'))]),
   );
   const data = loadRules(files);
-  const old = before.games as (Recorded & { version: string })[];
+  const old = [...before.games, ...beforeS71.games] as (Recorded & { version: string })[];
 
-  it('covers every preset at its pre-S68 version', () => {
+  it('covers every preset at its pre-S68 version, and Standard at its pre-S71 version', () => {
     expect([...new Set(old.map((g) => `${g.ruleset}@${g.version}`))].sort()).toEqual([
       'draft-3p@0.3.0',
       'easy-3p@0.1.0',
       'standard-3p@0.1.0',
+      'standard-3p@0.2.0',
     ]);
   });
 
@@ -154,7 +157,7 @@ describe('games recorded before S68 replay under the versions they were played u
     },
   );
 
-  it('most of them are not legal under the current versions, which bring the Dragon out through A5', () => {
+  it('most of them are not legal under the current versions (the A5 exit, no attacks from the Coast)', () => {
     const illegal = old.filter((game) => {
       try {
         game.moves.reduce(

@@ -336,7 +336,7 @@ describe('retention (D53)', () => {
 });
 
 describe('a room with three seats (S63, D61)', () => {
-  const STANDARD_3P = { id: 'standard-3p', version: '0.2.0' };
+  const STANDARD_3P = { id: 'standard-3p', version: '0.3.0' };
   const make = (computer?: string[]) => ({
     v: 1,
     type: 'create',

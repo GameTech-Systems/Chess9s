@@ -135,6 +135,7 @@ describe('fixture coverage', () => {
     'coast.2p.capturable', // rules/special-rules.test.ts (S22a)
     'coast.3p.capturable', // 3-player Coast play
     'coast.3p.exit', // game/three-coast-exit.test.ts (S68)
+    'coast.3p.attackFrom', // game/three-coast-attack.test.ts (S71)
   ];
 
   it('the pieces of this batch read only the parameters covered here or set aside above', () => {

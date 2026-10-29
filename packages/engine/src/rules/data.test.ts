@@ -60,6 +60,7 @@ describe('loadRules', () => {
       'draft-3p@0.3.0',
       'easy-3p@0.1.0',
       'standard-3p@0.1.0',
+      'standard-3p@0.2.0',
     ]);
     expect(data.find('draft-3p', '0.2.0')?.archived).toBe(true);
     expect(() => data.values('draft-3p', '0.2.0')).toThrow(/no lock/);

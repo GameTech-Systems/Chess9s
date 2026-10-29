@@ -335,7 +335,7 @@ describe('making a room', () => {
 });
 
 describe('a room with three seats (S63)', () => {
-  const STANDARD = { id: 'standard-3p', version: '0.2.0', name: 'Standard 3-player' };
+  const STANDARD = { id: 'standard-3p', version: '0.3.0', name: 'Standard 3-player' };
   const ALL = { dark: 'present', light: 'present', dragon: 'present' } as const;
   const room = (over: Partial<Snapshot> = {}, seat = 'dark') => {
     const s = setup(
@@ -540,7 +540,7 @@ describe('clocks in rooms (S66)', () => {
     s.socket.say(
       snap({
         seat: 'dark',
-        ruleset: { id: 'standard-3p', version: '0.2.0', name: 'Standard 3-player' },
+        ruleset: { id: 'standard-3p', version: '0.3.0', name: 'Standard 3-player' },
         seats: { dark: 'present', light: 'present', dragon: 'present' },
         time: {
           control: '5+0',

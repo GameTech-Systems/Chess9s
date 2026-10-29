@@ -1,6 +1,6 @@
 {
   "$schema": "./schema/parameters.schema.json",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "parameters": [
     {
       "id": "king.range",
@@ -696,6 +696,34 @@
       "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
     },
     {
+      "id": "coast.3p.attackFrom",
+      "label": "Attacks from the Coast (3-player)",
+      "description": "Whether the Dragon's pieces attack while they stand on a Coast square in 3-player games. Blocked: a Coast piece on the Coast captures nothing, gives no check and guards nothing, but still blocks lines; off the Coast it attacks as usual.",
+      "piece": null,
+      "players": [
+        3
+      ],
+      "type": "enum",
+      "default": "allowed",
+      "options": [
+        "allowed",
+        "blocked"
+      ],
+      "group": "Coast",
+      "optionLabels": {
+        "allowed": "Allowed",
+        "blocked": "No attacks from the Coast"
+      },
+      "status": "experimental",
+      "affects": [
+        "capture",
+        "check-detection",
+        "balance"
+      ],
+      "source": "owner, 29 Oct 2026 (S70 review in chat, decision 0020, D70)",
+      "notes": "Default allowed is how every 3-player game played up to standard-3p 0.2.0; standard-3p 0.3.0 sets blocked (D74). Built as piece data (S71): the five Coast pieces' moveOnly rule. A Coast piece still leaves the Coast first through A5 (coast.3p.exit) and may come back onto any Coast square."
+    },
+    {
       "id": "tail.2p.path",
       "label": "Dragon Tail squares (2-player)",
       "description": "Where the Tail may stand in 2-player games. It jumps, so pieces in between don't block it.",
@@ -1162,7 +1190,7 @@
     {
       "id": "turn.firstMove",
       "label": "First move (2-player)",
-      "description": "Which side moves first in 2-player games. In 3-player games the order is dark, light, Dragon.",
+      "description": "Which side moves first in 2-player games. In 3-player games the order is turn.3p.order.",
       "piece": null,
       "players": [
         2
@@ -1184,6 +1212,32 @@
       ],
       "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)",
       "notes": "Decision D26."
+    },
+    {
+      "id": "turn.3p.order",
+      "label": "Turn order (3-player)",
+      "description": "The order of play in 3-player games: dark, light, then the Dragon; or dark, the Dragon, then light.",
+      "piece": null,
+      "players": [
+        3
+      ],
+      "type": "enum",
+      "default": "dark-light-dragon",
+      "options": [
+        "dark-light-dragon",
+        "dark-dragon-light"
+      ],
+      "group": "Turns and draws",
+      "optionLabels": {
+        "dark-light-dragon": "Dark, light, Dragon",
+        "dark-dragon-light": "Dark, Dragon, light"
+      },
+      "status": "experimental",
+      "affects": [
+        "balance"
+      ],
+      "source": "owner rule set v0.2 (decision D26) for the default; dark-dragon-light added in S71 (owner, 29 Oct 2026, decision 0020, D73)",
+      "notes": "The value names the seats in order of play; the board's 3-player setup must seat exactly those sides (src/game/turns.ts)."
     },
     {
       "id": "draw.stalemate",

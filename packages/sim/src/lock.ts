@@ -51,10 +51,32 @@ export function writeLock(root: string, id: string): string {
 }
 
 /**
+ * Lock the current version of a ruleset that is not a Candidate or Official yet but has been
+ * played (recorded games, fairness reports, room records), so that it replays from the lock once
+ * `archive` keeps it (S68 and S71, decision 0019). Refuses to overwrite a lock.
+ */
+export function keepLock(root: string, id: string): string {
+  const { ruleset, resolved } = currentOf(root, id);
+  if (isLocked(ruleset)) {
+    throw new RulesError(`Ruleset ${id} is ${ruleset.status}: use write to lock it`);
+  }
+  const path = lockPath(root, ruleset);
+  if (existsSync(path))
+    throw new RulesError(`Lock ${path} already exists; a lock is never overwritten`);
+  const { id: lockId, version, values } = lockOf(resolved);
+  writeJson(path, { $schema: LOCK_SCHEMA, id: lockId, version, values });
+  return path;
+}
+
+/**
  * Record parameters that are new since the lock was written, at their current value. Refuses when
- * any locked value changed or was lost: recording a new key never changes a locked value.
+ * any locked value changed or was lost: recording a new key never changes a locked value. With
+ * `<id>@<version>`, an archived version's lock: the new keys take the value the archived file
+ * resolves to today, and the values the lock already holds stay as they are (the lock, not the
+ * file, says how that version played).
  */
 export function addLockKeys(root: string, id: string): { path: string; added: string[] } {
+  if (id.includes('@')) return addArchivedLockKeys(root, id);
   const { library, ruleset, resolved } = currentOf(root, id);
   const lock = library.locks.find((l) => l.id === id && l.version === ruleset.version);
   const path = lockPath(root, ruleset);
@@ -68,6 +90,25 @@ export function addLockKeys(root: string, id: string): { path: string; added: st
     );
   }
   const added = problems.map((p) => p.key);
+  if (added.length > 0) {
+    const values: Lock['values'] = { ...lock.values };
+    for (const key of added) values[key] = resolved.values[key]!;
+    writeJson(path, { ...lock, values });
+  }
+  return { path, added };
+}
+
+function addArchivedLockKeys(root: string, name: string): { path: string; added: string[] } {
+  const { registry, library } = loadLibrary(root);
+  const [id, version] = name.split('@');
+  const ruleset = library.archived.find((r) => r.id === id && r.version === version);
+  if (!ruleset) throw new RulesError(`No archived ruleset ${name} in rules/rulesets/archive`);
+  const lock = library.locks.find((l) => l.id === id && l.version === version);
+  if (!lock) throw new RulesError(`Archived ruleset ${name} has no lock`);
+  const known = Object.fromEntries(library.current.map((r) => [r.id, r]));
+  const resolved = resolveRuleset(registry, ruleset, known);
+  const added = Object.keys(resolved.values).filter((key) => !(key in lock.values));
+  const path = lockPath(root, ruleset);
   if (added.length > 0) {
     const values: Lock['values'] = { ...lock.values };
     for (const key of added) values[key] = resolved.values[key]!;

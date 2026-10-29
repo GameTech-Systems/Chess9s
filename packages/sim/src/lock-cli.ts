@@ -2,21 +2,27 @@
 //
 //   write <id>      lock the current version of a Candidate or Official ruleset
 //                   (rules/locks/<id>@<version>.json); refuses to overwrite a lock
+//   keep <id>       lock the current version of an experimental ruleset that has been played
+//                   (games, reports, room records), so it replays once archived; refuses to
+//                   overwrite a lock
 //   add-keys <id>   record parameters added since the lock was written, at their current value;
-//                   refuses if any locked value changed
+//                   refuses if any locked value changed. <id>@<version>: an archived version's
+//                   lock, new keys at the archived file's value
 //   archive <id>    keep the current file as rules/rulesets/archive/<id>@<version>.json (status
 //                   deprecated); run it before bumping the version, then `write` the new one
 import { pathToFileURL } from 'node:url';
 import { RulesError } from '@chess9s/engine';
 import { repoRoot } from './cli';
-import { addLockKeys, archiveRuleset, writeLock } from './lock';
+import { addLockKeys, archiveRuleset, keepLock, writeLock } from './lock';
 
 export function run(args: string[], root: string): string {
   const [command, id] = args;
-  if (!id) throw new RulesError('Usage: pnpm lock <write|add-keys|archive> <ruleset id>');
+  if (!id) throw new RulesError('Usage: pnpm lock <write|keep|add-keys|archive> <ruleset id>');
   switch (command) {
     case 'write':
       return `wrote ${writeLock(root, id)}`;
+    case 'keep':
+      return `wrote ${keepLock(root, id)}`;
     case 'add-keys': {
       const { path, added } = addLockKeys(root, id);
       return added.length > 0
@@ -26,7 +32,9 @@ export function run(args: string[], root: string): string {
     case 'archive':
       return `archived to ${archiveRuleset(root, id)}`;
     default:
-      throw new RulesError(`Unknown command ${command ?? ''}; use write, add-keys or archive`);
+      throw new RulesError(
+        `Unknown command ${command ?? ''}; use write, keep, add-keys or archive`,
+      );
   }
 }
 

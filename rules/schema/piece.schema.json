@@ -13,6 +13,13 @@
     "royal": { "description": "Checkmate target. Default false.", "type": "boolean" },
     "capturable": { "description": "Default true.", "$ref": "#/$defs/flag" },
     "givesCheck": { "description": "Its attacks count as check. Default true.", "$ref": "#/$defs/flag" },
+    "moveOnly": {
+      "description": "While `when` holds, every move of the piece is move-only: it captures nothing and attacks nothing (no check, it guards no square), and its capture-only moves are not played. It still blocks lines. A Coast piece on the Coast under coast.3p.attackFrom = blocked (S71).",
+      "type": "object",
+      "required": ["when"],
+      "properties": { "when": { "$ref": "#/$defs/condition" }, "notes": { "type": "string" } },
+      "additionalProperties": false
+    },
     "moves": {
       "type": "array",
       "minItems": 1,

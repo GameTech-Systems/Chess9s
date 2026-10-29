@@ -45,17 +45,17 @@ const play = (id: string, row: string, upTo?: number) => {
 describe('the result of a 3-player game, for every row of both end tables', () => {
   const cases: [string, string, string, string][] = [
     // [ruleset, row, heading, detail]
-    ['standard-3p', 'kinged-checkmates-king', 'Light wins', "Light checkmated Dark's King."],
+    ['standard-3p', 'kinged-checkmates-king', 'Dark wins', "Dark checkmated Light's King."],
     ['easy-3p', 'kinged-checkmates-king', 'Dark wins', "Dark checkmated Light's King."],
     ['easy-3p', 'kinged-checkmates-tail', 'Dark wins', "Dark checkmated the Dragon's Tail."],
     ['easy-3p', 'dragon-checkmates-king', 'The Dragon wins', "The Dragon checkmated Light's King."],
-    ['standard-3p', 'duel-dragon-wins', 'The Dragon wins', "The Dragon checkmated Dark's King."],
+    ['standard-3p', 'duel-dragon-wins', 'The Dragon wins', "The Dragon checkmated Light's King."],
     ['draft-3p', 'duel-dragon-wins', 'The Dragon wins', "The Dragon captured Dark's King."],
     [
       'standard-3p',
       'duel-kinged-wins',
-      'Dark wins',
-      'Dark captured both Dragon Heads, the Sun and the Moon.',
+      'Light wins',
+      'Light captured both Dragon Heads, the Sun and the Moon.',
     ],
     ['draft-3p', 'draw-both-kings', 'Draw', 'Fifty-move rule. Dark and Light share the draw.'],
     ['draft-3p', 'draw-duel', 'Draw', 'Fifty-move rule. Dark and the Dragon share the draw.'],

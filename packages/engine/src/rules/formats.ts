@@ -135,6 +135,8 @@ export interface Piece {
   royal?: boolean;
   capturable?: Flag;
   givesCheck?: Flag;
+  /** While `when` holds, its moves capture and attack nothing but it still blocks (S71). */
+  moveOnly?: { when: Condition; notes?: string };
   moves: Move[];
   squares?: SquareRule[];
   promotion?: { to: string[] | ParamRef; when?: Condition };
@@ -282,6 +284,7 @@ export function validatePiece(piece: unknown, board: Board, registry: Registry):
 
   ref('capturable', p.capturable, 'boolean');
   ref('givesCheck', p.givesCheck, 'boolean');
+  if (p.moveOnly) condition('moveOnly.when', p.moveOnly.when);
   p.moves.forEach((m, i) => {
     const path = `moves[${i}]`;
     for (const t of m.targets ?? []) squareType(`${path}.targets`, t);

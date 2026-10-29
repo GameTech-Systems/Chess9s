@@ -29,6 +29,8 @@ export const TAIL_SQUARE = 40;
  * For the Dragon, while its pieces must leave the Coast through A5 (decision 0019): per Dragon
  * Head, Sun or Moon that has left the Coast, and per square from A5 that one still to go out
  * through it stands. Neither search depth sees far enough to walk a piece out on its own (S68).
+ * While its pieces attack nothing from the Coast (coast.3p.attackFrom = blocked, decision 0020),
+ * DEVELOPED is only for one standing off the Coast, so it does not park them back there (S71).
  */
 export const DEVELOPED = 150;
 export const COAST_STEP = 20;
@@ -75,12 +77,15 @@ const gates = new WeakMap<MoveRules, string[]>();
 /**
  * How far out the Dragon's pieces are, for its own score (S68): DEVELOPED for each Head, Sun or
  * Moon that has left the Coast, less COAST_STEP per square between A5 and each one that must still
- * go out through it, and COAST_STEP if the Tail stands on A5 while one must. Nothing when Coast
- * pieces may leave with any legal move, so those games play as before S68.
+ * go out through it, and COAST_STEP if the Tail stands on A5 while one must. With attacks from the
+ * Coast blocked, DEVELOPED for each one standing off the Coast instead. Nothing when Coast pieces
+ * may leave with any legal move and attack from the Coast, so those games play as before S68.
  */
 export function development(rules: MoveRules, position: Position, dragon: string): number {
   const exit = rules.values['coast.3p.exit'];
-  if (exit !== 'a5-first-then-any' && exit !== 'a5-always') return 0;
+  const gated = exit === 'a5-first-then-any' || exit === 'a5-always';
+  const blocked = rules.values['coast.3p.attackFrom'] === 'blocked';
+  if (!gated && !blocked) return 0;
   const types = squareTypes(rules.board);
   let gate = gates.get(rules);
   if (!gate)
@@ -105,8 +110,8 @@ export function development(rules: MoveRules, position: Position, dragon: string
       continue;
     }
     const left = p.left?.includes(COAST) === true;
-    if (left || !here.includes(COAST)) score += DEVELOPED;
-    if (here.includes(COAST) && !here.includes(GATE) && (exit === 'a5-always' || !left)) {
+    if (!here.includes(COAST) || (left && !blocked)) score += DEVELOPED;
+    if (gated && here.includes(COAST) && !here.includes(GATE) && (exit === 'a5-always' || !left)) {
       score -= COAST_STEP * steps(at);
       waiting = true;
     }

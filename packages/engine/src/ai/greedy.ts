@@ -10,7 +10,7 @@
 // fare (hundredths of a value unit, like `pieceValues`). They live in paranoid.ts, shared with
 // the 3-player search (S62).
 import { attackMap } from '../moves/check';
-import { attacksFrom, toNotation, type GeneratedMove } from '../moves/generate';
+import { reachFrom, toNotation, type GeneratedMove } from '../moves/generate';
 import type { GameState } from '../game/game';
 import {
   activeKinged,
@@ -95,8 +95,10 @@ function rate(g: Three, o: Outcome, seat: string, values: Record<string, number>
     const kingedAttacks = new Set(
       activeKinged(g, o.seats).flatMap((k) => attackMap(g.rules, o.position, k)),
     );
+    // Where the Tail could go: on the Coast with attacks from it blocked it attacks nothing, but
+    // its ways out still count (S71).
     for (const at of royalSquares(g, o, g.dragon)) {
-      for (const to of attacksFrom(g.rules, o.position, at)) {
+      for (const to of reachFrom(g.rules, o.position, at)) {
         if (kingedAttacks.has(to)) score -= TAIL_SQUARE;
       }
     }

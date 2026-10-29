@@ -57,6 +57,8 @@
     "draw.3p.fiftyMove": true,
     "check.3p.exposedKing": "not-allowed",
     "setup.swapKingQueen": false,
-    "extendedPlay.enabled": false
+    "extendedPlay.enabled": false,
+    "coast.3p.attackFrom": "allowed",
+    "turn.3p.order": "dark-light-dragon"
   }
 }
