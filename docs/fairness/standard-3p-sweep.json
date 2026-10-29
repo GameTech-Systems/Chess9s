@@ -1,0 +1,5844 @@
+{
+  "players": 3,
+  "ruleset": {
+    "id": "standard-3p",
+    "version": "0.2.0"
+  },
+  "overrides": {},
+  "date": "2026-10-29",
+  "decision": "0015",
+  "measures": {
+    "decision": "0015",
+    "version": 1,
+    "band": {
+      "min": 0.28,
+      "max": 0.38
+    },
+    "minGames": 2000,
+    "depths": [
+      1,
+      2
+    ],
+    "nodes": 100000,
+    "openingPlies": 6,
+    "maxPlies": 2000,
+    "maxCapped": 0.05
+  },
+  "mode": "search",
+  "verdict": "incomplete",
+  "runs": [
+    {
+      "combination": "default",
+      "overrides": {},
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1411,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 11,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 9,
+            "losses": 15,
+            "draws": 11,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "checkmate": 9
+            }
+          },
+          "light": {
+            "wins": 10,
+            "losses": 12,
+            "draws": 9,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "dragon-captured": 2,
+              "checkmate": 8
+            }
+          },
+          "dragon": {
+            "wins": 10,
+            "losses": 2,
+            "draws": 2,
+            "score": 0.275,
+            "interval": [
+              0.1610785343314309,
+              0.4283525083312457
+            ],
+            "winsBy": {
+              "checkmate": 9,
+              "king-capture": 1
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 10,
+          "king-mates-king": 17,
+          "draw-duel": 2,
+          "king-takes-dragon-duel": 2,
+          "draw-kinged": 9
+        },
+        "drawsBetween": {
+          "dark+dragon": 2,
+          "dark+light": 9
+        },
+        "results": {
+          "checkmate": 26,
+          "repetition": 2,
+          "dragon-captured": 2,
+          "insufficient-material": 2,
+          "fifty-move": 7,
+          "king-capture": 1
+        },
+        "events": {
+          "king-captured:dark": 5,
+          "tail-stone:dark": 18,
+          "dragon-out": 22,
+          "tail-stone:light": 9,
+          "king-captured:light": 9
+        },
+        "plies": {
+          "mean": 267.75,
+          "median": 212.5,
+          "min": 28,
+          "max": 598
+        },
+        "distinct": 40,
+        "flags": [
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "king.range=2",
+      "overrides": {
+        "king.range": 2
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 3286,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 12,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 14,
+            "losses": 11,
+            "draws": 10,
+            "score": 0.475,
+            "interval": [
+              0.32935229550181694,
+              0.6250289314607027
+            ],
+            "winsBy": {
+              "checkmate": 13,
+              "dragon-captured": 1
+            }
+          },
+          "light": {
+            "wins": 12,
+            "losses": 14,
+            "draws": 12,
+            "score": 0.45,
+            "interval": [
+              0.30705075280944694,
+              0.6017117011155924
+            ],
+            "winsBy": {
+              "checkmate": 10,
+              "dragon-captured": 2
+            }
+          },
+          "dragon": {
+            "wins": 2,
+            "losses": 3,
+            "draws": 2,
+            "score": 0.075,
+            "interval": [
+              0.025835556771858226,
+              0.19864530159097524
+            ],
+            "winsBy": {
+              "king-capture": 1,
+              "checkmate": 1
+            }
+          }
+        },
+        "endings": {
+          "king-mates-king": 23,
+          "dragon-wins-duel": 2,
+          "draw-duel": 2,
+          "king-takes-dragon-duel": 3,
+          "draw-kinged": 10
+        },
+        "drawsBetween": {
+          "light+dragon": 2,
+          "dark+light": 10
+        },
+        "results": {
+          "checkmate": 24,
+          "king-capture": 1,
+          "repetition": 2,
+          "dragon-captured": 3,
+          "fifty-move": 9,
+          "insufficient-material": 1
+        },
+        "events": {
+          "tail-stone:light": 12,
+          "dragon-out": 29,
+          "king-captured:dark": 5,
+          "tail-stone:dark": 23,
+          "king-captured:light": 2
+        },
+        "plies": {
+          "mean": 306.5,
+          "median": 304,
+          "min": 49,
+          "max": 594
+        },
+        "distinct": 40,
+        "flags": [
+          "dark score outside 28–38%",
+          "light score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "king.range=3",
+      "overrides": {
+        "king.range": 3
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 4105,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 27,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 9,
+            "losses": 3,
+            "draws": 27,
+            "score": 0.5625,
+            "interval": [
+              0.41007502677620444,
+              0.7039719058174966
+            ],
+            "winsBy": {
+              "checkmate": 9
+            }
+          },
+          "light": {
+            "wins": 3,
+            "losses": 9,
+            "draws": 24,
+            "score": 0.375,
+            "interval": [
+              0.2422277353579172,
+              0.529678399454681
+            ],
+            "winsBy": {
+              "checkmate": 3
+            }
+          },
+          "dragon": {
+            "wins": 1,
+            "losses": 1,
+            "draws": 3,
+            "score": 0.0625,
+            "interval": [
+              0.019571481816151023,
+              0.18209999002794225
+            ],
+            "winsBy": {
+              "checkmate": 1
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 1,
+          "draw-kinged": 24,
+          "king-mates-king": 11,
+          "draw-duel": 3,
+          "king-mates-tail-duel": 1
+        },
+        "drawsBetween": {
+          "dark+light": 24,
+          "dark+dragon": 3
+        },
+        "results": {
+          "checkmate": 13,
+          "fifty-move": 26,
+          "repetition": 1
+        },
+        "events": {
+          "tail-stone:light": 12,
+          "king-captured:light": 4,
+          "tail-stone:dark": 25,
+          "dragon-out": 33,
+          "king-captured:dark": 1
+        },
+        "plies": {
+          "mean": 381.5,
+          "median": 390,
+          "min": 13,
+          "max": 702
+        },
+        "distinct": 40,
+        "flags": [
+          "dark score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "king.range=4",
+      "overrides": {
+        "king.range": 4
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 7498,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 28,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 9,
+            "losses": 3,
+            "draws": 26,
+            "score": 0.55,
+            "interval": [
+              0.39828829888440775,
+              0.6929492471905531
+            ],
+            "winsBy": {
+              "checkmate": 9
+            }
+          },
+          "light": {
+            "wins": 3,
+            "losses": 9,
+            "draws": 25,
+            "score": 0.3875,
+            "interval": [
+              0.25280911078248314,
+              0.5419064105488552
+            ],
+            "winsBy": {
+              "checkmate": 3
+            }
+          },
+          "dragon": {
+            "wins": 0,
+            "losses": 0,
+            "draws": 5,
+            "score": 0.0625,
+            "interval": [
+              0.019571481816151023,
+              0.18209999002794225
+            ],
+            "winsBy": {}
+          }
+        },
+        "endings": {
+          "draw-duel": 5,
+          "king-mates-king": 12,
+          "draw-kinged": 23
+        },
+        "drawsBetween": {
+          "light+dragon": 2,
+          "dark+dragon": 3,
+          "dark+light": 23
+        },
+        "results": {
+          "fifty-move": 27,
+          "checkmate": 12,
+          "repetition": 1
+        },
+        "events": {
+          "tail-stone:dark": 18,
+          "king-captured:dark": 2,
+          "tail-stone:light": 20,
+          "dragon-out": 33,
+          "king-captured:light": 3
+        },
+        "plies": {
+          "mean": 396.4,
+          "median": 409.5,
+          "min": 52,
+          "max": 821
+        },
+        "distinct": 40,
+        "flags": [
+          "dark score outside 28–38%",
+          "light score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "king.canJump=true",
+      "overrides": {
+        "king.canJump": true
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1315,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 11,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 9,
+            "losses": 15,
+            "draws": 11,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "checkmate": 9
+            }
+          },
+          "light": {
+            "wins": 10,
+            "losses": 12,
+            "draws": 9,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "dragon-captured": 2,
+              "checkmate": 8
+            }
+          },
+          "dragon": {
+            "wins": 10,
+            "losses": 2,
+            "draws": 2,
+            "score": 0.275,
+            "interval": [
+              0.1610785343314309,
+              0.4283525083312457
+            ],
+            "winsBy": {
+              "checkmate": 9,
+              "king-capture": 1
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 10,
+          "king-mates-king": 17,
+          "draw-duel": 2,
+          "king-takes-dragon-duel": 2,
+          "draw-kinged": 9
+        },
+        "drawsBetween": {
+          "dark+dragon": 2,
+          "dark+light": 9
+        },
+        "results": {
+          "checkmate": 26,
+          "repetition": 2,
+          "dragon-captured": 2,
+          "insufficient-material": 2,
+          "fifty-move": 7,
+          "king-capture": 1
+        },
+        "events": {
+          "king-captured:dark": 5,
+          "tail-stone:dark": 18,
+          "dragon-out": 22,
+          "tail-stone:light": 9,
+          "king-captured:light": 9
+        },
+        "plies": {
+          "mean": 267.75,
+          "median": 212.5,
+          "min": 28,
+          "max": 598
+        },
+        "distinct": 40,
+        "flags": [
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "king.canEnterCoast=false",
+      "overrides": {
+        "king.canEnterCoast": false
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1334,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 7,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 12,
+            "losses": 15,
+            "draws": 7,
+            "score": 0.3875,
+            "interval": [
+              0.25280911078248314,
+              0.5419064105488552
+            ],
+            "winsBy": {
+              "checkmate": 11,
+              "dragon-captured": 1
+            }
+          },
+          "light": {
+            "wins": 13,
+            "losses": 14,
+            "draws": 5,
+            "score": 0.3875,
+            "interval": [
+              0.25280911078248314,
+              0.5419064105488552
+            ],
+            "winsBy": {
+              "checkmate": 10,
+              "dragon-captured": 3
+            }
+          },
+          "dragon": {
+            "wins": 8,
+            "losses": 4,
+            "draws": 2,
+            "score": 0.225,
+            "interval": [
+              0.1231595325467853,
+              0.3750339640409305
+            ],
+            "winsBy": {
+              "checkmate": 7,
+              "king-capture": 1
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 8,
+          "king-mates-king": 21,
+          "draw-kinged": 5,
+          "draw-duel": 2,
+          "king-takes-dragon-duel": 4
+        },
+        "drawsBetween": {
+          "dark+light": 5,
+          "dark+dragon": 2
+        },
+        "results": {
+          "checkmate": 28,
+          "fifty-move": 6,
+          "repetition": 1,
+          "dragon-captured": 4,
+          "king-capture": 1
+        },
+        "events": {
+          "king-captured:dark": 6,
+          "tail-stone:dark": 19,
+          "dragon-out": 22,
+          "tail-stone:light": 8,
+          "king-captured:light": 8
+        },
+        "plies": {
+          "mean": 264.95,
+          "median": 265.5,
+          "min": 28,
+          "max": 548
+        },
+        "distinct": 40,
+        "flags": [
+          "dark score outside 28–38%",
+          "light score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "castling.enabled=true",
+      "overrides": {
+        "castling.enabled": true
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1563,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 11,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 9,
+            "losses": 11,
+            "draws": 11,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "checkmate": 9
+            }
+          },
+          "light": {
+            "wins": 10,
+            "losses": 16,
+            "draws": 9,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "dragon-captured": 2,
+              "checkmate": 8
+            }
+          },
+          "dragon": {
+            "wins": 10,
+            "losses": 2,
+            "draws": 2,
+            "score": 0.275,
+            "interval": [
+              0.1610785343314309,
+              0.4283525083312457
+            ],
+            "winsBy": {
+              "checkmate": 9,
+              "king-capture": 1
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 10,
+          "king-mates-king": 17,
+          "draw-kinged": 9,
+          "king-takes-dragon-duel": 2,
+          "draw-duel": 2
+        },
+        "drawsBetween": {
+          "dark+light": 9,
+          "dark+dragon": 2
+        },
+        "results": {
+          "checkmate": 26,
+          "fifty-move": 8,
+          "dragon-captured": 2,
+          "insufficient-material": 2,
+          "repetition": 1,
+          "king-capture": 1
+        },
+        "events": {
+          "king-captured:dark": 9,
+          "tail-stone:dark": 22,
+          "dragon-out": 22,
+          "tail-stone:light": 6,
+          "king-captured:light": 5
+        },
+        "plies": {
+          "mean": 279.8,
+          "median": 256.5,
+          "min": 73,
+          "max": 598
+        },
+        "distinct": 40,
+        "flags": [
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "queen.canCrossVoid=true",
+      "overrides": {
+        "queen.canCrossVoid": true
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1734,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 5,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 12,
+            "losses": 14,
+            "draws": 4,
+            "score": 0.35,
+            "interval": [
+              0.2213433317104915,
+              0.5049440300646263
+            ],
+            "winsBy": {
+              "checkmate": 12
+            }
+          },
+          "light": {
+            "wins": 8,
+            "losses": 21,
+            "draws": 5,
+            "score": 0.2625,
+            "interval": [
+              0.15141445317657293,
+              0.4152072029673635
+            ],
+            "winsBy": {
+              "checkmate": 8
+            }
+          },
+          "dragon": {
+            "wins": 15,
+            "losses": 0,
+            "draws": 1,
+            "score": 0.3875,
+            "interval": [
+              0.25280911078248314,
+              0.5419064105488552
+            ],
+            "winsBy": {
+              "king-capture": 5,
+              "checkmate": 10
+            }
+          }
+        },
+        "endings": {
+          "king-mates-king": 20,
+          "dragon-wins-duel": 15,
+          "draw-kinged": 4,
+          "draw-duel": 1
+        },
+        "drawsBetween": {
+          "dark+light": 4,
+          "light+dragon": 1
+        },
+        "results": {
+          "checkmate": 30,
+          "king-capture": 5,
+          "fifty-move": 2,
+          "repetition": 1,
+          "insufficient-material": 2
+        },
+        "events": {
+          "tail-stone:light": 7,
+          "tail-stone:dark": 17,
+          "dragon-out": 18,
+          "king-captured:dark": 10,
+          "king-captured:light": 6
+        },
+        "plies": {
+          "mean": 236.275,
+          "median": 187,
+          "min": 25,
+          "max": 678
+        },
+        "distinct": 40,
+        "flags": [
+          "light score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "queen.canStandOnVoid=true",
+      "overrides": {
+        "queen.canStandOnVoid": true
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1777,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 5,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 14,
+            "losses": 12,
+            "draws": 5,
+            "score": 0.4125,
+            "interval": [
+              0.27424235635053607,
+              0.5660919380182826
+            ],
+            "winsBy": {
+              "checkmate": 14
+            }
+          },
+          "light": {
+            "wins": 8,
+            "losses": 23,
+            "draws": 4,
+            "score": 0.25,
+            "interval": [
+              0.14186967895549518,
+              0.40194259066970106
+            ],
+            "winsBy": {
+              "checkmate": 8
+            }
+          },
+          "dragon": {
+            "wins": 13,
+            "losses": 0,
+            "draws": 1,
+            "score": 0.3375,
+            "interval": [
+              0.21104411177376006,
+              0.49243386348261764
+            ],
+            "winsBy": {
+              "king-capture": 5,
+              "checkmate": 8
+            }
+          }
+        },
+        "endings": {
+          "king-mates-king": 22,
+          "dragon-wins-duel": 13,
+          "draw-kinged": 4,
+          "draw-duel": 1
+        },
+        "drawsBetween": {
+          "dark+light": 4,
+          "dark+dragon": 1
+        },
+        "results": {
+          "checkmate": 30,
+          "king-capture": 5,
+          "fifty-move": 3,
+          "repetition": 2
+        },
+        "events": {
+          "tail-stone:dark": 17,
+          "dragon-out": 19,
+          "tail-stone:light": 6,
+          "king-captured:light": 5,
+          "king-captured:dark": 9
+        },
+        "plies": {
+          "mean": 204.225,
+          "median": 167,
+          "min": 74,
+          "max": 472
+        },
+        "distinct": 40,
+        "flags": [
+          "dark score outside 28–38%",
+          "light score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "queen.voidCrossings=e5-only",
+      "overrides": {
+        "queen.voidCrossings": "e5-only"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1426,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 13,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 9,
+            "losses": 9,
+            "draws": 11,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "checkmate": 9
+            }
+          },
+          "light": {
+            "wins": 6,
+            "losses": 16,
+            "draws": 13,
+            "score": 0.3125,
+            "interval": [
+              0.19074307355631814,
+              0.467116128662579
+            ],
+            "winsBy": {
+              "checkmate": 4,
+              "dragon-captured": 2
+            }
+          },
+          "dragon": {
+            "wins": 12,
+            "losses": 2,
+            "draws": 2,
+            "score": 0.325,
+            "interval": [
+              0.20084316962661725,
+              0.4798254191110201
+            ],
+            "winsBy": {
+              "checkmate": 9,
+              "king-capture": 3
+            }
+          }
+        },
+        "endings": {
+          "king-mates-king": 13,
+          "draw-kinged": 11,
+          "dragon-wins-duel": 12,
+          "king-takes-dragon-duel": 2,
+          "draw-duel": 2
+        },
+        "drawsBetween": {
+          "dark+light": 11,
+          "light+dragon": 2
+        },
+        "results": {
+          "checkmate": 22,
+          "fifty-move": 10,
+          "dragon-captured": 2,
+          "king-capture": 3,
+          "repetition": 3
+        },
+        "events": {
+          "tail-stone:dark": 18,
+          "dragon-out": 19,
+          "tail-stone:light": 6,
+          "king-captured:dark": 11,
+          "king-captured:light": 5
+        },
+        "plies": {
+          "mean": 310.15,
+          "median": 311.5,
+          "min": 28,
+          "max": 826
+        },
+        "distinct": 40,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "queen.voidCrossings=none",
+      "overrides": {
+        "queen.voidCrossings": "none"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1515,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 11,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 9,
+            "losses": 10,
+            "draws": 10,
+            "score": 0.35,
+            "interval": [
+              0.2213433317104915,
+              0.5049440300646263
+            ],
+            "winsBy": {
+              "checkmate": 9
+            }
+          },
+          "light": {
+            "wins": 15,
+            "losses": 13,
+            "draws": 10,
+            "score": 0.5,
+            "interval": [
+              0.35199278797099753,
+              0.6480072120290025
+            ],
+            "winsBy": {
+              "dragon-captured": 4,
+              "checkmate": 11
+            }
+          },
+          "dragon": {
+            "wins": 5,
+            "losses": 6,
+            "draws": 2,
+            "score": 0.15,
+            "interval": [
+              0.07061091708507435,
+              0.2907262603902003
+            ],
+            "winsBy": {
+              "checkmate": 4,
+              "king-capture": 1
+            }
+          }
+        },
+        "endings": {
+          "draw-kinged": 9,
+          "king-mates-king": 18,
+          "draw-duel": 2,
+          "king-takes-dragon-duel": 4,
+          "dragon-wins-duel": 5,
+          "king-mates-tail-duel": 2
+        },
+        "drawsBetween": {
+          "dark+light": 9,
+          "dark+dragon": 1,
+          "light+dragon": 1
+        },
+        "results": {
+          "fifty-move": 7,
+          "checkmate": 24,
+          "repetition": 4,
+          "dragon-captured": 4,
+          "king-capture": 1
+        },
+        "events": {
+          "tail-stone:dark": 19,
+          "dragon-out": 23,
+          "king-captured:light": 2,
+          "tail-stone:light": 7,
+          "king-captured:dark": 11
+        },
+        "plies": {
+          "mean": 299.3,
+          "median": 281,
+          "min": 28,
+          "max": 664
+        },
+        "distinct": 40,
+        "flags": [
+          "light score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "queen.canEnterCoast=false",
+      "overrides": {
+        "queen.canEnterCoast": false
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1318,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 12,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 8,
+            "losses": 11,
+            "draws": 11,
+            "score": 0.3375,
+            "interval": [
+              0.21104411177376006,
+              0.49243386348261764
+            ],
+            "winsBy": {
+              "checkmate": 8
+            }
+          },
+          "light": {
+            "wins": 7,
+            "losses": 14,
+            "draws": 11,
+            "score": 0.3125,
+            "interval": [
+              0.19074307355631814,
+              0.467116128662579
+            ],
+            "winsBy": {
+              "dragon-captured": 3,
+              "checkmate": 4
+            }
+          },
+          "dragon": {
+            "wins": 13,
+            "losses": 3,
+            "draws": 2,
+            "score": 0.35,
+            "interval": [
+              0.2213433317104915,
+              0.5049440300646263
+            ],
+            "winsBy": {
+              "king-capture": 2,
+              "checkmate": 11
+            }
+          }
+        },
+        "endings": {
+          "king-mates-king": 12,
+          "king-takes-dragon-duel": 3,
+          "draw-duel": 2,
+          "dragon-wins-duel": 13,
+          "draw-kinged": 10
+        },
+        "drawsBetween": {
+          "dark+dragon": 1,
+          "light+dragon": 1,
+          "dark+light": 10
+        },
+        "results": {
+          "checkmate": 23,
+          "dragon-captured": 3,
+          "repetition": 3,
+          "king-capture": 2,
+          "fifty-move": 9
+        },
+        "events": {
+          "king-captured:dark": 10,
+          "tail-stone:light": 5,
+          "king-captured:light": 8,
+          "tail-stone:dark": 14,
+          "dragon-out": 15
+        },
+        "plies": {
+          "mean": 266.35,
+          "median": 193.5,
+          "min": 16,
+          "max": 730
+        },
+        "distinct": 40,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "pawn.initialDoubleStep=false",
+      "overrides": {
+        "pawn.initialDoubleStep": false
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 2272,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 8,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 7,
+            "losses": 12,
+            "draws": 7,
+            "score": 0.2625,
+            "interval": [
+              0.15141445317657293,
+              0.4152072029673635
+            ],
+            "winsBy": {
+              "checkmate": 6,
+              "dragon-captured": 1
+            }
+          },
+          "light": {
+            "wins": 13,
+            "losses": 15,
+            "draws": 7,
+            "score": 0.4125,
+            "interval": [
+              0.27424235635053607,
+              0.5660919380182826
+            ],
+            "winsBy": {
+              "checkmate": 9,
+              "dragon-captured": 4
+            }
+          },
+          "dragon": {
+            "wins": 12,
+            "losses": 5,
+            "draws": 2,
+            "score": 0.325,
+            "interval": [
+              0.20084316962661725,
+              0.4798254191110201
+            ],
+            "winsBy": {
+              "king-capture": 6,
+              "checkmate": 6
+            }
+          }
+        },
+        "endings": {
+          "king-mates-king": 15,
+          "dragon-wins-duel": 12,
+          "draw-duel": 2,
+          "king-takes-dragon-duel": 5,
+          "draw-kinged": 6
+        },
+        "drawsBetween": {
+          "light+dragon": 1,
+          "dark+dragon": 1,
+          "dark+light": 6
+        },
+        "results": {
+          "checkmate": 21,
+          "king-capture": 6,
+          "repetition": 5,
+          "dragon-captured": 5,
+          "fifty-move": 2,
+          "insufficient-material": 1
+        },
+        "events": {
+          "king-captured:dark": 14,
+          "tail-stone:dark": 10,
+          "dragon-out": 15,
+          "king-captured:light": 5,
+          "tail-stone:light": 6
+        },
+        "plies": {
+          "mean": 252.55,
+          "median": 212.5,
+          "min": 23,
+          "max": 610
+        },
+        "distinct": 40,
+        "flags": [
+          "dark score outside 28–38%",
+          "light score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "pawn.promotion.targets-queen",
+      "overrides": {
+        "pawn.promotion.targets": [
+          "rook",
+          "bishop",
+          "knight"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1317,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 13,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 8,
+            "losses": 15,
+            "draws": 13,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "checkmate": 8
+            }
+          },
+          "light": {
+            "wins": 9,
+            "losses": 11,
+            "draws": 11,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "checkmate": 8,
+              "dragon-captured": 1
+            }
+          },
+          "dragon": {
+            "wins": 10,
+            "losses": 1,
+            "draws": 2,
+            "score": 0.275,
+            "interval": [
+              0.1610785343314309,
+              0.4283525083312457
+            ],
+            "winsBy": {
+              "checkmate": 9,
+              "king-capture": 1
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 10,
+          "king-mates-king": 16,
+          "draw-duel": 2,
+          "draw-kinged": 11,
+          "king-takes-dragon-duel": 1
+        },
+        "drawsBetween": {
+          "dark+dragon": 2,
+          "dark+light": 11
+        },
+        "results": {
+          "checkmate": 25,
+          "repetition": 3,
+          "insufficient-material": 2,
+          "fifty-move": 8,
+          "dragon-captured": 1,
+          "king-capture": 1
+        },
+        "events": {
+          "king-captured:dark": 4,
+          "tail-stone:dark": 18,
+          "dragon-out": 22,
+          "tail-stone:light": 9,
+          "king-captured:light": 9
+        },
+        "plies": {
+          "mean": 294.375,
+          "median": 261,
+          "min": 28,
+          "max": 671
+        },
+        "distinct": 40,
+        "flags": [
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "pawn.promotion.targets-rook",
+      "overrides": {
+        "pawn.promotion.targets": [
+          "queen",
+          "bishop",
+          "knight"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1323,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 11,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 9,
+            "losses": 15,
+            "draws": 11,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "checkmate": 9
+            }
+          },
+          "light": {
+            "wins": 10,
+            "losses": 12,
+            "draws": 9,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "dragon-captured": 2,
+              "checkmate": 8
+            }
+          },
+          "dragon": {
+            "wins": 10,
+            "losses": 2,
+            "draws": 2,
+            "score": 0.275,
+            "interval": [
+              0.1610785343314309,
+              0.4283525083312457
+            ],
+            "winsBy": {
+              "checkmate": 9,
+              "king-capture": 1
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 10,
+          "king-mates-king": 17,
+          "draw-duel": 2,
+          "king-takes-dragon-duel": 2,
+          "draw-kinged": 9
+        },
+        "drawsBetween": {
+          "dark+dragon": 2,
+          "dark+light": 9
+        },
+        "results": {
+          "checkmate": 26,
+          "repetition": 2,
+          "dragon-captured": 2,
+          "insufficient-material": 2,
+          "fifty-move": 7,
+          "king-capture": 1
+        },
+        "events": {
+          "king-captured:dark": 5,
+          "tail-stone:dark": 18,
+          "dragon-out": 22,
+          "tail-stone:light": 9,
+          "king-captured:light": 9
+        },
+        "plies": {
+          "mean": 272.6,
+          "median": 236.5,
+          "min": 28,
+          "max": 598
+        },
+        "distinct": 40,
+        "flags": [
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "pawn.promotion.targets-bishop",
+      "overrides": {
+        "pawn.promotion.targets": [
+          "queen",
+          "rook",
+          "knight"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1322,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 11,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 9,
+            "losses": 15,
+            "draws": 11,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "checkmate": 9
+            }
+          },
+          "light": {
+            "wins": 10,
+            "losses": 12,
+            "draws": 9,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "dragon-captured": 2,
+              "checkmate": 8
+            }
+          },
+          "dragon": {
+            "wins": 10,
+            "losses": 2,
+            "draws": 2,
+            "score": 0.275,
+            "interval": [
+              0.1610785343314309,
+              0.4283525083312457
+            ],
+            "winsBy": {
+              "checkmate": 9,
+              "king-capture": 1
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 10,
+          "king-mates-king": 17,
+          "draw-duel": 2,
+          "king-takes-dragon-duel": 2,
+          "draw-kinged": 9
+        },
+        "drawsBetween": {
+          "dark+dragon": 2,
+          "dark+light": 9
+        },
+        "results": {
+          "checkmate": 26,
+          "repetition": 2,
+          "dragon-captured": 2,
+          "insufficient-material": 2,
+          "fifty-move": 7,
+          "king-capture": 1
+        },
+        "events": {
+          "king-captured:dark": 5,
+          "tail-stone:dark": 18,
+          "dragon-out": 22,
+          "tail-stone:light": 9,
+          "king-captured:light": 9
+        },
+        "plies": {
+          "mean": 272.6,
+          "median": 236.5,
+          "min": 28,
+          "max": 598
+        },
+        "distinct": 40,
+        "flags": [
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "pawn.promotion.targets-knight",
+      "overrides": {
+        "pawn.promotion.targets": [
+          "queen",
+          "rook",
+          "bishop"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1318,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 11,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 9,
+            "losses": 15,
+            "draws": 11,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "checkmate": 9
+            }
+          },
+          "light": {
+            "wins": 10,
+            "losses": 12,
+            "draws": 9,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "dragon-captured": 2,
+              "checkmate": 8
+            }
+          },
+          "dragon": {
+            "wins": 10,
+            "losses": 2,
+            "draws": 2,
+            "score": 0.275,
+            "interval": [
+              0.1610785343314309,
+              0.4283525083312457
+            ],
+            "winsBy": {
+              "checkmate": 9,
+              "king-capture": 1
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 10,
+          "king-mates-king": 17,
+          "draw-duel": 2,
+          "king-takes-dragon-duel": 2,
+          "draw-kinged": 9
+        },
+        "drawsBetween": {
+          "dark+dragon": 2,
+          "dark+light": 9
+        },
+        "results": {
+          "checkmate": 26,
+          "repetition": 2,
+          "dragon-captured": 2,
+          "insufficient-material": 2,
+          "fifty-move": 7,
+          "king-capture": 1
+        },
+        "events": {
+          "king-captured:dark": 5,
+          "tail-stone:dark": 18,
+          "dragon-out": 22,
+          "tail-stone:light": 9,
+          "king-captured:light": 9
+        },
+        "plies": {
+          "mean": 272.6,
+          "median": 236.5,
+          "min": 28,
+          "max": 598
+        },
+        "distinct": 40,
+        "flags": [
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "pawn.promotion.targets+captured-piece",
+      "overrides": {
+        "pawn.promotion.targets": [
+          "queen",
+          "rook",
+          "bishop",
+          "knight",
+          "captured-piece"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1314,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 11,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 9,
+            "losses": 15,
+            "draws": 11,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "checkmate": 9
+            }
+          },
+          "light": {
+            "wins": 10,
+            "losses": 12,
+            "draws": 9,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "dragon-captured": 2,
+              "checkmate": 8
+            }
+          },
+          "dragon": {
+            "wins": 10,
+            "losses": 2,
+            "draws": 2,
+            "score": 0.275,
+            "interval": [
+              0.1610785343314309,
+              0.4283525083312457
+            ],
+            "winsBy": {
+              "checkmate": 9,
+              "king-capture": 1
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 10,
+          "king-mates-king": 17,
+          "draw-duel": 2,
+          "king-takes-dragon-duel": 2,
+          "draw-kinged": 9
+        },
+        "drawsBetween": {
+          "dark+dragon": 2,
+          "dark+light": 9
+        },
+        "results": {
+          "checkmate": 26,
+          "repetition": 2,
+          "dragon-captured": 2,
+          "insufficient-material": 2,
+          "fifty-move": 7,
+          "king-capture": 1
+        },
+        "events": {
+          "king-captured:dark": 5,
+          "tail-stone:dark": 18,
+          "dragon-out": 22,
+          "tail-stone:light": 9,
+          "king-captured:light": 9
+        },
+        "plies": {
+          "mean": 267.75,
+          "median": 212.5,
+          "min": 28,
+          "max": 598
+        },
+        "distinct": 40,
+        "flags": [
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "pawn.safeZones=any-colored-square",
+      "overrides": {
+        "pawn.safeZones": "any-colored-square"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1321,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 6,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 11,
+            "losses": 17,
+            "draws": 6,
+            "score": 0.35,
+            "interval": [
+              0.2213433317104915,
+              0.5049440300646263
+            ],
+            "winsBy": {
+              "checkmate": 11
+            }
+          },
+          "light": {
+            "wins": 13,
+            "losses": 14,
+            "draws": 5,
+            "score": 0.3875,
+            "interval": [
+              0.25280911078248314,
+              0.5419064105488552
+            ],
+            "winsBy": {
+              "checkmate": 11,
+              "dragon-captured": 2
+            }
+          },
+          "dragon": {
+            "wins": 10,
+            "losses": 3,
+            "draws": 1,
+            "score": 0.2625,
+            "interval": [
+              0.15141445317657293,
+              0.4152072029673635
+            ],
+            "winsBy": {
+              "checkmate": 8,
+              "king-capture": 2
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 10,
+          "king-mates-king": 21,
+          "king-takes-dragon-duel": 2,
+          "king-mates-tail-duel": 1,
+          "draw-kinged": 5,
+          "draw-duel": 1
+        },
+        "drawsBetween": {
+          "dark+light": 5,
+          "dark+dragon": 1
+        },
+        "results": {
+          "checkmate": 30,
+          "dragon-captured": 2,
+          "insufficient-material": 2,
+          "repetition": 1,
+          "fifty-move": 3,
+          "king-capture": 2
+        },
+        "events": {
+          "king-captured:dark": 6,
+          "tail-stone:dark": 20,
+          "dragon-out": 23,
+          "tail-stone:light": 8,
+          "king-captured:light": 8
+        },
+        "plies": {
+          "mean": 275.275,
+          "median": 249,
+          "min": 28,
+          "max": 646
+        },
+        "distinct": 40,
+        "flags": [
+          "light score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "pawn.safeZones=off",
+      "overrides": {
+        "pawn.safeZones": "off"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1216,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 9,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 9,
+            "losses": 15,
+            "draws": 8,
+            "score": 0.325,
+            "interval": [
+              0.20084316962661725,
+              0.4798254191110201
+            ],
+            "winsBy": {
+              "checkmate": 8,
+              "dragon-captured": 1
+            }
+          },
+          "light": {
+            "wins": 11,
+            "losses": 13,
+            "draws": 8,
+            "score": 0.375,
+            "interval": [
+              0.2422277353579172,
+              0.529678399454681
+            ],
+            "winsBy": {
+              "checkmate": 9,
+              "dragon-captured": 2
+            }
+          },
+          "dragon": {
+            "wins": 11,
+            "losses": 3,
+            "draws": 2,
+            "score": 0.3,
+            "interval": [
+              0.18074670915695296,
+              0.454303106543204
+            ],
+            "winsBy": {
+              "checkmate": 9,
+              "king-capture": 2
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 11,
+          "king-mates-king": 17,
+          "draw-duel": 2,
+          "king-takes-dragon-duel": 3,
+          "draw-kinged": 7
+        },
+        "drawsBetween": {
+          "dark+dragon": 1,
+          "dark+light": 7,
+          "light+dragon": 1
+        },
+        "results": {
+          "checkmate": 26,
+          "repetition": 1,
+          "dragon-captured": 3,
+          "king-capture": 2,
+          "fifty-move": 7,
+          "insufficient-material": 1
+        },
+        "events": {
+          "king-captured:dark": 8,
+          "tail-stone:dark": 17,
+          "dragon-out": 20,
+          "tail-stone:light": 8,
+          "king-captured:light": 8
+        },
+        "plies": {
+          "mean": 261.8,
+          "median": 243,
+          "min": 28,
+          "max": 610
+        },
+        "distinct": 40,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "pawn.canEnterCoast=true",
+      "overrides": {
+        "pawn.canEnterCoast": true
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1333,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 6,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 8,
+            "losses": 16,
+            "draws": 6,
+            "score": 0.275,
+            "interval": [
+              0.1610785343314309,
+              0.4283525083312457
+            ],
+            "winsBy": {
+              "checkmate": 8
+            }
+          },
+          "light": {
+            "wins": 14,
+            "losses": 15,
+            "draws": 5,
+            "score": 0.4125,
+            "interval": [
+              0.27424235635053607,
+              0.5660919380182826
+            ],
+            "winsBy": {
+              "checkmate": 11,
+              "dragon-captured": 3
+            }
+          },
+          "dragon": {
+            "wins": 12,
+            "losses": 3,
+            "draws": 1,
+            "score": 0.3125,
+            "interval": [
+              0.19074307355631814,
+              0.467116128662579
+            ],
+            "winsBy": {
+              "checkmate": 7,
+              "king-capture": 5
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 12,
+          "king-mates-king": 19,
+          "king-takes-dragon-duel": 3,
+          "draw-kinged": 5,
+          "draw-duel": 1
+        },
+        "drawsBetween": {
+          "dark+light": 5,
+          "dark+dragon": 1
+        },
+        "results": {
+          "checkmate": 26,
+          "king-capture": 5,
+          "dragon-captured": 3,
+          "fifty-move": 5,
+          "repetition": 1
+        },
+        "events": {
+          "king-captured:dark": 10,
+          "king-captured:light": 6,
+          "tail-stone:dark": 21,
+          "dragon-out": 19,
+          "tail-stone:light": 6
+        },
+        "plies": {
+          "mean": 243,
+          "median": 235.5,
+          "min": 28,
+          "max": 582
+        },
+        "distinct": 40,
+        "flags": [
+          "dark score outside 28–38%",
+          "light score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "pawn.canEnterCenter=true",
+      "overrides": {
+        "pawn.canEnterCenter": true
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1317,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 11,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 9,
+            "losses": 15,
+            "draws": 11,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "checkmate": 9
+            }
+          },
+          "light": {
+            "wins": 10,
+            "losses": 12,
+            "draws": 9,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "dragon-captured": 2,
+              "checkmate": 8
+            }
+          },
+          "dragon": {
+            "wins": 10,
+            "losses": 2,
+            "draws": 2,
+            "score": 0.275,
+            "interval": [
+              0.1610785343314309,
+              0.4283525083312457
+            ],
+            "winsBy": {
+              "checkmate": 9,
+              "king-capture": 1
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 10,
+          "king-mates-king": 17,
+          "draw-duel": 2,
+          "king-takes-dragon-duel": 2,
+          "draw-kinged": 9
+        },
+        "drawsBetween": {
+          "dark+dragon": 2,
+          "dark+light": 9
+        },
+        "results": {
+          "checkmate": 26,
+          "repetition": 2,
+          "dragon-captured": 2,
+          "insufficient-material": 2,
+          "fifty-move": 7,
+          "king-capture": 1
+        },
+        "events": {
+          "king-captured:dark": 5,
+          "tail-stone:dark": 18,
+          "dragon-out": 22,
+          "tail-stone:light": 9,
+          "king-captured:light": 9
+        },
+        "plies": {
+          "mean": 267.75,
+          "median": 212.5,
+          "min": 28,
+          "max": 598
+        },
+        "distinct": 40,
+        "flags": [
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "center.occupants=dragons-and-sun-moon",
+      "overrides": {
+        "center.occupants": "dragons-and-sun-moon"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1311,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 12,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 9,
+            "losses": 14,
+            "draws": 12,
+            "score": 0.375,
+            "interval": [
+              0.2422277353579172,
+              0.529678399454681
+            ],
+            "winsBy": {
+              "checkmate": 9
+            }
+          },
+          "light": {
+            "wins": 9,
+            "losses": 12,
+            "draws": 10,
+            "score": 0.35,
+            "interval": [
+              0.2213433317104915,
+              0.5049440300646263
+            ],
+            "winsBy": {
+              "dragon-captured": 2,
+              "checkmate": 7
+            }
+          },
+          "dragon": {
+            "wins": 10,
+            "losses": 2,
+            "draws": 2,
+            "score": 0.275,
+            "interval": [
+              0.1610785343314309,
+              0.4283525083312457
+            ],
+            "winsBy": {
+              "checkmate": 9,
+              "king-capture": 1
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 10,
+          "king-mates-king": 16,
+          "draw-duel": 2,
+          "king-takes-dragon-duel": 2,
+          "draw-kinged": 10
+        },
+        "drawsBetween": {
+          "dark+dragon": 2,
+          "dark+light": 10
+        },
+        "results": {
+          "checkmate": 25,
+          "repetition": 2,
+          "dragon-captured": 2,
+          "insufficient-material": 2,
+          "fifty-move": 8,
+          "king-capture": 1
+        },
+        "events": {
+          "king-captured:dark": 5,
+          "tail-stone:dark": 18,
+          "dragon-out": 22,
+          "tail-stone:light": 9,
+          "king-captured:light": 9
+        },
+        "plies": {
+          "mean": 269.575,
+          "median": 224.5,
+          "min": 28,
+          "max": 598
+        },
+        "distinct": 40,
+        "flags": [
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "center.occupants=any",
+      "overrides": {
+        "center.occupants": "any"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1172,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 9,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 14,
+            "losses": 12,
+            "draws": 7,
+            "score": 0.4375,
+            "interval": [
+              0.29602809418250353,
+              0.5899249732237956
+            ],
+            "winsBy": {
+              "checkmate": 13,
+              "dragon-captured": 1
+            }
+          },
+          "light": {
+            "wins": 10,
+            "losses": 18,
+            "draws": 6,
+            "score": 0.325,
+            "interval": [
+              0.20084316962661725,
+              0.4798254191110201
+            ],
+            "winsBy": {
+              "checkmate": 10
+            }
+          },
+          "dragon": {
+            "wins": 7,
+            "losses": 1,
+            "draws": 5,
+            "score": 0.2375,
+            "interval": [
+              0.13244941025968585,
+              0.3885534728467702
+            ],
+            "winsBy": {
+              "checkmate": 6,
+              "king-capture": 1
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 7,
+          "king-mates-king": 23,
+          "draw-kinged": 4,
+          "draw-duel": 5,
+          "king-takes-dragon-duel": 1
+        },
+        "drawsBetween": {
+          "dark+light": 4,
+          "dark+dragon": 3,
+          "light+dragon": 2
+        },
+        "results": {
+          "checkmate": 29,
+          "fifty-move": 4,
+          "repetition": 5,
+          "dragon-captured": 1,
+          "king-capture": 1
+        },
+        "events": {
+          "king-captured:dark": 7,
+          "tail-stone:dark": 18,
+          "dragon-out": 22,
+          "tail-stone:light": 9,
+          "king-captured:light": 6
+        },
+        "plies": {
+          "mean": 243,
+          "median": 220,
+          "min": 79,
+          "max": 499
+        },
+        "distinct": 40,
+        "flags": [
+          "dark score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "center.passThrough-dragon-head",
+      "overrides": {
+        "center.passThrough": [
+          "queen",
+          "king",
+          "sun-moon-pawn",
+          "knight"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1297,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 9,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 9,
+            "losses": 14,
+            "draws": 8,
+            "score": 0.325,
+            "interval": [
+              0.20084316962661725,
+              0.4798254191110201
+            ],
+            "winsBy": {
+              "checkmate": 9
+            }
+          },
+          "light": {
+            "wins": 11,
+            "losses": 16,
+            "draws": 9,
+            "score": 0.3875,
+            "interval": [
+              0.25280911078248314,
+              0.5419064105488552
+            ],
+            "winsBy": {
+              "checkmate": 11
+            }
+          },
+          "dragon": {
+            "wins": 11,
+            "losses": 1,
+            "draws": 1,
+            "score": 0.2875,
+            "interval": [
+              0.17085731648676938,
+              0.44138311269464736
+            ],
+            "winsBy": {
+              "checkmate": 9,
+              "king-capture": 2
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 11,
+          "draw-kinged": 8,
+          "king-mates-king": 19,
+          "king-mates-tail-duel": 1,
+          "draw-duel": 1
+        },
+        "drawsBetween": {
+          "dark+light": 8,
+          "light+dragon": 1
+        },
+        "results": {
+          "checkmate": 29,
+          "fifty-move": 7,
+          "repetition": 2,
+          "king-capture": 2
+        },
+        "events": {
+          "king-captured:dark": 9,
+          "tail-stone:light": 8,
+          "dragon-out": 21,
+          "king-captured:light": 4,
+          "tail-stone:dark": 21
+        },
+        "plies": {
+          "mean": 288.25,
+          "median": 197.5,
+          "min": 28,
+          "max": 758
+        },
+        "distinct": 40,
+        "flags": [
+          "light score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "center.passThrough-queen",
+      "overrides": {
+        "center.passThrough": [
+          "dragon-head",
+          "king",
+          "sun-moon-pawn",
+          "knight"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1359,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 7,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 13,
+            "losses": 14,
+            "draws": 7,
+            "score": 0.4125,
+            "interval": [
+              0.27424235635053607,
+              0.5660919380182826
+            ],
+            "winsBy": {
+              "checkmate": 12,
+              "dragon-captured": 1
+            }
+          },
+          "light": {
+            "wins": 11,
+            "losses": 16,
+            "draws": 6,
+            "score": 0.35,
+            "interval": [
+              0.2213433317104915,
+              0.5049440300646263
+            ],
+            "winsBy": {
+              "checkmate": 9,
+              "dragon-captured": 2
+            }
+          },
+          "dragon": {
+            "wins": 9,
+            "losses": 3,
+            "draws": 1,
+            "score": 0.2375,
+            "interval": [
+              0.13244941025968585,
+              0.3885534728467702
+            ],
+            "winsBy": {
+              "checkmate": 6,
+              "king-capture": 3
+            }
+          }
+        },
+        "endings": {
+          "king-mates-king": 21,
+          "dragon-wins-duel": 9,
+          "king-takes-dragon-duel": 3,
+          "draw-duel": 1,
+          "draw-kinged": 6
+        },
+        "drawsBetween": {
+          "dark+dragon": 1,
+          "dark+light": 6
+        },
+        "results": {
+          "checkmate": 27,
+          "dragon-captured": 3,
+          "repetition": 1,
+          "king-capture": 3,
+          "fifty-move": 6
+        },
+        "events": {
+          "tail-stone:dark": 17,
+          "dragon-out": 25,
+          "tail-stone:light": 11,
+          "king-captured:light": 7,
+          "king-captured:dark": 6
+        },
+        "plies": {
+          "mean": 294.15,
+          "median": 246,
+          "min": 28,
+          "max": 733
+        },
+        "distinct": 40,
+        "flags": [
+          "dark score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "center.passThrough-king",
+      "overrides": {
+        "center.passThrough": [
+          "dragon-head",
+          "queen",
+          "sun-moon-pawn",
+          "knight"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1318,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 11,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 9,
+            "losses": 15,
+            "draws": 11,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "checkmate": 9
+            }
+          },
+          "light": {
+            "wins": 10,
+            "losses": 12,
+            "draws": 9,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "dragon-captured": 2,
+              "checkmate": 8
+            }
+          },
+          "dragon": {
+            "wins": 10,
+            "losses": 2,
+            "draws": 2,
+            "score": 0.275,
+            "interval": [
+              0.1610785343314309,
+              0.4283525083312457
+            ],
+            "winsBy": {
+              "checkmate": 9,
+              "king-capture": 1
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 10,
+          "king-mates-king": 17,
+          "draw-duel": 2,
+          "king-takes-dragon-duel": 2,
+          "draw-kinged": 9
+        },
+        "drawsBetween": {
+          "dark+dragon": 2,
+          "dark+light": 9
+        },
+        "results": {
+          "checkmate": 26,
+          "repetition": 2,
+          "dragon-captured": 2,
+          "insufficient-material": 2,
+          "fifty-move": 7,
+          "king-capture": 1
+        },
+        "events": {
+          "king-captured:dark": 5,
+          "tail-stone:dark": 18,
+          "dragon-out": 22,
+          "tail-stone:light": 9,
+          "king-captured:light": 9
+        },
+        "plies": {
+          "mean": 267.75,
+          "median": 212.5,
+          "min": 28,
+          "max": 598
+        },
+        "distinct": 40,
+        "flags": [
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "center.passThrough-sun-moon-pawn",
+      "overrides": {
+        "center.passThrough": [
+          "dragon-head",
+          "queen",
+          "king",
+          "knight"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1311,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 10,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 10,
+            "losses": 15,
+            "draws": 10,
+            "score": 0.375,
+            "interval": [
+              0.2422277353579172,
+              0.529678399454681
+            ],
+            "winsBy": {
+              "checkmate": 10
+            }
+          },
+          "light": {
+            "wins": 10,
+            "losses": 13,
+            "draws": 9,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "dragon-captured": 2,
+              "checkmate": 8
+            }
+          },
+          "dragon": {
+            "wins": 10,
+            "losses": 2,
+            "draws": 1,
+            "score": 0.2625,
+            "interval": [
+              0.15141445317657293,
+              0.4152072029673635
+            ],
+            "winsBy": {
+              "checkmate": 8,
+              "king-capture": 2
+            }
+          }
+        },
+        "endings": {
+          "draw-kinged": 9,
+          "king-mates-king": 18,
+          "dragon-wins-duel": 10,
+          "draw-duel": 1,
+          "king-takes-dragon-duel": 2
+        },
+        "drawsBetween": {
+          "dark+light": 9,
+          "dark+dragon": 1
+        },
+        "results": {
+          "fifty-move": 8,
+          "checkmate": 26,
+          "repetition": 1,
+          "dragon-captured": 2,
+          "insufficient-material": 1,
+          "king-capture": 2
+        },
+        "events": {
+          "tail-stone:dark": 20,
+          "dragon-out": 23,
+          "tail-stone:light": 9,
+          "king-captured:light": 8,
+          "king-captured:dark": 5
+        },
+        "plies": {
+          "mean": 278.025,
+          "median": 243.5,
+          "min": 28,
+          "max": 598
+        },
+        "distinct": 40,
+        "flags": [
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "center.passThrough-knight",
+      "overrides": {
+        "center.passThrough": [
+          "dragon-head",
+          "queen",
+          "king",
+          "sun-moon-pawn"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1312,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 11,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 9,
+            "losses": 15,
+            "draws": 11,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "checkmate": 9
+            }
+          },
+          "light": {
+            "wins": 10,
+            "losses": 12,
+            "draws": 9,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "dragon-captured": 2,
+              "checkmate": 8
+            }
+          },
+          "dragon": {
+            "wins": 10,
+            "losses": 2,
+            "draws": 2,
+            "score": 0.275,
+            "interval": [
+              0.1610785343314309,
+              0.4283525083312457
+            ],
+            "winsBy": {
+              "checkmate": 9,
+              "king-capture": 1
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 10,
+          "king-mates-king": 17,
+          "draw-duel": 2,
+          "king-takes-dragon-duel": 2,
+          "draw-kinged": 9
+        },
+        "drawsBetween": {
+          "dark+dragon": 2,
+          "dark+light": 9
+        },
+        "results": {
+          "checkmate": 26,
+          "repetition": 2,
+          "dragon-captured": 2,
+          "insufficient-material": 2,
+          "fifty-move": 7,
+          "king-capture": 1
+        },
+        "events": {
+          "king-captured:dark": 5,
+          "tail-stone:dark": 18,
+          "dragon-out": 22,
+          "tail-stone:light": 9,
+          "king-captured:light": 9
+        },
+        "plies": {
+          "mean": 267.75,
+          "median": 212.5,
+          "min": 28,
+          "max": 598
+        },
+        "distinct": 40,
+        "flags": [
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "center.passThrough+rook",
+      "overrides": {
+        "center.passThrough": [
+          "dragon-head",
+          "queen",
+          "king",
+          "sun-moon-pawn",
+          "knight",
+          "rook"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1337,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 7,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 13,
+            "losses": 16,
+            "draws": 7,
+            "score": 0.4125,
+            "interval": [
+              0.27424235635053607,
+              0.5660919380182826
+            ],
+            "winsBy": {
+              "checkmate": 13
+            }
+          },
+          "light": {
+            "wins": 12,
+            "losses": 15,
+            "draws": 5,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "dragon-captured": 2,
+              "checkmate": 10
+            }
+          },
+          "dragon": {
+            "wins": 8,
+            "losses": 2,
+            "draws": 2,
+            "score": 0.225,
+            "interval": [
+              0.1231595325467853,
+              0.3750339640409305
+            ],
+            "winsBy": {
+              "checkmate": 6,
+              "king-capture": 2
+            }
+          }
+        },
+        "endings": {
+          "draw-kinged": 5,
+          "king-mates-king": 23,
+          "dragon-wins-duel": 8,
+          "draw-duel": 2,
+          "king-takes-dragon-duel": 2
+        },
+        "drawsBetween": {
+          "dark+light": 5,
+          "dark+dragon": 2
+        },
+        "results": {
+          "fifty-move": 4,
+          "checkmate": 29,
+          "repetition": 2,
+          "dragon-captured": 2,
+          "king-capture": 2,
+          "insufficient-material": 1
+        },
+        "events": {
+          "tail-stone:dark": 19,
+          "dragon-out": 23,
+          "tail-stone:light": 8,
+          "king-captured:light": 8,
+          "king-captured:dark": 4
+        },
+        "plies": {
+          "mean": 273.3,
+          "median": 226.5,
+          "min": 28,
+          "max": 592
+        },
+        "distinct": 40,
+        "flags": [
+          "dark score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "center.passThrough+bishop",
+      "overrides": {
+        "center.passThrough": [
+          "dragon-head",
+          "queen",
+          "king",
+          "sun-moon-pawn",
+          "knight",
+          "bishop"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1326,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 14,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 7,
+            "losses": 11,
+            "draws": 11,
+            "score": 0.3125,
+            "interval": [
+              0.19074307355631814,
+              0.467116128662579
+            ],
+            "winsBy": {
+              "checkmate": 7
+            }
+          },
+          "light": {
+            "wins": 11,
+            "losses": 12,
+            "draws": 12,
+            "score": 0.425,
+            "interval": [
+              0.28509168524815875,
+              0.5780519956394001
+            ],
+            "winsBy": {
+              "checkmate": 8,
+              "dragon-captured": 3
+            }
+          },
+          "dragon": {
+            "wins": 8,
+            "losses": 3,
+            "draws": 5,
+            "score": 0.2625,
+            "interval": [
+              0.15141445317657293,
+              0.4152072029673635
+            ],
+            "winsBy": {
+              "checkmate": 6,
+              "king-capture": 2
+            }
+          }
+        },
+        "endings": {
+          "king-mates-king": 15,
+          "king-takes-dragon-duel": 3,
+          "dragon-wins-duel": 8,
+          "draw-kinged": 9,
+          "draw-duel": 5
+        },
+        "drawsBetween": {
+          "dark+light": 9,
+          "light+dragon": 3,
+          "dark+dragon": 2
+        },
+        "results": {
+          "checkmate": 21,
+          "dragon-captured": 3,
+          "fifty-move": 9,
+          "king-capture": 2,
+          "repetition": 3,
+          "insufficient-material": 2
+        },
+        "events": {
+          "tail-stone:dark": 13,
+          "dragon-out": 20,
+          "king-captured:dark": 11,
+          "tail-stone:light": 12,
+          "king-captured:light": 5
+        },
+        "plies": {
+          "mean": 298.525,
+          "median": 303.5,
+          "min": 28,
+          "max": 564
+        },
+        "distinct": 40,
+        "flags": [
+          "light score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "center.passThrough+pawn",
+      "overrides": {
+        "center.passThrough": [
+          "dragon-head",
+          "queen",
+          "king",
+          "sun-moon-pawn",
+          "knight",
+          "pawn"
+        ]
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1319,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 11,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 9,
+            "losses": 15,
+            "draws": 11,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "checkmate": 9
+            }
+          },
+          "light": {
+            "wins": 10,
+            "losses": 12,
+            "draws": 9,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "dragon-captured": 2,
+              "checkmate": 8
+            }
+          },
+          "dragon": {
+            "wins": 10,
+            "losses": 2,
+            "draws": 2,
+            "score": 0.275,
+            "interval": [
+              0.1610785343314309,
+              0.4283525083312457
+            ],
+            "winsBy": {
+              "checkmate": 9,
+              "king-capture": 1
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 10,
+          "king-mates-king": 17,
+          "draw-duel": 2,
+          "king-takes-dragon-duel": 2,
+          "draw-kinged": 9
+        },
+        "drawsBetween": {
+          "dark+dragon": 2,
+          "dark+light": 9
+        },
+        "results": {
+          "checkmate": 26,
+          "repetition": 2,
+          "dragon-captured": 2,
+          "insufficient-material": 2,
+          "fifty-move": 7,
+          "king-capture": 1
+        },
+        "events": {
+          "king-captured:dark": 5,
+          "tail-stone:dark": 18,
+          "dragon-out": 22,
+          "tail-stone:light": 9,
+          "king-captured:light": 9
+        },
+        "plies": {
+          "mean": 267.75,
+          "median": 212.5,
+          "min": 28,
+          "max": 598
+        },
+        "distinct": 40,
+        "flags": [
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "coast.3p.exit=a5-always",
+      "overrides": {
+        "coast.3p.exit": "a5-always"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1288,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 11,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 13,
+            "losses": 9,
+            "draws": 11,
+            "score": 0.4625,
+            "interval": [
+              0.3181589915266756,
+              0.6134128489171039
+            ],
+            "winsBy": {
+              "checkmate": 13
+            }
+          },
+          "light": {
+            "wins": 9,
+            "losses": 18,
+            "draws": 9,
+            "score": 0.3375,
+            "interval": [
+              0.21104411177376006,
+              0.49243386348261764
+            ],
+            "winsBy": {
+              "dragon-captured": 2,
+              "checkmate": 7
+            }
+          },
+          "dragon": {
+            "wins": 7,
+            "losses": 2,
+            "draws": 2,
+            "score": 0.2,
+            "interval": [
+              0.10499864973166874,
+              0.34757607381856676
+            ],
+            "winsBy": {
+              "checkmate": 5,
+              "king-capture": 2
+            }
+          }
+        },
+        "endings": {
+          "king-takes-dragon-duel": 2,
+          "king-mates-king": 20,
+          "draw-duel": 2,
+          "draw-kinged": 9,
+          "dragon-wins-duel": 7
+        },
+        "drawsBetween": {
+          "dark+dragon": 2,
+          "dark+light": 9
+        },
+        "results": {
+          "dragon-captured": 2,
+          "checkmate": 25,
+          "fifty-move": 8,
+          "insufficient-material": 2,
+          "repetition": 1,
+          "king-capture": 2
+        },
+        "events": {
+          "king-captured:dark": 7,
+          "tail-stone:dark": 17,
+          "dragon-out": 23,
+          "tail-stone:light": 9,
+          "king-captured:light": 4
+        },
+        "plies": {
+          "mean": 296.7,
+          "median": 291.5,
+          "min": 28,
+          "max": 670
+        },
+        "distinct": 40,
+        "flags": [
+          "dark score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "coast.3p.exit=any-legal-move",
+      "overrides": {
+        "coast.3p.exit": "any-legal-move"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1632,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 12,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 7,
+            "losses": 9,
+            "draws": 7,
+            "score": 0.2625,
+            "interval": [
+              0.15141445317657293,
+              0.4152072029673635
+            ],
+            "winsBy": {
+              "checkmate": 6,
+              "dragon-captured": 1
+            }
+          },
+          "light": {
+            "wins": 16,
+            "losses": 9,
+            "draws": 11,
+            "score": 0.5375,
+            "interval": [
+              0.38658715108289615,
+              0.6818410084733244
+            ],
+            "winsBy": {
+              "checkmate": 11,
+              "dragon-captured": 5
+            }
+          },
+          "dragon": {
+            "wins": 5,
+            "losses": 10,
+            "draws": 6,
+            "score": 0.2,
+            "interval": [
+              0.10499864973166874,
+              0.34757607381856676
+            ],
+            "winsBy": {
+              "checkmate": 3,
+              "king-capture": 2
+            }
+          }
+        },
+        "endings": {
+          "king-mates-king": 13,
+          "king-takes-dragon-duel": 6,
+          "draw-duel": 6,
+          "king-mates-tail-duel": 4,
+          "draw-kinged": 6,
+          "dragon-wins-duel": 5
+        },
+        "drawsBetween": {
+          "light+dragon": 5,
+          "dark+light": 6,
+          "dark+dragon": 1
+        },
+        "results": {
+          "checkmate": 20,
+          "dragon-captured": 6,
+          "fifty-move": 7,
+          "repetition": 4,
+          "insufficient-material": 1,
+          "king-capture": 2
+        },
+        "events": {
+          "tail-stone:dark": 14,
+          "dragon-out": 17,
+          "tail-stone:light": 5,
+          "king-captured:dark": 17,
+          "king-captured:light": 4
+        },
+        "plies": {
+          "mean": 257.375,
+          "median": 211.5,
+          "min": 48,
+          "max": 552
+        },
+        "distinct": 40,
+        "flags": [
+          "dark score outside 28–38%",
+          "light score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "coast.openToAll=true",
+      "overrides": {
+        "coast.openToAll": true
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1709,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 10,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 11,
+            "losses": 10,
+            "draws": 6,
+            "score": 0.35,
+            "interval": [
+              0.2213433317104915,
+              0.5049440300646263
+            ],
+            "winsBy": {
+              "checkmate": 11
+            }
+          },
+          "light": {
+            "wins": 10,
+            "losses": 19,
+            "draws": 10,
+            "score": 0.375,
+            "interval": [
+              0.2422277353579172,
+              0.529678399454681
+            ],
+            "winsBy": {
+              "checkmate": 10
+            }
+          },
+          "dragon": {
+            "wins": 9,
+            "losses": 1,
+            "draws": 4,
+            "score": 0.275,
+            "interval": [
+              0.1610785343314309,
+              0.4283525083312457
+            ],
+            "winsBy": {
+              "checkmate": 5,
+              "king-capture": 4
+            }
+          }
+        },
+        "endings": {
+          "king-mates-king": 20,
+          "dragon-wins-duel": 9,
+          "draw-kinged": 6,
+          "draw-duel": 4,
+          "king-mates-tail-duel": 1
+        },
+        "drawsBetween": {
+          "dark+light": 6,
+          "light+dragon": 4
+        },
+        "results": {
+          "checkmate": 26,
+          "king-capture": 4,
+          "fifty-move": 7,
+          "repetition": 3
+        },
+        "events": {
+          "tail-stone:light": 9,
+          "dragon-out": 19,
+          "tail-stone:dark": 18,
+          "king-captured:light": 1,
+          "king-captured:dark": 13
+        },
+        "plies": {
+          "mean": 247.025,
+          "median": 197.5,
+          "min": 28,
+          "max": 664
+        },
+        "distinct": 40,
+        "flags": [
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "coast.returnAllowed=false",
+      "overrides": {
+        "coast.returnAllowed": false
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1347,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 15,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 11,
+            "losses": 11,
+            "draws": 13,
+            "score": 0.4375,
+            "interval": [
+              0.29602809418250353,
+              0.5899249732237956
+            ],
+            "winsBy": {
+              "checkmate": 11
+            }
+          },
+          "light": {
+            "wins": 10,
+            "losses": 12,
+            "draws": 14,
+            "score": 0.425,
+            "interval": [
+              0.28509168524815875,
+              0.5780519956394001
+            ],
+            "winsBy": {
+              "checkmate": 8,
+              "dragon-captured": 2
+            }
+          },
+          "dragon": {
+            "wins": 4,
+            "losses": 2,
+            "draws": 3,
+            "score": 0.1375,
+            "interval": [
+              0.06248998594189924,
+              0.27603780501463526
+            ],
+            "winsBy": {
+              "checkmate": 3,
+              "king-capture": 1
+            }
+          }
+        },
+        "endings": {
+          "draw-kinged": 12,
+          "king-mates-king": 19,
+          "dragon-wins-duel": 4,
+          "draw-duel": 3,
+          "king-takes-dragon-duel": 2
+        },
+        "drawsBetween": {
+          "dark+light": 12,
+          "light+dragon": 2,
+          "dark+dragon": 1
+        },
+        "results": {
+          "fifty-move": 10,
+          "checkmate": 22,
+          "repetition": 3,
+          "insufficient-material": 2,
+          "dragon-captured": 2,
+          "king-capture": 1
+        },
+        "events": {
+          "tail-stone:dark": 22,
+          "dragon-out": 27,
+          "tail-stone:light": 8,
+          "king-captured:light": 4,
+          "king-captured:dark": 5
+        },
+        "plies": {
+          "mean": 304.625,
+          "median": 270,
+          "min": 28,
+          "max": 622
+        },
+        "distinct": 40,
+        "flags": [
+          "dark score outside 28–38%",
+          "light score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "coast.3p.capturable=true",
+      "overrides": {
+        "coast.3p.capturable": true
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1226,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 10,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 12,
+            "losses": 10,
+            "draws": 9,
+            "score": 0.4125,
+            "interval": [
+              0.27424235635053607,
+              0.5660919380182826
+            ],
+            "winsBy": {
+              "checkmate": 12
+            }
+          },
+          "light": {
+            "wins": 10,
+            "losses": 18,
+            "draws": 9,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "checkmate": 8,
+              "dragon-captured": 2
+            }
+          },
+          "dragon": {
+            "wins": 8,
+            "losses": 2,
+            "draws": 2,
+            "score": 0.225,
+            "interval": [
+              0.1231595325467853,
+              0.3750339640409305
+            ],
+            "winsBy": {
+              "checkmate": 3,
+              "king-capture": 5
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 8,
+          "king-mates-king": 20,
+          "draw-kinged": 8,
+          "king-takes-dragon-duel": 2,
+          "draw-duel": 2
+        },
+        "drawsBetween": {
+          "dark+light": 8,
+          "dark+dragon": 1,
+          "light+dragon": 1
+        },
+        "results": {
+          "checkmate": 23,
+          "king-capture": 5,
+          "fifty-move": 8,
+          "dragon-captured": 2,
+          "repetition": 1,
+          "stalemate": 1
+        },
+        "events": {
+          "king-captured:dark": 9,
+          "tail-stone:dark": 22,
+          "dragon-out": 24,
+          "tail-stone:light": 5,
+          "king-captured:light": 3
+        },
+        "plies": {
+          "mean": 274.65,
+          "median": 225,
+          "min": 28,
+          "max": 561
+        },
+        "distinct": 40,
+        "flags": [
+          "dark score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "tail.3p.movement=two-player-path",
+      "overrides": {
+        "tail.3p.movement": "two-player-path"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1028,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 12,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 22,
+            "losses": 5,
+            "draws": 12,
+            "score": 0.7,
+            "interval": [
+              0.545696893456796,
+              0.8192532908430471
+            ],
+            "winsBy": {
+              "checkmate": 22
+            }
+          },
+          "light": {
+            "wins": 4,
+            "losses": 22,
+            "draws": 10,
+            "score": 0.225,
+            "interval": [
+              0.1231595325467853,
+              0.3750339640409305
+            ],
+            "winsBy": {
+              "checkmate": 3,
+              "dragon-captured": 1
+            }
+          },
+          "dragon": {
+            "wins": 2,
+            "losses": 1,
+            "draws": 2,
+            "score": 0.075,
+            "interval": [
+              0.025835556771858226,
+              0.19864530159097524
+            ],
+            "winsBy": {
+              "checkmate": 2
+            }
+          }
+        },
+        "endings": {
+          "draw-kinged": 10,
+          "king-mates-king": 25,
+          "draw-duel": 2,
+          "king-takes-dragon-duel": 1,
+          "dragon-wins-duel": 2
+        },
+        "drawsBetween": {
+          "dark+light": 10,
+          "dark+dragon": 2
+        },
+        "results": {
+          "fifty-move": 10,
+          "checkmate": 27,
+          "dragon-captured": 1,
+          "repetition": 2
+        },
+        "events": {
+          "tail-stone:dark": 18,
+          "dragon-out": 26,
+          "tail-stone:light": 8,
+          "king-captured:light": 4,
+          "king-captured:dark": 1
+        },
+        "plies": {
+          "mean": 291.375,
+          "median": 272,
+          "min": 40,
+          "max": 727
+        },
+        "distinct": 40,
+        "flags": [
+          "dark score outside 28–38%",
+          "light score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "tail.3p.captures=none",
+      "overrides": {
+        "tail.3p.captures": "none"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 821,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 11,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 24,
+            "losses": 3,
+            "draws": 9,
+            "score": 0.7125,
+            "interval": [
+              0.5586168873053526,
+              0.8291426835132306
+            ],
+            "winsBy": {
+              "checkmate": 24
+            }
+          },
+          "light": {
+            "wins": 2,
+            "losses": 25,
+            "draws": 10,
+            "score": 0.175,
+            "interval": [
+              0.08745302996883066,
+              0.3195029205439244
+            ],
+            "winsBy": {
+              "checkmate": 2
+            }
+          },
+          "dragon": {
+            "wins": 3,
+            "losses": 1,
+            "draws": 3,
+            "score": 0.1125,
+            "interval": [
+              0.04694736715822735,
+              0.2459616507608267
+            ],
+            "winsBy": {
+              "checkmate": 3
+            }
+          }
+        },
+        "endings": {
+          "king-mates-king": 25,
+          "draw-kinged": 8,
+          "dragon-wins-duel": 3,
+          "draw-duel": 3,
+          "king-mates-tail-duel": 1
+        },
+        "drawsBetween": {
+          "dark+light": 8,
+          "light+dragon": 2,
+          "dark+dragon": 1
+        },
+        "results": {
+          "checkmate": 29,
+          "stalemate": 3,
+          "fifty-move": 6,
+          "repetition": 2
+        },
+        "events": {
+          "tail-stone:light": 11,
+          "dragon-out": 18,
+          "tail-stone:dark": 22,
+          "king-captured:light": 3,
+          "king-captured:dark": 4
+        },
+        "plies": {
+          "mean": 214.15,
+          "median": 205.5,
+          "min": 40,
+          "max": 503
+        },
+        "distinct": 40,
+        "flags": [
+          "dark score outside 28–38%",
+          "light score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "tail.canCheck=true",
+      "overrides": {
+        "tail.canCheck": true
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1336,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 11,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 9,
+            "losses": 15,
+            "draws": 11,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "checkmate": 9
+            }
+          },
+          "light": {
+            "wins": 10,
+            "losses": 12,
+            "draws": 9,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "dragon-captured": 2,
+              "checkmate": 8
+            }
+          },
+          "dragon": {
+            "wins": 10,
+            "losses": 2,
+            "draws": 2,
+            "score": 0.275,
+            "interval": [
+              0.1610785343314309,
+              0.4283525083312457
+            ],
+            "winsBy": {
+              "checkmate": 10
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 10,
+          "king-mates-king": 17,
+          "draw-duel": 2,
+          "king-takes-dragon-duel": 2,
+          "draw-kinged": 9
+        },
+        "drawsBetween": {
+          "dark+dragon": 2,
+          "dark+light": 9
+        },
+        "results": {
+          "checkmate": 27,
+          "repetition": 2,
+          "dragon-captured": 2,
+          "insufficient-material": 2,
+          "fifty-move": 7
+        },
+        "events": {
+          "king-captured:dark": 5,
+          "tail-stone:dark": 18,
+          "dragon-out": 22,
+          "tail-stone:light": 9,
+          "king-captured:light": 9
+        },
+        "plies": {
+          "mean": 267.7,
+          "median": 212.5,
+          "min": 28,
+          "max": 598
+        },
+        "distinct": 40,
+        "flags": [
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "tail.capturable=true",
+      "overrides": {
+        "tail.capturable": true
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1326,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 10,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 9,
+            "losses": 17,
+            "draws": 10,
+            "score": 0.35,
+            "interval": [
+              0.2213433317104915,
+              0.5049440300646263
+            ],
+            "winsBy": {
+              "checkmate": 9
+            }
+          },
+          "light": {
+            "wins": 11,
+            "losses": 12,
+            "draws": 8,
+            "score": 0.375,
+            "interval": [
+              0.2422277353579172,
+              0.529678399454681
+            ],
+            "winsBy": {
+              "checkmate": 10,
+              "dragon-captured": 1
+            }
+          },
+          "dragon": {
+            "wins": 10,
+            "losses": 1,
+            "draws": 2,
+            "score": 0.275,
+            "interval": [
+              0.1610785343314309,
+              0.4283525083312457
+            ],
+            "winsBy": {
+              "checkmate": 9,
+              "king-capture": 1
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 10,
+          "king-mates-king": 19,
+          "draw-duel": 2,
+          "draw-kinged": 8,
+          "king-takes-dragon-duel": 1
+        },
+        "drawsBetween": {
+          "dark+dragon": 2,
+          "dark+light": 8
+        },
+        "results": {
+          "checkmate": 28,
+          "repetition": 2,
+          "insufficient-material": 2,
+          "fifty-move": 6,
+          "dragon-captured": 1,
+          "king-capture": 1
+        },
+        "events": {
+          "king-captured:dark": 4,
+          "tail-stone:dark": 18,
+          "dragon-out": 24,
+          "tail-stone:light": 11,
+          "king-captured:light": 9
+        },
+        "plies": {
+          "mean": 249.325,
+          "median": 194,
+          "min": 28,
+          "max": 564
+        },
+        "distinct": 40,
+        "flags": [
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "dragonHead.range=1",
+      "overrides": {
+        "dragonHead.range": 1
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 665,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 9,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 23,
+            "losses": 7,
+            "draws": 9,
+            "score": 0.6875,
+            "interval": [
+              0.532883871337421,
+              0.8092569264436819
+            ],
+            "winsBy": {
+              "checkmate": 23
+            }
+          },
+          "light": {
+            "wins": 6,
+            "losses": 24,
+            "draws": 8,
+            "score": 0.25,
+            "interval": [
+              0.14186967895549518,
+              0.40194259066970106
+            ],
+            "winsBy": {
+              "checkmate": 6
+            }
+          },
+          "dragon": {
+            "wins": 2,
+            "losses": 0,
+            "draws": 1,
+            "score": 0.0625,
+            "interval": [
+              0.019571481816151023,
+              0.18209999002794225
+            ],
+            "winsBy": {
+              "checkmate": 1,
+              "king-capture": 1
+            }
+          }
+        },
+        "endings": {
+          "draw-kinged": 8,
+          "king-mates-king": 29,
+          "draw-duel": 1,
+          "dragon-wins-duel": 2
+        },
+        "drawsBetween": {
+          "dark+light": 8,
+          "dark+dragon": 1
+        },
+        "results": {
+          "fifty-move": 8,
+          "checkmate": 30,
+          "repetition": 1,
+          "king-capture": 1
+        },
+        "events": {
+          "tail-stone:dark": 32,
+          "dragon-out": 27,
+          "tail-stone:light": 7,
+          "king-captured:light": 2,
+          "king-captured:dark": 1
+        },
+        "plies": {
+          "mean": 315.325,
+          "median": 312.5,
+          "min": 31,
+          "max": 913
+        },
+        "distinct": 40,
+        "flags": [
+          "dark score outside 28–38%",
+          "light score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "dragonHead.range=2",
+      "overrides": {
+        "dragonHead.range": 2
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1310,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 13,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 12,
+            "losses": 11,
+            "draws": 12,
+            "score": 0.45,
+            "interval": [
+              0.30705075280944694,
+              0.6017117011155924
+            ],
+            "winsBy": {
+              "checkmate": 12
+            }
+          },
+          "light": {
+            "wins": 11,
+            "losses": 16,
+            "draws": 11,
+            "score": 0.4125,
+            "interval": [
+              0.27424235635053607,
+              0.5660919380182826
+            ],
+            "winsBy": {
+              "checkmate": 11
+            }
+          },
+          "dragon": {
+            "wins": 4,
+            "losses": 0,
+            "draws": 3,
+            "score": 0.1375,
+            "interval": [
+              0.06248998594189924,
+              0.27603780501463526
+            ],
+            "winsBy": {
+              "checkmate": 2,
+              "king-capture": 2
+            }
+          }
+        },
+        "endings": {
+          "king-mates-king": 23,
+          "dragon-wins-duel": 4,
+          "draw-duel": 3,
+          "draw-kinged": 10
+        },
+        "drawsBetween": {
+          "light+dragon": 1,
+          "dark+light": 10,
+          "dark+dragon": 2
+        },
+        "results": {
+          "checkmate": 25,
+          "fifty-move": 11,
+          "king-capture": 2,
+          "insufficient-material": 1,
+          "stalemate": 1
+        },
+        "events": {
+          "tail-stone:dark": 22,
+          "dragon-out": 28,
+          "king-captured:dark": 5,
+          "tail-stone:light": 11,
+          "king-captured:light": 2
+        },
+        "plies": {
+          "mean": 283.825,
+          "median": 259,
+          "min": 73,
+          "max": 518
+        },
+        "distinct": 40,
+        "flags": [
+          "dark score outside 28–38%",
+          "light score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "dragonHead.range=3",
+      "overrides": {
+        "dragonHead.range": 3
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1338,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 9,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 17,
+            "losses": 7,
+            "draws": 7,
+            "score": 0.5125,
+            "interval": [
+              0.3634396866693108,
+              0.6593696998494294
+            ],
+            "winsBy": {
+              "checkmate": 17
+            }
+          },
+          "light": {
+            "wins": 10,
+            "losses": 18,
+            "draws": 7,
+            "score": 0.3375,
+            "interval": [
+              0.21104411177376006,
+              0.49243386348261764
+            ],
+            "winsBy": {
+              "dragon-captured": 4,
+              "checkmate": 6
+            }
+          },
+          "dragon": {
+            "wins": 4,
+            "losses": 6,
+            "draws": 4,
+            "score": 0.15,
+            "interval": [
+              0.07061091708507435,
+              0.2907262603902003
+            ],
+            "winsBy": {
+              "checkmate": 3,
+              "king-capture": 1
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 4,
+          "king-takes-dragon-duel": 4,
+          "king-mates-king": 21,
+          "draw-duel": 4,
+          "king-mates-tail-duel": 2,
+          "draw-kinged": 5
+        },
+        "drawsBetween": {
+          "light+dragon": 2,
+          "dark+dragon": 2,
+          "dark+light": 5
+        },
+        "results": {
+          "checkmate": 26,
+          "dragon-captured": 4,
+          "repetition": 2,
+          "fifty-move": 7,
+          "king-capture": 1
+        },
+        "events": {
+          "tail-stone:light": 12,
+          "king-captured:light": 5,
+          "king-captured:dark": 9,
+          "dragon-out": 20,
+          "tail-stone:dark": 16
+        },
+        "plies": {
+          "mean": 276.275,
+          "median": 240.5,
+          "min": 23,
+          "max": 832
+        },
+        "distinct": 40,
+        "flags": [
+          "dark score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "dragonHead.range=4",
+      "overrides": {
+        "dragonHead.range": 4
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1660,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 14,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 11,
+            "losses": 10,
+            "draws": 9,
+            "score": 0.3875,
+            "interval": [
+              0.25280911078248314,
+              0.5419064105488552
+            ],
+            "winsBy": {
+              "checkmate": 10,
+              "dragon-captured": 1
+            }
+          },
+          "light": {
+            "wins": 13,
+            "losses": 12,
+            "draws": 13,
+            "score": 0.4875,
+            "interval": [
+              0.3406303001505707,
+              0.6365603133306892
+            ],
+            "winsBy": {
+              "checkmate": 12,
+              "dragon-captured": 1
+            }
+          },
+          "dragon": {
+            "wins": 2,
+            "losses": 4,
+            "draws": 6,
+            "score": 0.125,
+            "interval": [
+              0.05459419773541284,
+              0.26112420670238146
+            ],
+            "winsBy": {
+              "king-capture": 1,
+              "checkmate": 1
+            }
+          }
+        },
+        "endings": {
+          "king-mates-tail-duel": 2,
+          "king-mates-king": 20,
+          "draw-kinged": 8,
+          "king-takes-dragon-duel": 2,
+          "draw-duel": 6,
+          "dragon-wins-duel": 2
+        },
+        "drawsBetween": {
+          "dark+light": 8,
+          "dark+dragon": 1,
+          "light+dragon": 5
+        },
+        "results": {
+          "checkmate": 23,
+          "fifty-move": 10,
+          "dragon-captured": 2,
+          "repetition": 4,
+          "king-capture": 1
+        },
+        "events": {
+          "king-captured:dark": 10,
+          "tail-stone:dark": 24,
+          "dragon-out": 24,
+          "king-captured:light": 2,
+          "tail-stone:light": 7
+        },
+        "plies": {
+          "mean": 341.975,
+          "median": 323.5,
+          "min": 113,
+          "max": 832
+        },
+        "distinct": 40,
+        "flags": [
+          "dark score outside 28–38%",
+          "light score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "dragonHead.range=5",
+      "overrides": {
+        "dragonHead.range": 5
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 2032,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 5,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 10,
+            "losses": 13,
+            "draws": 4,
+            "score": 0.3,
+            "interval": [
+              0.18074670915695296,
+              0.454303106543204
+            ],
+            "winsBy": {
+              "checkmate": 8,
+              "dragon-captured": 2
+            }
+          },
+          "light": {
+            "wins": 15,
+            "losses": 16,
+            "draws": 4,
+            "score": 0.425,
+            "interval": [
+              0.28509168524815875,
+              0.5780519956394001
+            ],
+            "winsBy": {
+              "dragon-captured": 4,
+              "checkmate": 11
+            }
+          },
+          "dragon": {
+            "wins": 10,
+            "losses": 6,
+            "draws": 2,
+            "score": 0.275,
+            "interval": [
+              0.1610785343314309,
+              0.4283525083312457
+            ],
+            "winsBy": {
+              "checkmate": 7,
+              "king-capture": 3
+            }
+          }
+        },
+        "endings": {
+          "draw-kinged": 3,
+          "king-takes-dragon-duel": 6,
+          "king-mates-king": 19,
+          "dragon-wins-duel": 10,
+          "draw-duel": 2
+        },
+        "drawsBetween": {
+          "dark+light": 3,
+          "light+dragon": 1,
+          "dark+dragon": 1
+        },
+        "results": {
+          "repetition": 3,
+          "dragon-captured": 6,
+          "checkmate": 26,
+          "king-capture": 3,
+          "fifty-move": 2
+        },
+        "events": {
+          "tail-stone:dark": 18,
+          "king-captured:dark": 13,
+          "tail-stone:light": 4,
+          "dragon-out": 15,
+          "king-captured:light": 5
+        },
+        "plies": {
+          "mean": 234.55,
+          "median": 208.5,
+          "min": 28,
+          "max": 832
+        },
+        "distinct": 40,
+        "flags": [
+          "light score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "dragonHead.range=6",
+      "overrides": {
+        "dragonHead.range": 6
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1395,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 9,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 11,
+            "losses": 14,
+            "draws": 5,
+            "score": 0.3375,
+            "interval": [
+              0.21104411177376006,
+              0.49243386348261764
+            ],
+            "winsBy": {
+              "checkmate": 11
+            }
+          },
+          "light": {
+            "wins": 12,
+            "losses": 17,
+            "draws": 9,
+            "score": 0.4125,
+            "interval": [
+              0.27424235635053607,
+              0.5660919380182826
+            ],
+            "winsBy": {
+              "checkmate": 12
+            }
+          },
+          "dragon": {
+            "wins": 8,
+            "losses": 0,
+            "draws": 4,
+            "score": 0.25,
+            "interval": [
+              0.14186967895549518,
+              0.40194259066970106
+            ],
+            "winsBy": {
+              "checkmate": 4,
+              "king-capture": 4
+            }
+          }
+        },
+        "endings": {
+          "king-mates-king": 23,
+          "draw-duel": 4,
+          "draw-kinged": 5,
+          "dragon-wins-duel": 8
+        },
+        "drawsBetween": {
+          "light+dragon": 4,
+          "dark+light": 5
+        },
+        "results": {
+          "checkmate": 27,
+          "repetition": 3,
+          "fifty-move": 3,
+          "insufficient-material": 2,
+          "king-capture": 4,
+          "stalemate": 1
+        },
+        "events": {
+          "tail-stone:dark": 20,
+          "dragon-out": 20,
+          "king-captured:dark": 10,
+          "tail-stone:light": 6,
+          "king-captured:light": 2
+        },
+        "plies": {
+          "mean": 298.45,
+          "median": 261,
+          "min": 28,
+          "max": 784
+        },
+        "distinct": 40,
+        "flags": [
+          "light score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "dragonHead.range=7",
+      "overrides": {
+        "dragonHead.range": 7
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1442,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 10,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 9,
+            "losses": 16,
+            "draws": 10,
+            "score": 0.35,
+            "interval": [
+              0.2213433317104915,
+              0.5049440300646263
+            ],
+            "winsBy": {
+              "checkmate": 9
+            }
+          },
+          "light": {
+            "wins": 12,
+            "losses": 13,
+            "draws": 8,
+            "score": 0.4,
+            "interval": [
+              0.2634811061240136,
+              0.5540438017260649
+            ],
+            "winsBy": {
+              "checkmate": 11,
+              "dragon-captured": 1
+            }
+          },
+          "dragon": {
+            "wins": 9,
+            "losses": 1,
+            "draws": 2,
+            "score": 0.25,
+            "interval": [
+              0.14186967895549518,
+              0.40194259066970106
+            ],
+            "winsBy": {
+              "checkmate": 6,
+              "king-capture": 3
+            }
+          }
+        },
+        "endings": {
+          "king-mates-king": 20,
+          "dragon-wins-duel": 9,
+          "draw-duel": 2,
+          "draw-kinged": 8,
+          "king-takes-dragon-duel": 1
+        },
+        "drawsBetween": {
+          "dark+dragon": 2,
+          "dark+light": 8
+        },
+        "results": {
+          "checkmate": 26,
+          "repetition": 3,
+          "king-capture": 3,
+          "fifty-move": 6,
+          "dragon-captured": 1,
+          "stalemate": 1
+        },
+        "events": {
+          "tail-stone:dark": 16,
+          "dragon-out": 21,
+          "tail-stone:light": 8,
+          "king-captured:light": 7,
+          "king-captured:dark": 5
+        },
+        "plies": {
+          "mean": 267.425,
+          "median": 245,
+          "min": 28,
+          "max": 712
+        },
+        "distinct": 40,
+        "flags": [
+          "light score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "dragon.canJump=true",
+      "overrides": {
+        "dragon.canJump": true
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 859,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 8,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 2,
+            "losses": 10,
+            "draws": 3,
+            "score": 0.0875,
+            "interval": [
+              0.03252574095675245,
+              0.2147645039248212
+            ],
+            "winsBy": {
+              "checkmate": 2
+            }
+          },
+          "light": {
+            "wins": 1,
+            "losses": 21,
+            "draws": 8,
+            "score": 0.125,
+            "interval": [
+              0.05459419773541284,
+              0.26112420670238146
+            ],
+            "winsBy": {
+              "dragon-captured": 1
+            }
+          },
+          "dragon": {
+            "wins": 29,
+            "losses": 1,
+            "draws": 5,
+            "score": 0.7875,
+            "interval": [
+              0.6386226239809931,
+              0.8859932659500314
+            ],
+            "winsBy": {
+              "checkmate": 22,
+              "king-capture": 7
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 29,
+          "king-mates-king": 2,
+          "king-takes-dragon-duel": 1,
+          "draw-kinged": 3,
+          "draw-duel": 5
+        },
+        "drawsBetween": {
+          "dark+light": 3,
+          "light+dragon": 5
+        },
+        "results": {
+          "checkmate": 24,
+          "dragon-captured": 1,
+          "repetition": 6,
+          "king-capture": 7,
+          "fifty-move": 2
+        },
+        "events": {
+          "king-captured:light": 10,
+          "king-captured:dark": 25,
+          "tail-stone:dark": 2,
+          "dragon-out": 2,
+          "tail-stone:light": 1
+        },
+        "plies": {
+          "mean": 89.225,
+          "median": 55,
+          "min": 13,
+          "max": 375
+        },
+        "distinct": 40,
+        "flags": [
+          "dark score outside 28–38%",
+          "light score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "dragon.3p.givesCheck=true",
+      "overrides": {
+        "dragon.3p.givesCheck": true
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1515,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 14,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 8,
+            "losses": 12,
+            "draws": 14,
+            "score": 0.375,
+            "interval": [
+              0.2422277353579172,
+              0.529678399454681
+            ],
+            "winsBy": {
+              "checkmate": 7,
+              "dragon-captured": 1
+            }
+          },
+          "light": {
+            "wins": 6,
+            "losses": 12,
+            "draws": 9,
+            "score": 0.2625,
+            "interval": [
+              0.15141445317657293,
+              0.4152072029673635
+            ],
+            "winsBy": {
+              "checkmate": 5,
+              "dragon-captured": 1
+            }
+          },
+          "dragon": {
+            "wins": 12,
+            "losses": 2,
+            "draws": 5,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "checkmate": 9,
+              "king-capture": 3
+            }
+          }
+        },
+        "endings": {
+          "king-mates-king": 12,
+          "draw-duel": 5,
+          "dragon-wins-duel": 12,
+          "draw-kinged": 9,
+          "king-takes-dragon-duel": 2
+        },
+        "drawsBetween": {
+          "dark+dragon": 5,
+          "dark+light": 9
+        },
+        "results": {
+          "checkmate": 21,
+          "fifty-move": 8,
+          "repetition": 4,
+          "king-capture": 3,
+          "insufficient-material": 2,
+          "dragon-captured": 2
+        },
+        "events": {
+          "tail-stone:dark": 18,
+          "dragon-out": 14,
+          "king-captured:light": 13,
+          "tail-stone:light": 6,
+          "king-captured:dark": 6
+        },
+        "plies": {
+          "mean": 273.675,
+          "median": 274,
+          "min": 28,
+          "max": 767
+        },
+        "distinct": 40,
+        "flags": [
+          "light score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "sunMoon.3p.range=1",
+      "overrides": {
+        "sunMoon.3p.range": 1
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1309,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 8,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 17,
+            "losses": 10,
+            "draws": 6,
+            "score": 0.5,
+            "interval": [
+              0.35199278797099753,
+              0.6480072120290025
+            ],
+            "winsBy": {
+              "checkmate": 17
+            }
+          },
+          "light": {
+            "wins": 10,
+            "losses": 20,
+            "draws": 8,
+            "score": 0.35,
+            "interval": [
+              0.2213433317104915,
+              0.5049440300646263
+            ],
+            "winsBy": {
+              "checkmate": 8,
+              "dragon-captured": 2
+            }
+          },
+          "dragon": {
+            "wins": 5,
+            "losses": 2,
+            "draws": 2,
+            "score": 0.15,
+            "interval": [
+              0.07061091708507435,
+              0.2907262603902003
+            ],
+            "winsBy": {
+              "checkmate": 3,
+              "king-capture": 2
+            }
+          }
+        },
+        "endings": {
+          "king-mates-king": 25,
+          "draw-kinged": 6,
+          "dragon-wins-duel": 5,
+          "king-takes-dragon-duel": 2,
+          "draw-duel": 2
+        },
+        "drawsBetween": {
+          "dark+light": 6,
+          "light+dragon": 2
+        },
+        "results": {
+          "checkmate": 28,
+          "fifty-move": 5,
+          "king-capture": 2,
+          "repetition": 3,
+          "dragon-captured": 2
+        },
+        "events": {
+          "tail-stone:dark": 20,
+          "dragon-out": 22,
+          "tail-stone:light": 7,
+          "king-captured:dark": 7,
+          "king-captured:light": 2
+        },
+        "plies": {
+          "mean": 290,
+          "median": 270.5,
+          "min": 28,
+          "max": 598
+        },
+        "distinct": 40,
+        "flags": [
+          "dark score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "sunMoon.capture=diagonal-only",
+      "overrides": {
+        "sunMoon.capture": "diagonal-only"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1298,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 16,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 11,
+            "losses": 7,
+            "draws": 11,
+            "score": 0.4125,
+            "interval": [
+              0.27424235635053607,
+              0.5660919380182826
+            ],
+            "winsBy": {
+              "checkmate": 11
+            }
+          },
+          "light": {
+            "wins": 5,
+            "losses": 16,
+            "draws": 12,
+            "score": 0.275,
+            "interval": [
+              0.1610785343314309,
+              0.4283525083312457
+            ],
+            "winsBy": {
+              "checkmate": 4,
+              "dragon-captured": 1
+            }
+          },
+          "dragon": {
+            "wins": 8,
+            "losses": 1,
+            "draws": 9,
+            "score": 0.3125,
+            "interval": [
+              0.19074307355631814,
+              0.467116128662579
+            ],
+            "winsBy": {
+              "king-capture": 4,
+              "checkmate": 4
+            }
+          }
+        },
+        "endings": {
+          "king-mates-king": 15,
+          "draw-kinged": 7,
+          "draw-duel": 9,
+          "dragon-wins-duel": 8,
+          "king-takes-dragon-duel": 1
+        },
+        "drawsBetween": {
+          "dark+light": 7,
+          "light+dragon": 5,
+          "dark+dragon": 4
+        },
+        "results": {
+          "checkmate": 19,
+          "fifty-move": 11,
+          "repetition": 5,
+          "king-capture": 4,
+          "dragon-captured": 1
+        },
+        "events": {
+          "tail-stone:light": 6,
+          "dragon-out": 15,
+          "tail-stone:dark": 17,
+          "king-captured:dark": 11,
+          "king-captured:light": 7
+        },
+        "plies": {
+          "mean": 273.775,
+          "median": 277,
+          "min": 28,
+          "max": 628
+        },
+        "distinct": 40,
+        "flags": [
+          "dark score outside 28–38%",
+          "light score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "sunMoon.capture=none",
+      "overrides": {
+        "sunMoon.capture": "none"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 979,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 8,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 19,
+            "losses": 7,
+            "draws": 6,
+            "score": 0.55,
+            "interval": [
+              0.39828829888440775,
+              0.6929492471905531
+            ],
+            "winsBy": {
+              "checkmate": 19
+            }
+          },
+          "light": {
+            "wins": 7,
+            "losses": 25,
+            "draws": 7,
+            "score": 0.2625,
+            "interval": [
+              0.15141445317657293,
+              0.4152072029673635
+            ],
+            "winsBy": {
+              "checkmate": 7
+            }
+          },
+          "dragon": {
+            "wins": 6,
+            "losses": 0,
+            "draws": 3,
+            "score": 0.1875,
+            "interval": [
+              0.09614404195947375,
+              0.33362129507202154
+            ],
+            "winsBy": {
+              "king-capture": 3,
+              "checkmate": 3
+            }
+          }
+        },
+        "endings": {
+          "king-mates-king": 26,
+          "dragon-wins-duel": 6,
+          "draw-duel": 3,
+          "draw-kinged": 5
+        },
+        "drawsBetween": {
+          "light+dragon": 2,
+          "dark+light": 5,
+          "dark+dragon": 1
+        },
+        "results": {
+          "checkmate": 29,
+          "king-capture": 3,
+          "fifty-move": 6,
+          "repetition": 2
+        },
+        "events": {
+          "tail-stone:light": 8,
+          "dragon-out": 20,
+          "tail-stone:dark": 17,
+          "king-captured:dark": 8,
+          "king-captured:light": 1
+        },
+        "plies": {
+          "mean": 277.15,
+          "median": 270,
+          "min": 28,
+          "max": 571
+        },
+        "distinct": 40,
+        "flags": [
+          "dark score outside 28–38%",
+          "light score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "endings.3p=first-checkmate",
+      "overrides": {
+        "endings.3p": "first-checkmate",
+        "dragon.3p.givesCheck": true
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 816,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 1,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 15,
+            "losses": 7,
+            "draws": 1,
+            "score": 0.38333333333333336,
+            "interval": [
+              0.24927184366761174,
+              0.5378405488241467
+            ],
+            "winsBy": {
+              "checkmate": 15
+            }
+          },
+          "light": {
+            "wins": 6,
+            "losses": 12,
+            "draws": 1,
+            "score": 0.15833333333333333,
+            "interval": [
+              0.07614012651680832,
+              0.30040330863762643
+            ],
+            "winsBy": {
+              "checkmate": 6
+            }
+          },
+          "dragon": {
+            "wins": 18,
+            "losses": 20,
+            "draws": 1,
+            "score": 0.45833333333333337,
+            "interval": [
+              0.31444677129744913,
+              0.6095219403067503
+            ],
+            "winsBy": {
+              "checkmate": 13,
+              "king-capture": 5
+            }
+          }
+        },
+        "endings": {
+          "dragon-mates-king": 18,
+          "king-mates-tail": 20,
+          "draw-all": 1,
+          "king-mates-king": 1
+        },
+        "drawsBetween": {
+          "dark+light+dragon": 1
+        },
+        "results": {
+          "checkmate": 34,
+          "stalemate": 1,
+          "king-capture": 5
+        },
+        "events": {},
+        "plies": {
+          "mean": 96.8,
+          "median": 67,
+          "min": 10,
+          "max": 492
+        },
+        "distinct": 40,
+        "flags": [
+          "dark score outside 28–38%",
+          "light score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "dragon.3p.lastKing=capture",
+      "overrides": {
+        "dragon.3p.lastKing": "capture"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1310,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 11,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 9,
+            "losses": 15,
+            "draws": 11,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "checkmate": 9
+            }
+          },
+          "light": {
+            "wins": 10,
+            "losses": 12,
+            "draws": 9,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "dragon-captured": 2,
+              "checkmate": 8
+            }
+          },
+          "dragon": {
+            "wins": 10,
+            "losses": 2,
+            "draws": 2,
+            "score": 0.275,
+            "interval": [
+              0.1610785343314309,
+              0.4283525083312457
+            ],
+            "winsBy": {
+              "king-capture": 10
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 10,
+          "king-mates-king": 17,
+          "draw-duel": 2,
+          "king-takes-dragon-duel": 2,
+          "draw-kinged": 9
+        },
+        "drawsBetween": {
+          "dark+dragon": 2,
+          "dark+light": 9
+        },
+        "results": {
+          "king-capture": 10,
+          "checkmate": 17,
+          "repetition": 2,
+          "dragon-captured": 2,
+          "insufficient-material": 2,
+          "fifty-move": 7
+        },
+        "events": {
+          "king-captured:dark": 5,
+          "tail-stone:dark": 18,
+          "dragon-out": 22,
+          "tail-stone:light": 9,
+          "king-captured:light": 9
+        },
+        "plies": {
+          "mean": 270.2,
+          "median": 226,
+          "min": 28,
+          "max": 598
+        },
+        "distinct": 40,
+        "flags": [
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "tail.3p.mateTiming=dragon-turn",
+      "overrides": {
+        "tail.3p.mateTiming": "dragon-turn"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1100,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 13,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 5,
+            "losses": 15,
+            "draws": 13,
+            "score": 0.2875,
+            "interval": [
+              0.17085731648676938,
+              0.44138311269464736
+            ],
+            "winsBy": {
+              "checkmate": 5
+            }
+          },
+          "light": {
+            "wins": 11,
+            "losses": 9,
+            "draws": 11,
+            "score": 0.4125,
+            "interval": [
+              0.27424235635053607,
+              0.5660919380182826
+            ],
+            "winsBy": {
+              "dragon-captured": 2,
+              "checkmate": 9
+            }
+          },
+          "dragon": {
+            "wins": 11,
+            "losses": 3,
+            "draws": 2,
+            "score": 0.3,
+            "interval": [
+              0.18074670915695296,
+              0.454303106543204
+            ],
+            "winsBy": {
+              "checkmate": 10,
+              "king-capture": 1
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 11,
+          "king-mates-king": 13,
+          "draw-duel": 2,
+          "king-takes-dragon-duel": 2,
+          "draw-kinged": 11,
+          "king-mates-tail-duel": 1
+        },
+        "drawsBetween": {
+          "dark+dragon": 2,
+          "dark+light": 11
+        },
+        "results": {
+          "checkmate": 24,
+          "repetition": 4,
+          "dragon-captured": 2,
+          "fifty-move": 8,
+          "king-capture": 1,
+          "insufficient-material": 1
+        },
+        "events": {
+          "king-captured:dark": 7,
+          "tail-stone:dark": 4,
+          "dragon-out": 17,
+          "tail-stone:light": 17,
+          "king-captured:light": 9
+        },
+        "plies": {
+          "mean": 269,
+          "median": 212.5,
+          "min": 28,
+          "max": 598
+        },
+        "distinct": 40,
+        "flags": [
+          "light score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "draw.3p.threefoldRepetition=false",
+      "overrides": {
+        "draw.3p.threefoldRepetition": false
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1356,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 9,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 9,
+            "losses": 17,
+            "draws": 9,
+            "score": 0.3375,
+            "interval": [
+              0.21104411177376006,
+              0.49243386348261764
+            ],
+            "winsBy": {
+              "checkmate": 9
+            }
+          },
+          "light": {
+            "wins": 10,
+            "losses": 12,
+            "draws": 9,
+            "score": 0.3625,
+            "interval": [
+              0.23173854714969558,
+              0.5173582011441624
+            ],
+            "winsBy": {
+              "dragon-captured": 2,
+              "checkmate": 8
+            }
+          },
+          "dragon": {
+            "wins": 12,
+            "losses": 2,
+            "draws": 0,
+            "score": 0.3,
+            "interval": [
+              0.18074670915695296,
+              0.454303106543204
+            ],
+            "winsBy": {
+              "checkmate": 10,
+              "king-capture": 2
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 12,
+          "king-mates-king": 17,
+          "king-takes-dragon-duel": 2,
+          "draw-kinged": 9
+        },
+        "drawsBetween": {
+          "dark+light": 9
+        },
+        "results": {
+          "checkmate": 27,
+          "dragon-captured": 2,
+          "insufficient-material": 2,
+          "king-capture": 2,
+          "fifty-move": 7
+        },
+        "events": {
+          "king-captured:dark": 5,
+          "tail-stone:dark": 18,
+          "dragon-out": 22,
+          "tail-stone:light": 9,
+          "king-captured:light": 9
+        },
+        "plies": {
+          "mean": 270.55,
+          "median": 214.5,
+          "min": 28,
+          "max": 598
+        },
+        "distinct": 40,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "draw.3p.fiftyMove=false",
+      "overrides": {
+        "draw.3p.fiftyMove": false
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 1228,
+      "summary": {
+        "games": 40,
+        "finished": 39,
+        "draws": 5,
+        "unfinished": 1,
+        "seats": {
+          "dark": {
+            "wins": 10,
+            "losses": 19,
+            "draws": 5,
+            "score": 0.32051282051282054,
+            "interval": [
+              0.19593855452229986,
+              0.4772762647188116
+            ],
+            "winsBy": {
+              "checkmate": 10
+            }
+          },
+          "light": {
+            "wins": 14,
+            "losses": 13,
+            "draws": 3,
+            "score": 0.3974358974358974,
+            "interval": [
+              0.25980374197033085,
+              0.5534618690245899
+            ],
+            "winsBy": {
+              "dragon-captured": 2,
+              "checkmate": 12
+            }
+          },
+          "dragon": {
+            "wins": 10,
+            "losses": 2,
+            "draws": 2,
+            "score": 0.28205128205128205,
+            "interval": [
+              0.16543325013943294,
+              0.43775617322477384
+            ],
+            "winsBy": {
+              "checkmate": 9,
+              "king-capture": 1
+            }
+          }
+        },
+        "endings": {
+          "dragon-wins-duel": 10,
+          "king-mates-king": 22,
+          "draw-duel": 2,
+          "king-takes-dragon-duel": 2,
+          "draw-kinged": 3,
+          "capped": 1
+        },
+        "drawsBetween": {
+          "dark+dragon": 2,
+          "dark+light": 3
+        },
+        "results": {
+          "checkmate": 31,
+          "repetition": 2,
+          "dragon-captured": 2,
+          "insufficient-material": 3,
+          "king-capture": 1,
+          "unfinished": 1
+        },
+        "events": {
+          "king-captured:dark": 5,
+          "tail-stone:dark": 19,
+          "dragon-out": 23,
+          "tail-stone:light": 9,
+          "king-captured:light": 9
+        },
+        "plies": {
+          "mean": 333.5,
+          "median": 212.5,
+          "min": 28,
+          "max": 2000
+        },
+        "distinct": 40,
+        "flags": [
+          "light score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    },
+    {
+      "combination": "check.3p.exposedKing=counts-as-checkmate",
+      "overrides": {
+        "check.3p.exposedKing": "counts-as-checkmate"
+      },
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 975,
+      "summary": {
+        "games": 40,
+        "finished": 40,
+        "draws": 11,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 10,
+            "losses": 13,
+            "draws": 10,
+            "score": 0.375,
+            "interval": [
+              0.2422277353579172,
+              0.529678399454681
+            ],
+            "winsBy": {
+              "checkmate": 8,
+              "dragon-captured": 2
+            }
+          },
+          "light": {
+            "wins": 9,
+            "losses": 11,
+            "draws": 9,
+            "score": 0.3375,
+            "interval": [
+              0.21104411177376006,
+              0.49243386348261764
+            ],
+            "winsBy": {
+              "dragon-captured": 3,
+              "checkmate": 6
+            }
+          },
+          "dragon": {
+            "wins": 10,
+            "losses": 5,
+            "draws": 3,
+            "score": 0.2875,
+            "interval": [
+              0.17085731648676938,
+              0.44138311269464736
+            ],
+            "winsBy": {
+              "checkmate": 8,
+              "king-capture": 2
+            }
+          }
+        },
+        "endings": {
+          "king-mates-king": 14,
+          "dragon-wins-duel": 10,
+          "draw-duel": 3,
+          "king-takes-dragon-duel": 5,
+          "draw-kinged": 8
+        },
+        "drawsBetween": {
+          "dark+dragon": 2,
+          "dark+light": 8,
+          "light+dragon": 1
+        },
+        "results": {
+          "checkmate": 22,
+          "repetition": 4,
+          "dragon-captured": 5,
+          "fifty-move": 7,
+          "king-capture": 2
+        },
+        "events": {
+          "king-captured:light": 11,
+          "tail-stone:light": 4,
+          "king-captured:dark": 7,
+          "tail-stone:dark": 10,
+          "dragon-out": 11
+        },
+        "plies": {
+          "mean": 263,
+          "median": 191,
+          "min": 28,
+          "max": 598
+        },
+        "distinct": 40,
+        "flags": [
+          "too few games"
+        ],
+        "pass": false
+      }
+    }
+  ],
+  "flagged": [
+    "king.range=2 at depth 1: dragon interval 2.6–19.9% outside 28–38%",
+    "king.range=3 at depth 1: dark interval 41.0–70.4% outside 28–38%, dragon interval 2.0–18.2% outside 28–38%",
+    "king.range=4 at depth 1: dark interval 39.8–69.3% outside 28–38%, dragon interval 2.0–18.2% outside 28–38%",
+    "coast.3p.exit=any-legal-move at depth 1: light interval 38.7–68.2% outside 28–38%",
+    "coast.returnAllowed=false at depth 1: dragon interval 6.2–27.6% outside 28–38%",
+    "tail.3p.movement=two-player-path at depth 1: dark interval 54.6–81.9% outside 28–38%, dragon interval 2.6–19.9% outside 28–38%",
+    "tail.3p.captures=none at depth 1: dark interval 55.9–82.9% outside 28–38%, dragon interval 4.7–24.6% outside 28–38%",
+    "dragonHead.range=1 at depth 1: dark interval 53.3–80.9% outside 28–38%, dragon interval 2.0–18.2% outside 28–38%",
+    "dragonHead.range=2 at depth 1: dragon interval 6.2–27.6% outside 28–38%",
+    "dragonHead.range=4 at depth 1: dragon interval 5.5–26.1% outside 28–38%",
+    "dragon.canJump=true at depth 1: dark interval 3.3–21.5% outside 28–38%, light interval 5.5–26.1% outside 28–38%, dragon interval 63.9–88.6% outside 28–38%",
+    "sunMoon.capture=none at depth 1: dark interval 39.8–69.3% outside 28–38%"
+  ],
+  "skipped": [
+    {
+      "combination": "queen.pawnSwap=true",
+      "reason": "not built yet: queen.pawnSwap"
+    },
+    {
+      "combination": "sunMoon.canPromote=true",
+      "reason": "not built yet: sunMoon.canPromote"
+    },
+    {
+      "combination": "setup.swapKingQueen=true",
+      "reason": "not built yet: setup.swapKingQueen"
+    }
+  ]
+}
