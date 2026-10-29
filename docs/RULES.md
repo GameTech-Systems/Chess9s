@@ -16,7 +16,7 @@ The 3-player presets are all experimental, and none is fairness-checked yet ([de
 
 | Preset | Ruleset | What it plays |
 |---|---|---|
-| **Standard** (the 3-player default, D63) | `standard-3p` | Good Practice, except the King moves one square (`king.range` = 1), as in the 2-player Standard |
+| **Standard** (the 3-player default, D63) | `standard-3p` | Good Practice, except the King moves one square (`king.range` = 1), as in the 2-player Standard, and the Dragon's pieces attack nothing from the Coast, where Kings and Queens may capture them ([below](#standard-no-attacks-from-the-coast-3-player), [decision 0020](decisions/0020-three-player-coast-attacks.md)) |
 | **Good Practice** | `draft-3p` | Every 3-player setting at its default: the full Dragon rules below |
 | **Easy Start** | `easy-3p` | Easy Start's piece settings and a shorter Dragon game: the first checkmate wins ([below](#easy-start-for-3-players-the-first-checkmate-wins)) |
 
@@ -131,13 +131,21 @@ All Coast pieces move in straight lines and stop when blocked; none may turn a c
 
 Two options, for players to try: `coast.3p.exit` = a5-always (every way off the Coast is from A5, for the whole game), and any-legal-move (Coast pieces leave with any legal move from the first turn, which is how every 3-player game played before S68; [decision 0019](decisions/0019-three-player-coast-exit.md)).
 
+### Standard: no attacks from the Coast (3-player)
+
+Standard (`standard-3p` 0.3.0) plays two more Coast rules ([decision 0020](decisions/0020-three-player-coast-attacks.md)); Good Practice and Easy Start offer them as options:
+
+1. **No attacks from the Coast** (`coast.3p.attackFrom` = blocked). A Coast piece standing on a Coast square, A5 included, attacks nothing: it can't capture, gives no check and guards no square, so a King may stand in its line or next to it. It still blocks lines like any piece. Off the Coast it attacks as usual, and it may capture a piece standing on the Coast by landing there.
+2. Each piece still first leaves the Coast through A5, and may come back onto any Coast square afterwards.
+3. **Kings and Queens may capture on the Coast** (`coast.3p.capturable` on). They are the only pieces that may enter it, so they are the only ones that can take a Dragon Head, the Sun or the Moon standing there. The Tail can't be captured.
+
 ## Center square and general rules
 
 Only the 3 dragons (both Dragon Heads and the Dragon Tail) may ever stand on E5, in both 2- and 3-player games (`center.occupants` = dragons).
 
 - **Passing through E5**: Rooks and Bishops can't slide through E5. Dragon Heads, the Queen, the King, and the Sun and Moon may pass over an empty E5 in a straight line, and Knights jump over it as usual. No piece passes through an occupied E5.
 - **Capturing on E5**: a Dragon Head on E5 can be captured only by the other Dragon Head, since no other piece may land there.
-- **Turn order**: in 2-player games the dark side moves first, then light. In 3-player games: dark, light, Dragon, repeating.
+- **Turn order**: in 2-player games the dark side moves first, then light. In 3-player games: dark, light, Dragon, repeating. Option `turn.3p.order` = dark-dragon-light: dark, Dragon, light ([decision 0020](decisions/0020-three-player-coast-attacks.md)); the rules about who moves next (rules 6 and 7 below) follow the order played.
 - **Winning, 2-player**: checkmate wins.
 - **Draws, 2-player**: stalemate is a draw, as are threefold repetition, the 50-move rule and insufficient material, as in chess. Tail moves count as moves for the 50-move rule and repetition.
 - **Winning and draws, 3-player**: see [3-player Dragon mode](#3-player-dragon-mode-experimental).
@@ -149,13 +157,13 @@ The third player is the Dragon: it moves third each round (dark, light, Dragon) 
 - **First Coast move**: the Sun or Moon one square, or the Tail off A5 to any legal square, which frees A5.
 - **Movement**: Dragon Heads and the Tail any distance in any direction; the Sun and Moon one square at a time on the Coast, then up to 2 squares in any direction. All in straight lines.
 - **The Tail** can capture any light or dark piece that isn't a Coast piece, and can't be captured.
-- Both Kinged sides may capture Dragon Heads and the Sun and Moon once they are off the Coast.
+- Both Kinged sides may capture Dragon Heads and the Sun and Moon once they are off the Coast; in Standard, Kings and Queens may also capture them on it ([above](#standard-no-attacks-from-the-coast-3-player)).
 
 ### Check
 
 1. Kings check each other as usual. A Kinged player may never leave its own King in check from the other Kinged player.
 2. Dragon pieces don't give check (`dragon.3p.givesCheck` off). A Kinged player may leave its King on a square a Dragon piece attacks, or move it onto one, at its own risk: the Dragon may capture it on its turn.
-3. With `dragon.3p.givesCheck` on, attacks by the Dragon Heads, the Sun and the Moon are check, so a Kinged player must answer them. The Dragon then removes a King by checkmating it, which counts as capturing it. The Tail gives check only when `tail.canCheck` is also on; a King attacked only by a Tail that doesn't give check can still be captured by it.
+3. With `dragon.3p.givesCheck` on, attacks by the Dragon Heads, the Sun and the Moon are check, so a Kinged player must answer them. The Dragon then removes a King by checkmating it, which counts as capturing it: no King is ever captured, which makes this the checkmate-only option of [decision 0020](decisions/0020-three-player-coast-attacks.md) (D72). The Tail gives check only when `tail.canCheck` is also on; a King attacked only by a Tail that doesn't give check can still be captured by it.
 4. The Tail is the Dragon's King while it is active: the Dragon must end any attack on it when it can, and may not move the Tail onto an attacked square or make a move that leaves it attacked.
 5. **The duel.** Once the Dragon has captured one King, the last Kinged player and the Dragon play the game out. Dragon attacks on the last King are now check, whatever `dragon.3p.givesCheck` says, and the Dragon wins by checkmating that King. Option `dragon.3p.lastKing` = capture: Dragon attacks keep rule 2 or 3, and the Dragon wins by capturing the last King.
 6. No move may leave a King in check from a player who moves before that King's owner can answer: the Dragon may not leave light's King in check from dark, and with Dragon check on, light may not leave dark's King in check from the Dragon. Option `check.3p.exposedKing` = counts-as-checkmate: such a move is allowed, and the King's owner loses at once to the owner of the piece giving check.

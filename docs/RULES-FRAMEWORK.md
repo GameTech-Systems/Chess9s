@@ -87,6 +87,7 @@ Each piece is one file in `rules/pieces/`, validated by [`rules/schema/piece.sch
 | `squares` | Square rules for every move of the piece |
 | `royal` | The checkmate target. Default false |
 | `capturable`, `givesCheck` | Default true |
+| `moveOnly` | `when`: while the condition holds, every move of the piece is move-only. It captures and attacks nothing (no check, it guards no square) and its capture-only moves are not played, but it still blocks lines. A Coast piece on the Coast with `coast.3p.attackFrom` = blocked (S71, decision 0020) |
 | `promotion` | `to`: piece ids. Promotes on the last rank in the side's forward direction |
 | `castle` | `partner` (a piece id), `steps` and `when`: castling as in chess (below) |
 | `irreversible` | Its moves can't be taken back (the pawn): like a capture, a move by it restarts the fifty-move count and the repetition record |
@@ -104,7 +105,7 @@ A **square rule** names a square type and says whether the piece may `stop` ther
 **Parameters** plug in two ways:
 
 - A value may be `{ "param": "<id>" }`, read from the resolved ruleset: an integer parameter for `range`, a boolean one for `jump`, `stop`, `pass`, `capturable` and `givesCheck`, and an enumSet one for `promotion.to`.
-- A move, square rule or promotion may carry `when`, which applies it only if the condition holds: `{ "param", "is" }`, `{ "param", "in" }`, `{ "param", "has" }` (for enumSet parameters), `{ "players": [3] }`, `{ "from": "<square type>" }`, `{ "firstMove": true }`, `{ "hasLeft": "<square type>" }` (the piece has moved off a square of that type onto one without it at least once: a Coast piece's first way out, S68, decision 0019), or `not`, `all` and `any` around other conditions. The game keeps what `hasLeft` reads per piece (`PlacedPiece.left`), only for the square types its own data names, and the repetition key includes it.
+- A move, square rule, promotion or `moveOnly` may carry `when`, which applies it only if the condition holds: `{ "param", "is" }`, `{ "param", "in" }`, `{ "param", "has" }` (for enumSet parameters), `{ "players": [3] }`, `{ "from": "<square type>" }`, `{ "firstMove": true }`, `{ "hasLeft": "<square type>" }` (the piece has moved off a square of that type onto one without it at least once: a Coast piece's first way out, S68, decision 0019), or `not`, `all` and `any` around other conditions. The game keeps what `hasLeft` reads per piece (`PlacedPiece.left`), only for the square types its own data names, and the repetition key includes it.
 
 ```json
 {
@@ -147,7 +148,7 @@ Rules that need game state, such as opening the Coast, are engine features switc
 - **Inert pieces**: a caller may mark pieces whose attacks give no check (`inert`, such as every piece on a closed Coast); they still block lines. `lifts` names the moves after which every piece counts again (the move that opens the Coast), and `allow` removes moves the game state forbids before the check test.
 - **Legal moves** are the pseudo-legal moves after which none of the side's royal pieces is in check. A caller may let the side also move another side's pieces (`alsoMove`, such as `neutral` for the Tail in 2-player games), and a borrowed piece never captures a piece of the side moving it; whether it may move on this turn is game state.
 - **Game status**: no legal move is checkmate when in check and stalemate otherwise; stalemate reads `draw.stalemate` (draw, loss for the stalemated side, or win for it). 3-player games judge check and game end in `game/three.ts` instead (next section): a Coast piece's flag names a 2-player parameter and is never read there.
-- **Turn order** (`packages/engine/src/game/turns.ts`): the setup's `turnOrder`, rotated so that `turn.firstMove` starts where the ruleset resolves it, for any number of seats; `nextSide` skips seats that are out.
+- **Turn order** (`packages/engine/src/game/turns.ts`): the setup's `turnOrder`, rotated so that `turn.firstMove` starts where the ruleset resolves it, for any number of seats; where `turn.3p.order` resolves, its value names the whole order instead (seat ids joined by `-`, which must seat exactly the setup's sides; S71, decision 0020). `nextSide` skips seats that are out.
 - **Interactions** (`packages/engine/src/rules/interactions.ts`): every pair of parameters that can vary in a game of that player count and share an `affects` system, for the simulation harness.
 
 ## Game state

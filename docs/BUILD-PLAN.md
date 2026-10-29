@@ -391,9 +391,24 @@ Decisions: D55 to D57 as before; decision 0019.
 Run decision 0015's measures again for `standard-3p` 0.2.0: Actions → **Sim depth 2**, ruleset `standard-3p`, depths `1,2`, games 2000, shards 40; then the 40-game depth-1 sweep (sweep on, games 40, depths 1; it now plays `coast.3p.exit` at `a5-always` and `any-legal-move`) and screens of `draft-3p` and `easy-3p` (400 games, depths 1). Download each merged report and commit it to `docs/fairness/`; the earlier 3-player reports are kept as `<report>@<version>` (S68), so no merge picks one of them up. Compare with the 0.1.0 runs (same seeds) and say whether Light still collapses at depth 2. The owner then decides on the 3-player defaults as in S61.
 Done when: the reports for `standard-3p` 0.2.0 at both depths, the sweep and the two screens are committed, with a short comparison in the handoff.
 
-### S70 — 3-player defaults after the A5 runs · Owner with Claude in chat · Opus 5.5 · high · `todo`
-The owner reads the S69 reports (`docs/fairness/standard-3p.md`, the sweep, the two screens, the greedy-Dragon run) and decides on the 3-player defaults, as in S61. Claude records the answers (a decision record, the "Decision defaults" table) and builds nothing the owner has not chosen.
+### S70 — 3-player defaults after the A5 runs · Owner with Claude in chat · Opus 5.5 · high · `done`
+The owner reads the S69 reports (`docs/fairness/standard-3p@0.2.0.md`, the sweep, the two screens, the greedy-Dragon run) and decides on the 3-player defaults, as in S61. Claude records the answers (a decision record, the "Decision defaults" table) and builds nothing the owner has not chosen.
 Done when: the owner's 3-player calls are recorded, or recorded as kept as they are.
+Done 29 Oct 2026 in chat: the A5 exit fixed depth 1 but not depth 2. The owner chose the next Standard ruleset to test (D70, D71), two more levers to screen alone (D72, D73), and Standard only (D74); recorded and built in S71 ([decision 0020](decisions/0020-three-player-coast-attacks.md)).
+
+### S71 — 3-player Coast rule and balance options · Opus 5.5 · high · `done`
+Build the S70 calls as data, each tested at its default and every option ([decision 0020](decisions/0020-three-player-coast-attacks.md)):
+- **D70:** `coast.3p.attackFrom` (allowed, blocked): a Coast piece on a Coast square attacks nothing (no captures, no check, guards nothing) but still blocks; first way out through A5, then back onto any Coast square. Piece data: the new piece field `moveOnly`.
+- **D71:** Kings and Queens only may enter the Coast and may capture Coast pieces there (`coast.3p.capturable` on).
+- **D72:** checkmate only, no King capture: the existing `dragon.3p.givesCheck` = true.
+- **D73:** `turn.3p.order` (dark-light-dragon, dark-dragon-light).
+- **D74:** `standard-3p` 0.3.0 only; 0.2.0 archived with a lock (`pnpm lock keep`); the S69 reports renamed `@0.2.0`; recorded games and bench positions played again.
+- The computer Dragon walks its pieces out and does not park them on the Coast. The `Sim depth 2` workflow gains `set` and `label`, then the S72 screens are dispatched.
+Done when: the rules play as decided in every preset, tests pass, and the S72 screens are running.
+
+### S72 — 3-player balance screens on the Coast rule · Claude (workflow) · Opus 5.5 · medium · `todo`
+Depth-2 screens (a few hundred games each, depth 1 alongside), each lever alone on `standard-3p`: the Coast rule alone (0.3.0 as it is), checkmate only alone, the turn order alone (each on 0.2.0's rules: `coast.3p.attackFrom=allowed coast.3p.capturable=false`, then the lever), with the S69 runs as the 0.2.0 baseline. Actions → **Sim depth 2**, ruleset `standard-3p`, games 400, depths `1,2`, `set` and `label` per screen (reports `docs/fairness/standard-3p.<label>`). Full 2,000-game runs at depths 1 and 2 only for a variant that screens inside 28–38%; combine levers only if none passes alone. Commit the reports and compare; then the owner chooses defaults in chat.
+Done when: the screens' reports are committed, with a comparison in the handoff.
 
 ## Later phases
 
@@ -455,6 +470,11 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D65 | Easy Start for 3 players | Decided (Claude, at the owner's request): the first checkmate wins; every attack on a King is check; the Tail is the Dragon's King on A5, E5 and I5 (decision 0016); confirmed at S61 (Phase 6 exit) | S56 |
 | D66 | Running out of time | Default: the seat is out. In 2-player games it loses, or draws if the other player could not checkmate; in 3-player games its side turns to stone and the others play on, and in the duel it loses (decision 0017). Show only turns this off for a game | S65 |
 | D68 | 3-player resignation and Tail capture | Decided (owner, 27 Oct 2026): a resigning seat's pieces turn to stone and the others play on; a captured Tail swaps with the capturing piece and turns to stone, as in a checkmate. Easy Start parts by Claude, provisional (decision 0018) | S67 |
+| D70 | Dragon pieces don't attack from the Coast (3-player) | Decided (owner, 29 Oct 2026): no captures, no check, no guarding from any Coast square; still blocks; back onto any Coast square; first way out through A5. `coast.3p.attackFrom` = blocked in `standard-3p` 0.3.0; allowed (as 0.2.0) is the option (decision 0020) | S71 |
+| D71 | Who may enter the Coast (3-player) | Decided (owner, 29 Oct 2026): Kings and Queens only, and they may capture Coast pieces there (`coast.3p.capturable` on in `standard-3p` 0.3.0) | S71 |
+| D72 | Dragon wins by King capture or checkmate only | Decided (owner, 29 Oct 2026): King capture stays the default; checkmate only (`dragon.3p.givesCheck` = true) is screened alone in S72 | S71 |
+| D73 | 3-player turn order option | Decided (owner, 29 Oct 2026): dark, light, Dragon (D26) stays the default; dark, Dragon, light (`turn.3p.order`) is screened alone in S72 | S71 |
+| D74 | Which 3-player presets get the Coast rule | Decided (owner, 29 Oct 2026): `standard-3p` only, as a new version; Good Practice and Easy Start keep their rules and screen the rule as an option | S71 |
 
 ## Ledger sync format
 
