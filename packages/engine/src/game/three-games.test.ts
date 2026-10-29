@@ -77,6 +77,7 @@ describe('each preset plays from the start to every end in its table', () => {
     ).toEqual([...want].sort());
   });
 
+  // A long recorded game (S71's Standard draw is 386 plies) takes over 5 s to replay on CI.
   it.each(games.map((g) => [`${g.ruleset} ${g.rows.join(', ')}`, g] as const))(
     '%s',
     (_name, game) => {
@@ -84,6 +85,7 @@ describe('each preset plays from the start to every end in its table', () => {
       expect(g.result).toEqual(game.result);
       expect(g.moves.flatMap((m) => m.events ?? [])).toEqual(game.events);
     },
+    30_000,
   );
 });
 
@@ -155,6 +157,7 @@ describe('games recorded before S68 and S71 replay under the versions they were 
       expect(g.result).toEqual(game.result);
       expect(g.moves.flatMap((m) => m.events ?? [])).toEqual(game.events);
     },
+    30_000,
   );
 
   it('most of them are not legal under the current versions (the A5 exit, no attacks from the Coast)', () => {
