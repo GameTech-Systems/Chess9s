@@ -4,6 +4,8 @@
 # report, keeping the depth-1 run from docs/fairness/<ruleset>.json, and uploads it.
 # S59: a 3-player ruleset gets the balance report of decision 0015 the same way; `depths`, `sweep`
 # and `mode` also run its depth-1 run, its screening sweep and the greedy-Dragon run on shards.
+# S71: `set` changes parameters for every game (one lever screened alone, decision 0020); the
+# report is then named <ruleset>.<label>.
 name: Sim depth 2
 
 on:
@@ -34,12 +36,20 @@ on:
         type: choice
         options: [search, greedy-dragon]
         default: search
+      set:
+        description: Parameters changed for every game, id=value separated by spaces (needs label).
+        type: string
+        default: ''
+      label:
+        description: With set, the report is named <ruleset>.<label> (lowercase letters, digits, -).
+        type: string
+        default: ''
 
 permissions:
   contents: read
 
 concurrency:
-  group: sim-depth2-${{ inputs.ruleset }}-${{ inputs.depths }}-${{ inputs.sweep }}-${{ inputs.mode }}
+  group: sim-depth2-${{ inputs.ruleset }}-${{ inputs.label }}-${{ inputs.depths }}-${{ inputs.sweep }}-${{ inputs.mode }}
   cancel-in-progress: false
 
 jobs:
@@ -58,6 +68,8 @@ jobs:
           DEPTHS: ${{ inputs.depths }}
           SWEEP: ${{ inputs.sweep }}
           MODE: ${{ inputs.mode }}
+          SET: ${{ inputs.set }}
+          LABEL: ${{ inputs.label }}
         run: |
           if ! [[ "$SHARDS" =~ ^[1-9][0-9]*$ ]] || [ "$SHARDS" -gt 256 ]; then
             echo "::error::shards must be a whole number from 1 to 256, not $SHARDS"
@@ -76,6 +88,22 @@ jobs:
             exit 1
           fi
           name="$RULESET"; args="--depths $DEPTHS"
+          if [ -n "$SET" ] || [ -n "$LABEL" ]; then
+            if ! [[ "$LABEL" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]]; then
+              echo "::error::set needs a label of lowercase letters, digits and dashes, not $LABEL"
+              exit 1
+            fi
+            set -f
+            for pair in $SET; do
+              if ! [[ "$pair" =~ ^[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)+=[a-zA-Z0-9-]+$ ]]; then
+                echo "::error::each set entry must be id=value, not $pair"
+                exit 1
+              fi
+              args="$args --set $pair"
+            done
+            if [ -z "$SET" ]; then echo "::error::label needs set"; exit 1; fi
+            name="$name.$LABEL"
+          fi
           if [ "$SWEEP" = true ]; then name="$name-sweep"; args="$args --sweep"; fi
           if [ "$MODE" = greedy-dragon ]; then name="$name.greedy-dragon"; args="$args --greedy-dragon"; fi
           echo "shards=[$(seq -s , 1 "$SHARDS")]" >> "$GITHUB_OUTPUT"
