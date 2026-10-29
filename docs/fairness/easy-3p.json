@@ -1,0 +1,108 @@
+{
+  "players": 3,
+  "ruleset": {
+    "id": "easy-3p",
+    "version": "0.2.0"
+  },
+  "overrides": {},
+  "date": "2026-10-29",
+  "decision": "0015",
+  "measures": {
+    "decision": "0015",
+    "version": 1,
+    "band": {
+      "min": 0.28,
+      "max": 0.38
+    },
+    "minGames": 2000,
+    "depths": [
+      1,
+      2
+    ],
+    "nodes": 100000,
+    "openingPlies": 6,
+    "maxPlies": 2000,
+    "maxCapped": 0.05
+  },
+  "mode": "search",
+  "verdict": "incomplete",
+  "runs": [
+    {
+      "combination": "default",
+      "overrides": {},
+      "depth": 1,
+      "nodes": 100000,
+      "seed": 1,
+      "seconds": 149,
+      "summary": {
+        "games": 400,
+        "finished": 400,
+        "draws": 0,
+        "unfinished": 0,
+        "seats": {
+          "dark": {
+            "wins": 288,
+            "losses": 1,
+            "draws": 0,
+            "score": 0.72,
+            "interval": [
+              0.6740651379481614,
+              0.761749300187979
+            ],
+            "winsBy": {
+              "checkmate": 288
+            }
+          },
+          "light": {
+            "wins": 112,
+            "losses": 5,
+            "draws": 0,
+            "score": 0.28,
+            "interval": [
+              0.23825069981202085,
+              0.32593486205183864
+            ],
+            "winsBy": {
+              "checkmate": 112
+            }
+          },
+          "dragon": {
+            "wins": 0,
+            "losses": 394,
+            "draws": 0,
+            "score": 0,
+            "interval": [
+              0,
+              0.009512640599680667
+            ],
+            "winsBy": {}
+          }
+        },
+        "endings": {
+          "king-mates-tail": 394,
+          "king-mates-king": 6
+        },
+        "drawsBetween": {},
+        "results": {
+          "checkmate": 400
+        },
+        "events": {},
+        "plies": {
+          "mean": 10.5925,
+          "median": 7,
+          "min": 2,
+          "max": 70
+        },
+        "distinct": 397,
+        "flags": [
+          "dark score outside 28–38%",
+          "dragon score outside 28–38%",
+          "too few games"
+        ],
+        "pass": false
+      }
+    }
+  ],
+  "flagged": [],
+  "skipped": []
+}
