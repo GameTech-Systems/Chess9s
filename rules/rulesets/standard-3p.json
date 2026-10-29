@@ -2,11 +2,13 @@
   "$schema": "../schema/ruleset.schema.json",
   "id": "standard-3p",
   "name": "Standard (3-player)",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "status": "experimental",
   "players": 3,
-  "description": "The default 3-player game (D63): the full Dragon rules of Good Practice, except the King moves one square in any direction, as in the 2-player Standard (decision 0016). Each Coast piece's first way off the Coast is through A5 (coast.3p.exit, built in S68, decision 0019). Experimental until bot self-play shows the seats are balanced.",
+  "description": "The default 3-player game (D63): the full Dragon rules of Good Practice, except the King moves one square in any direction, as in the 2-player Standard (decision 0016). Each Coast piece's first way off the Coast is through A5 (decision 0019). On the Coast the Dragon's pieces attack nothing, and Kings and Queens may capture them there (decision 0020). Experimental until bot self-play shows the seats are balanced.",
   "overrides": {
-    "king.range": 1
+    "king.range": 1,
+    "coast.3p.attackFrom": "blocked",
+    "coast.3p.capturable": true
   }
 }

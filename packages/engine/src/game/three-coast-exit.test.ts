@@ -99,9 +99,16 @@ describe.each(PRESETS)('%s at the start', (id) => {
   });
 
   it('any-legal-move lets the Sun and Moon take the B-file Rooks on the first turn', () => {
-    const g = start(id, { 'coast.3p.exit': 'any-legal-move' });
+    // With attacks from the Coast allowed (standard-3p 0.3.0 blocks them, decision 0020).
+    const g = start(id, { 'coast.3p.exit': 'any-legal-move', 'coast.3p.attackFrom': 'allowed' });
     expect(offCoast(g)).toEqual(expect.arrayContaining(['a2xb1', 'a8xb9']));
     expect(offCoast(g).some((n) => n.startsWith('a1') || n.startsWith('a9'))).toBe(true);
+  });
+
+  it('any-legal-move with attacks from the Coast blocked: the Dragon may go out, but takes nothing', () => {
+    const g = start(id, { 'coast.3p.exit': 'any-legal-move', 'coast.3p.attackFrom': 'blocked' });
+    expect(offCoast(g).length).toBeGreaterThan(0);
+    expect(offCoast(g).some((n) => n.includes('x'))).toBe(false);
   });
 });
 

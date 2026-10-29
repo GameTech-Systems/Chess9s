@@ -204,7 +204,8 @@ describe('the score', () => {
 
 describe('the Dragon brings its pieces out through A5 (S68, decision 0019)', () => {
   // Kings far away; the Moon (which has not left the Coast yet) somewhere on file A.
-  const withMoon = (at: string, extra: Partial<PlacedPiece> = {}, id = 'standard-3p') => {
+  // Good Practice: the Coast pieces still attack from the Coast (coast.3p.attackFrom = allowed).
+  const withMoon = (at: string, extra: Partial<PlacedPiece> = {}, id = 'draft-3p') => {
     const g = from(id, 'dragon', {
       i9: 'dark king',
       i1: 'light king',
@@ -225,6 +226,30 @@ describe('the Dragon brings its pieces out through A5 (S68, decision 0019)', () 
     expect(out - a5).toBe(DEVELOPED);
     // Back on the Coast after leaving it once, it may leave from anywhere: no way to walk.
     expect(back).toBe(out);
+  });
+
+  it('blocked (standard-3p 0.3.0): a piece back on the Coast counts as not developed (S71)', () => {
+    const a5 = evaluateFor(withMoon('a5', {}, 'standard-3p'), 'dragon', values);
+    const out = evaluateFor(withMoon('b4', { left: ['coast'] }, 'standard-3p'), 'dragon', values);
+    const back = evaluateFor(withMoon('a3', { left: ['coast'] }, 'standard-3p'), 'dragon', values);
+    expect(out - a5).toBe(DEVELOPED);
+    expect(out - back).toBe(DEVELOPED);
+  });
+
+  it('blocked with any legal move off the Coast: only standing off the Coast counts', () => {
+    const any = (at: string, extra: Partial<PlacedPiece> = {}) => {
+      const g = withMoon(at, extra, 'standard-3p');
+      const rules = {
+        ...g.rules,
+        values: { ...g.rules.values, 'coast.3p.exit': 'any-legal-move' },
+      };
+      return { ...g, rules };
+    };
+    expect(evaluateFor(any('a2'), 'dragon', values)).toBe(evaluateFor(any('a5'), 'dragon', values));
+    expect(
+      evaluateFor(any('b4', { left: ['coast'] }), 'dragon', values) -
+        evaluateFor(any('a2'), 'dragon', values),
+    ).toBe(DEVELOPED);
   });
 
   it('does not change how the Kinged players score the position', () => {

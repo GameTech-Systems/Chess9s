@@ -288,6 +288,8 @@ interface Context {
   placed: PlacedPiece;
   forward: 'up' | 'down' | undefined;
   env: Env;
+  /** Its `moveOnly` condition holds here: it captures and attacks nothing (S71). */
+  disarmed: boolean;
   /** access() results for this piece in this situation, by move (`null` for the piece alone). */
   access: Map<Move | null, Access>;
 }
@@ -309,11 +311,13 @@ function context(rules: MoveRules, from: string, placed: PlacedPiece): Context {
   const key = `${piece.id}|${fromTypes.join('+')}|${placed.moved === true}|${placed.side}|${placed.home ?? ''}|${left.join('+')}`;
   let access = byRules.get(key);
   if (!access) byRules.set(key, (access = new Map()));
+  const env: Env = { rules, fromTypes, moved: placed.moved === true, left };
   return {
     piece,
     placed,
     forward,
-    env: { rules, fromTypes, moved: placed.moved === true, left },
+    env,
+    disarmed: piece.moveOnly !== undefined && holds(piece.moveOnly.when, env),
     access,
   };
 }
@@ -525,7 +529,8 @@ export function movesFrom(
   const promotions = (to: string) => promotionTargets(rules, ctx, from, to, lost);
 
   walk(rules, position, from, ctx, (to, move, step, n = 0) => {
-    const mode = move.capture ?? 'move-or-capture';
+    if (ctx.disarmed && move.capture === 'capture-only') return;
+    const mode = ctx.disarmed ? 'move-only' : (move.capture ?? 'move-or-capture');
     const occupant = position[to];
     let capture: string | undefined;
     let captureAt: string | undefined;
@@ -620,13 +625,29 @@ export function castlePath({ from, to }: { from: string; to: string }): string[]
  * Squares the piece on `from` attacks: where one of its moves could capture an enemy piece
  * standing there. Built from the same walk as its moves, so every parameter that shapes
  * movement shapes attacks too. Squares of its own side's pieces count (they are defended);
- * whether the piece standing on a square may be captured does not. Sorted; none if empty.
+ * whether the piece standing on a square may be captured does not. None while its `moveOnly`
+ * condition holds (it still blocks other pieces' lines). Sorted; none if empty.
  */
 export function attacksFrom(rules: MoveRules, position: Position, from: string): string[] {
+  return reach(rules, position, from, false);
+}
+
+/**
+ * The squares the piece on `from` would attack if its `moveOnly` condition did not hold: where its
+ * moves go, as attacksFrom counts them. The same as attacksFrom for any other piece. For playing
+ * heuristics that ask where a piece could go, such as the Tail's way out (S71).
+ */
+export function reachFrom(rules: MoveRules, position: Position, from: string): string[] {
+  return reach(rules, position, from, true);
+}
+
+function reach(rules: MoveRules, position: Position, from: string, armed: boolean): string[] {
   const placed = position[from];
   if (!placed || placed.stone === true) return [];
+  const ctx = context(rules, from, placed);
+  if (ctx.disarmed && !armed) return [];
   const squares = new Set<string>();
-  walk(rules, position, from, context(rules, from, placed), (to, move) => {
+  walk(rules, position, from, ctx, (to, move) => {
     if (move.capture !== 'move-only') squares.add(to);
   });
   return [...squares].sort();
@@ -646,11 +667,14 @@ export function attackReach(
   const reads = new Set<string>();
   const placed = position[from];
   if (!placed || placed.stone === true) return { attacks, reads };
+  const ctx = context(rules, from, placed);
+  // A disarmed piece attacks nothing wherever the others stand, so its walk reads nothing.
+  if (ctx.disarmed) return { attacks, reads };
   walk(
     rules,
     position,
     from,
-    context(rules, from, placed),
+    ctx,
     (to, move) => {
       if (move.capture !== 'move-only') attacks.add(to);
     },

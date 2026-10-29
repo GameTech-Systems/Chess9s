@@ -1,7 +1,8 @@
 // Turn order for any number of seats. The board's setup lists the seats in
 // order of play; turn.firstMove, where the ruleset resolves it, picks which
-// seat starts. Seats that are out (a captured King's side in 3-player games)
-// are skipped.
+// seat starts, and turn.3p.order, where it resolves, names the whole order
+// (seat ids joined by "-", S71). Seats that are out (a captured King's side in
+// 3-player games) are skipped.
 import type { MoveRules } from '../moves/generate';
 import { RulesError } from '../rules/loader';
 
@@ -15,6 +16,8 @@ export function turnOrder(rules: MoveRules): string[] {
       `Board ${rules.board.id} gives no turn order for ${rules.players} players`,
     );
   }
+  const named = rules.values['turn.3p.order'];
+  if (named !== undefined) return seatsNamed(String(named), setup.turnOrder);
   const order = setup.turnOrder;
   const first = rules.values['turn.firstMove'];
   if (first === undefined) return [...order];
@@ -22,6 +25,17 @@ export function turnOrder(rules: MoveRules): string[] {
   if (at < 0)
     throw new RulesError(`turn.firstMove = ${JSON.stringify(first)} is not a seat of this game`);
   return [...order.slice(at), ...order.slice(0, at)];
+}
+
+/** An order named by its seat ids, such as dark-dragon-light: every seat of the setup, once. */
+function seatsNamed(named: string, seats: readonly string[]): string[] {
+  const order = named.split('-');
+  if (order.length !== seats.length || !seats.every((s) => order.includes(s))) {
+    throw new RulesError(
+      `turn.3p.order = ${JSON.stringify(named)} does not seat ${seats.join(', ')}`,
+    );
+  }
+  return order;
 }
 
 /** The seat that moves after `current`, skipping seats that are `out`. */

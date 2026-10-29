@@ -39,7 +39,7 @@ describe('playGame3', () => {
         seed: 2,
         search: { depth, nodes: 3_000 },
       });
-    const greedy = playGame3(rules, ruleset, { openingPlies: 4, maxPlies: 10, seed: 2 });
+    const greedy = playGame3(rules, ruleset, { openingPlies: 4, maxPlies: 30, seed: 1 });
     for (const depth of [1, 2]) {
       const game = play(depth);
       expect(game.plies).toBe(10);
@@ -87,12 +87,13 @@ describe('playGame3', () => {
 
   it('plays the Dragon greedy against searching Kinged players when asked (S59)', () => {
     const { rules, ruleset } = rulesFor(source, 'standard-3p');
-    // 30 plies: since S68 both Dragons spend their first moves walking out through A5 alike.
-    const base = { openingPlies: 4, maxPlies: 30, seed: 2, search: { depth: 1, nodes: 3_000 } };
+    // 30 plies: since S68 both Dragons spend their first moves walking out through A5 alike, and
+    // since S71 (nothing to take from the Coast) seed 2 plays the same 60 plies both ways.
+    const base = { openingPlies: 4, maxPlies: 30, seed: 1, search: { depth: 1, nodes: 3_000 } };
     const mixed = playGame3(rules, ruleset, { ...base, greedyDragon: true });
     expect(mixed).toEqual(playGame3(rules, ruleset, { ...base, greedyDragon: true }));
     expect(mixed.key).not.toBe(playGame3(rules, ruleset, base).key);
-    const greedy = playGame3(rules, ruleset, { openingPlies: 4, maxPlies: 30, seed: 2 });
+    const greedy = playGame3(rules, ruleset, { openingPlies: 4, maxPlies: 30, seed: 1 });
     expect(mixed.key).not.toBe(greedy.key);
   }, 120_000);
 

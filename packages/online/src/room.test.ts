@@ -597,7 +597,7 @@ describe('room codes and seat tokens (D54)', () => {
 });
 
 // 3-seat rooms (S63, D61): the same state machine over a game with three seats.
-const STANDARD_3P = { id: 'standard-3p', version: '0.2.0' };
+const STANDARD_3P = { id: 'standard-3p', version: '0.3.0' };
 const EASY_3P = { id: 'easy-3p', version: '0.2.0' };
 const recorded = (ruleset: string, row: string) =>
   threeEnds.games.find((g) => g.ruleset === ruleset && g.rows.includes(row))!;

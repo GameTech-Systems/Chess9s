@@ -9,6 +9,25 @@
   "givesCheck": {
     "param": "tail.canCheck"
   },
+  "moveOnly": {
+    "when": {
+      "all": [
+        {
+          "players": [
+            3
+          ]
+        },
+        {
+          "param": "coast.3p.attackFrom",
+          "is": "blocked"
+        },
+        {
+          "from": "coast"
+        }
+      ]
+    },
+    "notes": "coast.3p.attackFrom = blocked (decision 0020): on a Coast square it captures nothing, gives no check and guards nothing, but still blocks lines."
+  },
   "moves": [
     {
       "targets": [

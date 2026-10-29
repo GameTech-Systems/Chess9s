@@ -25,7 +25,7 @@ import {
   type Registry,
   type Ruleset,
 } from '@chess9s/engine';
-import { UNLOCKED_NOTE, addLockKeys, archiveRuleset, writeLock } from './lock';
+import { UNLOCKED_NOTE, addLockKeys, archiveRuleset, keepLock, writeLock } from './lock';
 import { loadLibrary, loadSource, rulesFor } from './load';
 import { seeded } from './play';
 
@@ -295,5 +295,39 @@ describe('the lock script', () => {
       notes: UNLOCKED_NOTE,
     });
     expect(existsSync(join(root, 'rules/locks'))).toBe(false);
+  });
+
+  it('keeps a played experimental version: locks it, then archives it with the lock (S71)', () => {
+    const root = copyRules();
+    const r = readJson<Ruleset>(join(root, 'rules/rulesets/easy-2p.json'));
+    const path = keepLock(root, 'easy-2p');
+    expect(path).toBe(lockPath(root, `easy-2p@${r.version}`));
+    const known = Object.fromEntries(library.current.map((c) => [c.id, c]));
+    expect(readJson<Lock>(path).values).toEqual(resolveRuleset(registry, r, known).values);
+    expect(() => keepLock(root, 'easy-2p')).toThrow(/already exists/);
+    const archived = readJson<Ruleset>(archiveRuleset(root, 'easy-2p'));
+    expect(archived.status).toBe('deprecated');
+    expect(archived.notes).toBe(r.notes);
+  });
+
+  it('keep is for versions that are not locked yet: a Candidate takes write', () => {
+    expect(() => keepLock(copyRules(), 'standard-2p')).toThrow(/write/);
+  });
+
+  it("adds new keys to an archived version's lock at the archived file's value, keeping the rest", () => {
+    const root = copyRules();
+    cpSync(join(ROOT, 'rules/locks'), join(root, 'rules/locks'), { recursive: true });
+    const path = lockPath(root, 'standard-3p@0.1.0');
+    const before = readJson<Lock>(path);
+    const rest = { ...before.values };
+    delete rest['turn.3p.order'];
+    writeFileSync(path, JSON.stringify({ ...before, values: rest }));
+    expect(addLockKeys(root, 'standard-3p@0.1.0').added).toEqual(['turn.3p.order']);
+    const after = readJson<Lock>(path);
+    expect(after.values['turn.3p.order']).toBe('dark-light-dragon');
+    // The lock, not the archived file, says how it played: any legal move off the Coast.
+    expect(after.values['coast.3p.exit']).toBe('any-legal-move');
+    expect(after).toEqual(before);
+    expect(() => addLockKeys(root, 'standard-3p@9.9.9')).toThrow(/No archived/);
   });
 });
