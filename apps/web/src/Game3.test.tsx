@@ -193,17 +193,21 @@ describe('a result screen for every end', () => {
     ['easy-3p', 'draw', 'Draw', /Dark, Light and the Dragon share the draw\./],
   ];
 
-  it.each(cases)('%s %s', (id, row, heading, detail) => {
-    const game = replay(id, recorded(id, row).moves);
-    const html = render(fromGame(game), id);
-    expect(html).toContain('aria-label="Result"');
-    expect(html).toContain(`>${heading}<`);
-    expect(html).toMatch(detail);
-    expect(html).toContain(`data-result="${game.result.status}"`);
-    // Nothing can be moved once the game is over, and the way to a new game is there.
-    expect(html).not.toMatch(/data-hit="[a-i][1-9]"[^>]*tabindex="0"/);
-    expect(html).toContain('>New game<');
-  });
+  it.each(cases)(
+    '%s %s',
+    (id, row, heading, detail) => {
+      const game = replay(id, recorded(id, row).moves);
+      const html = render(fromGame(game), id);
+      expect(html).toContain('aria-label="Result"');
+      expect(html).toContain(`>${heading}<`);
+      expect(html).toMatch(detail);
+      expect(html).toContain(`data-result="${game.result.status}"`);
+      // Nothing can be moved once the game is over, and the way to a new game is there.
+      expect(html).not.toMatch(/data-hit="[a-i][1-9]"[^>]*tabindex="0"/);
+      expect(html).toContain('>New game<');
+    },
+    30_000,
+  ); // S68: some recorded games run to 300 moves.
 
   it('shows no result while the game goes on', () => {
     expect(render(fresh())).not.toContain('aria-label="Result"');
