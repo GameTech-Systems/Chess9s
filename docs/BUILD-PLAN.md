@@ -387,9 +387,13 @@ Added 28 Oct 2026, when the owner asked whether the A5 exit unbalanced the 3-pla
 - **Browser:** the 3-player how-to-play lines say how the Dragon's pieces come out.
 Decisions: D55 to D57 as before; decision 0019.
 
-### S69 — 3-player balance runs on the A5 exit · Claude (workflow) · Opus 5.5 · medium · `todo`
+### S69 — 3-player balance runs on the A5 exit · Claude (workflow) · Opus 5.5 · medium · `done`
 Run decision 0015's measures again for `standard-3p` 0.2.0: Actions → **Sim depth 2**, ruleset `standard-3p`, depths `1,2`, games 2000, shards 40; then the 40-game depth-1 sweep (sweep on, games 40, depths 1; it now plays `coast.3p.exit` at `a5-always` and `any-legal-move`) and screens of `draft-3p` and `easy-3p` (400 games, depths 1). Download each merged report and commit it to `docs/fairness/`; the earlier 3-player reports are kept as `<report>@<version>` (S68), so no merge picks one of them up. Compare with the 0.1.0 runs (same seeds) and say whether Light still collapses at depth 2. The owner then decides on the 3-player defaults as in S61.
 Done when: the reports for `standard-3p` 0.2.0 at both depths, the sweep and the two screens are committed, with a short comparison in the handoff.
+
+### S70 — 3-player defaults after the A5 runs · Owner with Claude in chat · Opus 5.5 · high · `todo`
+The owner reads the S69 reports (`docs/fairness/standard-3p.md`, the sweep, the two screens, the greedy-Dragon run) and decides on the 3-player defaults, as in S61. Claude records the answers (a decision record, the "Decision defaults" table) and builds nothing the owner has not chosen.
+Done when: the owner's 3-player calls are recorded, or recorded as kept as they are.
 
 ## Later phases
 
