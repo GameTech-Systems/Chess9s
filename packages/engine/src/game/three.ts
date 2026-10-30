@@ -534,22 +534,32 @@ function settleMove(
     mates.sort((a, b) => Number(a.side === g.dragon) - Number(b.side === g.dragon));
     // One choice per move: the first checkmate whose candidate pieces would act differently.
     let chosen = false;
+    // A checkmate that put a side out (its King off the board, its pieces stone, rule 11) changes
+    // who still gives check: the later checkmates are judged again on the position it left (S72).
+    const still = (w: Work, mate: Mate): Mate | undefined =>
+      w.result || w.seats === start.seats
+        ? mate
+        : matesAfter(g, w, mover, move, depth).find((m) => m.side === mate.side);
     for (const mate of mates) {
-      const keys = new Set(mate.by.map((at) => effectKey(g, works[0]!.work, mate, at)));
+      const each = works.map((v) => ({ v, m: still(v.work, mate) }));
+      const first = each[0]!.m;
+      const keys = new Set(first?.by.map((at) => effectKey(g, works[0]!.work, first, at)));
       const choice: boolean = !chosen && keys.size > 1;
       chosen ||= choice;
-      works = works.flatMap((v) =>
-        (choice ? mate.by : [mate.by[0]!]).flatMap((at) =>
-          applyMate(g, { ...v.work }, mate, at).map((r) => {
-            const mateBy = choice ? at : v.mateBy;
-            const promotion = r.promotion ?? v.promotion;
-            return {
-              work: r.work,
-              ...(mateBy !== undefined && { mateBy }),
-              ...(promotion !== undefined && { promotion }),
-            };
-          }),
-        ),
+      works = each.flatMap(({ v, m }) =>
+        !m
+          ? [v]
+          : (choice ? m.by : [m.by[0]!]).flatMap((at) =>
+              applyMate(g, { ...v.work }, m, at).map((r) => {
+                const mateBy = choice ? at : v.mateBy;
+                const promotion = r.promotion ?? v.promotion;
+                return {
+                  work: r.work,
+                  ...(mateBy !== undefined && { mateBy }),
+                  ...(promotion !== undefined && { promotion }),
+                };
+              }),
+            ),
       );
     }
     // The duel began with this move: the last King may already be checkmated (rule 5).

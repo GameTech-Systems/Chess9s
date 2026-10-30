@@ -1510,6 +1510,46 @@
       "expect": {
         "legalLacks": ["g8xi9"]
       }
+    },
+    {
+      "name": "S72 judging g5-h6: a Dragon checkmate that puts dark out leaves no checkmate by dark's King on the same move",
+      "rule": "7",
+      "overrides": {
+        "coast.3p.attackFrom": "allowed",
+        "coast.3p.capturable": false,
+        "dragon.3p.givesCheck": true
+      },
+      "turn": "light",
+      "pieces": {
+        "a3": "dragon light-dragon-head",
+        "a4": "dragon dragon-tail",
+        "a7": "dragon sun",
+        "b5": "light rook",
+        "c1": "light knight",
+        "c3": "light pawn",
+        "d1": "light bishop",
+        "d7": "dragon dark-dragon-head",
+        "e2": "light pawn",
+        "e3": "light bishop",
+        "e7": "dark pawn",
+        "e8": "dark knight",
+        "f1": "light queen",
+        "f4": "dark queen",
+        "g4": "light pawn",
+        "g5": "light king",
+        "g6": "dark pawn",
+        "g8": "dark bishop",
+        "g9": "dark bishop",
+        "h2": "light pawn",
+        "h8": "dark pawn",
+        "h9": "dark knight",
+        "i1": "light rook",
+        "i5": "light pawn",
+        "i6": "dark pawn",
+        "i7": "dark king",
+        "i8": "dark rook"
+      },
+      "expect": { "legalHas": ["g5-h4", "g5xf4", "g5xg6"], "legalLacks": ["g5-h6"] }
     }
   ]
 }
