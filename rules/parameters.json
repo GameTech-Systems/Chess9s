@@ -1,6 +1,6 @@
 {
   "$schema": "./schema/parameters.schema.json",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "parameters": [
     {
       "id": "king.range",
@@ -698,7 +698,7 @@
     {
       "id": "coast.3p.attackFrom",
       "label": "Attacks from the Coast (3-player)",
-      "description": "Whether the Dragon's pieces attack while they stand on a Coast square in 3-player games. Blocked: a Coast piece on the Coast captures nothing, gives no check and guards nothing, but still blocks lines; off the Coast it attacks as usual.",
+      "description": "Whether the Dragon pieces attack while they stand on a Coast square in 3-player games. Blocked: a Coast piece on the Coast captures nothing, gives no check and guards nothing, but still blocks lines. Coast only: a Coast piece on the Coast attacks only Coast squares (it may capture a King or Queen standing there and guards only the Coast), and still blocks lines. Off the Coast it attacks as usual.",
       "piece": null,
       "players": [
         3
@@ -707,12 +707,14 @@
       "default": "allowed",
       "options": [
         "allowed",
-        "blocked"
+        "blocked",
+        "coast-only"
       ],
       "group": "Coast",
       "optionLabels": {
         "allowed": "Allowed",
-        "blocked": "No attacks from the Coast"
+        "blocked": "No attacks from the Coast",
+        "coast-only": "From the Coast, only on the Coast"
       },
       "status": "experimental",
       "affects": [
@@ -720,8 +722,8 @@
         "check-detection",
         "balance"
       ],
-      "source": "owner, 29 Oct 2026 (S70 review in chat, decision 0020, D70)",
-      "notes": "Default allowed is how every 3-player game played up to standard-3p 0.2.0; standard-3p 0.3.0 sets blocked (D74). Built as piece data (S71): the five Coast pieces' moveOnly rule. A Coast piece still leaves the Coast first through A5 (coast.3p.exit) and may come back onto any Coast square."
+      "source": "owner, 29 Oct 2026 (S70 review in chat, decision 0020, D70); coast-only added in S74 (owner, 31 Oct 2026, decision 0021, D75 and D76)",
+      "notes": "Default allowed is how every 3-player game played up to standard-3p 0.2.0; standard-3p 0.3.0 sets blocked (D74), heavy-3p and light-3p set coast-only (decision 0021). Built as piece data: the five Coast pieces moveOnly rule (blocked, S71) and attackOnly rule (coast-only, S74). A Coast piece still leaves the Coast first through A5 (coast.3p.exit) and may come back onto any Coast square."
     },
     {
       "id": "tail.2p.path",
@@ -1216,7 +1218,7 @@
     {
       "id": "turn.3p.order",
       "label": "Turn order (3-player)",
-      "description": "The order of play in 3-player games: dark, light, then the Dragon; or dark, the Dragon, then light.",
+      "description": "The order of play in 3-player games, always clockwise round the board (D77): dark, light, then the Dragon; light, the Dragon, then dark; or the Dragon, dark, then light. The three share one cycle and differ only in who moves first.",
       "piece": null,
       "players": [
         3
@@ -1225,18 +1227,20 @@
       "default": "dark-light-dragon",
       "options": [
         "dark-light-dragon",
-        "dark-dragon-light"
+        "light-dragon-dark",
+        "dragon-dark-light"
       ],
       "group": "Turns and draws",
       "optionLabels": {
         "dark-light-dragon": "Dark, light, Dragon",
-        "dark-dragon-light": "Dark, Dragon, light"
+        "light-dragon-dark": "Light, Dragon, dark",
+        "dragon-dark-light": "Dragon, dark, light"
       },
       "status": "experimental",
       "affects": [
         "balance"
       ],
-      "source": "owner rule set v0.2 (decision D26) for the default; dark-dragon-light added in S71 (owner, 29 Oct 2026, decision 0020, D73)",
+      "source": "owner rule set v0.2 (decision D26) for the default; the clockwise orders light-dragon-dark and dragon-dark-light added in S74 (owner, 31 Oct 2026, decision 0021, D77), where dark-dragon-light (S71, D73) was withdrawn",
       "notes": "The value names the seats in order of play; the board's 3-player setup must seat exactly those sides (src/game/turns.ts)."
     },
     {
@@ -1373,6 +1377,68 @@
       ],
       "source": "decision 0016 (S55, owner, 26 Oct 2026)",
       "notes": "Applies with endings.3p = stones-and-duel."
+    },
+    {
+      "id": "dragon.3p.defeat",
+      "label": "How the Dragon loses (3-player)",
+      "description": "Tail or pieces: the full rules (decision 0016): a checkmated Tail turns to stone and the Dragon plays on while both Kings are in, and is out once the four are captured too; in the duel the last Kinged player wins by checkmating the Tail or capturing the four. Pieces and Tail: the Dragon loses only once the Sun, the Moon and both Dragon Heads are captured and the Tail is checkmated, in either order, in the duel too. Pieces only: the Tail only blocks, is never checkmated and need not be kept out of attack; the Dragon loses when the four are captured.",
+      "piece": null,
+      "players": [
+        3
+      ],
+      "type": "enum",
+      "default": "tail-or-pieces-in-duel",
+      "options": [
+        "tail-or-pieces-in-duel",
+        "pieces-and-tail",
+        "pieces-only"
+      ],
+      "group": "Dragon Tail",
+      "optionLabels": {
+        "tail-or-pieces-in-duel": "The Tail, or the pieces in the duel",
+        "pieces-and-tail": "The pieces and the Tail",
+        "pieces-only": "The pieces only"
+      },
+      "status": "experimental",
+      "affects": [
+        "game-end",
+        "check-detection"
+      ],
+      "requires": {
+        "pieces-only": {
+          "tail.3p.captures": "none",
+          "tail.canCheck": false,
+          "tail.capturable": false
+        }
+      },
+      "source": "owner, 31 Oct 2026 (S73 review in chat, decision 0021, D75 and D76)",
+      "notes": "Applies with endings.3p = stones-and-duel. pieces-only needs a Tail that only blocks (D76.1); the loader refuses it otherwise. With both Kinged players in, the Dragon that loses is out and the Tail turns to stone where it stands (D75.5, D76.4). Readings provisional (decision 0021): in the duel pieces-and-tail needs both (D75.4); a Tail checkmated while any of the four is on the board turns to stone at once and the Dragon plays on (D75.6)."
+    },
+    {
+      "id": "tail.3p.stone",
+      "label": "Where the checkmated Tail turns to stone",
+      "description": "Swap: the checkmated Tail switches places with the checkmating piece and turns to stone there (decision 0016 rule 9). Where it stands: it turns to stone on its own square, and if the Dragon plays on it loses its next turn.",
+      "piece": "dragon-tail",
+      "players": [
+        3
+      ],
+      "type": "enum",
+      "default": "swap",
+      "options": [
+        "swap",
+        "where-it-stands"
+      ],
+      "group": "Dragon Tail",
+      "optionLabels": {
+        "swap": "Switch with the checkmating piece",
+        "where-it-stands": "Where it stands"
+      },
+      "status": "experimental",
+      "affects": [
+        "game-end"
+      ],
+      "source": "owner, 31 Oct 2026 (S73 review in chat, decision 0021, D75.5); the lost turn: owner, S74 brief (31 Oct 2026)",
+      "notes": "Applies with endings.3p = stones-and-duel. The lost turn: the Tail turning to stone counts as the Dragon move, so its next turn is skipped and play goes on in order. On the center, or where the checkmating piece may not stand, the Tail stays where it stands under either option, as before."
     },
     {
       "id": "draw.3p.threefoldRepetition",

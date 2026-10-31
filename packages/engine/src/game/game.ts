@@ -28,6 +28,7 @@ import {
   outcomes,
   resignedBy,
   three,
+  turnsLost,
   type GameEvent,
   type Seats,
 } from './three';
@@ -132,6 +133,11 @@ export interface GameState {
   moves: PlayedMove[];
   /** 3-player games: the resignations so far, in order (a resignation is not a move). */
   resignations: Resignation[];
+  /**
+   * 3-player games: seats whose next turn is lost, skipped when it comes (the Dragon, once its
+   * Tail turned to stone where it stands, `tail.3p.stone`, decision 0021). Empty otherwise.
+   */
+  turnsLost: string[];
   /** The side to move is in check. */
   inCheck: boolean;
   /** Squares of the pieces giving check. */
@@ -248,7 +254,7 @@ function insufficientMaterial(rules: MoveRules, position: Position): boolean {
  */
 function positionKey(
   rules: MoveRules,
-  s: Dynamic & { turn: string; seats: Seats },
+  s: Dynamic & { turn: string; seats: Seats; turnsLost: string[] },
   legal: GeneratedMove[],
 ) {
   const pieces = Object.keys(s.position)
@@ -256,7 +262,9 @@ function positionKey(
     .map((at) => `${at}=${placedKey(rules, s.position[at]!)}`);
   // 3-player games: the seats' statuses too (decision 0016, rule 13). Stones are in placedKey.
   const seats = rules.players === 3 ? `|${seatsKey(s.seats)}` : '';
-  return `${s.turn}|${s.coastOpen ? 'open' : 'closed'}${seats}|${pieces.join(',')}|${legal.map(toNotation).join(',')}`;
+  // A lost turn still to come makes a different position (decision 0021).
+  const lostTurns = s.turnsLost.length > 0 ? `|lost:${[...s.turnsLost].sort().join('+')}` : '';
+  return `${s.turn}|${s.coastOpen ? 'open' : 'closed'}${seats}${lostTurns}|${pieces.join(',')}|${legal.map(toNotation).join(',')}`;
 }
 
 const seatsKey = (seats: Seats) =>
@@ -325,6 +333,17 @@ function drawnThree(rules: MoveRules, base: Settled, seen: Seen | null): DrawRea
   return null;
 }
 
+/** The side to move's turn passes without a move; the event goes with the last move played. */
+function skipTurn(b: Settled): Settled {
+  const last = b.moves.at(-1);
+  const event: GameEvent = { kind: 'turn-skipped', side: b.turn };
+  const moves = last
+    ? [...b.moves.slice(0, -1), { ...last, events: [...(last.events ?? []), event] }]
+    : b.moves;
+  const turn = nextSide(b.order, b.turn, outSeats(b.seats));
+  return { ...b, moves, turn, passing: null, quiet: b.quiet + 1 };
+}
+
 /**
  * settle for 3-player games: the side to move's legal moves (three.ts), its turn skipped when the
  * Dragon has no legal move with both Kings on the board (rule 15), and the result. Checkmates are
@@ -340,6 +359,11 @@ function settleThree(
   const g = three(rules, base.order);
   let b = base;
   for (;;) {
+    // A seat whose turn is lost (decision 0021): skipped once, as rule 15's skip.
+    if (!ended && b.turnsLost.includes(b.turn)) {
+      b = { ...skipTurn(b), turnsLost: b.turnsLost.filter((s) => s !== b.turn) };
+      continue;
+    }
     const table = { position: b.position, seats: b.seats, lost: b.lost, passing: b.passing };
     const checkers = checkersOn(g, b.position, b.seats, b.turn);
     const found = ended ? [] : outcomes(g, table, b.turn);
@@ -351,13 +375,7 @@ function settleThree(
       !g.mode.firstMate &&
       activeKinged(g, b.seats).length === 2;
     if (skip) {
-      const last = b.moves.at(-1);
-      const event: GameEvent = { kind: 'turn-skipped', side: b.turn };
-      const moves = last
-        ? [...b.moves.slice(0, -1), { ...last, events: [...(last.events ?? []), event] }]
-        : b.moves;
-      const turn = nextSide(b.order, b.turn, outSeats(b.seats));
-      b = { ...b, moves, turn, passing: null, quiet: b.quiet + 1 };
+      b = skipTurn(b);
       continue;
     }
     const legal = found.map((o) => o.move);
@@ -448,6 +466,7 @@ export function newGame(rules: MoveRules, ruleset: RulesetRef, init: GameInit = 
         quiet: 0,
         moves: [],
         resignations: [],
+        turnsLost: [],
       },
       null,
     );
@@ -473,6 +492,7 @@ export function newGame(rules: MoveRules, ruleset: RulesetRef, init: GameInit = 
       quiet: 0,
       moves: [],
       resignations: [],
+      turnsLost: [],
     },
     null,
   );
@@ -541,6 +561,7 @@ export function playMove(state: GameState, move: GeneratedMove): GameState {
       quiet: fresh ? 0 : state.quiet + 1,
       moves: [...state.moves, played],
       resignations: state.resignations,
+      turnsLost: [],
     },
     fresh ? null : state.seen,
   );
@@ -585,6 +606,9 @@ function playThree(state: GameState, legal: GeneratedMove): GameState {
       quiet: fresh ? 0 : state.quiet + 1,
       moves: [...state.moves, played],
       resignations: state.resignations,
+      turnsLost: [...new Set([...state.turnsLost, ...turnsLost(g, o)])].filter(
+        (s) => o.seats[s] !== 'out',
+      ),
     },
     fresh ? null : state.seen,
     o.result,
@@ -668,6 +692,7 @@ function leaveThree(state: GameState, side: string, reason: 'resignation' | 'tim
       quiet: 0,
       moves: state.moves,
       resignations,
+      turnsLost: state.turnsLost.filter((s) => r.seats[s] !== 'out'),
     },
     null,
   );

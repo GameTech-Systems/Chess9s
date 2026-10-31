@@ -3,7 +3,8 @@
 // 0.3.0): a Coast piece standing on a Coast square captures nothing, gives no check and guards
 // nothing, but still blocks lines. allowed: as standard-3p 0.2.0 and the other presets. Kings and
 // Queens may take Coast pieces on the Coast (coast.3p.capturable on in standard-3p 0.3.0).
-// turn.3p.order: dark, light, Dragon (D26) or dark, Dragon, light.
+// turn.3p.order: dark, light, Dragon (D26), or another clockwise order (S74, decision 0021, D77;
+// dark, Dragon, light withdrawn). coast-only (S74): three-dragon-defeat.test.ts.
 import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
@@ -64,24 +65,30 @@ const kings: Position = {
 const tail = { e5: { piece: 'dragon-tail', side: 'dragon', home: 'a5', moved: true } };
 
 describe('the registry', () => {
-  it('coast.3p.attackFrom: allowed by default (the other presets), blocked as an option', () => {
+  it('coast.3p.attackFrom: allowed by default (the other presets), blocked and coast-only as options', () => {
     const p = registry.parameters.find((x) => x.id === 'coast.3p.attackFrom')!;
     expect(p.players).toEqual([3]);
     expect(p.default).toBe('allowed');
-    expect(p.options).toEqual(['allowed', 'blocked']);
-    expect(Object.keys(p.optionLabels ?? {})).toEqual(['allowed', 'blocked']);
+    expect(p.options).toEqual(['allowed', 'blocked', 'coast-only']);
+    expect(Object.keys(p.optionLabels ?? {})).toEqual(['allowed', 'blocked', 'coast-only']);
   });
 
-  it('turn.3p.order: dark, light, Dragon by default (D26); dark, Dragon, light as an option', () => {
+  it('turn.3p.order: dark, light, Dragon by default (D26); the other clockwise orders as options', () => {
     const p = registry.parameters.find((x) => x.id === 'turn.3p.order')!;
     expect(p.players).toEqual([3]);
     expect(p.default).toBe('dark-light-dragon');
-    expect(p.options).toEqual(['dark-light-dragon', 'dark-dragon-light']);
+    expect(p.options).toEqual(['dark-light-dragon', 'light-dragon-dark', 'dragon-dark-light']);
   });
 
   it('both are built in every 3-player preset, at every option', () => {
     for (const id of ['draft-3p', 'standard-3p', 'easy-3p']) {
-      for (const o of [BLOCKED, ALLOWED, { 'turn.3p.order': 'dark-dragon-light' }]) {
+      for (const o of [
+        BLOCKED,
+        ALLOWED,
+        { 'coast.3p.attackFrom': 'coast-only' },
+        { 'turn.3p.order': 'light-dragon-dark' },
+        { 'turn.3p.order': 'dragon-dark-light' },
+      ]) {
         expect(unbuiltFeatures(rulesFor(id, o))).toEqual([]);
       }
     }
@@ -286,24 +293,24 @@ describe('turn.3p.order', () => {
     expect(g.turn).toBe('light');
   });
 
-  it('dark-dragon-light: dark, the Dragon, then light', () => {
-    const rules = rulesFor('standard-3p', { 'turn.3p.order': 'dark-dragon-light' });
-    expect(turnOrder(rules)).toEqual(['dark', 'dragon', 'light']);
+  it('dragon-dark-light: the Dragon, dark, then light', () => {
+    const rules = rulesFor('standard-3p', { 'turn.3p.order': 'dragon-dark-light' });
+    expect(turnOrder(rules)).toEqual(['dragon', 'dark', 'light']);
     let g = newGame(rules, { id: 'standard-3p', version: '0.3.0' });
-    expect(g.turn).toBe('dark');
-    g = playMove(
-      g,
-      g.legal.find((m) => toNotation(m) === 'b8-b7')!,
-    );
     expect(g.turn).toBe('dragon');
     g = playMove(
       g,
       g.legal.find((m) => toNotation(m) === 'a5-e5')!,
     );
+    expect(g.turn).toBe('dark');
+    g = playMove(
+      g,
+      g.legal.find((m) => toNotation(m) === 'b8-b7')!,
+    );
     expect(g.turn).toBe('light');
   });
 
-  it("rule 6 follows the order: the Dragon may not leave dark's King to light's Rook when light moves next", () => {
+  it("rule 6 is the same in every clockwise order: dark answers the Dragon, so the Dragon may leave dark's King to light's Rook", () => {
     // Dark's King on h2, light's Rook on c2 and the Dragon's Moon (out) between them on e2.
     const position: Position = {
       h2: { piece: 'king', side: 'dark', home: 'f9', moved: true },
@@ -317,10 +324,10 @@ describe('turn.3p.order', () => {
         game(rulesFor('standard-3p', { 'turn.3p.order': order }), 'dragon', position),
         'e2',
       ).filter((n) => !n.endsWith('2'));
-    // Dark moves next and may answer the check.
-    expect(off('dark-light-dragon').length).toBeGreaterThan(0);
-    // Light moves next and would take the King.
-    expect(off('dark-dragon-light')).toEqual([]);
+    // Dark moves next and may answer the check, whichever seat moved first (D77).
+    for (const order of ['dark-light-dragon', 'light-dragon-dark', 'dragon-dark-light']) {
+      expect(off(order).length, order).toBeGreaterThan(0);
+    }
   });
 
   it('an order that is not a permutation of the seats is refused', () => {

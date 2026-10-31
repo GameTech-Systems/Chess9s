@@ -20,6 +20,17 @@
       "properties": { "when": { "$ref": "#/$defs/condition" }, "notes": { "type": "string" } },
       "additionalProperties": false
     },
+    "attackOnly": {
+      "description": "While `when` holds, its moves capture and attack only squares of the types in `on`: elsewhere they are move-only (no capture, no check, it guards nothing there), and its capture-only moves are not played there. It still moves and blocks as usual. A Coast piece on the Coast under coast.3p.attackFrom = coast-only (S74).",
+      "type": "object",
+      "required": ["when", "on"],
+      "properties": {
+        "when": { "$ref": "#/$defs/condition" },
+        "on": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "notes": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
     "moves": {
       "type": "array",
       "minItems": 1,

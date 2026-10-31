@@ -1,0 +1,17 @@
+{
+  "$schema": "../schema/ruleset.schema.json",
+  "id": "light-3p",
+  "name": "Light-Handed Dragon",
+  "version": "0.1.0",
+  "status": "experimental",
+  "players": 3,
+  "description": "A 3-player game to test (D76, decision 0021), the Heavy-Handed Dragon except the Tail: it only blocks (it captures nothing, gives no check and can't be captured), it is not the Dragon's King, and it moves like a Dragon Head, first off the Coast through A5. The Dragon loses when the Sun, the Moon and both Dragon Heads are captured; then the Tail turns to stone where it stands. Experimental; readings of decision 0021 provisional.",
+  "overrides": {
+    "king.range": 1,
+    "coast.3p.attackFrom": "coast-only",
+    "coast.3p.capturable": true,
+    "dragon.3p.defeat": "pieces-only",
+    "tail.3p.stone": "where-it-stands",
+    "tail.3p.captures": "none"
+  }
+}

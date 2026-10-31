@@ -137,6 +137,8 @@ export interface Piece {
   givesCheck?: Flag;
   /** While `when` holds, its moves capture and attack nothing but it still blocks (S71). */
   moveOnly?: { when: Condition; notes?: string };
+  /** While `when` holds, it captures and attacks only on squares of the types in `on` (S74). */
+  attackOnly?: { when: Condition; on: string[]; notes?: string };
   moves: Move[];
   squares?: SquareRule[];
   promotion?: { to: string[] | ParamRef; when?: Condition };
@@ -285,6 +287,10 @@ export function validatePiece(piece: unknown, board: Board, registry: Registry):
   ref('capturable', p.capturable, 'boolean');
   ref('givesCheck', p.givesCheck, 'boolean');
   if (p.moveOnly) condition('moveOnly.when', p.moveOnly.when);
+  if (p.attackOnly) {
+    condition('attackOnly.when', p.attackOnly.when);
+    for (const t of p.attackOnly.on) squareType('attackOnly.on', t);
+  }
   p.moves.forEach((m, i) => {
     const path = `moves[${i}]`;
     for (const t of m.targets ?? []) squareType(`${path}.targets`, t);

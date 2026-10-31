@@ -25,6 +25,28 @@
     },
     "notes": "coast.3p.attackFrom = blocked (decision 0020): on a Coast square it captures nothing, gives no check and guards nothing, but still blocks lines."
   },
+  "attackOnly": {
+    "when": {
+      "all": [
+        {
+          "players": [
+            3
+          ]
+        },
+        {
+          "param": "coast.3p.attackFrom",
+          "is": "coast-only"
+        },
+        {
+          "from": "coast"
+        }
+      ]
+    },
+    "on": [
+      "coast"
+    ],
+    "notes": "coast.3p.attackFrom = coast-only (decision 0021, D75.2): on a Coast square it captures and attacks only Coast squares (a King or Queen standing there), and guards only the Coast; it still moves and blocks as usual."
+  },
   "moves": [
     {
       "directions": [

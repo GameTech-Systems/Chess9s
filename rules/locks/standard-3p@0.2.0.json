@@ -55,6 +55,8 @@
     "draw.3p.fiftyMove": true,
     "check.3p.exposedKing": "not-allowed",
     "setup.swapKingQueen": false,
-    "extendedPlay.enabled": false
+    "extendedPlay.enabled": false,
+    "dragon.3p.defeat": "tail-or-pieces-in-duel",
+    "tail.3p.stone": "swap"
   }
 }
