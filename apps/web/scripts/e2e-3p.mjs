@@ -5,6 +5,10 @@
 //   Good Practice (draft-3p): the Dragon captures a King, then checkmates the other.
 //   Good Practice (draft-3p): one Kinged player checkmates the other.
 //   Easy Start (easy-3p): a Kinged player wins by checkmating the Tail.
+//   Heavy-Handed Dragon (heavy-3p, S74): the Tail checkmated turns to stone where it stands and the
+//   Dragon loses its turn; then a game to the Dragon's loss in the duel (the four and the Tail).
+//   Light-Handed Dragon (light-3p, S74): the four captured with both Kings in (the Dragon out, the
+//   Tail to stone where it stands); then a game to the Dragon's loss in the duel (the four).
 // Then a hot-seat game against a computer Dragon (S58): two people click their moves and the
 // greedy Dragon answers each round; then it is switched to the Search level (S62) and answers a
 // round looking ahead; undo takes its reply back too. Desktop and Pixel 7 width.
@@ -53,6 +57,45 @@ const GAMES = [
     game: fromEnds('easy-3p', 'kinged-checkmates-tail'),
     heading: 'Dark wins',
     detail: "Dark checkmated the Dragon's Tail.",
+  },
+  {
+    label: 'Heavy-Handed Dragon, the Tail to stone and a lost turn',
+    name: 'Heavy-Handed Dragon',
+    game: fromEnds('heavy-3p', 'tail-stone'),
+    heading: 'Dark wins',
+    detail: "Dark checkmated Light's King.",
+    notices: [
+      /checkmated the Dragon's Tail; it turns to stone on [a-i][1-9]\. The Dragon plays on without it\./,
+      /^The Dragon loses its turn: the Tail turning to stone was its move\.$/,
+    ],
+  },
+  {
+    label: 'Heavy-Handed Dragon, the Dragon loses the duel',
+    name: 'Heavy-Handed Dragon',
+    game: fromEnds('heavy-3p', 'duel-kinged-wins'),
+    heading: 'Dark wins',
+    detail: 'Dark captured both Dragon Heads, the Sun and the Moon.',
+    duel: true,
+    notices: [/^The Dragon loses its turn: the Tail turning to stone was its move\.$/],
+  },
+  {
+    label: 'Light-Handed Dragon, the Dragon out with both Kings in',
+    name: 'Light-Handed Dragon',
+    game: fromEnds('light-3p', 'dragon-out'),
+    heading: 'Dark wins',
+    detail: "Dark checkmated Light's King.",
+    notices: [
+      /^The Dragon's Tail turns to stone on [a-i][1-9]\.$/,
+      /the Tail is stone: the Dragon is out\.$/,
+    ],
+  },
+  {
+    label: 'Light-Handed Dragon, the Dragon loses the duel',
+    name: 'Light-Handed Dragon',
+    game: fromEnds('light-3p', 'duel-kinged-wins'),
+    heading: 'Light wins',
+    detail: 'Light captured both Dragon Heads, the Sun and the Moon.',
+    duel: true,
   },
 ];
 
@@ -174,6 +217,7 @@ async function play(browser, options, size, spec) {
 
   let turnsSeen = 0;
   let sawDuel = false;
+  const seen = new Set();
   for (const [i, move] of spec.game.moves.entries()) {
     // The board is turned to the side to move: the seat in the board's label is the one whose
     // turn the seat list marks.
@@ -191,6 +235,9 @@ async function play(browser, options, size, spec) {
       i + 1,
       { timeout: TIMEOUT },
     );
+    if (spec.notices) {
+      for (const text of await page.locator('.notice').allInnerTexts()) seen.add(text);
+    }
     if (spec.duel && !sawDuel && (await page.locator('.phase').count()) > 0) {
       const text = await page.locator('.phase').innerText();
       sawDuel = /^The duel: \w+ against the Dragon\./.test(text);
@@ -218,6 +265,10 @@ async function play(browser, options, size, spec) {
   }
   if (spec.duel) {
     check(sawDuel, `${label}: the panel said the duel had begun after the King was captured`);
+  }
+  for (const want of spec.notices ?? []) {
+    const found = [...seen].find((t) => want.test(t));
+    check(found !== undefined, `${label}: a notice said "${found ?? want}"`);
   }
   check(
     (await page.locator('[data-seat][data-turn="true"]').count()) === 0,
