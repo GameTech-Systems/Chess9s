@@ -333,10 +333,13 @@ function drawnThree(rules: MoveRules, base: Settled, seen: Seen | null): DrawRea
   return null;
 }
 
-/** The side to move's turn passes without a move; the event goes with the last move played. */
-function skipTurn(b: Settled): Settled {
+/**
+ * The side to move's turn passes without a move (`lost`: a lost turn, decision 0021); the event
+ * goes with the last move played.
+ */
+function skipTurn(b: Settled, lost = false): Settled {
   const last = b.moves.at(-1);
-  const event: GameEvent = { kind: 'turn-skipped', side: b.turn };
+  const event: GameEvent = { kind: 'turn-skipped', side: b.turn, ...(lost && { lost: true }) };
   const moves = last
     ? [...b.moves.slice(0, -1), { ...last, events: [...(last.events ?? []), event] }]
     : b.moves;
@@ -361,7 +364,7 @@ function settleThree(
   for (;;) {
     // A seat whose turn is lost (decision 0021): skipped once, as rule 15's skip.
     if (!ended && b.turnsLost.includes(b.turn)) {
-      b = { ...skipTurn(b), turnsLost: b.turnsLost.filter((s) => s !== b.turn) };
+      b = { ...skipTurn(b, true), turnsLost: b.turnsLost.filter((s) => s !== b.turn) };
       continue;
     }
     const table = { position: b.position, seats: b.seats, lost: b.lost, passing: b.passing };

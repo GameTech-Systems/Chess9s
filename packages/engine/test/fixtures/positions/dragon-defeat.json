@@ -89,7 +89,8 @@
           },
           {
             "kind": "turn-skipped",
-            "side": "dragon"
+            "side": "dragon",
+            "lost": true
           }
         ],
         "seats": {
@@ -178,7 +179,8 @@
           },
           {
             "kind": "turn-skipped",
-            "side": "dragon"
+            "side": "dragon",
+            "lost": true
           }
         ],
         "at": {
@@ -342,7 +344,8 @@
           },
           {
             "kind": "turn-skipped",
-            "side": "dragon"
+            "side": "dragon",
+            "lost": true
           }
         ],
         "seats": {

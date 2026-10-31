@@ -66,6 +66,9 @@ describe('each preset plays from the start to every end in its table', () => {
       'dragon-checkmates-king',
       'draw',
     ],
+    // S74, decision 0021. The Light-Handed Tail is never checkmated: no tail-stone row.
+    'heavy-3p': FULL_ROWS(),
+    'light-3p': FULL_ROWS().filter((r) => r !== 'tail-stone'),
   };
 
   it.each(Object.entries(rows))('%s has a recorded game for every row', (id, want) => {
@@ -87,6 +90,60 @@ describe('each preset plays from the start to every end in its table', () => {
     },
     30_000,
   );
+});
+
+describe('the Heavy-Handed and Light-Handed games end as decision 0021 says', () => {
+  const games = (ends.games as Recorded[]).filter((g) => g.ruleset.match(/^(heavy|light)-3p$/));
+  type Ev = { kind: string; at?: string; by?: string; lost?: true };
+
+  it.each(games.map((g) => [`${g.ruleset} ${g.rows.join(', ')}`, g] as const))(
+    '%s: the Tail turns to stone where it stands, and the Dragon that plays on loses its turn',
+    (_name, game) => {
+      const g = replay(game.ruleset, game.moves);
+      for (let i = 0; i < g.moves.length; i++) {
+        const move = g.moves[i]!;
+        for (const e of (move.events ?? []) as Ev[]) {
+          if (e.kind !== 'tail-stone') continue;
+          // Where it stands: nothing moved onto the stone's square with this move.
+          expect(move.to, `${i}`).not.toBe(e.at);
+          const out = (move.events as Ev[]).some((x) => x.kind === 'dragon-out');
+          const lostTurn = g.moves
+            .slice(i, i + 3)
+            .some((m) =>
+              ((m.events ?? []) as Ev[]).some((x) => x.kind === 'turn-skipped' && x.lost),
+            );
+          expect(lostTurn, `${i}`).toBe(!out && game.ruleset === 'heavy-3p');
+        }
+      }
+    },
+    30_000,
+  );
+
+  it('heavy-3p: the Dragon is out only once the four are captured and the Tail is in stone', () => {
+    for (const game of games.filter((g) => g.ruleset === 'heavy-3p')) {
+      const g = replay(game.ruleset, game.moves);
+      const at = g.moves.findIndex((m) => (m.events ?? []).some((e) => e.kind === 'dragon-out'));
+      const won = g.result.status === 'win' && g.result.loser === 'dragon';
+      if (at < 0 && !won) continue;
+      const end = at < 0 ? g : replay(game.ruleset, game.moves.slice(0, at + 1));
+      const pieces = Object.values(end.position).filter(
+        (p) => p.side === 'dragon' && p.piece !== 'dragon-tail' && p.stone !== true,
+      );
+      expect(pieces).toEqual([]);
+      const tail = Object.values(end.position).find((p) => p.piece === 'dragon-tail')!;
+      expect(tail.stone).toBe(true);
+    }
+  });
+
+  it('light-3p: the Tail is never checkmated; it turns to stone only with the Dragon out', () => {
+    for (const game of games.filter((g) => g.ruleset === 'light-3p')) {
+      const g = replay(game.ruleset, game.moves);
+      for (const m of g.moves) {
+        const kinds = (m.events ?? []).map((e) => e.kind);
+        if (kinds.includes('tail-stone')) expect(kinds).toContain('dragon-out');
+      }
+    }
+  });
 });
 
 function FULL_ROWS(): string[] {
