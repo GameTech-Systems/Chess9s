@@ -12,13 +12,15 @@ The game offers these 2-player presets ([decision 0011](decisions/0011-presets.m
 | **Good Practice** | `draft-2p` | Candidate | Nothing: every setting at its default. The 2-square King makes checkmate harder to force, which is good practice |
 | **Easy Start** | `easy-2p` | Experimental, casual play | Closest to regular chess: light moves first, a 1-square King that may castle, the Queen may cross the void anywhere, e5 is an ordinary square for every piece but the Queen, and no pawn-safe zones |
 
-The 3-player presets are all experimental, and none is fairness-checked yet ([decision 0016](decisions/0016-three-player-rules-v0.3.md)). In all three, each of the Dragon's pieces first leaves the Coast through A5 ([decision 0019](decisions/0019-three-player-coast-exit.md)):
+The 3-player presets are all experimental, and none is fairness-checked yet ([decision 0016](decisions/0016-three-player-rules-v0.3.md)). In all of them, each of the Dragon's pieces first leaves the Coast through A5 ([decision 0019](decisions/0019-three-player-coast-exit.md)):
 
 | Preset | Ruleset | What it plays |
 |---|---|---|
 | **Standard** (the 3-player default, D63) | `standard-3p` | Good Practice, except the King moves one square (`king.range` = 1), as in the 2-player Standard, and the Dragon's pieces attack nothing from the Coast, where Kings and Queens may capture them ([below](#standard-no-attacks-from-the-coast-3-player), [decision 0020](decisions/0020-three-player-coast-attacks.md)) |
 | **Good Practice** | `draft-3p` | Every 3-player setting at its default: the full Dragon rules below |
 | **Easy Start** | `easy-3p` | Easy Start's piece settings and a shorter Dragon game: the first checkmate wins ([below](#easy-start-for-3-players-the-first-checkmate-wins)) |
+| **Heavy-Handed Dragon** | `heavy-3p` | Standard, except that from the Coast the Dragon's pieces attack only the Coast, and the Dragon loses only once the four are captured and the Tail is checkmated ([below](#heavy-handed-and-light-handed-dragon-3-player), [decision 0021](decisions/0021-heavy-and-light-handed-dragon.md)). To test |
+| **Light-Handed Dragon** | `light-3p` | Heavy-Handed, except that the Tail only blocks and the Dragon loses once the four are captured ([below](#heavy-handed-and-light-handed-dragon-3-player)). To test |
 
 Every rule here is a parameter with a default and a list of options, so players can experiment. The data in [`rules/parameters.json`](../rules/parameters.json) and [`rules/rulesets/`](../rules/rulesets/) is what the engine reads; this page explains it. Where the two disagree, the data is a bug to report.
 
@@ -139,13 +141,42 @@ Standard (`standard-3p` 0.3.0) plays two more Coast rules ([decision 0020](decis
 2. Each piece still first leaves the Coast through A5, and may come back onto any Coast square afterwards.
 3. **Kings and Queens may capture on the Coast** (`coast.3p.capturable` on). They are the only pieces that may enter it, so they are the only ones that can take a Dragon Head, the Sun or the Moon standing there. The Tail can't be captured.
 
+### Heavy-Handed and Light-Handed Dragon (3-player)
+
+Two experimental rulesets to test ([decision 0021](decisions/0021-heavy-and-light-handed-dragon.md)), each on Standard's rules. The **four** are the Sun, the Moon and both Dragon Heads.
+
+**Heavy-Handed Dragon** (`heavy-3p`):
+
+1. Each of the Dragon's pieces first leaves the Coast through A5, then may come back onto the Coast with any legal move.
+2. **From the Coast, only the Coast** (`coast.3p.attackFrom` = coast-only). A Dragon piece standing on a Coast square attacks only Coast squares: it can't attack or capture a piece off the Coast, but it may capture a King or a Queen standing on the Coast, and it guards only Coast squares. It still blocks lines. Off the Coast it attacks as usual.
+3. Kings and Queens are the only other pieces that may enter the Coast; they may capture a Dragon Head, the Sun or the Moon there. The Tail can't be captured.
+4. **How the Dragon loses** (`dragon.3p.defeat` = pieces-and-tail): only once the four are captured **and** the Tail is checkmated, in either order, in the duel too. A Tail checkmated while any of the four is on the board turns to stone, and the Dragon plays on with the rest.
+5. **The Tail turns to stone where it stands** (`tail.3p.stone` = where-it-stands): it doesn't switch places with the checkmating piece. If the Dragon plays on, it loses its next turn: the Tail turning to stone counts as its move, and play then goes on in order.
+6. When the Dragon loses with both Kinged players in, it is out and the Kinged players play on (rule 17). In the duel the last Kinged player wins.
+
+**Light-Handed Dragon** (`light-3p`) is the same, except the Tail:
+
+1. **Only blocks**: it captures nothing (`tail.3p.captures` = none), gives no check and can't be captured. It is not the Dragon's King: it is never checkmated, and the Dragon need not keep it out of attack.
+2. It moves like a Dragon Head, any distance in any straight line, first off the Coast through A5, and may stand on E5.
+3. **How the Dragon loses** (`dragon.3p.defeat` = pieces-only): once the four are captured. With both Kinged players in, the Dragon is out and the Tail turns to stone where it stands; in the duel the last Kinged player wins. The engine refuses `pieces-only` unless the Tail only blocks.
+
+How they end, beside the table [below](#how-3-player-games-end):
+
+| What happened | Heavy-Handed | Light-Handed |
+|---|---|---|
+| The Tail is checkmated while any of the four is on the board | It turns to stone where it stands; the Dragon loses its next turn and plays on, in the duel too | Never happens |
+| The four are captured while the Tail is active | The Dragon plays on with the Tail, in the duel too | The Dragon is out and the Tail turns to stone where it stands (in the duel, the last Kinged player wins) |
+| The last of the four and the Tail's checkmate both done | The Dragon is out (in the duel, the last Kinged player wins) | Doesn't apply: the Tail is never checkmated |
+
+Readings of decision 0021 the owner confirmed on 31 Oct 2026 (S74 brief): a Dragon piece on the Coast may capture a King or Queen there; in the duel both conditions are needed; a Tail checkmated early turns to stone and the Dragon plays on, losing its next turn; the Light-Handed Tail moves like a Dragon Head.
+
 ## Center square and general rules
 
 Only the 3 dragons (both Dragon Heads and the Dragon Tail) may ever stand on E5, in both 2- and 3-player games (`center.occupants` = dragons).
 
 - **Passing through E5**: Rooks and Bishops can't slide through E5. Dragon Heads, the Queen, the King, and the Sun and Moon may pass over an empty E5 in a straight line, and Knights jump over it as usual. No piece passes through an occupied E5.
 - **Capturing on E5**: a Dragon Head on E5 can be captured only by the other Dragon Head, since no other piece may land there.
-- **Turn order**: in 2-player games the dark side moves first, then light. In 3-player games: dark, light, Dragon, repeating. Option `turn.3p.order` = dark-dragon-light: dark, Dragon, light ([decision 0020](decisions/0020-three-player-coast-attacks.md)); the rules about who moves next (rules 6 and 7 below) follow the order played.
+- **Turn order**: in 2-player games the dark side moves first, then light. In 3-player games: dark, light, Dragon, repeating. The order always goes clockwise round the board; option `turn.3p.order` picks who starts: light-dragon-dark (light, Dragon, dark) or dragon-dark-light (Dragon, dark, light) ([decision 0021](decisions/0021-heavy-and-light-handed-dragon.md), D77; dark-dragon-light, of [decision 0020](decisions/0020-three-player-coast-attacks.md), is withdrawn). The rules about who moves next (rules 6 and 7 below) follow the order played.
 - **Winning, 2-player**: checkmate wins.
 - **Draws, 2-player**: stalemate is a draw, as are threefold repetition, the 50-move rule and insufficient material, as in chess. Tail moves count as moves for the 50-move rule and repetition.
 - **Winning and draws, 3-player**: see [3-player Dragon mode](#3-player-dragon-mode-experimental).
