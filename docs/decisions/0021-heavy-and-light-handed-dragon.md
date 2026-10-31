@@ -1,11 +1,11 @@
 # 0021: Heavy-Handed and Light-Handed Dragon, and clockwise turn orders (3-player)
 
-**Status:** Accepted (owner in chat, 31 Oct 2026, S73 review; D75 to D78). Built in S74, screened in S75.
+**Status:** Accepted (owner in chat, 31 Oct 2026, S73 review; D75 to D78; readings confirmed in the S74 brief). Built in S74, screened in S75.
 
 ## Context
 The S72 screens put no single lever inside 28–38% at depth 2 (reports `docs/fairness/standard-3p.md`, `.checkmate-only`, `.turn-order`, `.old-rules`). The Coast rule of [decision 0020](0020-three-player-coast-attacks.md) was the only one that stopped the Dragon capturing Kings, but it left dark ahead at depth 2 (45.8 / 34.9 / 19.4) and overshot at depth 1 (Dragon 8.5%). The owner read the screens in chat and chose two new 3-player rulesets to test, and ruled the counter-clockwise turn order out.
 
-How it reads. **(owner)** marks the owner's words, **(reading)** a case they don't name. Readings are provisional until the owner confirms them; the open ones are listed at the end.
+How it reads. **(owner)** marks the owner's words, **(reading)** a case they don't name. The owner confirmed the four open readings in the S74 brief (below); the others stay provisional.
 
 ## D75: Heavy-Handed Dragon
 1. Each of the Dragon's pieces leaves the Coast first through A5, then may come back onto the Coast with any legal move. **(owner;** the existing `coast.3p.exit` = a5-first-then-any and `coast.returnAllowed` on**)**
@@ -51,8 +51,11 @@ Light also sets `tail.3p.captures` = none; `pieces-only` makes the Tail a plain 
 
 Two new experimental rulesets on `standard-3p` 0.3.0's values: `heavy-3p` "Heavy-Handed Dragon" and `light-3p` "Light-Handed Dragon". Every bundled ruleset is playable in the browser, so both appear with the 3-player presets, marked experimental. Registry 0.6.0. The computer Dragon learns the new loss rules (it guards the Tail only where the Tail is royal). RULES.md gets both rulesets and the turn-order line.
 
-## Open for the owner (defaults apply until answered)
-- Rule D75.2: may a Dragon piece on the Coast still capture a King or Queen that has entered the Coast? Default: yes (the owner's words). If the owner meant "attacks nothing", it is 0020's `blocked` and `coast-only` is not built.
-- Rule D75.4: in the duel, does the last Kinged player need both the four pieces and the Tail checkmate? Default: both.
-- Rule D75.6: a Tail checkmated before the four are captured turns to stone at once and the Dragon plays on. Default: yes.
-- Rule D76.3: the light-handed Tail moves like a Dragon Head under the Tail's square rules. Default: yes.
+## The owner's answers (31 Oct 2026, S74 brief)
+- Rule D75.2: a Dragon piece on the Coast may still capture a King or Queen that has entered the Coast. **Confirmed** (`coast-only` built).
+- Rule D75.4: in the duel the last Kinged player needs both the four pieces and the Tail checkmate. **Confirmed.**
+- Rule D75.6: a Tail checkmated before the four are captured turns to stone where it stands and the Dragon plays on. **Confirmed, with one addition (owner):** the Dragon then loses a turn: the Tail turning to stone by checkmate counts as the Dragon's move, then play continues normally. Built as part of `tail.3p.stone` = where-it-stands: the Dragon's next turn is skipped whenever its Tail turns to stone where it stands and it plays on (a `turn-skipped` event with `lost`). Under the Light-Handed rules the Tail turns to stone only with the Dragon out, so no turn is lost.
+- Rule D76.3: the Light-Handed Tail moves like a Dragon Head under the Tail's square rules (first off the Coast through A5). **Confirmed.**
+
+## How S74 built it
+As the table above, with these names. The new piece field `attackOnly` (`when`, `on`: square types) carries coast-only on the five Coast pieces. `pieces-only` requires `tail.3p.captures` = none, `tail.canCheck` off and `tail.capturable` off (D76.1). `dragon.3p.defeat` and `tail.3p.stone` apply with `endings.3p` = stones-and-duel. Reading (S74, provisional): a Tail captured under `tail.capturable` with where-it-stands turns to stone where it stands and the capturing piece stays on its square, as on E5 before.

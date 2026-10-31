@@ -88,6 +88,7 @@ Each piece is one file in `rules/pieces/`, validated by [`rules/schema/piece.sch
 | `royal` | The checkmate target. Default false |
 | `capturable`, `givesCheck` | Default true |
 | `moveOnly` | `when`: while the condition holds, every move of the piece is move-only. It captures and attacks nothing (no check, it guards no square) and its capture-only moves are not played, but it still blocks lines. A Coast piece on the Coast with `coast.3p.attackFrom` = blocked (S71, decision 0020) |
+| `attackOnly` | `when` and `on` (square types): while the condition holds, the piece captures and attacks only on squares of those types; elsewhere its moves are move-only (no capture, no check, it guards nothing there) and its capture-only moves are not played there. It still moves and blocks as usual. A Coast piece on the Coast with `coast.3p.attackFrom` = coast-only (S74, decision 0021) |
 | `promotion` | `to`: piece ids. Promotes on the last rank in the side's forward direction |
 | `castle` | `partner` (a piece id), `steps` and `when`: castling as in chess (below) |
 | `irreversible` | Its moves can't be taken back (the pawn): like a capture, a move by it restarts the fifty-move count and the repetition record |
@@ -105,7 +106,7 @@ A **square rule** names a square type and says whether the piece may `stop` ther
 **Parameters** plug in two ways:
 
 - A value may be `{ "param": "<id>" }`, read from the resolved ruleset: an integer parameter for `range`, a boolean one for `jump`, `stop`, `pass`, `capturable` and `givesCheck`, and an enumSet one for `promotion.to`.
-- A move, square rule, promotion or `moveOnly` may carry `when`, which applies it only if the condition holds: `{ "param", "is" }`, `{ "param", "in" }`, `{ "param", "has" }` (for enumSet parameters), `{ "players": [3] }`, `{ "from": "<square type>" }`, `{ "firstMove": true }`, `{ "hasLeft": "<square type>" }` (the piece has moved off a square of that type onto one without it at least once: a Coast piece's first way out, S68, decision 0019), or `not`, `all` and `any` around other conditions. The game keeps what `hasLeft` reads per piece (`PlacedPiece.left`), only for the square types its own data names, and the repetition key includes it.
+- A move, square rule, promotion, `moveOnly` or `attackOnly` may carry `when`, which applies it only if the condition holds: `{ "param", "is" }`, `{ "param", "in" }`, `{ "param", "has" }` (for enumSet parameters), `{ "players": [3] }`, `{ "from": "<square type>" }`, `{ "firstMove": true }`, `{ "hasLeft": "<square type>" }` (the piece has moved off a square of that type onto one without it at least once: a Coast piece's first way out, S68, decision 0019), or `not`, `all` and `any` around other conditions. The game keeps what `hasLeft` reads per piece (`PlacedPiece.left`), only for the square types its own data names, and the repetition key includes it.
 
 ```json
 {
