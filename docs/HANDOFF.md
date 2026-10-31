@@ -1,31 +1,29 @@
 # Handoff
 
-Updated 2026-10-31 by S73 (Opus 5.5 · medium). `/end-session` rewrites this file; keep it under 40 lines.
+Updated 2026-10-31 by S74 (Opus 5.5 · high). `/end-session` rewrites this file; keep it under 40 lines.
 
 ## State
-- Phase 6. The owner reviewed the S72 screens (no lever inside 28–38% at depth 2: Coast rule 45.8 / 34.9 / 19.4, turn order 5.6 / 69.8 / 24.6, checkmate only 23.8 / 6.6 / 69.6, old rules 23.6 / 5.9 / 70.5) and chose what to test next, recorded in [decision 0021](decisions/0021-heavy-and-light-handed-dragon.md):
-  - **Heavy-Handed Dragon** (D75): first exit through A5, then back with any legal move; on the Coast a Dragon piece can't attack a piece off the Coast; only Kings and Queens enter the Coast; the Dragon loses when the Sun, Moon and both Heads are captured **and** the Tail is checkmated; with both Kings in, the Tail turns to stone where it stands.
-  - **Light-Handed Dragon** (D76): the same, but the Tail only blocks (no attack, can't be captured, never checkmated), moves anywhere, and the Dragon loses when the four are captured.
-  - **Clockwise turn orders only** (D77): dark-light-dragon, light-dragon-dark, dragon-dark-light; dark-dragon-light withdrawn.
-  - Screens (D78): both rulesets at each order, six 400-game screens at depths 1 and 2.
-- Docs only; nothing built. S74 to S76 added to the plan.
+- Phase 6. Decision 0021 is built. New rulesets `heavy-3p` "Heavy-Handed Dragon" and `light-3p` "Light-Handed Dragon" 0.1.0, both experimental and playable in the browser (hot-seat, computer, online); registry 0.6.0.
+  - `coast.3p.attackFrom` = coast-only: on the Coast a Dragon piece attacks only Coast squares (new piece field `attackOnly`).
+  - `dragon.3p.defeat` (tail-or-pieces-in-duel, pieces-and-tail, pieces-only; pieces-only requires a Tail that only blocks) and `tail.3p.stone` (swap, where-it-stands). Where it stands, a Dragon that plays on loses its next turn (`turn-skipped` with `lost`; owner, S74 brief).
+  - `turn.3p.order`: dark-light-dragon, light-dragon-dark, dragon-dark-light; dark-dragon-light removed.
+- Recorded games to every end of both rulesets (engine), four of them clicked in Chromium (`e2e-3p.mjs`). The computer treats the Tail as royal only where it is. `standard-3p`, `draft-3p` and `easy-3p` play as before; the four 3-player locks gained the two new keys at their defaults (`pnpm lock add-keys`, values unchanged).
+- S75 screens: the six `Sim depth 2` runs are dispatched after the S74 merge if the token allows. If Actions shows none, dispatch them as the S75 section says.
 
 ## Next session
-**S74 — Heavy-Handed and Light-Handed Dragon** · Opus 5.5 · effort high
-Why: new loss rules, a new Coast attack option and turn orders in the engine; correctness-critical.
-Start with: `/start-session S74`. Read the S74 section of `docs/BUILD-PLAN.md` and decision 0021.
+**S75 — Screens of Heavy-Handed and Light-Handed Dragon** · Sonnet 5.5 · effort medium
+Why: wait for six workflow runs, commit the reports and compare them; mechanical.
+Start with: `/start-session S75`
 
 ## Decisions in effect for the next step
-- D75 to D78 (decided, decision 0021; its readings provisional). D70 to D74 as before, except D73's order is withdrawn (D77). D60: every 3-player ruleset stays experimental.
+- D75 to D77 (decided; the four 0021 readings confirmed in the S74 brief). D78: six 400-game screens at depths 1 and 2; full runs only for one inside 28–38% at both (default). D60: every 3-player ruleset stays experimental.
 
 ## Open questions for the owner
-- 0021 rule D75.2: may a Dragon piece on the Coast still capture a King or Queen standing on the Coast? Default: yes (new option `coast-only`); "no" means 0020's `blocked` as it is.
-- 0021 rule D75.4: in the duel, must the last Kinged player capture the four **and** checkmate the Tail? Default: both.
-- 0021 rule D75.6: a Tail checkmated while Heads, Sun or Moon remain turns to stone where it stands and the Dragon plays on. Default: yes.
-- 0021 rule D76.3: the Light-Handed Tail moves like a Dragon Head, first off the Coast through A5. Default: yes.
+- None blocking S75.
+- S74 readings (provisional): the lost turn is part of `tail.3p.stone` = where-it-stands, so it also applies if that option is set under the full rules; a Tail captured (`tail.capturable`) with where-it-stands stays where it stands and the capturing piece doesn't move; `pieces-only` also requires `tail.capturable` off (D76.1).
 - Carried over: the decision 0020 readings, the held-setting rule (S64), Easy Start calls (S67), the decision 0017 clock readings, the S53 defaults, the draw-offer default (S51), the flag rule (0013), `coast.openToAll`, the I34 contact address, the favicon, the Ting Yang art.
 
 ## Notes for Claude
-- The parameter names in 0021's build table are proposals; keep `standard-3p`, `draft-3p`, `easy-3p` and every lock unchanged.
-- `gh` had an invalid token in S72: if `scripts/claude/ship.sh` fails, open the PR through the GitHub connector.
-- A screen is a `Sim depth 2` run with `set` and `label`; a combination is one run with every `set` pair.
+- A screen is a `Sim depth 2` run with `ruleset`, `games` 400, `depths` `1,2`; the other orders add `set` = `turn.3p.order=<order>` and `label` = the order.
+- The balance report's "How the games ended" table names decision 0016's rows; the new loss rules show up as tail-stone and dragon-out events.
+- The GitHub connector failed to connect in S74; `scripts/claude/ship.sh` uses `gh api`.
