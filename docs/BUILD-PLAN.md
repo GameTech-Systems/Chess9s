@@ -411,9 +411,29 @@ Depth-2 screens (a few hundred games each, depth 1 alongside), each lever alone 
 Done when: the screens' reports are committed, with a comparison in the handoff.
 Done 31 Oct 2026: no lever screens inside 28–38% at depth 2 (Coast rule: dark 45.8%, light 34.9%, Dragon 19.4%; turn order: 5.6%, 69.8%, 24.6%; checkmate only: 23.8%, 6.6%, 69.6%; old rules 23.6%, 5.9%, 70.5%, as S69). The checkmate-only run first crashed on a move giving two checkmates; fixed in the engine and run again.
 
-### S73 — Owner review of the S72 screens · Owner with Claude in chat · Opus 5.5 · medium · `todo`
+### S73 — Owner review of the S72 screens · Owner with Claude in chat · Opus 5.5 · medium · `done`
 The owner reads the four S72 reports (`docs/fairness/standard-3p.md`, `.checkmate-only`, `.turn-order`, `.old-rules`) and the comparison in the handoff, and picks what to screen next: which levers to combine (the plan's rule once none passes alone), or other changes. Claude records the calls (a decision record, the "Decision defaults" table) and builds nothing the owner has not chosen.
 Done when: the owner's calls are recorded, with the next step added to this plan.
+Done 31 Oct 2026 in chat: the owner chose two new 3-player rulesets to test, Heavy-Handed Dragon (D75) and Light-Handed Dragon (D76), and clockwise turn orders only (D77: dark-light-dragon, light-dragon-dark, dragon-dark-light; dark-dragon-light withdrawn); each screened at the three orders (D78). Recorded in [decision 0021](decisions/0021-heavy-and-light-handed-dragon.md), with its readings marked provisional.
+
+### S74 — Heavy-Handed and Light-Handed Dragon · Opus 5.5 · high · `todo`
+Build [decision 0021](decisions/0021-heavy-and-light-handed-dragon.md) as data, each new option tested at its default and every option, so `standard-3p`, `draft-3p` and `easy-3p` play as before:
+- **D75 and D76, attacks from the Coast:** `coast.3p.attackFrom` gains `coast-only`: a Dragon piece on a Coast square attacks only Coast squares (captures a King or Queen there, guards only the Coast), still blocks; piece data (`moveOnly` or a sibling condition), so attack maps, check and the computer follow.
+- **How the Dragon loses:** `dragon.3p.defeat` (tail-or-pieces-in-duel, pieces-and-tail, pieces-only) and `tail.3p.stone` (swap, where-it-stands), names as the record proposes or better. `pieces-only`: the Tail is a plain blocker, never checkmated and not guarded by the Dragon; the engine refuses it without `tail.3p.captures` = none and `tail.canCheck` off. Each row of the end table in 0016 checked under each option, the duel included; the Tail in stone where it stands when the Dragon is out with both Kings in.
+- **D77:** `turn.3p.order` options become `dark-light-dragon`, `light-dragon-dark`, `dragon-dark-light`; `dark-dragon-light` removed (no ruleset or lock uses it). Rules 6 and 7 follow the order played, as now.
+- **Rulesets:** `heavy-3p` 0.1.0 and `light-3p` 0.1.0, experimental, on `standard-3p` 0.3.0's values (0021 table); `pnpm rules:index`; registry 0.6.0. No existing ruleset or lock changes.
+- **Computer:** the Dragon's evaluation and greedy player follow the loss rule in play (the Tail counts as royal only where it is).
+- **Docs:** RULES.md (both rulesets, the turn-order line), the 3-player how-to-play lines if they name the order.
+- Tests first: each new option at its default and each option; a recorded game per ruleset to the Dragon's loss with both Kings in (Tail to stone where it stands) and in the duel; each turn order starts with its seat.
+Done when: both rulesets play to each end in their tables in the engine and the browser (hot-seat), all checks pass, and the S75 screens are dispatched.
+Decisions: D75 to D78.
+
+### S75 — Screens of Heavy-Handed and Light-Handed Dragon · Claude (workflow) · Opus 5.5 · medium · `todo`
+Six screens, as S72 ran them (D78): Actions → **Sim depth 2**, games 400, depths `1,2`, ruleset `heavy-3p` and `light-3p`, each at `turn.3p.order` = dark-light-dragon (no `set`), light-dragon-dark and dragon-dark-light (`set`, `label` per order). Commit the reports to `docs/fairness/` and compare them with the S72 table in the handoff. Full 2,000-game runs only for one that screens inside 28–38% at both depths.
+Done when: the six reports are committed, with the comparison in the handoff.
+
+### S76 — Owner review of the S75 screens · Owner with Claude in chat · Opus 5.5 · medium · `todo`
+The owner reads the six screens and picks what comes next, as in S73. Claude records the calls and builds nothing the owner has not chosen.
 
 ## Later phases
 
@@ -478,8 +498,12 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D70 | Dragon pieces don't attack from the Coast (3-player) | Decided (owner, 29 Oct 2026): no captures, no check, no guarding from any Coast square; still blocks; back onto any Coast square; first way out through A5. `coast.3p.attackFrom` = blocked in `standard-3p` 0.3.0; allowed (as 0.2.0) is the option (decision 0020) | S71 |
 | D71 | Who may enter the Coast (3-player) | Decided (owner, 29 Oct 2026): Kings and Queens only, and they may capture Coast pieces there (`coast.3p.capturable` on in `standard-3p` 0.3.0) | S71 |
 | D72 | Dragon wins by King capture or checkmate only | Decided (owner, 29 Oct 2026): King capture stays the default; checkmate only (`dragon.3p.givesCheck` = true) is screened alone in S72 | S71 |
-| D73 | 3-player turn order option | Decided (owner, 29 Oct 2026): dark, light, Dragon (D26) stays the default; dark, Dragon, light (`turn.3p.order`) is screened alone in S72 | S71 |
+| D73 | 3-player turn order option | Decided (owner, 29 Oct 2026): dark, light, Dragon (D26) stays the default; dark, Dragon, light (`turn.3p.order`) is screened alone in S72. Superseded by D77 (that order is withdrawn) | S71 |
 | D74 | Which 3-player presets get the Coast rule | Decided (owner, 29 Oct 2026): `standard-3p` only, as a new version; Good Practice and Easy Start keep their rules and screen the rule as an option | S71 |
+| D75 | Heavy-Handed Dragon (3-player) | Decided (owner, 31 Oct 2026): first exit through A5, then back with any legal move; on the Coast a Dragon piece can't attack a piece off the Coast; only Kings and Queens enter the Coast; the Dragon loses when the Sun, Moon and both Heads are captured and the Tail is checkmated; with both Kings in, the Tail turns to stone where it stands. Ruleset `heavy-3p`, experimental; readings provisional (decision 0021) | S74 |
+| D76 | Light-Handed Dragon (3-player) | Decided (owner, 31 Oct 2026): as D75, but the Tail only blocks (attacks nothing, can't be captured, never checkmated) and moves anywhere with a legal move; the Dragon loses when the Sun, Moon and both Heads are captured; with both Kings in, the Tail then turns to stone where it stands. Ruleset `light-3p`, experimental (decision 0021) | S74 |
+| D77 | 3-player turn orders | Decided (owner, 31 Oct 2026): clockwise only: dark-light-dragon (default), light-dragon-dark, dragon-dark-light; dark-dragon-light withdrawn (decision 0021) | S74 |
+| D78 | What to screen after S73 | Default (reading of the owner's words): both new rulesets at each clockwise order, six 400-game screens at depths 1 and 2; full runs only for one inside 28–38% at both depths (decision 0021) | S75 |
 
 ## Ledger sync format
 
