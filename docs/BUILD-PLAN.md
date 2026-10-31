@@ -406,9 +406,14 @@ Build the S70 calls as data, each tested at its default and every option ([decis
 - The computer Dragon walks its pieces out and does not park them on the Coast. The `Sim depth 2` workflow gains `set` and `label`, then the S72 screens are dispatched.
 Done when: the rules play as decided in every preset, tests pass, and the S72 screens are running.
 
-### S72 — 3-player balance screens on the Coast rule · Claude (workflow) · Opus 5.5 · medium · `todo`
+### S72 — 3-player balance screens on the Coast rule · Claude (workflow) · Opus 5.5 · medium · `done`
 Depth-2 screens (a few hundred games each, depth 1 alongside), each lever alone on `standard-3p`: the Coast rule alone (0.3.0 as it is), checkmate only alone, the turn order alone (each on 0.2.0's rules: `coast.3p.attackFrom=allowed coast.3p.capturable=false`, then the lever), with the S69 runs as the 0.2.0 baseline. Actions → **Sim depth 2**, ruleset `standard-3p`, games 400, depths `1,2`, `set` and `label` per screen (reports `docs/fairness/standard-3p.<label>`). Full 2,000-game runs at depths 1 and 2 only for a variant that screens inside 28–38%; combine levers only if none passes alone. Commit the reports and compare; then the owner chooses defaults in chat.
 Done when: the screens' reports are committed, with a comparison in the handoff.
+Done 31 Oct 2026: no lever screens inside 28–38% at depth 2 (Coast rule: dark 45.8%, light 34.9%, Dragon 19.4%; turn order: 5.6%, 69.8%, 24.6%; checkmate only: 23.8%, 6.6%, 69.6%; old rules 23.6%, 5.9%, 70.5%, as S69). The checkmate-only run first crashed on a move giving two checkmates; fixed in the engine and run again.
+
+### S73 — Owner review of the S72 screens · Owner with Claude in chat · Opus 5.5 · medium · `todo`
+The owner reads the four S72 reports (`docs/fairness/standard-3p.md`, `.checkmate-only`, `.turn-order`, `.old-rules`) and the comparison in the handoff, and picks what to screen next: which levers to combine (the plan's rule once none passes alone), or other changes. Claude records the calls (a decision record, the "Decision defaults" table) and builds nothing the owner has not chosen.
+Done when: the owner's calls are recorded, with the next step added to this plan.
 
 ## Later phases
 
