@@ -16,6 +16,7 @@ import {
   activeKinged,
   checkersOn,
   outcomes,
+  royals,
   three,
   TAIL,
   type Outcome,
@@ -46,15 +47,12 @@ function material(g: Three, o: Outcome, seat: string, values: Record<string, num
   return g.order.includes(seat) ? score : 0;
 }
 
-/** Squares of the royal pieces of `side`: its King, or the Dragon's active Tail. */
-function royalSquares(g: Three, o: Outcome, side: string): string[] {
-  if (o.seats[side] !== 'active') return [];
-  return Object.keys(o.position).filter((at) => {
-    const p = o.position[at]!;
-    if (p.side !== side || p.stone === true) return false;
-    return side === g.dragon ? p.piece === TAIL : g.rules.pieces[p.piece]?.royal === true;
-  });
-}
+/**
+ * Squares of the royal pieces of `side`: its King, or the Dragon's active Tail where the loss rule
+ * makes it royal (not under dragon.3p.defeat = pieces-only, decision 0021).
+ */
+const royalSquares = (g: Three, o: Outcome, side: string): string[] =>
+  royals(g, o.position, o.seats, side);
 
 /** How `seat` rates the position a move leads to; higher is better. */
 function rate(g: Three, o: Outcome, seat: string, values: Record<string, number>): number {
