@@ -3,7 +3,8 @@
 // minimize it, so the tree is a 2-sided one and alpha-beta still prunes (search.ts). This file is
 // the score: a seat's own material less the other seats' (S23's piece values) and its win
 // conditions in decision 0016, the Kings for the Kinged players, the Kings and the Tail's safety
-// for the Dragon. A finished game, or the seat being out, is a win or a loss for it.
+// for the Dragon (only where the Tail is the Dragon's King: not under dragon.3p.defeat =
+// pieces-only, decision 0021, where three.ts gives it no royal square). A finished game, or the seat being out, is a win or a loss for it.
 //
 // The weights are playing heuristics, not rules, and provisional until S59 reports how the seats
 // fare (hundredths of a value unit, like `pieceValues`). The greedy player (S58) uses them too.
@@ -30,7 +31,8 @@ export const TAIL_SQUARE = 40;
  * Head, Sun or Moon that has left the Coast, and per square from A5 that one still to go out
  * through it stands. Neither search depth sees far enough to walk a piece out on its own (S68).
  * While its pieces attack nothing from the Coast (coast.3p.attackFrom = blocked, decision 0020),
- * DEVELOPED is only for one standing off the Coast, so it does not park them back there (S71).
+ * or only the Coast (coast-only, decision 0021), DEVELOPED is only for one standing off the Coast,
+ * so it does not park them back there (S71, S74).
  */
 export const DEVELOPED = 150;
 export const COAST_STEP = 20;
@@ -84,7 +86,10 @@ const gates = new WeakMap<MoveRules, string[]>();
 export function development(rules: MoveRules, position: Position, dragon: string): number {
   const exit = rules.values['coast.3p.exit'];
   const gated = exit === 'a5-first-then-any' || exit === 'a5-always';
-  const blocked = rules.values['coast.3p.attackFrom'] === 'blocked';
+  // From the Coast its pieces attack nothing (blocked) or only the Coast (coast-only, S74): only
+  // standing off it counts.
+  const attackFrom = rules.values['coast.3p.attackFrom'];
+  const blocked = attackFrom === 'blocked' || attackFrom === 'coast-only';
   if (!gated && !blocked) return 0;
   const types = squareTypes(rules.board);
   let gate = gates.get(rules);

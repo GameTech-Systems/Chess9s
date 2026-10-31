@@ -307,3 +307,61 @@ describe('the Dragon brings its pieces out through A5 (S68, decision 0019)', () 
     }
   });
 });
+
+describe('the loss rule in play (S74, decision 0021)', () => {
+  const values = { moon: 1000 };
+  // A light Rook on f3 attacks the Tail on c3 along the rank, or stands on f2 and doesn't.
+  const tail = (id: string, rook: string) =>
+    from(id, 'dragon', {
+      e1: 'light king',
+      [rook]: 'light rook',
+      c3: 'dragon dragon-tail',
+      c8: 'dragon moon',
+      e9: 'dark king',
+    });
+
+  it('heavy-3p: the Tail is the Dragon’s King, so an attack on it costs the Dragon', () => {
+    expect(evaluateFor(tail('heavy-3p', 'f2'), 'dragon', values)).toBeGreaterThan(
+      evaluateFor(tail('heavy-3p', 'f3'), 'dragon', values),
+    );
+  });
+
+  it('light-3p: the Tail only blocks, so an attack on it costs nothing', () => {
+    expect(evaluateFor(tail('light-3p', 'f2'), 'dragon', values)).toBe(
+      evaluateFor(tail('light-3p', 'f3'), 'dragon', values),
+    );
+  });
+
+  it('light-3p: the greedy Dragon takes a Queen rather than keep its Tail out of attack', () => {
+    const g = from('light-3p', 'dragon', {
+      e1: 'light king',
+      f3: 'light rook',
+      c3: 'dragon dragon-tail',
+      c8: 'dragon moon',
+      d7: 'dark queen',
+      e9: 'dark king',
+      i9: 'dark rook',
+    });
+    const m = greedyMove(g)!;
+    expect(`${m.from}-${m.to}`).toBe('c8-d7');
+  });
+
+  it('coast-only (heavy-3p, light-3p): a piece back on the Coast counts as not developed, as blocked', () => {
+    for (const id of ['heavy-3p', 'light-3p']) {
+      const at = (sq: string, extra: Partial<PlacedPiece> = {}) => {
+        const g = from(id, 'dragon', {
+          i9: 'dark king',
+          i1: 'light king',
+          e5: 'dragon dragon-tail',
+        });
+        return {
+          ...g,
+          position: { ...g.position, [sq]: { ...placed('dragon moon'), ...extra } },
+        };
+      };
+      const out = evaluateFor(at('b4', { left: ['coast'] }), 'dragon', values);
+      const back = evaluateFor(at('a3', { left: ['coast'] }), 'dragon', values);
+      expect(out - back, id).toBe(DEVELOPED);
+    }
+  });
+});
