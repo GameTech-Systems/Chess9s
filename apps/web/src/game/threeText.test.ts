@@ -185,6 +185,85 @@ describe('notices and the phase of the game', () => {
     });
   });
 
+  // S74 (decision 0021): the two new loss rules.
+  const at = (id: string, turn: string, pieces: Record<string, string>) => {
+    const info = listRulesets().find((r) => r.id === id)!;
+    const position = Object.fromEntries(
+      Object.entries(pieces).map(([sq, text]) => {
+        const [side, piece] = text.split(' ');
+        return [sq, { piece: piece!, side: side!, moved: true }];
+      }),
+    );
+    return newGame(createRules(id), info, { turn, position });
+  };
+  const move = (g: GameState, notation: string) =>
+    playMove(
+      g,
+      g.legal.find((m) => toNotation(m) === notation)!,
+    );
+  const tailMate = {
+    a1: 'dragon dark-dragon-head',
+    b7: 'dark king',
+    c9: 'light rook',
+    e2: 'light king',
+    e7: 'light knight',
+    f6: 'light bishop',
+    h8: 'dragon moon',
+    h9: 'dragon sun',
+    i6: 'light rook',
+    i8: 'dragon light-dragon-head',
+    i9: 'dragon dragon-tail',
+  };
+
+  it('Heavy-Handed: the Tail turns to stone where it stands and the Dragon loses its turn', () => {
+    const g = move(at('heavy-3p', 'light', tailMate), 'e7-g8');
+    expect(noticeLines(g)).toEqual([
+      "Light checkmated the Dragon's Tail; it turns to stone on i9. The Dragon plays on without it.",
+      'The Dragon loses its turn: the Tail turning to stone was its move.',
+    ]);
+    expect(g.turn).toBe('dark');
+  });
+
+  it('Heavy-Handed: the Tail checkmated once the four are gone puts the Dragon out', () => {
+    const g = move(
+      at('heavy-3p', 'dark', {
+        i9: 'dragon dragon-tail',
+        h9: 'dark knight',
+        g7: 'dark pawn',
+        f8: 'dark pawn',
+        h2: 'dark rook',
+        c1: 'dark rook',
+        g2: 'dark knight',
+        e2: 'dark king',
+        b7: 'light king',
+      }),
+      'c1-i1',
+    );
+    expect(noticeLines(g)).toEqual([
+      "Dark checkmated the Dragon's Tail; it turns to stone on i9.",
+      'Both Dragon Heads, the Sun and the Moon are gone, and the Tail is stone: the Dragon is out.',
+    ]);
+  });
+
+  it('Light-Handed: the four gone, the Tail turns to stone where it stands and the Dragon is out', () => {
+    const g = move(
+      at('light-3p', 'light', {
+        e1: 'light king',
+        c2: 'light rook',
+        e9: 'dark king',
+        d9: 'dark rook',
+        c6: 'dragon moon',
+        g4: 'dragon dragon-tail',
+      }),
+      'c2xc6',
+    );
+    expect(noticeLines(g)).toEqual([
+      "The Dragon's Tail turns to stone on g4.",
+      'Both Dragon Heads, the Sun and the Moon are gone, and the Tail is stone: the Dragon is out.',
+    ]);
+    expect(phaseLine(g)).toBe('The Dragon is out. Dark and Light play on.');
+  });
+
   it('says when the Dragon is out and the Kinged players play on', () => {
     const g = play('draft-3p', 'dragon-out');
     expect(phaseLine(g)).toBe('The Dragon is out. Dark and Light play on.');

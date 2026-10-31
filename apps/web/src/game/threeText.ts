@@ -57,6 +57,8 @@ export function noticeLines(game: GameState): string[] {
   const last = game.moves.at(-1);
   const events = last?.events ?? [];
   const taken = last?.capture === TAIL;
+  const g = three(game.rules, game.order);
+  const out = events.some((e) => e.kind === 'dragon-out');
   const lines = events.map((e) => {
     switch (e.kind) {
       case 'king-captured': {
@@ -69,19 +71,22 @@ export function noticeLines(game: GameState): string[] {
         return `${whose(e.side)} King was ${how} the Dragon. ${title(e.side)} is out and its pieces are stone.`;
       }
       case 'tail-stone':
-        return `${who(e.by)} ${taken ? 'captured' : 'checkmated'} the Dragon's Tail; it turns to stone on ${e.at}. The Dragon plays on without it.`.replace(
+        // Light-Handed Dragon: the Tail is never checkmated; it turns to stone with the Dragon out.
+        if (g.mode.defeat === 'pieces') return `The Dragon's Tail turns to stone on ${e.at}.`;
+        return `${who(e.by)} ${taken ? 'captured' : 'checkmated'} the Dragon's Tail; it turns to stone on ${e.at}.${out ? '' : ' The Dragon plays on without it.'}`.replace(
           /^the /,
           'The ',
         );
       case 'dragon-out':
         return 'Both Dragon Heads, the Sun and the Moon are gone, and the Tail is stone: the Dragon is out.';
       case 'turn-skipped':
-        return `${title(e.side)} had no legal move, so its turn was skipped.`;
+        return e.lost
+          ? `${title(who(e.side))} loses its turn: the Tail turning to stone was its move.`
+          : `${title(e.side)} had no legal move, so its turn was skipped.`;
     }
   });
   // A resignation, or a seat out of time, since the last move (neither is a move, decisions 0018, 0017).
   const resigned = game.resignations.filter((r) => r.after === game.moves.length);
-  const g = three(game.rules, game.order);
   for (const { side, timeout } of resigned) {
     if (game.result.status !== 'ongoing' || game.seats[side] !== 'out') continue;
     const did = timeout ? 'ran out of time' : 'resigned';

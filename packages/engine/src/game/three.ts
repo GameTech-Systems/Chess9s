@@ -53,8 +53,11 @@ export type GameEvent =
   | { kind: 'tail-stone'; by: string; at: string }
   /** Both Dragon Heads, the Sun and the Moon are gone and the Tail is in stone. */
   | { kind: 'dragon-out' }
-  /** The Dragon had no legal move with both Kings on the board (rule 15). */
-  | { kind: 'turn-skipped'; side: string };
+  /**
+   * The Dragon had no legal move with both Kings on the board (rule 15), or, with `lost`, its turn
+   * was lost to its Tail turning to stone where it stands (decision 0021).
+   */
+  | { kind: 'turn-skipped'; side: string; lost?: true };
 
 /** The pieces and seats a move is played on. */
 export interface Table {
