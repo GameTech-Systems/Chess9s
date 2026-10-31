@@ -1,0 +1,16 @@
+{
+  "$schema": "../schema/ruleset.schema.json",
+  "id": "heavy-3p",
+  "name": "Heavy-Handed Dragon",
+  "version": "0.1.0",
+  "status": "experimental",
+  "players": 3,
+  "description": "A 3-player game to test (D75, decision 0021), on Standard's rules: each Coast piece leaves the Coast first through A5 and may come back; on the Coast a Dragon piece attacks only the Coast, where Kings and Queens are the only other pieces that may enter. The Dragon loses only when the Sun, the Moon and both Dragon Heads are captured and the Tail is checkmated. A checkmated Tail turns to stone where it stands; if the Dragon plays on, it loses its next turn. Experimental; readings of decision 0021 provisional.",
+  "overrides": {
+    "king.range": 1,
+    "coast.3p.attackFrom": "coast-only",
+    "coast.3p.capturable": true,
+    "dragon.3p.defeat": "pieces-and-tail",
+    "tail.3p.stone": "where-it-stands"
+  }
+}

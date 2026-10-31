@@ -28,15 +28,17 @@ import f24 from '../../../rules/rulesets/draft-2p.json';
 import f25 from '../../../rules/rulesets/draft-3p.json';
 import f26 from '../../../rules/rulesets/easy-2p.json';
 import f27 from '../../../rules/rulesets/easy-3p.json';
-import f28 from '../../../rules/rulesets/standard-2p.json';
-import f29 from '../../../rules/rulesets/standard-3p.json';
-import f30 from '../../../rules/schema/board.schema.json';
-import f31 from '../../../rules/schema/lock.schema.json';
-import f32 from '../../../rules/schema/parameters.schema.json';
-import f33 from '../../../rules/schema/piece.schema.json';
-import f34 from '../../../rules/schema/ruleset.schema.json';
-import f35 from '../../../rules/schema/timeControls.schema.json';
-import f36 from '../../../rules/timeControls.json';
+import f28 from '../../../rules/rulesets/heavy-3p.json';
+import f29 from '../../../rules/rulesets/light-3p.json';
+import f30 from '../../../rules/rulesets/standard-2p.json';
+import f31 from '../../../rules/rulesets/standard-3p.json';
+import f32 from '../../../rules/schema/board.schema.json';
+import f33 from '../../../rules/schema/lock.schema.json';
+import f34 from '../../../rules/schema/parameters.schema.json';
+import f35 from '../../../rules/schema/piece.schema.json';
+import f36 from '../../../rules/schema/ruleset.schema.json';
+import f37 from '../../../rules/schema/timeControls.schema.json';
+import f38 from '../../../rules/timeControls.json';
 
 /** Every JSON file in rules/, keyed by its path under rules/. */
 export const rulesFiles: RulesFiles = {
@@ -68,13 +70,15 @@ export const rulesFiles: RulesFiles = {
   'rulesets/draft-3p.json': f25,
   'rulesets/easy-2p.json': f26,
   'rulesets/easy-3p.json': f27,
-  'rulesets/standard-2p.json': f28,
-  'rulesets/standard-3p.json': f29,
-  'schema/board.schema.json': f30,
-  'schema/lock.schema.json': f31,
-  'schema/parameters.schema.json': f32,
-  'schema/piece.schema.json': f33,
-  'schema/ruleset.schema.json': f34,
-  'schema/timeControls.schema.json': f35,
-  'timeControls.json': f36,
+  'rulesets/heavy-3p.json': f28,
+  'rulesets/light-3p.json': f29,
+  'rulesets/standard-2p.json': f30,
+  'rulesets/standard-3p.json': f31,
+  'schema/board.schema.json': f32,
+  'schema/lock.schema.json': f33,
+  'schema/parameters.schema.json': f34,
+  'schema/piece.schema.json': f35,
+  'schema/ruleset.schema.json': f36,
+  'schema/timeControls.schema.json': f37,
+  'timeControls.json': f38,
 };

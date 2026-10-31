@@ -74,8 +74,23 @@ export interface Outcome {
   result: GameResult | null;
 }
 
+/**
+ * How the Dragon loses (`dragon.3p.defeat`, decision 0021): `either` is the full rules of decision
+ * 0016, `both` needs the four captured and the Tail checkmated, `pieces` the four captured (the
+ * Tail is then never royal).
+ */
+type Defeat = 'either' | 'both' | 'pieces';
+const DEFEATS: Record<string, Defeat> = {
+  'tail-or-pieces-in-duel': 'either',
+  'pieces-and-tail': 'both',
+  'pieces-only': 'pieces',
+};
+
 interface Mode {
   firstMate: boolean;
+  defeat: Defeat;
+  /** A checkmated Tail turns to stone where it stands, and the Dragon playing on loses a turn. */
+  stoneInPlace: boolean;
   dragonCheck: boolean;
   lastKingCapture: boolean;
   tailAtDragonTurn: boolean;
@@ -110,13 +125,20 @@ export function three(rules: MoveRules, order: readonly string[]): Three {
   if (kinged.length !== 2 || dragon === undefined) {
     throw new RulesError('A 3-player game needs two Kinged sides and a side with the Tail');
   }
+  const firstMate = param(rules, 'endings.3p') === 'first-checkmate';
+  // Both apply with endings.3p = stones-and-duel (registry notes); rulesets resolved before S74
+  // don't have them and play as before.
+  const defeat = String(rules.values['dragon.3p.defeat'] ?? 'tail-or-pieces-in-duel');
+  if (!(defeat in DEFEATS)) throw new RulesError(`dragon.3p.defeat = ${defeat} is not an option`);
   return {
     rules,
     order,
     kinged: order.filter((s) => kinged.includes(s)),
     dragon,
     mode: {
-      firstMate: param(rules, 'endings.3p') === 'first-checkmate',
+      firstMate,
+      defeat: firstMate ? 'either' : DEFEATS[defeat]!,
+      stoneInPlace: !firstMate && rules.values['tail.3p.stone'] === 'where-it-stands',
       dragonCheck: param(rules, 'dragon.3p.givesCheck') === true,
       lastKingCapture: param(rules, 'dragon.3p.lastKing') === 'capture',
       tailAtDragonTurn: param(rules, 'tail.3p.mateTiming') === 'dragon-turn',
@@ -141,9 +163,13 @@ export function drawSeats(g: Three, seats: Seats): string[] {
   return g.order.filter((s) => seats[s] !== 'out');
 }
 
-/** Squares of the pieces of `side` that are royal now: its King, or the Dragon's active Tail. */
-function royals(g: Three, position: Position, seats: Seats, side: string): string[] {
+/**
+ * Squares of the pieces of `side` that are royal now: its King, or the Dragon's active Tail (never
+ * under `dragon.3p.defeat` = pieces-only, where the Tail only blocks).
+ */
+export function royals(g: Three, position: Position, seats: Seats, side: string): string[] {
   if (seats[side] !== 'active') return [];
+  if (side === g.dragon && g.mode.defeat === 'pieces') return [];
   return Object.keys(position).filter((at) => {
     const p = position[at]!;
     if (p.side !== side || p.stone === true) return false;
@@ -393,9 +419,25 @@ function matesAfter(g: Three, w: Work, mover: string, move: GeneratedMove, depth
   return mates;
 }
 
+/** Whether the Dragon still has any of the four: a Dragon Head, the Sun or the Moon. */
+const piecesLeft = (g: Three, position: Position): boolean =>
+  Object.values(position).some((p) => p.side === g.dragon && p.piece !== TAIL && p.stone !== true);
+
+/**
+ * Whether the Dragon plays on once its Tail is checkmated (or captured) now: with both Kinged
+ * players in (rule 9), and in the duel under `dragon.3p.defeat` = pieces-and-tail while any of
+ * the four is still on the board (decision 0021, D75.4 and D75.6). Otherwise the checkmate ends
+ * the game.
+ */
+const playsOn = (g: Three, w: Pick<Work, 'position' | 'seats'>, side: string): boolean =>
+  side === g.dragon &&
+  !g.mode.firstMate &&
+  (activeKinged(g, w.seats).length === 2 ||
+    (g.mode.defeat === 'both' && piecesLeft(g, w.position)));
+
 /** Whether the Tail checkmated now switches places with the checkmating piece (rule 9). */
-const swaps = (g: Three, seats: Seats, side: string): boolean =>
-  side === g.dragon && !g.mode.firstMate && activeKinged(g, seats).length === 2;
+const swaps = (g: Three, w: Pick<Work, 'position' | 'seats'>, side: string): boolean =>
+  playsOn(g, w, side) && !g.mode.stoneInPlace;
 
 /** Apply one checkmate; returns the variants it leads to (a swapped pawn's promotions). */
 function applyMate(
@@ -411,7 +453,7 @@ function applyMate(
     else kingTaken(g, w, mate.side, g.dragon, 'checkmate');
     return [{ work: w }];
   }
-  if (!swaps(g, w.seats, mate.side)) {
+  if (!playsOn(g, w, mate.side)) {
     w.result = win(owner, g.dragon, 'checkmate');
     return [{ work: w }];
   }
@@ -419,9 +461,9 @@ function applyMate(
 }
 
 /**
- * The Tail on its square turns to stone and, unless it stands on the center or the piece on `at`
- * (the checkmating or capturing piece) may not stand on its square, switches places with that piece
- * (rule 9). A swapped pawn promotes at once, one variant per choice. `keepSeat`: the Dragon seat
+ * The Tail on its square turns to stone and, unless it stands on the center, the piece on `at`
+ * (the checkmating or capturing piece) may not stand on its square, or `tail.3p.stone` =
+ * where-it-stands, switches places with that piece (rule 9). A swapped pawn promotes at once, one variant per choice. `keepSeat`: the Dragon seat
  * stays as it is (a capture that ends the game).
  */
 function stoneTail(
@@ -436,6 +478,7 @@ function stoneTail(
   const piece = w.position[at]!;
   const seats: Seats = keepSeat ? w.seats : { ...w.seats, [g.dragon]: 'tail-stone' };
   const stays =
+    g.mode.stoneInPlace ||
     (squareTypes(g.rules.board).get(tailAt) ?? []).includes(CENTER) ||
     !mayStand(g.rules, at, piece, tailAt);
   if (stays) {
@@ -461,7 +504,7 @@ function stoneTail(
 
 /** What decides a checkmate's effect, so a choice is offered only between different effects. */
 const effectKey = (g: Three, w: Work, mate: Mate, at: string): string =>
-  swaps(g, w.seats, mate.side) ? at : w.position[at]!.side;
+  swaps(g, w, mate.side) ? at : w.position[at]!.side;
 
 /**
  * Every outcome of one pseudo-legal move of `mover` that is legal: the move with its checkmate
@@ -505,7 +548,7 @@ function tailCaptures(g: Three, t: Table, mover: string, move: GeneratedMove): W
     events: [],
     result: null,
   };
-  const final = !swaps(g, t.seats, g.dragon);
+  const final = !playsOn(g, t, g.dragon);
   return stoneTail(g, before, move.from, final)
     .filter((v) => v.promotion === move.promotion)
     .map(({ work }) => {
@@ -595,20 +638,42 @@ function settleMove(
 }
 
 /**
- * Both Dragon Heads, the Sun and the Moon are gone (no Dragon piece but the Tail is left): in the
- * duel the last Kinged player wins; with the Tail in stone the Dragon is out (end table).
+ * Both Dragon Heads, the Sun and the Moon are gone (no Dragon piece but the Tail is left). Under
+ * the full rules: in the duel the last Kinged player wins; with the Tail in stone the Dragon is out
+ * (end table). Under `dragon.3p.defeat` = pieces-and-tail the Tail must be in stone too, in the duel
+ * as well (D75.4). Under pieces-only the Dragon loses now: in the duel the last Kinged player wins,
+ * otherwise the Dragon is out and its Tail turns to stone where it stands (D76.2, D76.4).
  */
 function dragonCaptured(g: Three, w: Work, mover: string) {
-  if (w.seats[g.dragon] === 'out') return;
-  const left = Object.values(w.position).some(
-    (p) => p.side === g.dragon && p.piece !== TAIL && p.stone !== true,
-  );
-  if (left) return;
-  if (inDuel(g, w.seats)) w.result = win(mover, g.dragon, 'dragon-captured');
-  else if (w.seats[g.dragon] === 'tail-stone') {
-    w.seats = { ...w.seats, [g.dragon]: 'out' };
-    w.events = [...w.events, { kind: 'dragon-out' }];
+  if (w.seats[g.dragon] === 'out' || piecesLeft(g, w.position)) return;
+  const stone = w.seats[g.dragon] === 'tail-stone';
+  if (inDuel(g, w.seats)) {
+    if (g.mode.defeat !== 'both' || stone) w.result = win(mover, g.dragon, 'dragon-captured');
+    return;
   }
+  if (g.mode.defeat === 'pieces') {
+    const tailAt = Object.keys(w.position).find((at) => {
+      const p = w.position[at]!;
+      return p.side === g.dragon && p.piece === TAIL && p.stone !== true;
+    });
+    if (tailAt !== undefined) {
+      w.position = { ...w.position, [tailAt]: { ...w.position[tailAt]!, stone: true } };
+      w.events = [...w.events, { kind: 'tail-stone', by: mover, at: tailAt }];
+    }
+  } else if (!stone) return;
+  w.seats = { ...w.seats, [g.dragon]: 'out' };
+  w.events = [...w.events, { kind: 'dragon-out' }];
+}
+
+/**
+ * The seats whose next turn a move's outcome takes away: the Dragon's, when its Tail was
+ * checkmated (or captured) by the move and turned to stone where it stands while the Dragon plays
+ * on (`tail.3p.stone` = where-it-stands; owner, S74 brief: the Tail turning to stone is the
+ * Dragon's move).
+ */
+export function turnsLost(g: Three, o: Pick<Outcome, 'events' | 'seats' | 'result'>): string[] {
+  if (!g.mode.stoneInPlace || o.result || o.seats[g.dragon] !== 'tail-stone') return [];
+  return o.events.some((e) => e.kind === 'tail-stone') ? [g.dragon] : [];
 }
 
 /**

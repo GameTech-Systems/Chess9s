@@ -22,9 +22,9 @@ const NEW: [string, string, unknown, unknown[]][] = [
   ['check.3p.exposedKing', 'King', 'not-allowed', ['not-allowed', 'counts-as-checkmate']],
 ];
 
-describe('registry 0.3.0 (decision 0016), 0.4.0 (decision 0019) and 0.5.0 (decision 0020)', () => {
-  it('has version 0.5.0', () => {
-    expect(registry.version).toBe('0.5.0');
+describe('registry 0.3.0 (decision 0016), 0.4.0 (decision 0019), 0.5.0 (decision 0020) and 0.6.0 (decision 0021)', () => {
+  it('has version 0.6.0', () => {
+    expect(registry.version).toBe('0.6.0');
   });
 
   it.each(NEW)('%s: group, default, options, 3 players, experimental', (id, group, def, options) => {

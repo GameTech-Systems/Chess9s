@@ -1,0 +1,577 @@
+{
+  "description": "S74: decision 0021 (Heavy-Handed and Light-Handed Dragon), one position per rule and per end the two rulesets add, on the real board and pieces. Pieces are \"<side> <piece>\", with \"stone\" for a stone and \"left\" for a Coast piece that has left the Coast once; every piece has moved. ruleset defaults to heavy-3p. seats default to all active; turn is the side to move. play lists moves in notation; expect is checked after them (events: those of the last move), then next is played and nextTurn and result checked.",
+  "cases": [
+    {
+      "name": "D75.2 coast-only: a Dragon Head on the Coast takes a Queen on the Coast, but not a Rook off it",
+      "turn": "dragon",
+      "pieces": {
+        "f1": "light king",
+        "f9": "dark king",
+        "e5": "dragon dragon-tail",
+        "a3": "dragon light-dragon-head left",
+        "a7": "dark queen",
+        "d6": "light rook"
+      },
+      "expect": {
+        "legalHas": ["a3xa7", "a3-b4", "a3-c5", "a3-a1"],
+        "legalLacks": ["a3xd6", "a3-d6"]
+      }
+    },
+    {
+      "name": "D75.2 coast-only: a Dragon piece on the Coast takes a King that entered the Coast",
+      "turn": "dragon",
+      "pieces": {
+        "a2": "light king",
+        "f9": "dark king",
+        "e5": "dragon dragon-tail",
+        "a3": "dragon sun left"
+      },
+      "play": ["a3xa2"],
+      "expect": {
+        "events": [
+          {
+            "kind": "king-captured",
+            "side": "light",
+            "how": "capture"
+          }
+        ],
+        "seats": {
+          "dark": "active",
+          "light": "out",
+          "dragon": "active"
+        },
+        "turn": "dark"
+      }
+    },
+    {
+      "name": "D75.2 coast-only, with Dragon check on: no check on a King off the Coast, but it guards a Coast square",
+      "overrides": {
+        "dragon.3p.givesCheck": true
+      },
+      "turn": "light",
+      "pieces": {
+        "b2": "light king",
+        "f9": "dark king",
+        "a2": "dragon moon left",
+        "a1": "dragon dark-dragon-head left",
+        "i1": "light rook",
+        "e5": "dragon dragon-tail"
+      },
+      "expect": {
+        "checkers": [],
+        "legalHas": ["i1-i2"],
+        "legalLacks": ["b2xa2"]
+      }
+    },
+    {
+      "name": "D75.5 Heavy: light checkmates the Tail while the four are on the board: it turns to stone where it stands, and the Dragon loses its next turn",
+      "turn": "light",
+      "pieces": {
+        "a1": "dragon dark-dragon-head",
+        "b7": "dark king",
+        "c9": "light rook",
+        "e2": "light king",
+        "e7": "light knight",
+        "f6": "light bishop",
+        "h8": "dragon moon",
+        "h9": "dragon sun",
+        "i6": "light rook",
+        "i8": "dragon light-dragon-head",
+        "i9": "dragon dragon-tail"
+      },
+      "play": ["e7-g8"],
+      "expect": {
+        "events": [
+          {
+            "kind": "tail-stone",
+            "by": "light",
+            "at": "i9"
+          },
+          {
+            "kind": "turn-skipped",
+            "side": "dragon"
+          }
+        ],
+        "seats": {
+          "dark": "active",
+          "light": "active",
+          "dragon": "tail-stone"
+        },
+        "at": {
+          "i9": "dragon dragon-tail stone",
+          "g8": "light knight"
+        },
+        "turn": "dark",
+        "result": {
+          "status": "ongoing"
+        },
+        "next": ["b7-b6", "e2-e3"],
+        "nextTurn": "dragon"
+      }
+    },
+    {
+      "name": "D75.6 Heavy: dark checkmates the Tail; light moves, then the Dragon's turn is lost",
+      "turn": "dark",
+      "pieces": {
+        "a1": "dragon dark-dragon-head",
+        "b7": "dark king",
+        "c9": "light rook",
+        "e2": "light king",
+        "e7": "dark knight",
+        "f6": "light bishop",
+        "h8": "dragon moon",
+        "h9": "dragon sun",
+        "i6": "light rook",
+        "i8": "dragon light-dragon-head",
+        "i9": "dragon dragon-tail"
+      },
+      "play": ["e7-g8"],
+      "expect": {
+        "events": [
+          {
+            "kind": "tail-stone",
+            "by": "dark",
+            "at": "i9"
+          }
+        ],
+        "seats": {
+          "dark": "active",
+          "light": "active",
+          "dragon": "tail-stone"
+        },
+        "at": {
+          "i9": "dragon dragon-tail stone",
+          "g8": "dark knight"
+        },
+        "turn": "light",
+        "next": ["e2-e3"],
+        "nextTurn": "dark"
+      }
+    },
+    {
+      "name": "tail.3p.stone = where-it-stands under the full rules: the Tail stays where it is and the Dragon loses its next turn",
+      "ruleset": "standard-3p",
+      "overrides": {
+        "tail.3p.stone": "where-it-stands"
+      },
+      "turn": "light",
+      "pieces": {
+        "a1": "dragon dark-dragon-head",
+        "b7": "dark king",
+        "c9": "light rook",
+        "e2": "light king",
+        "e7": "light knight",
+        "f6": "light bishop",
+        "h8": "dragon moon",
+        "h9": "dragon sun",
+        "i6": "light rook",
+        "i8": "dragon light-dragon-head",
+        "i9": "dragon dragon-tail"
+      },
+      "play": ["e7-g8"],
+      "expect": {
+        "events": [
+          {
+            "kind": "tail-stone",
+            "by": "light",
+            "at": "i9"
+          },
+          {
+            "kind": "turn-skipped",
+            "side": "dragon"
+          }
+        ],
+        "at": {
+          "i9": "dragon dragon-tail stone",
+          "g8": "light knight"
+        },
+        "turn": "dark"
+      }
+    },
+    {
+      "name": "D75.4 Heavy: the four captured while the Tail is still active: the Dragon plays on with the Tail",
+      "turn": "light",
+      "pieces": {
+        "e1": "light king",
+        "c2": "light rook",
+        "e9": "dark king",
+        "d9": "dark rook",
+        "c6": "dragon moon",
+        "g4": "dragon dragon-tail"
+      },
+      "play": ["c2xc6"],
+      "expect": {
+        "events": [],
+        "seats": {
+          "dark": "active",
+          "light": "active",
+          "dragon": "active"
+        },
+        "turn": "dragon",
+        "result": {
+          "status": "ongoing"
+        }
+      }
+    },
+    {
+      "name": "D75.5 Heavy: the four captured once the Tail is in stone: the Dragon is out and the Kinged players play on",
+      "turn": "light",
+      "seats": {
+        "dragon": "tail-stone"
+      },
+      "pieces": {
+        "e1": "light king",
+        "c2": "light rook",
+        "e9": "dark king",
+        "d9": "dark rook",
+        "c6": "dragon moon",
+        "g4": "dragon dragon-tail stone"
+      },
+      "play": ["c2xc6"],
+      "expect": {
+        "events": [
+          {
+            "kind": "dragon-out"
+          }
+        ],
+        "seats": {
+          "dark": "active",
+          "light": "active",
+          "dragon": "out"
+        },
+        "turn": "dark",
+        "result": {
+          "status": "ongoing"
+        }
+      }
+    },
+    {
+      "name": "D75.5 Heavy: the Tail checkmated once the four are captured, both Kings in: it turns to stone where it stands and the Dragon is out",
+      "turn": "dark",
+      "pieces": {
+        "i9": "dragon dragon-tail",
+        "h9": "dark knight",
+        "g7": "dark pawn",
+        "f8": "dark pawn",
+        "h2": "dark rook",
+        "c1": "dark rook",
+        "g2": "dark knight",
+        "e2": "dark king",
+        "b7": "light king"
+      },
+      "play": ["c1-i1"],
+      "expect": {
+        "events": [
+          {
+            "kind": "tail-stone",
+            "by": "dark",
+            "at": "i9"
+          },
+          {
+            "kind": "dragon-out"
+          }
+        ],
+        "seats": {
+          "dark": "active",
+          "light": "active",
+          "dragon": "out"
+        },
+        "at": {
+          "i9": "dragon dragon-tail stone",
+          "i1": "dark rook"
+        },
+        "turn": "light",
+        "result": {
+          "status": "ongoing"
+        }
+      }
+    },
+    {
+      "name": "D75.4 Heavy duel: the Tail checkmated once the four are captured: the last Kinged player wins",
+      "turn": "dark",
+      "seats": {
+        "light": "out"
+      },
+      "pieces": {
+        "i9": "dragon dragon-tail",
+        "h9": "dark knight",
+        "g7": "dark pawn",
+        "f8": "dark pawn",
+        "h2": "dark rook",
+        "c1": "dark rook",
+        "g2": "dark knight",
+        "e2": "dark king",
+        "b7": "light pawn stone"
+      },
+      "play": ["c1-i1"],
+      "expect": {
+        "result": {
+          "status": "win",
+          "winner": "dark",
+          "loser": "dragon",
+          "reason": "checkmate"
+        }
+      }
+    },
+    {
+      "name": "D75.4 Heavy duel: the last Kinged player checkmates the Tail while the four are on the board: stone where it stands, the Dragon plays on and loses its turn",
+      "turn": "dark",
+      "seats": {
+        "light": "out"
+      },
+      "pieces": {
+        "e3": "light pawn stone",
+        "b7": "dark king",
+        "i9": "dragon dragon-tail",
+        "h9": "dragon sun",
+        "h8": "dragon moon",
+        "i8": "dragon light-dragon-head",
+        "a1": "dragon dark-dragon-head",
+        "c9": "dark rook",
+        "f6": "dark bishop",
+        "i6": "dark rook",
+        "e7": "dark knight"
+      },
+      "play": ["e7-g8"],
+      "expect": {
+        "events": [
+          {
+            "kind": "tail-stone",
+            "by": "dark",
+            "at": "i9"
+          },
+          {
+            "kind": "turn-skipped",
+            "side": "dragon"
+          }
+        ],
+        "seats": {
+          "dark": "active",
+          "light": "out",
+          "dragon": "tail-stone"
+        },
+        "at": {
+          "i9": "dragon dragon-tail stone"
+        },
+        "turn": "dark",
+        "result": {
+          "status": "ongoing"
+        }
+      }
+    },
+    {
+      "name": "D75.4 Heavy duel: the last Kinged player captures the last of the four with the Tail in stone and wins",
+      "turn": "dark",
+      "seats": {
+        "light": "out",
+        "dragon": "tail-stone"
+      },
+      "pieces": {
+        "e3": "light pawn stone",
+        "b7": "dark king",
+        "c9": "dark rook",
+        "c6": "dragon moon",
+        "g4": "dragon dragon-tail stone"
+      },
+      "play": ["c9xc6"],
+      "expect": {
+        "result": {
+          "status": "win",
+          "winner": "dark",
+          "loser": "dragon",
+          "reason": "dragon-captured"
+        }
+      }
+    },
+    {
+      "name": "D75.4 Heavy duel: the last of the four captured while the Tail is active: the Dragon plays on",
+      "turn": "dark",
+      "seats": {
+        "light": "out"
+      },
+      "pieces": {
+        "e3": "light pawn stone",
+        "b7": "dark king",
+        "c9": "dark rook",
+        "c6": "dragon moon",
+        "g4": "dragon dragon-tail"
+      },
+      "play": ["c9xc6"],
+      "expect": {
+        "events": [],
+        "seats": {
+          "dark": "active",
+          "light": "out",
+          "dragon": "active"
+        },
+        "turn": "dragon",
+        "result": {
+          "status": "ongoing"
+        }
+      }
+    },
+    {
+      "name": "the full rules, for contrast: in the duel the last of the four captured wins whatever the Tail",
+      "ruleset": "standard-3p",
+      "turn": "dark",
+      "seats": {
+        "light": "out"
+      },
+      "pieces": {
+        "e3": "light pawn stone",
+        "b7": "dark king",
+        "c9": "dark rook",
+        "c6": "dragon moon",
+        "g4": "dragon dragon-tail"
+      },
+      "play": ["c9xc6"],
+      "expect": {
+        "result": {
+          "status": "win",
+          "winner": "dark",
+          "loser": "dragon",
+          "reason": "dragon-captured"
+        }
+      }
+    },
+    {
+      "name": "D76.1 Light: the Tail is not the Dragon's King: an attack on it is no check, and the Dragon may leave it attacked",
+      "ruleset": "light-3p",
+      "turn": "dragon",
+      "pieces": {
+        "e1": "light king",
+        "f3": "light rook",
+        "c3": "dragon dragon-tail",
+        "c8": "dragon sun",
+        "e9": "dark king"
+      },
+      "expect": {
+        "checkers": [],
+        "legalHas": ["c8-c7", "c3-d3", "c3-c4"],
+        "legalLacks": ["c3xf3"]
+      }
+    },
+    {
+      "name": "D76.1 Light: the Tail is never checkmated",
+      "ruleset": "light-3p",
+      "turn": "light",
+      "pieces": {
+        "a1": "dragon dark-dragon-head",
+        "b7": "dark king",
+        "c9": "light rook",
+        "e2": "light king",
+        "e7": "light knight",
+        "f6": "light bishop",
+        "h8": "dragon moon",
+        "h9": "dragon sun",
+        "i6": "light rook",
+        "i8": "dragon light-dragon-head",
+        "i9": "dragon dragon-tail"
+      },
+      "play": ["e7-g8"],
+      "expect": {
+        "events": [],
+        "seats": {
+          "dark": "active",
+          "light": "active",
+          "dragon": "active"
+        },
+        "turn": "dragon"
+      }
+    },
+    {
+      "name": "D76.1 Light: a knight attacking the Tail may not take it",
+      "ruleset": "light-3p",
+      "turn": "light",
+      "pieces": {
+        "b7": "dark king",
+        "e2": "light king",
+        "g8": "light knight",
+        "h8": "dragon moon",
+        "i9": "dragon dragon-tail"
+      },
+      "expect": {
+        "legalLacks": ["g8xi9"]
+      }
+    },
+    {
+      "name": "D76.4 Light: the four captured with both Kings in: the Dragon is out and the Tail turns to stone where it stands",
+      "ruleset": "light-3p",
+      "turn": "light",
+      "pieces": {
+        "e1": "light king",
+        "c2": "light rook",
+        "e9": "dark king",
+        "d9": "dark rook",
+        "c6": "dragon moon",
+        "g4": "dragon dragon-tail"
+      },
+      "play": ["c2xc6"],
+      "expect": {
+        "events": [
+          {
+            "kind": "tail-stone",
+            "by": "light",
+            "at": "g4"
+          },
+          {
+            "kind": "dragon-out"
+          }
+        ],
+        "seats": {
+          "dark": "active",
+          "light": "active",
+          "dragon": "out"
+        },
+        "at": {
+          "g4": "dragon dragon-tail stone"
+        },
+        "turn": "dark",
+        "result": {
+          "status": "ongoing"
+        },
+        "next": ["d9-d8"],
+        "nextTurn": "light"
+      }
+    },
+    {
+      "name": "D76.2 Light duel: the last Kinged player captures the last of the four and wins",
+      "ruleset": "light-3p",
+      "turn": "dark",
+      "seats": {
+        "light": "out"
+      },
+      "pieces": {
+        "e3": "light pawn stone",
+        "b7": "dark king",
+        "c9": "dark rook",
+        "c6": "dragon moon",
+        "g4": "dragon dragon-tail"
+      },
+      "play": ["c9xc6"],
+      "expect": {
+        "result": {
+          "status": "win",
+          "winner": "dark",
+          "loser": "dragon",
+          "reason": "dragon-captured"
+        }
+      }
+    },
+    {
+      "name": "D76.3 Light: the Tail moves like a Dragon Head, first off the Coast through A5, and captures nothing",
+      "ruleset": "light-3p",
+      "turn": "dragon",
+      "pieces": {
+        "f1": "light king",
+        "f9": "dark king",
+        "a5": "dragon dragon-tail",
+        "c7": "dark pawn"
+      },
+      "expect": {
+        "legalHas": ["a5-b6", "a5-e5", "a5-a1", "a5-b4"],
+        "legalLacks": ["a5xc7"]
+      }
+    }
+  ]
+}

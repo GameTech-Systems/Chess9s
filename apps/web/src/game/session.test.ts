@@ -69,6 +69,8 @@ describe('the ruleset list', () => {
       'standard-3p',
       'easy-3p',
       'draft-3p',
+      'heavy-3p',
+      'light-3p',
     ]);
     expect(list.map((r) => r.name)).toEqual([
       'Standard',
@@ -77,6 +79,8 @@ describe('the ruleset list', () => {
       'Standard (3-player)',
       'Easy Start (3-player)',
       'Good Practice (3-player)',
+      'Heavy-Handed Dragon',
+      'Light-Handed Dragon',
     ]);
     expect(list.filter((r) => r.isDefault).map((r) => r.id)).toEqual(['standard-2p']);
     expect(list.filter((r) => r.defaultFor).map((r) => [r.id, r.defaultFor])).toEqual([

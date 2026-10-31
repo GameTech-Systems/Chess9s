@@ -59,6 +59,8 @@
     "setup.swapKingQueen": false,
     "extendedPlay.enabled": false,
     "coast.3p.attackFrom": "allowed",
-    "turn.3p.order": "dark-light-dragon"
+    "turn.3p.order": "dark-light-dragon",
+    "dragon.3p.defeat": "tail-or-pieces-in-duel",
+    "tail.3p.stone": "swap"
   }
 }

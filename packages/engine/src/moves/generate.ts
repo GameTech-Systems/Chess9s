@@ -290,6 +290,11 @@ interface Context {
   env: Env;
   /** Its `moveOnly` condition holds here: it captures and attacks nothing (S71). */
   disarmed: boolean;
+  /**
+   * Its `attackOnly` condition holds here: the only squares it captures on and attacks (S74);
+   * null when it doesn't.
+   */
+  attackOn: Set<string> | null;
   /** access() results for this piece in this situation, by move (`null` for the piece alone). */
   access: Map<Move | null, Access>;
 }
@@ -318,9 +323,33 @@ function context(rules: MoveRules, from: string, placed: PlacedPiece): Context {
     forward,
     env,
     disarmed: piece.moveOnly !== undefined && holds(piece.moveOnly.when, env),
+    attackOn:
+      piece.attackOnly !== undefined && holds(piece.attackOnly.when, env)
+        ? squaresOfTypes(rules, piece.attackOnly.on)
+        : null,
     access,
   };
 }
+
+const typedSquares = new WeakMap<MoveRules, Map<string, Set<string>>>();
+
+/** The squares of the board that have any of `types`, worked out once per ruleset. */
+function squaresOfTypes(rules: MoveRules, types: readonly string[]): Set<string> {
+  let byKey = typedSquares.get(rules);
+  if (!byKey) typedSquares.set(rules, (byKey = new Map()));
+  const key = types.join('+');
+  let found = byKey.get(key);
+  if (!found) {
+    const all = squareTypes(rules.board);
+    found = new Set(COORDS.filter((at) => (all.get(at) ?? []).some((t) => types.includes(t))));
+    byKey.set(key, found);
+  }
+  return found;
+}
+
+/** Whether the piece in this context may capture on, and attacks, `to` (moveOnly, attackOnly). */
+const armedAt = (ctx: Context, to: string): boolean =>
+  !ctx.disarmed && (ctx.attackOn === null || ctx.attackOn.has(to));
 
 /** Whether a square rule covers the square `at` for this piece: its type, owner and file. */
 function covers(rules: MoveRules, rule: SquareRule, at: string, placed: PlacedPiece): boolean {
@@ -529,8 +558,9 @@ export function movesFrom(
   const promotions = (to: string) => promotionTargets(rules, ctx, from, to, lost);
 
   walk(rules, position, from, ctx, (to, move, step, n = 0) => {
-    if (ctx.disarmed && move.capture === 'capture-only') return;
-    const mode = ctx.disarmed ? 'move-only' : (move.capture ?? 'move-or-capture');
+    const armed = armedAt(ctx, to);
+    if (!armed && move.capture === 'capture-only') return;
+    const mode = armed ? (move.capture ?? 'move-or-capture') : 'move-only';
     const occupant = position[to];
     let capture: string | undefined;
     let captureAt: string | undefined;
@@ -626,14 +656,16 @@ export function castlePath({ from, to }: { from: string; to: string }): string[]
  * standing there. Built from the same walk as its moves, so every parameter that shapes
  * movement shapes attacks too. Squares of its own side's pieces count (they are defended);
  * whether the piece standing on a square may be captured does not. None while its `moveOnly`
- * condition holds (it still blocks other pieces' lines). Sorted; none if empty.
+ * condition holds, and only squares of its `attackOnly` types while that one holds (it still
+ * blocks other pieces' lines). Sorted; none if empty.
  */
 export function attacksFrom(rules: MoveRules, position: Position, from: string): string[] {
   return reach(rules, position, from, false);
 }
 
 /**
- * The squares the piece on `from` would attack if its `moveOnly` condition did not hold: where its
+ * The squares the piece on `from` would attack if its `moveOnly` and `attackOnly` conditions did
+ * not hold: where its
  * moves go, as attacksFrom counts them. The same as attacksFrom for any other piece. For playing
  * heuristics that ask where a piece could go, such as the Tail's way out (S71).
  */
@@ -648,7 +680,7 @@ function reach(rules: MoveRules, position: Position, from: string, armed: boolea
   if (ctx.disarmed && !armed) return [];
   const squares = new Set<string>();
   walk(rules, position, from, ctx, (to, move) => {
-    if (move.capture !== 'move-only') squares.add(to);
+    if (move.capture !== 'move-only' && (armed || armedAt(ctx, to))) squares.add(to);
   });
   return [...squares].sort();
 }
@@ -676,7 +708,7 @@ export function attackReach(
     from,
     ctx,
     (to, move) => {
-      if (move.capture !== 'move-only') attacks.add(to);
+      if (move.capture !== 'move-only' && armedAt(ctx, to)) attacks.add(to);
     },
     (at) => reads.add(at),
   );
