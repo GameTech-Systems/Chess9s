@@ -1,0 +1,17 @@
+{
+  "$schema": "../schema/ruleset.schema.json",
+  "id": "heavy-limited-3p",
+  "name": "Heavy-Handed Dragon, Limited",
+  "version": "0.1.0",
+  "status": "experimental",
+  "players": 3,
+  "description": "A 3-player game to test (D80, decision 0022): the Heavy-Handed Dragon (heavy-3p 0.1.0) with the Dragon Heads limited to 4 squares a move. Experimental; readings of decision 0022 provisional.",
+  "overrides": {
+    "king.range": 1,
+    "coast.3p.attackFrom": "coast-only",
+    "coast.3p.capturable": true,
+    "dragon.3p.defeat": "pieces-and-tail",
+    "tail.3p.stone": "where-it-stands",
+    "dragonHead.range": 4
+  }
+}
