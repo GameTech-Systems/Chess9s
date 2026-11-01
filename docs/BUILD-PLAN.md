@@ -432,8 +432,16 @@ Decisions: D75 to D78.
 Six screens, as S72 ran them (D78): Actions → **Sim depth 2**, games 400, depths `1,2`, ruleset `heavy-3p` and `light-3p`, each at `turn.3p.order` = dark-light-dragon (no `set`), light-dragon-dark and dragon-dark-light (`set`, `label` per order). Commit the reports to `docs/fairness/` and compare them with the S72 table in the handoff. Full 2,000-game runs only for one that screens inside 28–38% at both depths.
 Done when: the six reports are committed, with the comparison in the handoff.
 
-### S76 — Owner review of the S75 screens · Owner with Claude in chat · Opus 5.5 · medium · `todo`
+### S76 — Owner review of the S75 screens · Owner with Claude in chat · Opus 5.5 · medium · `done`
 The owner reads the six screens and picks what comes next, as in S73. Claude records the calls and builds nothing the owner has not chosen.
+Done 31 Oct 2026 in chat. The S75 handoff table had four rows in the reports' turn-order column order, not dark / light / Dragon; read correctly, light is last at depth 2 in all six screens (4.8–11.4%), and the Dragon takes light's King about three times as often as dark's. Every clockwise order seats light just before the Dragon; S72's reversed order (`.turn-order` against `.old-rules`, the same rules otherwise) moved the collapse to dark (dark 5.6%, light 24.6%), so it follows the seat, not the color. At depth 1 it runs the other way (the seat after the Dragon loses its King more), which points at the search horizon: depth 2 sees a seat's move and the next seat's reply, never the third seat's. The owner chose D79's default: a depth-3 screen before any rule change (S77).
+
+### S77 — Depth-3 diagnostic screen of Heavy-Handed Dragon · Claude (workflow) · Opus 5.5 · medium · `in progress`
+Actions → **Sim depth 2**, ruleset `heavy-3p`, depths `3`, `set` `turn.3p.order=dark-light-dragon` (the default, so the report gets its own name), `label` `depth3`, report `docs/fairness/heavy-3p.depth3`. A screen, not a full run (D79). Compare light's score and King captures with `heavy-3p` at depth 2: if light recovers, the depth-2 measure misleads for 3 players; if not, the seat before the Dragon is the problem. Commit the report and add the comparison to the handoff.
+Done when: the report is committed, with the comparison in the handoff.
+
+### S78 — Owner review of the depth-3 screen · Owner with Claude in chat · Opus 5.5 · medium · `todo`
+The owner reads S77 and picks what comes next: the 3-player balance measure, alternating the turn cycle's direction, or a rule for the seat before the Dragon. Claude records the calls and builds nothing the owner has not chosen.
 
 ## Later phases
 
@@ -504,6 +512,7 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D76 | Light-Handed Dragon (3-player) | Decided (owner, 31 Oct 2026): as D75, but the Tail only blocks (attacks nothing, can't be captured, never checkmated) and moves like a Dragon Head, first off the Coast through A5 (confirmed, S74 brief); the Dragon loses when the Sun, Moon and both Heads are captured; with both Kings in, the Tail then turns to stone where it stands. Ruleset `light-3p`, experimental (decision 0021) | S74 |
 | D77 | 3-player turn orders | Decided (owner, 31 Oct 2026): clockwise only: dark-light-dragon (default), light-dragon-dark, dragon-dark-light; dark-dragon-light withdrawn (decision 0021) | S74 |
 | D78 | What to screen after S73 | Default (reading of the owner's words): both new rulesets at each clockwise order, six 400-game screens at depths 1 and 2; full runs only for one inside 28–38% at both depths (decision 0021) | S75 |
+| D79 | Next step on the seat before the Dragon (after S75) | Decided (owner, 31 Oct 2026): a depth-3 diagnostic screen of `heavy-3p` first, no rule change yet; alternating the cycle direction and a rule for that seat stay options for S78 | S77 |
 
 ## Ledger sync format
 
