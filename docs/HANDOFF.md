@@ -1,6 +1,6 @@
 # Handoff
 
-Updated 2026-10-31 by S76 (Opus 5.5 · chat · medium). `/end-session` rewrites this file; keep it under 40 lines.
+Updated 2026-11-01 by S77 (Sonnet 5.5 · medium). `/end-session` rewrites this file; keep it under 40 lines.
 
 ## State
 - Phase 6. S76 done in chat: the owner reviewed the S75 screens and chose D79 (a depth-3 screen before any rule change).
@@ -17,10 +17,13 @@ Updated 2026-10-31 by S76 (Opus 5.5 · chat · medium). `/end-session` rewrites 
 
 - Reading: at depth 2 light is last in all six (Dragon takes light's King 216–293 times per 400 games, dark's 72–83). Every clockwise order seats light just before the Dragon; S72's reversed order moved the collapse to dark (`standard-3p.turn-order` 5.6 / 24.6 / 69.8 against `.old-rules` 23.6 / 5.9 / 70.5). It follows the seat, not the color. At depth 1 the seat after the Dragon loses its King more, so the depth-2 search horizon (a seat's move and the next seat's reply, never the third seat's) likely drives much of it.
 
+- S77 result (workflow run 41277628275, `docs/fairness/heavy-3p.depth3.md`, 149 games, screening only). Dark / light / Dragon: depth 3 24.5 / 24.8 / 50.7 against depth 2 27.5 / 10.5 / 62.0. Light's King is captured in 58 of 149 games (39%) against 222 of 400 (56%); dark's in 48 (32%) against 76 (19%). Light recovers to dark's level and the Dragon stays far over the band (interval 42.7–58.6%); 38 draws, none capped.
+- Reading: the depth-2 horizon explains most of light's collapse, but the Dragon is still about twice either Kinged seat at depth 3, so depth 2 misleads for 3 players and the Dragon edge remains. Not a full run (149 games).
+
 ## Next session
-**S77 — Depth-3 diagnostic screen of Heavy-Handed Dragon** · Opus 5.5 · effort medium
-Why: tells the search horizon from the seat itself (D79). The workflow run is dispatched from chat; S77 collects the report, commits it and compares it with `heavy-3p` at depth 2.
-Start with: `/start-session S77`
+**S78 — Owner review of the depth-3 screen** · Opus 5.5 · effort medium · chat with the owner
+Why: pick the 3-player balance measure (depth 3 or higher?), alternating the turn cycle's direction, or a rule for the seat before the Dragon. Claude builds nothing the owner has not chosen.
+Start with: `/start-session S78`
 
 ## Decisions in effect for the next step
 - D79: depth-3 screen first, no rule change. D60: every 3-player ruleset stays experimental.
