@@ -1,0 +1,18 @@
+{
+  "$schema": "../schema/ruleset.schema.json",
+  "id": "light-limited-3p",
+  "name": "Light-Handed Dragon, Limited",
+  "version": "0.1.0",
+  "status": "experimental",
+  "players": 3,
+  "description": "A 3-player game to test (D80, decision 0022): the Light-Handed Dragon (light-3p 0.1.0) with the Dragon Heads limited to 4 squares a move. The Tail moves like a Dragon Head, so it is limited to 4 too. Experimental; readings of decision 0022 provisional.",
+  "overrides": {
+    "king.range": 1,
+    "coast.3p.attackFrom": "coast-only",
+    "coast.3p.capturable": true,
+    "dragon.3p.defeat": "pieces-only",
+    "tail.3p.stone": "where-it-stands",
+    "tail.3p.captures": "none",
+    "dragonHead.range": 4
+  }
+}

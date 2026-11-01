@@ -440,8 +440,15 @@ Done 31 Oct 2026 in chat. The S75 handoff table had four rows in the reports' tu
 Actions → **Sim depth 2**, ruleset `heavy-3p`, depths `3`, `set` `turn.3p.order=dark-light-dragon` (the default, so the report gets its own name), `label` `depth3`, report `docs/fairness/heavy-3p.depth3`. A screen, not a full run (D79). Compare light's score and King captures with `heavy-3p` at depth 2: if light recovers, the depth-2 measure misleads for 3 players; if not, the seat before the Dragon is the problem. Commit the report and add the comparison to the handoff.
 Done when: the report is committed, with the comparison in the handoff.
 
-### S78 — Owner review of the depth-3 screen · Owner with Claude in chat · Opus 5.5 · medium · `todo`
+### S78 — Owner review of the depth-3 screen · Owner with Claude in chat · Opus 5.5 · medium · `done`
 The owner reads S77 and picks what comes next: the 3-player balance measure, alternating the turn cycle's direction, or a rule for the seat before the Dragon. Claude records the calls and builds nothing the owner has not chosen.
+
+### S79 — Limited Dragon rulesets and screens · Claude · Sonnet 5.5 · medium · `in progress`
+Ship S77 (done, PR 69). Build D80 as data (decision 0022): `heavy-limited-3p` and `light-limited-3p` 0.1.0, each its base plus `dragonHead.range` 4, tests (rulesets, a Head and the Tail capped at 4, four recorded games), RULES.md. Dispatch the screens from Actions → **Sim depth 2**: depth 3 (about 150 games, default order) of `light-3p`, `heavy-limited-3p` and `light-limited-3p`; 400 games at depths 1 and 2 of both Limited rulesets.
+Done when: the rulesets and tests are merged and the screens are dispatched.
+
+### S80 — Collect and compare the Limited screens · Claude (workflow) · Opus 5.5 · medium · `todo`
+Collect the S79 reports, commit them as in S77, and compare with S75 and `heavy-3p` depth 3. Report seats as dark / light / Dragon.
 
 ## Later phases
 
@@ -513,6 +520,7 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D77 | 3-player turn orders | Decided (owner, 31 Oct 2026): clockwise only: dark-light-dragon (default), light-dragon-dark, dragon-dark-light; dark-dragon-light withdrawn (decision 0021) | S74 |
 | D78 | What to screen after S73 | Default (reading of the owner's words): both new rulesets at each clockwise order, six 400-game screens at depths 1 and 2; full runs only for one inside 28–38% at both depths (decision 0021) | S75 |
 | D79 | Next step on the seat before the Dragon (after S75) | Decided (owner, 31 Oct 2026): a depth-3 diagnostic screen of `heavy-3p` first, no rule change yet; alternating the cycle direction and a rule for that seat stay options for S78 | S77 |
+| D80 | Limited Dragon (Heads move at most 4 squares) | Decided (owner, 1 Nov 2026): `heavy-limited-3p` and `light-limited-3p` = the 0.1.0 rulesets + `dragonHead.range` 4, plus a depth-3 screen of `light-3p` as baseline (decision 0022) | S79 |
 
 ## Ledger sync format
 
