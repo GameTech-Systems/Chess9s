@@ -428,7 +428,7 @@ Build [decision 0021](decisions/0021-heavy-and-light-handed-dragon.md) as data, 
 Done when: both rulesets play to each end in their tables in the engine and the browser (hot-seat), all checks pass, and the S75 screens are dispatched.
 Decisions: D75 to D78.
 
-### S75 — Screens of Heavy-Handed and Light-Handed Dragon · Claude (workflow) · Opus 5.5 · medium · `todo`
+### S75 — Screens of Heavy-Handed and Light-Handed Dragon · Claude (workflow) · Opus 5.5 · medium · `done`
 Six screens, as S72 ran them (D78): Actions → **Sim depth 2**, games 400, depths `1,2`, ruleset `heavy-3p` and `light-3p`, each at `turn.3p.order` = dark-light-dragon (no `set`), light-dragon-dark and dragon-dark-light (`set`, `label` per order). Commit the reports to `docs/fairness/` and compare them with the S72 table in the handoff. Full 2,000-game runs only for one that screens inside 28–38% at both depths.
 Done when: the six reports are committed, with the comparison in the handoff.
 
