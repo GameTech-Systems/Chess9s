@@ -1,37 +1,24 @@
 # Handoff
 
-Updated 2026-11-01 by S77 (Sonnet 5.5 · medium). `/end-session` rewrites this file; keep it under 40 lines.
+Updated 2026-11-01 by S79 (Sonnet 5.5 · medium). `/end-session` rewrites this file; keep it under 40 lines.
 
 ## State
-- Phase 6. S76 done in chat: the owner reviewed the S75 screens and chose D79 (a depth-3 screen before any rule change).
-- Correction: S75's table copied four rows in the reports' turn-order column order. Seat scores, dark / light / Dragon, depth 1 then depth 2:
-
-| Ruleset · order | Depth 1 | Depth 2 |
-| --- | --- | --- |
-| heavy · dark-light-dragon | 36.6 / 28.6 / 34.8 | 27.5 / 10.5 / 62.0 |
-| heavy · light-dragon-dark | 35.3 / 33.4 / 31.4 | 30.5 / 10.0 / 59.5 |
-| heavy · dragon-dark-light | 34.3 / 28.1 / 37.6 | 27.9 / 11.4 / 60.8 |
-| light · dark-light-dragon | 55.8 / 32.9 / 11.4 | 22.5 / 4.8 / 72.8 |
-| light · light-dragon-dark | 57.4 / 32.8 / 9.9 | 21.3 / 5.8 / 73.0 |
-| light · dragon-dark-light | 52.4 / 34.9 / 12.8 | 26.3 / 4.8 / 69.0 |
-
-- Reading: at depth 2 light is last in all six (Dragon takes light's King 216–293 times per 400 games, dark's 72–83). Every clockwise order seats light just before the Dragon; S72's reversed order moved the collapse to dark (`standard-3p.turn-order` 5.6 / 24.6 / 69.8 against `.old-rules` 23.6 / 5.9 / 70.5). It follows the seat, not the color. At depth 1 the seat after the Dragon loses its King more, so the depth-2 search horizon (a seat's move and the next seat's reply, never the third seat's) likely drives much of it.
-
-- S77 result (workflow run 41277628275, `docs/fairness/heavy-3p.depth3.md`, 149 games, screening only). Dark / light / Dragon: depth 3 24.5 / 24.8 / 50.7 against depth 2 27.5 / 10.5 / 62.0. Light's King is captured in 58 of 149 games (39%) against 222 of 400 (56%); dark's in 48 (32%) against 76 (19%). Light recovers to dark's level and the Dragon stays far over the band (interval 42.7–58.6%); 38 draws, none capped.
-- Reading: the depth-2 horizon explains most of light's collapse, but the Dragon is still about twice either Kinged seat at depth 3, so depth 2 misleads for 3 players and the Dragon edge remains. Not a full run (149 games).
+- Phase 6. S77 merged (PR 69): `heavy-3p` at depth 3 is 24.5 / 24.8 / 50.7 (dark / light / Dragon) against 27.5 / 10.5 / 62.0 at depth 2. Light recovers to dark's level, the Dragon stays far over the band, so depth 2 misleads for 3 players (`docs/fairness/heavy-3p.depth3.md`, 149 games, a screen).
+- S79 built D80 as data (decision 0022): `heavy-limited-3p` "Heavy-Handed Dragon, Limited" and `light-limited-3p` "Light-Handed Dragon, Limited", each 0.1.0 experimental = its base + `dragonHead.range` 4 (the Light Tail reads it too). No engine change. Tests: ruleset diffs, a Head and the Tail capped at 4, four recorded greedy games (`three-player-limited.json`); 2,622 tests green.
+- Screens dispatched from Actions → **Sim depth 2** after the merge (see the PR thread / Actions list): depth 3 about 150 games, default order, of `light-3p`, `heavy-limited-3p`, `light-limited-3p`; 400 games at depths 1 and 2 of both Limited rulesets.
 
 ## Next session
-**S78 — Owner review of the depth-3 screen** · Opus 5.5 · effort medium · chat with the owner
-Why: pick the 3-player balance measure (depth 3 or higher?), alternating the turn cycle's direction, or a rule for the seat before the Dragon. Claude builds nothing the owner has not chosen.
-Start with: `/start-session S78`
+**S80 — Collect and compare the Limited screens** · Opus 5.5 · effort medium
+Why: commit the five-plus reports as in S77 and compare with S75 and `heavy-3p` depth 3.
+Start with: `/start-session S80`
 
 ## Decisions in effect for the next step
-- D79: depth-3 screen first, no rule change. D60: every 3-player ruleset stays experimental.
+- D80: decided (Heads move at most 4; both Heavy and Light; `light-3p` depth-3 baseline). D60: every 3-player ruleset stays experimental.
 
 ## Open questions for the owner
-- After S77 (S78): the 3-player balance measure, alternating the turn cycle's direction, or a rule for the seat before the Dragon.
-- Carried over: the S74 readings (D76.1), the decision 0020 readings, the held-setting rule (S64), Easy Start calls (S67), the decision 0017 clock readings, the S53 defaults, the draw-offer default (S51), the flag rule (0013), `coast.openToAll`, the I34 contact address, the favicon, the Ting Yang art.
+- None blocking S80. Carried over: the 3-player balance measure (depth 3 or higher), alternating the turn cycle's direction, a rule for the seat before the Dragon; the S74 readings (D76.1), the decision 0020 readings, the held-setting rule (S64), Easy Start calls (S67), the decision 0017 clock readings, the S53 defaults, the draw-offer default (S51), the flag rule (0013), `coast.openToAll`, the I34 contact address, the favicon, the Ting Yang art.
 
 ## Notes for Claude
 - Reports come from the workflow artifacts (`fairness-report-<name>`); `gh api repos/.../actions/artifacts/<id>/zip`.
 - Report tables list seats in turn order; always restate them as dark / light / Dragon.
+- New ruleset files change the web ruleset list (alphabetical by file); run `pnpm rules:index` and update `session.test.ts`.
