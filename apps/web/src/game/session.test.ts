@@ -71,6 +71,7 @@ describe('the ruleset list', () => {
       'draft-3p',
       'heavy-3p',
       'heavy-limited-3p',
+      'heavy-limited3-3p',
       'light-3p',
       'light-limited-3p',
     ]);
@@ -83,6 +84,7 @@ describe('the ruleset list', () => {
       'Good Practice (3-player)',
       'Heavy-Handed Dragon',
       'Heavy-Handed Dragon, Limited',
+      'Heavy-Handed Dragon, Limited to 3',
       'Light-Handed Dragon',
       'Light-Handed Dragon, Limited',
     ]);

@@ -27,3 +27,9 @@ Readings (facts from the reports; the choice of what to do next is the owner's):
 - At depth 2 the light seat (just before the Dragon) stays last in both Limited rulesets (13.6 and 8.6), as in every S75 turn order. At depth 3 it recovers in Heavy (28.7) and partly in Light (20.3).
 - `light-limited-3p` at depth 3 stays far from the band (dragon 56.1 [48.0–63.8]) with almost the same Dragon checkmate count as `light-3p` (60 of 148 and 60 of 147). Its Kinged players capture both Dragon Heads more often (19 games against 4).
 - The three measures disagree on size and sometimes on direction, so depth 2 misleads for 3 players, as S77 found; the balance measure at depth 3 or higher is still an open owner question.
+
+## D81: Heavy-Handed with the Heads limited to 3 (S81)
+Owner in chat, 2 Nov 2026, after reading the S80 results: the Dragon is still too strong, so one more screen with a tighter limit.
+1. One experimental ruleset, `heavy-limited3-3p` "Heavy-Handed Dragon, Limited to 3": `heavy-3p` 0.1.0 with `dragonHead.range` = 3 (a registry option) and nothing else changed. **(owner)** `heavy-limited-3p` (range 4) stays as it is, so both can be compared. No engine change.
+2. The Tail reads the same parameter, as in D80 item 2, so it is limited to 3 too (provisional reading: the owner named the Heads).
+3. Screens, set up as in S79: 400 games at depths 1 and 2 (20 shards), and depth 3 with about 150 games, default turn order (30 shards). Experimental whatever they show (D60).
