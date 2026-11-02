@@ -451,8 +451,13 @@ Done when: the rulesets and tests are merged and the screens are dispatched.
 Collect the S79 reports, commit them as in S77, and compare with S75 and `heavy-3p` depth 3. Report seats as dark / light / Dragon.
 Done when: the reports are committed and the comparison is in decision 0022 and the handoff.
 
-### S81 — Owner review of the Limited screens · Owner with Claude in chat · Opus 5.5 · medium · `todo`
+### S81 — Owner review of the Limited screens · Owner with Claude in chat · Opus 5.5 · medium · `done`
 The owner reads the S80 comparison (decision 0022) and picks what comes next. Claude records the calls and builds nothing the owner has not chosen.
+Owner's call (D81): one more screen of Heavy-Handed with the Heads limited to 3. Built as data: `heavy-limited3-3p` 0.1.0 (= `heavy-3p` + `dragonHead.range` 3, the Tail capped too), tests, RULES.md. Screens dispatched after the merge from Actions → **Sim depth 2**: 400 games at depths `1,2` (20 shards); depth `3`, 150 games, 30 shards, `set` `turn.3p.order=dark-light-dragon`, `label` `depth3`.
+
+### S82 — Collect the Limited-to-3 screens · Claude (workflow) · Opus 5.5 · medium · `todo`
+Collect the S81 reports (`fairness-report-heavy-limited3-3p`, and `.depth3`), check each report's game count, commit them as in S80, and add the results to the decision 0022 table beside `heavy-3p` and `heavy-limited-3p`. Report seats as dark / light / Dragon.
+Done when: the reports are committed with the comparison in decision 0022 and the handoff.
 
 ## Later phases
 
@@ -525,6 +530,7 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D78 | What to screen after S73 | Default (reading of the owner's words): both new rulesets at each clockwise order, six 400-game screens at depths 1 and 2; full runs only for one inside 28–38% at both depths (decision 0021) | S75 |
 | D79 | Next step on the seat before the Dragon (after S75) | Decided (owner, 31 Oct 2026): a depth-3 diagnostic screen of `heavy-3p` first, no rule change yet; alternating the cycle direction and a rule for that seat stay options for S78 | S77 |
 | D80 | Limited Dragon (Heads move at most 4 squares) | Decided (owner, 1 Nov 2026): `heavy-limited-3p` and `light-limited-3p` = the 0.1.0 rulesets + `dragonHead.range` 4, plus a depth-3 screen of `light-3p` as baseline (decision 0022) | S79 |
+| D81 | Limited to 3 (after S80) | Decided (owner, 2 Nov 2026): `heavy-limited3-3p` = `heavy-3p` 0.1.0 + `dragonHead.range` 3, screened at depths 1, 2 and 3 (decision 0022) | S81 |
 
 ## Ledger sync format
 

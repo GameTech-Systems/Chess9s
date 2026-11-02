@@ -22,6 +22,7 @@ The 3-player presets are all experimental, and none is fairness-checked yet ([de
 | **Heavy-Handed Dragon** | `heavy-3p` | Standard, except that from the Coast the Dragon's pieces attack only the Coast, and the Dragon loses only once the four are captured and the Tail is checkmated ([below](#heavy-handed-and-light-handed-dragon-3-player), [decision 0021](decisions/0021-heavy-and-light-handed-dragon.md)). To test |
 | **Light-Handed Dragon** | `light-3p` | Heavy-Handed, except that the Tail only blocks and the Dragon loses once the four are captured ([below](#heavy-handed-and-light-handed-dragon-3-player)). To test |
 | **Heavy-Handed Dragon, Limited** | `heavy-limited-3p` | Heavy-Handed, except that Dragon Heads (and so a Tail that moves like one) slide at most 4 squares ([decision 0022](decisions/0022-limited-dragon.md)). To test |
+| **Heavy-Handed Dragon, Limited to 3** | `heavy-limited3-3p` | Heavy-Handed, except that Dragon Heads (and so the Tail) slide at most 3 squares ([decision 0022](decisions/0022-limited-dragon.md)). To test |
 | **Light-Handed Dragon, Limited** | `light-limited-3p` | Light-Handed, with the same limit of 4 on the Dragon Heads and the Tail ([decision 0022](decisions/0022-limited-dragon.md)). To test |
 
 Every rule here is a parameter with a default and a list of options, so players can experiment. The data in [`rules/parameters.json`](../rules/parameters.json) and [`rules/rulesets/`](../rules/rulesets/) is what the engine reads; this page explains it. Where the two disagree, the data is a bug to report.

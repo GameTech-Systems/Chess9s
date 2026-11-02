@@ -100,6 +100,42 @@ describe('the Limited rulesets (D80)', () => {
   });
 });
 
+// S81: the owner's call on the S80 screens (D81): Heavy-Handed with the Heads, and so the Tail,
+// capped at 3. A new ruleset beside heavy-limited-3p, so both stay playable and comparable.
+describe('Heavy-Handed Dragon, Limited to 3 (D81)', () => {
+  const id = 'heavy-limited3-3p';
+
+  it('is heavy-3p with dragonHead.range 3', () => {
+    const r = ruleset(id);
+    expect(r.name).toBe('Heavy-Handed Dragon, Limited to 3');
+    expect(r.version).toBe('0.1.0');
+    expect(r.status).toBe('experimental');
+    expect(r.overrides).toEqual({ ...ruleset('heavy-3p').overrides, 'dragonHead.range': 3 });
+    const v = rulesFor(id).values;
+    const b = rulesFor('heavy-3p').values;
+    const changed = Object.keys(v).filter((k) => JSON.stringify(v[k]) !== JSON.stringify(b[k]));
+    expect(changed).toEqual(['dragonHead.range']);
+    expect(v['dragonHead.range']).toBe(3);
+    expect(unbuiltFeatures(rulesFor(id))).toEqual([]);
+  });
+
+  it('a Dragon Head slides 3 squares', () => {
+    const m = movesOf(id, 'light-dragon-head', 'c3', TAIL);
+    expect(m).toEqual(expect.arrayContaining(['c4', 'c5', 'c6', 'f6', 'f3', 'c1']));
+    expect(m).not.toContain('c7');
+    expect(m).not.toContain('g7');
+    expect(m).not.toContain('g3');
+  });
+
+  it('the Tail moves like a Head, so it is capped at 3 too', () => {
+    const head = { a7: piece('dragon', 'light-dragon-head', true) };
+    const m = movesOf(id, 'dragon-tail', 'c3', head);
+    expect(m).toEqual(expect.arrayContaining(['c4', 'c6', 'f6', 'f3']));
+    expect(m).not.toContain('c7');
+    expect(m).not.toContain('g7');
+  });
+});
+
 describe('recorded games of the Limited rulesets play to their end', () => {
   type Recorded = {
     ruleset: string;
