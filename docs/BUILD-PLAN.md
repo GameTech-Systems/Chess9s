@@ -447,8 +447,12 @@ The owner reads S77 and picks what comes next: the 3-player balance measure, alt
 Ship S77 (done, PR 69). Build D80 as data (decision 0022): `heavy-limited-3p` and `light-limited-3p` 0.1.0, each its base plus `dragonHead.range` 4, tests (rulesets, a Head and the Tail capped at 4, four recorded games), RULES.md. Dispatch the screens from Actions → **Sim depth 2**: depth 3 (about 150 games, default order) of `light-3p`, `heavy-limited-3p` and `light-limited-3p`; 400 games at depths 1 and 2 of both Limited rulesets.
 Done when: the rulesets and tests are merged and the screens are dispatched.
 
-### S80 — Collect and compare the Limited screens · Claude (workflow) · Opus 5.5 · medium · `todo`
+### S80 — Collect and compare the Limited screens · Claude (workflow) · Opus 5.5 · medium · `done`
 Collect the S79 reports, commit them as in S77, and compare with S75 and `heavy-3p` depth 3. Report seats as dark / light / Dragon.
+Done when: the reports are committed and the comparison is in decision 0022 and the handoff.
+
+### S81 — Owner review of the Limited screens · Owner with Claude in chat · Opus 5.5 · medium · `todo`
+The owner reads the S80 comparison (decision 0022) and picks what comes next. Claude records the calls and builds nothing the owner has not chosen.
 
 ## Later phases
 
