@@ -33,3 +33,19 @@ Owner in chat, 2 Nov 2026, after reading the S80 results: the Dragon is still to
 1. One experimental ruleset, `heavy-limited3-3p` "Heavy-Handed Dragon, Limited to 3": `heavy-3p` 0.1.0 with `dragonHead.range` = 3 (a registry option) and nothing else changed. **(owner)** `heavy-limited-3p` (range 4) stays as it is, so both can be compared. No engine change.
 2. The Tail reads the same parameter, as in D80 item 2, so it is limited to 3 too (provisional reading: the owner named the Heads).
 3. Screens, set up as in S79: 400 games at depths 1 and 2 (20 shards), and depth 3 with about 150 games, default turn order (30 shards). Experimental whatever they show (D60).
+
+## S82: results of the Limited-to-3 screens
+Seat scores are dark / light / Dragon (percent; the report tables list seats in turn order, which here is dark, light, Dragon). Screens, not measures (D60). Reports: `docs/fairness/heavy-limited3-3p.md` (400 games at each of depths 1 and 2, all 20 shards) and `heavy-limited3-3p.depth3.md` (149 games: the 30 shards ran 5 each, and one game is missing from the merge; default turn order, `turn.3p.order=dark-light-dragon`). No game reached the cap.
+
+| Ruleset | Depth 1 (400) | Depth 2 (400) | Depth 3 (about 150) |
+| --- | --- | --- | --- |
+| `heavy-3p` | 36.6 / 28.6 / 34.8 | 27.5 / 10.5 / 62.0 | 24.5 / 24.8 / 50.7 |
+| `heavy-limited-3p` (range 4) | 44.5 / 32.5 / 23.0 | 38.3 / 13.6 / 48.1 | 28.7 / 28.7 / 42.7 |
+| `heavy-limited3-3p` (range 3) | 54.5 / 30.3 / 15.3 | 45.3 / 22.0 / 32.8 | 35.6 / 41.9 / 22.5 (149) |
+
+Readings (facts from the reports; the choice of what to do next is the owner's):
+- Range 3 takes the Dragon below range 4 at every depth. Depth 2: 48.1 [43.3-53.0] to 32.8 [28.3-37.5], now inside the 28-38% band. Depth 3: 42.7 to 22.5 [16.5-29.8], now below the band. Depth 1: 23.0 to 15.3 [12.1-19.1].
+- The overshoot D81 risked appears: at every depth the Dragon sits at or below the band's lower end except depth 2, and dark leads at depths 1 and 2 (54.5 [49.6-59.3], 45.3 [40.4-50.1]), both outside the band.
+- At depth 3 the light seat (just before the Dragon) leads at 41.9 [34.3-50.0] and dark is 35.6 [28.3-43.5]; the Dragon wins 19 of 149 games (checkmate 14, king-capture 5), against 60 of about 148 in the Light-Handed screens. Kinged players capture both Dragon Heads in 16 games, and 29 games are draws in the duel.
+- At depth 2 light stays last among the Kinged players' scores (22.0), as in every earlier 3-player screen at that depth, but is much closer to dark+Dragon than under range 4 (13.6).
+- No depth puts all three seats inside the band at once. The closest single run is depth 2 on the Dragon only; `heavy-limited-3p` at depth 3 is still the closest 3-seat screen overall (D80 reading). The balance measure at depth 3 or higher remains an open owner question.
