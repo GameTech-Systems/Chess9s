@@ -324,7 +324,8 @@ describe('the 3-player game record', () => {
       expect(opened.ok, `${id} ${row}`).toBe(true);
       if (opened.ok) expect(opened.game.result).toEqual(game.result);
     }
-  });
+    // Two long recorded games, each replayed twice: CI runners took just over 5 seconds (main, 3 Nov).
+  }, 30_000);
 
   it('refuses a record whose result its moves do not give', () => {
     const game = replay('easy-3p', recorded('easy-3p', 'kinged-checkmates-tail').moves);
