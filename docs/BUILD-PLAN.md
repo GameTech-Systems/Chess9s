@@ -467,9 +467,13 @@ Build [decision 0023](decisions/0023-tail-range.md) as data, each new option tes
 Done when: the parameter, ruleset and tests are merged and the screen is dispatched.
 Built as data with no engine change: `tail.3p.range` is an enum (`same-as-heads` default, 1 to 8) so a default that follows `dragonHead.range` fits; the Tail's Head-like slide has one move per option. Every earlier ruleset's moves are unchanged (checked before and after); four 3-player locks record the new key. See "Built in S84" in decision 0023.
 
-### S85 — Collect the Tail-8 screen · Claude (workflow) · Sonnet 5.5 · medium · `todo`
+### S85 — Collect the Tail-8 screen · Claude (workflow) · Sonnet 5.5 · medium · `done`
 Collect the report, check its game count, commit it as in S82, add the result to decision 0023 (dark / light / Dragon). If the Dragon is above the 28-38% band, dispatch the Tail sweep (`set` `tail.3p.range=4`, `5`, `6`, `7`, Heads at 3, depth 3, about 150 games each, no new ruleset files). If it is below the band, skip the sweep and leave it to the owner. Either way the best result later gets a confirming run of about 450 games before the owner decides.
 Done when: the report is committed with the comparison in decision 0023 and the handoff, and the sweep is dispatched or skipped.
+
+### S86 — Confirming run of `heavy-h3-3p` · Claude (workflow) · Sonnet 5.5 · medium · `todo`
+Dispatch the Sim depth 2 workflow on `heavy-h3-3p` (depth 3, about 450 games, default turn order, `label` `depth3-confirm`), as D82 item 5 asks for the best screen. Collect and commit the report in a later session and add it to decision 0023; the owner then decides. Provisional: S85 left the choice of dispatching before or after the owner's review of the 150-game result to the owner.
+Done when: the run is dispatched (run id in the log), or the owner has said to wait.
 
 ## Later phases
 
