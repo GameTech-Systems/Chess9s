@@ -136,6 +136,23 @@ describe('Rule picker', () => {
     }
   });
 
+  it('opens the home page on the player count of the game kept in this browser', () => {
+    const memory = new Map<string, string>();
+    const store = {
+      getItem: (k: string) => memory.get(k) ?? null,
+      setItem: (k: string, v: string) => void memory.set(k, v),
+      removeItem: (k: string) => void memory.delete(k),
+    };
+    expect(renderToStaticMarkup(<App path="/" store={store} />)).toMatch(
+      /class="mode" aria-pressed="true" data-players="2"/,
+    );
+    const three = listRulesets().find((r) => r.id === 'standard-3p')!;
+    saveGuest(store, { game: newModel(createRules('standard-3p'), three).game, mode: 'hot-seat' });
+    const html = renderToStaticMarkup(<App path="/" store={store} />);
+    expect(html).toMatch(/class="mode" aria-pressed="true" data-players="3"/);
+    expect(html).toContain('Choose a ruleset · 3 players');
+  });
+
   it('puts the logo in the masthead as a link home', () => {
     for (const path of ['/', '/privacy', '/rules/standard-2p']) {
       const html = renderToStaticMarkup(<App path={path} />);

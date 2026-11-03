@@ -74,6 +74,18 @@ const endedByTime = ({ result, rules }: GameState): boolean =>
   ((result.status === 'win' && result.reason === 'timeout') ||
     (result.status === 'draw' && result.reason === 'timeout-insufficient-material'));
 
+/** The ruleset id of the game kept in this browser, or null: the home page opens on its player count. */
+export function savedRulesetId(store: Store | null | undefined): string | null {
+  try {
+    const raw = store?.getItem(KEY);
+    if (!raw) return null;
+    const saved = JSON.parse(raw) as Record<string, unknown>;
+    return typeof saved.ruleset === 'string' ? saved.ruleset : null;
+  } catch {
+    return null;
+  }
+}
+
 export function clearGuest(store: Store): void {
   try {
     store.removeItem(KEY);
