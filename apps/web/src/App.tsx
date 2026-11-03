@@ -14,11 +14,12 @@ import {
   customInfo,
   DEFAULT_3P_RULESET_ID,
   DEFAULT_RULESET_ID,
+  findRuleset,
   type CustomRuleset,
   type RulesetInfo,
 } from './game/rules';
 import { EMBLEM_URL } from './brand';
-import type { Store } from './game/guest';
+import { savedRulesetId, type Store } from './game/guest';
 import { fromGame } from './game/session';
 import { roomPath } from './game/share';
 import type { Opened } from './game/record';
@@ -89,8 +90,13 @@ export function App({
   // The player's own rulesets live in this browser only (privacy page).
   const [customs, setCustoms] = useState<CustomRuleset[]>(() => loadCustoms(store));
   const [editing, setEditing] = useState<string | undefined>(undefined);
-  // The home page's player count: the last game's, so "Change ruleset" comes back to it.
-  const [players, setPlayers] = useState<2 | 3>(2);
+  // The home page's player count: the last game's, so "Change ruleset" (or a reload, from the game
+  // kept in this browser) comes back to it.
+  const [players, setPlayers] = useState<2 | 3>(() => {
+    const id = savedRulesetId(store);
+    if (!id) return 2;
+    return findRuleset(id)?.players ?? customs.find((c) => c.id === id)?.players ?? 2;
+  });
   // The preset a new custom ruleset starts from: the default for the player count it was made for.
   const [buildBase, setBuildBase] = useState(DEFAULT_RULESET_ID);
   const keepCustom = (c: CustomRuleset) => {
