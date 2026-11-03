@@ -29,19 +29,20 @@ import f25 from '../../../rules/rulesets/draft-3p.json';
 import f26 from '../../../rules/rulesets/easy-2p.json';
 import f27 from '../../../rules/rulesets/easy-3p.json';
 import f28 from '../../../rules/rulesets/heavy-3p.json';
-import f29 from '../../../rules/rulesets/heavy-limited-3p.json';
-import f30 from '../../../rules/rulesets/heavy-limited3-3p.json';
-import f31 from '../../../rules/rulesets/light-3p.json';
-import f32 from '../../../rules/rulesets/light-limited-3p.json';
-import f33 from '../../../rules/rulesets/standard-2p.json';
-import f34 from '../../../rules/rulesets/standard-3p.json';
-import f35 from '../../../rules/schema/board.schema.json';
-import f36 from '../../../rules/schema/lock.schema.json';
-import f37 from '../../../rules/schema/parameters.schema.json';
-import f38 from '../../../rules/schema/piece.schema.json';
-import f39 from '../../../rules/schema/ruleset.schema.json';
-import f40 from '../../../rules/schema/timeControls.schema.json';
-import f41 from '../../../rules/timeControls.json';
+import f29 from '../../../rules/rulesets/heavy-h3-3p.json';
+import f30 from '../../../rules/rulesets/heavy-limited-3p.json';
+import f31 from '../../../rules/rulesets/heavy-limited3-3p.json';
+import f32 from '../../../rules/rulesets/light-3p.json';
+import f33 from '../../../rules/rulesets/light-limited-3p.json';
+import f34 from '../../../rules/rulesets/standard-2p.json';
+import f35 from '../../../rules/rulesets/standard-3p.json';
+import f36 from '../../../rules/schema/board.schema.json';
+import f37 from '../../../rules/schema/lock.schema.json';
+import f38 from '../../../rules/schema/parameters.schema.json';
+import f39 from '../../../rules/schema/piece.schema.json';
+import f40 from '../../../rules/schema/ruleset.schema.json';
+import f41 from '../../../rules/schema/timeControls.schema.json';
+import f42 from '../../../rules/timeControls.json';
 
 /** Every JSON file in rules/, keyed by its path under rules/. */
 export const rulesFiles: RulesFiles = {
@@ -74,17 +75,18 @@ export const rulesFiles: RulesFiles = {
   'rulesets/easy-2p.json': f26,
   'rulesets/easy-3p.json': f27,
   'rulesets/heavy-3p.json': f28,
-  'rulesets/heavy-limited-3p.json': f29,
-  'rulesets/heavy-limited3-3p.json': f30,
-  'rulesets/light-3p.json': f31,
-  'rulesets/light-limited-3p.json': f32,
-  'rulesets/standard-2p.json': f33,
-  'rulesets/standard-3p.json': f34,
-  'schema/board.schema.json': f35,
-  'schema/lock.schema.json': f36,
-  'schema/parameters.schema.json': f37,
-  'schema/piece.schema.json': f38,
-  'schema/ruleset.schema.json': f39,
-  'schema/timeControls.schema.json': f40,
-  'timeControls.json': f41,
+  'rulesets/heavy-h3-3p.json': f29,
+  'rulesets/heavy-limited-3p.json': f30,
+  'rulesets/heavy-limited3-3p.json': f31,
+  'rulesets/light-3p.json': f32,
+  'rulesets/light-limited-3p.json': f33,
+  'rulesets/standard-2p.json': f34,
+  'rulesets/standard-3p.json': f35,
+  'schema/board.schema.json': f36,
+  'schema/lock.schema.json': f37,
+  'schema/parameters.schema.json': f38,
+  'schema/piece.schema.json': f39,
+  'schema/ruleset.schema.json': f40,
+  'schema/timeControls.schema.json': f41,
+  'timeControls.json': f42,
 };

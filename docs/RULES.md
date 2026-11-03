@@ -22,6 +22,7 @@ The 3-player presets are all experimental, and none is fairness-checked yet ([de
 | **Heavy-Handed Dragon** | `heavy-3p` | Standard, except that from the Coast the Dragon's pieces attack only the Coast, and the Dragon loses only once the four are captured and the Tail is checkmated ([below](#heavy-handed-and-light-handed-dragon-3-player), [decision 0021](decisions/0021-heavy-and-light-handed-dragon.md)). To test |
 | **Light-Handed Dragon** | `light-3p` | Heavy-Handed, except that the Tail only blocks and the Dragon loses once the four are captured ([below](#heavy-handed-and-light-handed-dragon-3-player)). To test |
 | **Heavy-Handed Dragon, Limited** | `heavy-limited-3p` | Heavy-Handed, except that Dragon Heads (and so a Tail that moves like one) slide at most 4 squares ([decision 0022](decisions/0022-limited-dragon.md)). To test |
+| **Heavy-Handed Dragon, Heads 3** | `heavy-h3-3p` | Heavy-Handed, except that the Dragon Heads slide at most 3 squares and the Tail keeps its full slide (`dragonHead.range` = 3, `tail.3p.range` = 8; [decision 0023](decisions/0023-tail-range.md)). To test |
 | **Heavy-Handed Dragon, Limited to 3** | `heavy-limited3-3p` | Heavy-Handed, except that Dragon Heads (and so the Tail) slide at most 3 squares ([decision 0022](decisions/0022-limited-dragon.md)). To test |
 | **Light-Handed Dragon, Limited** | `light-limited-3p` | Light-Handed, with the same limit of 4 on the Dragon Heads and the Tail ([decision 0022](decisions/0022-limited-dragon.md)). To test |
 
@@ -105,7 +106,7 @@ In 2-player games the Coast stays closed until a player opens it with the Dragon
 
 | Coast piece | 2-player owner | 2-player movement | 3-player movement | Captures |
 |---|---|---|---|---|
-| Dragon Tail | Neither side; either player may move it | Jumps among A5, E5 and I5 only | Any direction, any distance, like a Dragon Head | 2-player: never, and never checks. 3-player: any light or dark piece that isn't a Coast piece |
+| Dragon Tail | Neither side; either player may move it | Jumps among A5, E5 and I5 only | Any direction, any distance, like a Dragon Head (3-player: as far as `tail.3p.range` says, by default the Heads' range, [decision 0023](decisions/0023-tail-range.md)) | 2-player: never, and never checks. 3-player: any light or dark piece that isn't a Coast piece |
 | Light / Dark Dragon Head (A1 / A9) | Light / Dark | Any direction, any distance | Same | Yes, like any piece |
 | Sun / Moon | Light (A2) / Dark (A8) | 1 square in any direction, or 2 straight forward on its first move. Option: 2 squares in any direction | 1 square at a time on the Coast; off it, up to 2 squares in any direction | Onto any square it can move to |
 

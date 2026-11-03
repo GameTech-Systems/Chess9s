@@ -171,6 +171,266 @@
           {
             "param": "tail.3p.captures",
             "is": "non-coast-pieces"
+          },
+          {
+            "param": "tail.3p.range",
+            "is": "same-as-heads"
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "orthogonal",
+        "diagonal"
+      ],
+      "range": 1,
+      "jump": {
+        "param": "dragon.canJump"
+      },
+      "capture": "move-or-capture",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "param": "tail.3p.movement",
+            "is": "like-dragon-head"
+          },
+          {
+            "param": "tail.3p.captures",
+            "is": "non-coast-pieces"
+          },
+          {
+            "param": "tail.3p.range",
+            "is": 1
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "orthogonal",
+        "diagonal"
+      ],
+      "range": 2,
+      "jump": {
+        "param": "dragon.canJump"
+      },
+      "capture": "move-or-capture",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "param": "tail.3p.movement",
+            "is": "like-dragon-head"
+          },
+          {
+            "param": "tail.3p.captures",
+            "is": "non-coast-pieces"
+          },
+          {
+            "param": "tail.3p.range",
+            "is": 2
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "orthogonal",
+        "diagonal"
+      ],
+      "range": 3,
+      "jump": {
+        "param": "dragon.canJump"
+      },
+      "capture": "move-or-capture",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "param": "tail.3p.movement",
+            "is": "like-dragon-head"
+          },
+          {
+            "param": "tail.3p.captures",
+            "is": "non-coast-pieces"
+          },
+          {
+            "param": "tail.3p.range",
+            "is": 3
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "orthogonal",
+        "diagonal"
+      ],
+      "range": 4,
+      "jump": {
+        "param": "dragon.canJump"
+      },
+      "capture": "move-or-capture",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "param": "tail.3p.movement",
+            "is": "like-dragon-head"
+          },
+          {
+            "param": "tail.3p.captures",
+            "is": "non-coast-pieces"
+          },
+          {
+            "param": "tail.3p.range",
+            "is": 4
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "orthogonal",
+        "diagonal"
+      ],
+      "range": 5,
+      "jump": {
+        "param": "dragon.canJump"
+      },
+      "capture": "move-or-capture",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "param": "tail.3p.movement",
+            "is": "like-dragon-head"
+          },
+          {
+            "param": "tail.3p.captures",
+            "is": "non-coast-pieces"
+          },
+          {
+            "param": "tail.3p.range",
+            "is": 5
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "orthogonal",
+        "diagonal"
+      ],
+      "range": 6,
+      "jump": {
+        "param": "dragon.canJump"
+      },
+      "capture": "move-or-capture",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "param": "tail.3p.movement",
+            "is": "like-dragon-head"
+          },
+          {
+            "param": "tail.3p.captures",
+            "is": "non-coast-pieces"
+          },
+          {
+            "param": "tail.3p.range",
+            "is": 6
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "orthogonal",
+        "diagonal"
+      ],
+      "range": 7,
+      "jump": {
+        "param": "dragon.canJump"
+      },
+      "capture": "move-or-capture",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "param": "tail.3p.movement",
+            "is": "like-dragon-head"
+          },
+          {
+            "param": "tail.3p.captures",
+            "is": "non-coast-pieces"
+          },
+          {
+            "param": "tail.3p.range",
+            "is": 7
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "orthogonal",
+        "diagonal"
+      ],
+      "range": 8,
+      "jump": {
+        "param": "dragon.canJump"
+      },
+      "capture": "move-or-capture",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "param": "tail.3p.movement",
+            "is": "like-dragon-head"
+          },
+          {
+            "param": "tail.3p.captures",
+            "is": "non-coast-pieces"
+          },
+          {
+            "param": "tail.3p.range",
+            "is": 8
           }
         ]
       }
@@ -201,6 +461,266 @@
           {
             "param": "tail.3p.captures",
             "is": "none"
+          },
+          {
+            "param": "tail.3p.range",
+            "is": "same-as-heads"
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "orthogonal",
+        "diagonal"
+      ],
+      "range": 1,
+      "jump": {
+        "param": "dragon.canJump"
+      },
+      "capture": "move-only",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "param": "tail.3p.movement",
+            "is": "like-dragon-head"
+          },
+          {
+            "param": "tail.3p.captures",
+            "is": "none"
+          },
+          {
+            "param": "tail.3p.range",
+            "is": 1
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "orthogonal",
+        "diagonal"
+      ],
+      "range": 2,
+      "jump": {
+        "param": "dragon.canJump"
+      },
+      "capture": "move-only",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "param": "tail.3p.movement",
+            "is": "like-dragon-head"
+          },
+          {
+            "param": "tail.3p.captures",
+            "is": "none"
+          },
+          {
+            "param": "tail.3p.range",
+            "is": 2
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "orthogonal",
+        "diagonal"
+      ],
+      "range": 3,
+      "jump": {
+        "param": "dragon.canJump"
+      },
+      "capture": "move-only",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "param": "tail.3p.movement",
+            "is": "like-dragon-head"
+          },
+          {
+            "param": "tail.3p.captures",
+            "is": "none"
+          },
+          {
+            "param": "tail.3p.range",
+            "is": 3
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "orthogonal",
+        "diagonal"
+      ],
+      "range": 4,
+      "jump": {
+        "param": "dragon.canJump"
+      },
+      "capture": "move-only",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "param": "tail.3p.movement",
+            "is": "like-dragon-head"
+          },
+          {
+            "param": "tail.3p.captures",
+            "is": "none"
+          },
+          {
+            "param": "tail.3p.range",
+            "is": 4
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "orthogonal",
+        "diagonal"
+      ],
+      "range": 5,
+      "jump": {
+        "param": "dragon.canJump"
+      },
+      "capture": "move-only",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "param": "tail.3p.movement",
+            "is": "like-dragon-head"
+          },
+          {
+            "param": "tail.3p.captures",
+            "is": "none"
+          },
+          {
+            "param": "tail.3p.range",
+            "is": 5
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "orthogonal",
+        "diagonal"
+      ],
+      "range": 6,
+      "jump": {
+        "param": "dragon.canJump"
+      },
+      "capture": "move-only",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "param": "tail.3p.movement",
+            "is": "like-dragon-head"
+          },
+          {
+            "param": "tail.3p.captures",
+            "is": "none"
+          },
+          {
+            "param": "tail.3p.range",
+            "is": 6
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "orthogonal",
+        "diagonal"
+      ],
+      "range": 7,
+      "jump": {
+        "param": "dragon.canJump"
+      },
+      "capture": "move-only",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "param": "tail.3p.movement",
+            "is": "like-dragon-head"
+          },
+          {
+            "param": "tail.3p.captures",
+            "is": "none"
+          },
+          {
+            "param": "tail.3p.range",
+            "is": 7
+          }
+        ]
+      }
+    },
+    {
+      "directions": [
+        "orthogonal",
+        "diagonal"
+      ],
+      "range": 8,
+      "jump": {
+        "param": "dragon.canJump"
+      },
+      "capture": "move-only",
+      "when": {
+        "all": [
+          {
+            "players": [
+              3
+            ]
+          },
+          {
+            "param": "tail.3p.movement",
+            "is": "like-dragon-head"
+          },
+          {
+            "param": "tail.3p.captures",
+            "is": "none"
+          },
+          {
+            "param": "tail.3p.range",
+            "is": 8
           }
         ]
       }
@@ -314,5 +834,5 @@
     }
   ],
   "source": "Unverified seed (S10, 19 Oct 2026): from docs/RULES.md draft v0.2, ledger decisions D25, D28, D29, D30 and S34, and the owner's board images of 18 and 19 Oct 2026.",
-  "notes": "Game state, not piece data (S17, src/game/game.ts): its first move is a5 to e5, which opens the Coast (coast.2p.initiation); the repeat limit (tail.repeatLimit); either player may move it in 2-player games, and it never captures a piece of the player moving it. In 3-player games it is the Dragon's King while it is active, and turns to stone when checkmated: game state (S56, src/game/three.ts, decision 0016). In 3-player games all other Coast pieces are the Dragon's own, so non-coast-pieces captures any enemy piece. Its way off the Coast in 3-player games (coast.3p.exit) is a square rule, as for the other Coast pieces (S68); with tail.3p.movement = two-player-path it only stands on A5, E5 and I5, so the rule never stops it."
+  "notes": "Game state, not piece data (S17, src/game/game.ts): its first move is a5 to e5, which opens the Coast (coast.2p.initiation); the repeat limit (tail.repeatLimit); either player may move it in 2-player games, and it never captures a piece of the player moving it. In 3-player games it is the Dragon's King while it is active, and turns to stone when checkmated: game state (S56, src/game/three.ts, decision 0016). In 3-player games all other Coast pieces are the Dragon's own, so non-coast-pieces captures any enemy piece. Its way off the Coast in 3-player games (coast.3p.exit) is a square rule, as for the other Coast pieces (S68); with tail.3p.movement = two-player-path it only stands on A5, E5 and I5, so the rule never stops it. Its 3-player slide (tail.3p.movement = like-dragon-head) has one move per tail.3p.range option (S84, decision 0023): same-as-heads reads dragonHead.range, 1 to 8 are its own."
 }

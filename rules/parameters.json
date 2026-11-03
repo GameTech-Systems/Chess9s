@@ -779,6 +779,48 @@
       "source": "owner rule set v0.2, 18 Oct 2026 (docs/RULES.md)"
     },
     {
+      "id": "tail.3p.range",
+      "label": "Dragon Tail range (3-player)",
+      "description": "How many squares the Tail may slide in one straight direction in 3-player games, when it moves like a Dragon Head. Same as the Dragon Heads follows dragonHead.range. 8 is unlimited on a 9x9 board.",
+      "piece": "dragon-tail",
+      "players": [
+        3
+      ],
+      "type": "enum",
+      "default": "same-as-heads",
+      "options": [
+        "same-as-heads",
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "group": "Dragon Tail",
+      "optionLabels": {
+        "same-as-heads": "Same as the Dragon Heads",
+        "1": "1 square",
+        "2": "2 squares",
+        "3": "3 squares",
+        "4": "4 squares",
+        "5": "5 squares",
+        "6": "6 squares",
+        "7": "7 squares",
+        "8": "Unlimited"
+      },
+      "status": "experimental",
+      "affects": [
+        "movement",
+        "check-detection",
+        "balance"
+      ],
+      "source": "Owner, 2 Nov 2026 (D82, decision 0023): the Tail gets its own range, separate from the Heads.",
+      "notes": "Name, options and default are provisional readings of decision 0023 (S84). The default follows dragonHead.range, so no earlier ruleset changes. Only read when tail.3p.movement = like-dragon-head; the 2-player path ignores it. Modelled as an enum because a default that follows another parameter is not an integer option; the Tail's moves in dragon-tail.json carry one variant per option."
+    },
+    {
       "id": "tail.repeatLimit",
       "label": "Tail repeat limit",
       "description": "How many of a player's own turns in a row may be Tail moves (0 = no limit). The player who opens the Coast may move the Tail A5 to E5 and then E5 to I5 on consecutive turns, the first time.",

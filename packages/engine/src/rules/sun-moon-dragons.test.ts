@@ -131,6 +131,7 @@ describe('fixture coverage', () => {
     'sunMoon.3p.range', // 3-player Coast play
     'tail.3p.movement',
     'tail.3p.captures',
+    'tail.3p.range', // every option: game/three-tail-range.test.ts (S84)
     'coast.2p.exit', // rules/special-rules.test.ts (S22a)
     'coast.2p.capturable', // rules/special-rules.test.ts (S22a)
     'coast.3p.capturable', // 3-player Coast play

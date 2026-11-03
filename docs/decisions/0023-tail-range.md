@@ -20,3 +20,10 @@ The S82 screens ([decision 0022](0022-limited-dragon.md)) show range 4 leaves th
 ## Plan
 - S84: build `tail.3p.range` and `heavy-h3-3p` with tests and RULES.md; dispatch the Tail-8 depth-3 screen after the merge.
 - S85: collect that screen; dispatch the sweep if item 4 applies.
+
+## Built in S84
+- **Parameter** `tail.3p.range` (3-player, Dragon Tail group, experimental): an enum with options `same-as-heads` (default) and 1 to 8, so `--set tail.3p.range=4` and the Builder work with plain numbers. An enum, not an integer, because a default that follows `dragonHead.range` is not one of 1 to 8; the Tail's Head-like slide in `dragon-tail.json` has one move per option (the default one reads `dragonHead.range`). Name, options and default stay provisional readings (D82 item 2). Only read while `tail.3p.movement` = like-dragon-head.
+- **No ruleset changes.** Every earlier ruleset resolves to `same-as-heads`; the Tail's and Heads' legal moves were compared before and after for all 3-player rulesets and are identical. The locks of `standard-3p` 0.1.0 and 0.2.0, `draft-3p` 0.3.0 and `easy-3p` 0.1.0 gained the key at `same-as-heads` (`pnpm lock add-keys`), no locked value changed.
+- **Ruleset** `heavy-h3-3p` "Heavy-Handed Dragon, Heads 3" 0.1.0, experimental: `heavy-3p` 0.1.0 + `dragonHead.range` 3 + `tail.3p.range` 8.
+- **Tests:** `packages/engine/src/game/three-tail-range.test.ts` (every option with and without Tail captures, Heads and Tail independent, the default following the Heads at every range, three recorded games).
+- **Screen:** depth 3, about 150 games, 30 shards, `set` `turn.3p.order=dark-light-dragon`, `label` `depth3`, dispatched after the merge (result in S85).
