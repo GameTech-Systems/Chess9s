@@ -27,7 +27,7 @@ Chess Nines is a 9×9 chess variant (custom pieces and special squares). 2-playe
 - **Test every parameter** at its default and at each option.
 - **Official rulesets are immutable.** Changes ship as a new version.
 - **2-player defaults must be fairness-checked** before they are published as a Candidate. Don't change a default without the owner's decision.
-- **Public repo hygiene.** No secrets, no personal information (names, emails, addresses), no unreleased art or lore. Never read `.env` or private paths. Don't create art, lore, or characters.
+- **Public repo hygiene.** No secrets, no personal information (names, emails, addresses), no unreleased art or lore. Never read `.env` or private paths. Don't create art, lore, or characters unless the owner asks; released art lives in `assets/brand/` and stays All Rights Reserved (`assets/README.md`).
 - **Dependencies.** Only permissive licenses (MIT, BSD, Apache-2.0, ISC). Never GPL, LGPL, or AGPL. Use the pre-approved list in the step; anything else, note it in the PR and the handoff. List third-party components in NOTICE.
 - **Naming.** Product text says "Chess Nines". Chess9s.com is the web address.
 
