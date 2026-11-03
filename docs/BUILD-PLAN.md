@@ -459,6 +459,17 @@ Owner's call (D81): one more screen of Heavy-Handed with the Heads limited to 3.
 Collect the S81 reports (`fairness-report-heavy-limited3-3p`, and `.depth3`), check each report's game count, commit them as in S80, and add the results to the decision 0022 table beside `heavy-3p` and `heavy-limited-3p`. Report seats as dark / light / Dragon.
 Done when: the reports are committed with the comparison in decision 0022 and the handoff.
 
+### S83 — Owner review of the Limited-to-3 screens · Owner with Claude in chat · Opus 5.5 · medium · `done`
+The owner read the S82 screens (decision 0022) and chose (D82, decision 0023): depth 3 is the 3-player balance measure (no more depth 1 and 2 screens); the Tail gets its own range `tail.3p.range`; first screen `heavy-h3-3p` (Heads 3, Tail 8); a Tail sweep with `set` overrides only if the Dragon screens above the band; Light-Handed dropped from simulations. Claude recorded it (decision 0023, this plan, handoff, log) and built nothing.
+
+### S84 — Tail range parameter and `heavy-h3-3p` · Claude · Sonnet 5.5 · medium · `todo`
+Build [decision 0023](decisions/0023-tail-range.md) as data, each new option tested at its default and every option: parameter `tail.3p.range` (options 1 to 8, default "same as `dragonHead.range`", so no existing ruleset changes), then the experimental ruleset `heavy-h3-3p` "Heavy-Handed Dragon, Heads 3" 0.1.0 (= `heavy-3p` 0.1.0 + `dragonHead.range` 3 + `tail.3p.range` 8). Tests (a Tail capped by its own range, a Head by the Heads' range, the default following `dragonHead.range`, a recorded game), RULES.md, `pnpm rules:index`, `session.test.ts`. After the merge dispatch from Actions → **Sim depth 2**: `heavy-h3-3p`, depth `3`, about 150 games, 30 shards, `set` `turn.3p.order=dark-light-dragon`, `label` `depth3`.
+Done when: the parameter, ruleset and tests are merged and the screen is dispatched.
+
+### S85 — Collect the Tail-8 screen · Claude (workflow) · Opus 5.5 · medium · `todo`
+Collect the report, check its game count, commit it as in S82, add the result to decision 0023 (dark / light / Dragon). If the Dragon is above the 28-38% band, dispatch the Tail sweep (`set` `tail.3p.range=4`, `5`, `6`, `7`, Heads at 3, depth 3, about 150 games each, no new ruleset files). If it is below the band, skip the sweep and leave it to the owner. Either way the best result later gets a confirming run of about 450 games before the owner decides.
+Done when: the report is committed with the comparison in decision 0023 and the handoff, and the sweep is dispatched or skipped.
+
 ## Later phases
 
 Each later phase opens with an Opus 5.5 · high planning session that replaces its placeholder with detailed steps.
@@ -531,6 +542,7 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D79 | Next step on the seat before the Dragon (after S75) | Decided (owner, 31 Oct 2026): a depth-3 diagnostic screen of `heavy-3p` first, no rule change yet; alternating the cycle direction and a rule for that seat stay options for S78 | S77 |
 | D80 | Limited Dragon (Heads move at most 4 squares) | Decided (owner, 1 Nov 2026): `heavy-limited-3p` and `light-limited-3p` = the 0.1.0 rulesets + `dragonHead.range` 4, plus a depth-3 screen of `light-3p` as baseline (decision 0022) | S79 |
 | D81 | Limited to 3 (after S80) | Decided (owner, 2 Nov 2026): `heavy-limited3-3p` = `heavy-3p` 0.1.0 + `dragonHead.range` 3, screened at depths 1, 2 and 3 (decision 0022) | S81 |
+| D82 | Balance measure, Tail range, next screens (after S82) | Decided (owner, 2 Nov 2026): depth 3 is the 3-player balance measure; `tail.3p.range` (default = `dragonHead.range`); `heavy-h3-3p` = Heads 3, Tail 8, screened at depth 3; Tail sweep 4 to 7 if the Dragon is above the band; Light-Handed dropped from simulations (decision 0023) | S84 |
 
 ## Ledger sync format
 
