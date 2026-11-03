@@ -27,3 +27,15 @@ The S82 screens ([decision 0022](0022-limited-dragon.md)) show range 4 leaves th
 - **Ruleset** `heavy-h3-3p` "Heavy-Handed Dragon, Heads 3" 0.1.0, experimental: `heavy-3p` 0.1.0 + `dragonHead.range` 3 + `tail.3p.range` 8.
 - **Tests:** `packages/engine/src/game/three-tail-range.test.ts` (every option with and without Tail captures, Heads and Tail independent, the default following the Heads at every range, three recorded games).
 - **Screen:** depth 3, about 150 games, 30 shards, `set` `turn.3p.order=dark-light-dragon`, `label` `depth3`, dispatched after the merge (result in S85).
+
+## Result of the first screen (S85)
+`heavy-h3-3p` 0.1.0 (Heads 3, Tail 8), depth 3, 150 games, 30 shards, default turn order, run 41573587391 (all 30 shards reported, none capped): **33.7 / 35.3 / 31.0** dark / light / Dragon (95% intervals 26.6–41.6, 28.1–43.3, 24.2–38.8). All three seats are inside the 28–38% band. 46 draws (37 in the duel). Report: `docs/fairness/heavy-h3-3p.depth3.md`.
+
+| Ruleset (depth 3) | dark | light | Dragon |
+| --- | --- | --- | --- |
+| `heavy-3p` | 24.5 | 24.8 | 50.7 |
+| `heavy-limited-3p` (range 4) | 28.7 | 28.7 | 42.7 |
+| `heavy-limited3-3p` (range 3, Tail 3) | 35.6 | 41.9 | 22.5 |
+| `heavy-h3-3p` (Heads 3, Tail 8) | 33.7 | 35.3 | 31.0 |
+
+Under item 4 the Dragon is not above the band, so the Tail sweep (4 to 7) is **skipped**. Item 5 applies instead: the next step is a confirming run of about 450 games at depth 3 on `heavy-h3-3p` before the owner decides. 150 games leave wide intervals, so this is still a screen (D60).
