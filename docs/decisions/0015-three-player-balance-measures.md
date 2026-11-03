@@ -41,3 +41,6 @@ Standard (`standard-3p` 0.1.0, D63), 2,000 games at each depth ([report](../fair
 At depth 2 the Dragon captured light's King in 1,528 games (367 at depth 1) and won 1,477. The depth-1 screens of Good Practice (Dragon 9.6%) and Easy Start (dark 70.8%) are far from the band, and the 40-game depth-1 sweep shows no option that would bring both depths into it.
 
 **Outcome (owner):** the three 3-player presets stay experimental as they are; no default changes and no 3-player Candidate. D62 to D65 are confirmed unchanged. This closes Phase 6. Why light collapses at depth 2 (the rules, or the depth-2 horizon, where each seat sees only the next seat's reply) is open, and should be looked into before any 3-player default is changed.
+
+## S83 update (2 Nov 2026, D82)
+Depth 3 is now the balance measure for 3-player rulesets; they are no longer screened at depths 1 and 2 ([decision 0023](0023-tail-range.md)). The measures, bands and reports above don't change.
