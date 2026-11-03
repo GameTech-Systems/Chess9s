@@ -1,10 +1,11 @@
 import { renderToStaticMarkup } from 'react-dom/server';
+import { PRESET_SUMMARIES, RulePicker } from './RulePicker';
 import { describe, expect, it } from 'vitest';
 import { newGame, playMove, toNotation, type Position } from '@chess9s/engine';
 import hotSeatMate from '../../../packages/engine/test/fixtures/games/hot-seat-mate.json';
 import { Game } from './Game';
 import { App } from './App';
-import { createRules, listRulesets, ruleset } from './game/rules';
+import { createRules, HOME_PRESETS, listRulesets, ruleset } from './game/rules';
 import { fromGame, newModel } from './game/session';
 import { saveGuest } from './game/guest';
 
@@ -73,33 +74,75 @@ describe('Game screen', () => {
 });
 
 describe('Rule picker', () => {
-  it('opens on the picker: every ruleset with its status badge, the 3-player presets playable', () => {
+  it('opens on the home page: join a room, then the 2- and 3-player choices (owner, 3 Nov 2026)', () => {
     const html = renderToStaticMarkup(<App />);
-    expect(html).toContain('Choose a ruleset');
-    for (const name of ['Standard', 'Easy Start', 'Good Practice', 'Standard (3-player)']) {
-      expect(html).toContain(name);
-    }
-    // Standard comes first and is marked as the default.
-    expect(html.indexOf('Standard')).toBeLessThan(html.indexOf('Good Practice'));
-    expect(html).toMatch(/Standard<\/strong>[\s\S]*?class="default-tag"[^>]*>Default</);
-    // The 3-player presets: Standard first, marked Default for 3 players (D63), each experimental.
-    expect(html).toMatch(
+    // Join a room sits just above the two choices; the five Coast pieces open the page.
+    expect(html.indexOf('Join a room')).toBeGreaterThan(html.indexOf('class="coast-row"'));
+    expect(html.indexOf('Join a room')).toBeLessThan(html.indexOf('class="modes"'));
+    expect(html).toMatch(/class="mode" aria-pressed="true" data-players="2"/);
+    expect(html).toMatch(/class="mode" aria-pressed="false" data-players="3"/);
+    // Each board is drawn from its own seat: Light's for 2 players, the Dragon's for 3.
+    expect(html).toContain('Chess Nines board, light seat');
+    expect(html).toContain('Chess Nines board, dragon seat');
+    expect(html).not.toContain('aria-label="Moves"');
+  });
+
+  it.each([2, 3] as const)(
+    'shows the %i-player presets in order: Standard, Easy Start, Good Practice, then Build a custom ruleset',
+    (players) => {
+      const html = renderToStaticMarkup(<RulePicker players={players} onPick={() => {}} />);
+      const presets = html.slice(html.indexOf('id="presets-title"'), html.indexOf('build-row'));
+      const names = [...presets.matchAll(/<strong>([^<]+)<\/strong>/g)].map((m) => m[1]);
+      const suffix = players === 3 ? ' (3-player)' : '';
+      expect(names).toEqual([`Standard${suffix}`, `Easy Start${suffix}`, `Good Practice${suffix}`]);
+      for (const id of HOME_PRESETS[players]) {
+        expect(html).toContain(`href="/rules/${id}"`);
+        expect(html).toContain(PRESET_SUMMARIES[id]!);
+      }
+      expect(html).toContain('Build a custom ruleset');
+      expect(html).toMatch(/<button[^>]*>Play<\/button>/);
+      expect(html).not.toMatch(/Not playable yet/);
+    },
+  );
+
+  it('marks each count’s default and keeps the status badges', () => {
+    const two = renderToStaticMarkup(<RulePicker onPick={() => {}} />);
+    expect(two).toMatch(/Standard<\/strong>[\s\S]*?class="default-tag"[^>]*>Default</);
+    expect(two).toContain('data-status="candidate"');
+    expect(two).toContain('data-status="experimental"');
+    const three = renderToStaticMarkup(<RulePicker players={3} onPick={() => {}} />);
+    expect(three).toMatch(
       /Standard \(3-player\)<\/strong>[\s\S]*?class="default-tag"[^>]*>Default for 3 players</,
     );
-    expect(html.indexOf('Standard (3-player)')).toBeLessThan(html.indexOf('Easy Start (3-player)'));
-    expect(html.indexOf('Standard (3-player)')).toBeLessThan(
-      html.indexOf('Good Practice (3-player)'),
-    );
-    for (const id of ['standard-3p', 'easy-3p', 'draft-3p']) {
-      expect(html).toContain(`href="/rules/${id}"`);
+  });
+
+  it('lists every other 3-player ruleset under "Rulesets under test", none twice', () => {
+    const html = renderToStaticMarkup(<RulePicker players={3} onPick={() => {}} />);
+    const others = listRulesets().filter((r) => r.players === 3 && !HOME_PRESETS[3].includes(r.id));
+    expect(others.length).toBeGreaterThan(0);
+    expect(html).toContain(`Rulesets under test (${others.length})`);
+    for (const r of others) expect(html.split(`href="/rules/${r.id}"`)).toHaveLength(2);
+    // No 2-player ruleset on the 3-player page.
+    expect(html).not.toContain('href="/rules/standard-2p"');
+  });
+
+  it('names a real, playable ruleset of the right player count for every home preset', () => {
+    for (const players of [2, 3] as const) {
+      for (const id of HOME_PRESETS[players]) {
+        const r = listRulesets().find((x) => x.id === id);
+        expect(r?.players, id).toBe(players);
+        expect(r?.playable, id).toBe(true);
+      }
     }
-    expect(html).toContain('href="/rules/standard-2p"');
-    expect(html).toContain('href="/rules/draft-2p"');
-    expect(html).toContain('data-status="candidate"');
-    expect(html).toContain('data-status="experimental"');
-    expect(html).not.toMatch(/Not playable yet/);
-    expect(html).toMatch(/<button[^>]*>Play<\/button>/);
-    expect(html).not.toContain('aria-label="Moves"');
+  });
+
+  it('puts the logo in the masthead as a link home', () => {
+    for (const path of ['/', '/privacy', '/rules/standard-2p']) {
+      const html = renderToStaticMarkup(<App path={path} />);
+      expect(html, path).toMatch(
+        /<a href="\/" class="brand" aria-label="Chess Nines home"><img class="brand-mark" src="[^"]*emblem[^"]*\.svg"/,
+      );
+    }
   });
 
   it('the game screen offers Play online and joining a room, when the app wires them (S53)', () => {

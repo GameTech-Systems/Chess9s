@@ -194,6 +194,16 @@ async function noSidewaysScroll(page, what) {
   check(scroll <= width, `${what}: no sideways scroll (${scroll} <= ${width})`);
 }
 
+/**
+ * The home page shows one player count's rulesets at a time (owner, 3 Nov 2026): choose the count,
+ * and open "Rulesets under test" so every ruleset of that count has a card.
+ */
+async function showRulesets(page, players) {
+  await page.locator(`button.mode[data-players="${players}"]`).click();
+  const testing = page.locator('details.testing');
+  if ((await testing.count()) > 0) await testing.evaluate((d) => (d.open = true));
+}
+
 async function play(browser, options, size, spec) {
   const label = `${size} · ${spec.label}`;
   const context = await browser.newContext({ ...options, acceptDownloads: true });
@@ -203,6 +213,7 @@ async function play(browser, options, size, spec) {
   const slug = `${size.replace(/\W+/g, '')}-${spec.game.ruleset}-${spec.heading.replace(/\W+/g, '')}`;
 
   await page.goto(BASE);
+  await showRulesets(page, 3);
   const card = page.locator('li.ruleset', { has: page.getByText(spec.name, { exact: true }) });
   await card.getByRole('button', { name: 'Play', exact: true }).click();
   await page.locator('ul[aria-label="Seats"]').waitFor({ timeout: TIMEOUT });
@@ -323,6 +334,7 @@ async function playComputerDragon(browser, options, size) {
   const page = await context.newPage();
   page.on('pageerror', (e) => console.error(`${label} page error:`, e.message));
   await page.goto(BASE);
+  await showRulesets(page, 3);
   const card = page.locator('li.ruleset', {
     has: page.getByText('Good Practice (3-player)', { exact: true }),
   });
@@ -418,6 +430,7 @@ async function playResignation(browser, options, size) {
   const page = await context.newPage();
   page.on('pageerror', (e) => console.error(`${label} page error:`, e.message));
   await page.goto(BASE);
+  await showRulesets(page, 3);
   const card = page.locator('li.ruleset', {
     has: page.getByText('Good Practice (3-player)', { exact: true }),
   });

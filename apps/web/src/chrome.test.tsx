@@ -1,4 +1,5 @@
 import { renderToStaticMarkup } from 'react-dom/server';
+import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import { App, pageOf, roomCodeOf, rulesIdOf } from './App';
 import { ErrorBoundary, ErrorScreen } from './ErrorScreen';
@@ -8,6 +9,7 @@ import { Tournament } from './Tournament';
 import { STANDARD_DISCUSSION } from './tournament';
 import { PRIVACY_UPDATED } from './Privacy';
 import { listRulesets } from './game/rules';
+import { RulePicker } from './RulePicker';
 
 describe('error screen', () => {
   it('replaces the app with a message and a way to report it', () => {
@@ -212,12 +214,25 @@ describe('online play pages (S53)', () => {
     expect(html).toContain('Back to the game');
   });
 
-  it('the picker offers Play online for every 2-player ruleset, and joining by code', () => {
+  it('the home page offers Play online for every ruleset of the chosen count, and joining by code', () => {
     const html = renderToStaticMarkup(<App path="/" />);
-    const playable = listRulesets().filter((r) => r.online).length;
-    expect(html.split('>Play online<')).toHaveLength(playable + 1);
+    const two = listRulesets().filter((r) => r.online && r.players === 2).length;
+    expect(html.split('>Play online<')).toHaveLength(two + 1);
     expect(html).toContain('Join a room');
     expect(html).toContain('aria-label="Room code"');
+    const three = renderToStaticMarkup(
+      <RulePicker players={3} onPick={() => {}} onPlayOnline={() => {}} />,
+    );
+    const online3 = listRulesets().filter((r) => r.online && r.players === 3).length;
+    expect(three.split('>Play online<')).toHaveLength(online3 + 1);
+  });
+
+  it('links the favicon, the home-screen icon and the share card in index.html', () => {
+    const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+    expect(html).toContain('rel="icon" type="image/svg+xml" href="../../assets/brand/favicon.svg"');
+    expect(html).toContain('rel="apple-touch-icon" href="../../assets/brand/apple-touch-icon.png"');
+    expect(html).toContain('property="og:title" content="Chess Nines"');
+    expect(html).not.toContain('href="data:,"');
   });
 
   it('privacy says what online play sends, what the server keeps and for how long (D53)', () => {

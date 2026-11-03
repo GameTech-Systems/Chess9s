@@ -114,9 +114,20 @@ const watch = (label, name, page) => {
   page.on('console', (m) => m.type() === 'error' && console.error(`${label} ${name}:`, m.text()));
 };
 
+/**
+ * The home page shows one player count's rulesets at a time (owner, 3 Nov 2026): choose the count,
+ * and open "Rulesets under test" so every ruleset of that count has a card.
+ */
+async function showRulesets(page, players) {
+  await page.locator(`button.mode[data-players="${players}"]`).click();
+  const testing = page.locator('details.testing');
+  if ((await testing.count()) > 0) await testing.evaluate((d) => (d.open = true));
+}
+
 /** The creator opens the picker, chooses Play online for Good Practice, picks Dark and creates the room. */
 async function createRoom(page, label, computer) {
   await page.goto(BASE);
+  await showRulesets(page, 3);
   const card = page.locator('li.ruleset', { has: page.getByText(NAME, { exact: true }) });
   await card.getByRole('button', { name: 'Play online' }).click();
   await page.getByRole('button', { name: 'Dark', exact: true }).first().click();

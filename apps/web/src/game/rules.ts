@@ -35,6 +35,16 @@ export const DEFAULT_RULESET_ID = 'standard-2p';
 /** The ruleset that starts 3-player games (D63, owner, 26 Oct 2026). */
 export const DEFAULT_3P_RULESET_ID = 'standard-3p';
 
+/**
+ * The three presets the home page offers for each player count, in this order: Standard, Easy
+ * Start, Good Practice (owner, 3 Nov 2026). Every other bundled ruleset is listed under
+ * "Rulesets under test".
+ */
+export const HOME_PRESETS: Record<2 | 3, string[]> = {
+  2: [DEFAULT_RULESET_ID, 'easy-2p', 'draft-2p'],
+  3: [DEFAULT_3P_RULESET_ID, 'easy-3p', 'draft-3p'],
+};
+
 /** What the picker shows about a ruleset, and what is recorded with a game. */
 export interface RulesetInfo {
   id: string;

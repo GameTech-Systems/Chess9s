@@ -37,7 +37,31 @@ body {
 }
 
 .masthead {
+  display: grid;
+  justify-items: center;
   text-align: center;
+}
+
+/* The logo: the phoenix emblem and the name, one link home. */
+.masthead .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--ink);
+  text-decoration: none;
+  border-radius: 14px;
+  padding: 0.15rem 0.6rem 0.15rem 0.2rem;
+}
+
+.masthead .brand:hover {
+  color: var(--gold-text);
+}
+
+.brand-mark {
+  display: block;
+  width: clamp(2.6rem, 7vw, 3.6rem);
+  height: auto;
+  filter: drop-shadow(0 0 10px rgb(255 190 90 / 0.25));
 }
 
 .masthead h1 {
@@ -1115,4 +1139,261 @@ a:hover {
 .seats li[data-flag='true'] .seat-time {
   color: var(--ink);
   font-weight: 600;
+}
+
+/* Home page (owner, 3 Nov 2026): the five Coast pieces, joining a room, 2 or 3 players, then
+   that count's three presets and a custom ruleset. */
+.picker.home {
+  width: min(100%, 54rem);
+  display: grid;
+  gap: 1.1rem;
+}
+
+.home > h2 {
+  margin: 0.4rem 0 0;
+  letter-spacing: 0.06em;
+}
+
+.hero {
+  padding: 1.1rem 0.75rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--gold) 28%, transparent);
+  border-radius: 20px;
+  background:
+    radial-gradient(90% 70% at 50% 100%, rgb(200 164 93 / 0.14), transparent 70%),
+    radial-gradient(120% 100% at 50% 0%, #232835, #0a0b0e 75%);
+  text-align: center;
+}
+
+.hero-lede {
+  max-width: 34rem;
+  margin: 0 auto 0.6rem;
+  font-size: clamp(1.02rem, 2.4vw, 1.28rem);
+  line-height: 1.4;
+}
+
+.coast-row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.25rem;
+  align-items: end;
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.picker .coast-row {
+  gap: 0.25rem;
+}
+
+.coast-row img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.coast-row span {
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--gold-text);
+  font-size: clamp(0.62rem, 1.6vw, 0.78rem);
+  letter-spacing: 0.1em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.hero-note {
+  max-width: 34rem;
+  margin: 0.7rem auto 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.home .join {
+  width: min(100%, 28rem);
+  margin: 0 auto;
+}
+
+.modes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.mode {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 0.35rem;
+  padding: 0.75rem 0.6rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--gold) 30%, transparent);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--panel) 75%, transparent);
+  color: var(--ink);
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.mode:hover {
+  border-color: color-mix(in srgb, var(--gold) 70%, transparent);
+}
+
+.mode[aria-pressed='true'] {
+  border-color: var(--gold);
+  background:
+    radial-gradient(100% 80% at 50% 0%, rgb(200 164 93 / 0.18), transparent 70%), var(--panel);
+  box-shadow:
+    inset 0 0 0 1px var(--gold),
+    0 12px 30px rgb(0 0 0 / 0.35);
+}
+
+.mode:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+.mode-board {
+  display: block;
+  width: 100%;
+  max-width: 19rem;
+}
+
+.mode-board .board {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  filter: drop-shadow(0 8px 16px rgb(0 0 0 / 0.45));
+}
+
+.mode-title {
+  font-size: clamp(1.05rem, 3vw, 1.35rem);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.mode[aria-pressed='true'] .mode-title {
+  color: var(--gold-text);
+}
+
+.mode-note {
+  max-width: 18rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
+.presets {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.presets h3 {
+  margin: 0.5rem 0 0;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+
+.presets > ul,
+.testing > ul {
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.75rem;
+}
+
+.presets .ruleset {
+  align-content: start;
+  background: color-mix(in srgb, var(--panel) 60%, transparent);
+}
+
+.presets .ruleset .facts {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.ruleset .id-line {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.ruleset .again.play {
+  border-color: var(--gold);
+  background: var(--gold);
+  color: var(--bg);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.ruleset .again.play:hover {
+  background: var(--gold-text);
+}
+
+.build-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+
+.build-row .facts {
+  margin: 0;
+  color: var(--muted);
+}
+
+.build-row .again {
+  min-height: 44px;
+  padding: 0 1.25rem;
+  border: 1px dashed var(--gold);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.build-row .again:hover {
+  background: color-mix(in srgb, var(--gold) 18%, transparent);
+}
+
+.testing {
+  padding: 0.6rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--gold) 22%, transparent);
+  border-radius: 12px;
+}
+
+.testing summary {
+  color: var(--gold-text);
+  cursor: pointer;
+}
+
+.testing[open] summary {
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 700px) {
+  .masthead .brand {
+    gap: 0.4rem;
+  }
+
+  .hero {
+    padding: 0.8rem 0.4rem 0.7rem;
+    border-radius: 16px;
+  }
+
+  .modes {
+    gap: 0.5rem;
+  }
+
+  .mode {
+    padding: 0.5rem 0.4rem 0.75rem;
+    border-radius: 14px;
+  }
+
+  .mode-note {
+    font-size: 0.78rem;
+  }
 }

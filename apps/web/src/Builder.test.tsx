@@ -255,7 +255,7 @@ describe('the picker with the player’s own rulesets', () => {
 
   it('offers to build one, and says when there are none', () => {
     const html = renderToStaticMarkup(<RulePicker onPick={() => {}} />);
-    expect(html).toContain('Build a ruleset');
+    expect(html).toContain('Build a custom ruleset');
     expect(html).toContain('None yet');
   });
 

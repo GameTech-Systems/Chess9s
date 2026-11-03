@@ -16,6 +16,7 @@ import {
 } from '@chess9s/engine';
 import ends from '../../../packages/engine/test/fixtures/games/three-player-ends.json';
 import { App } from './App';
+import { RulePicker } from './RulePicker';
 import { Game } from './Game';
 import { RulesPage } from './RulesPage';
 import { customInfo } from './game/rules';
@@ -95,7 +96,8 @@ describe('the board turns to the side to move', () => {
     expect(html).toContain('Chess Nines board, light seat');
     expect(html).not.toContain('aria-label="Seats"');
     expect(html).toContain('aria-label="Opponent"');
-    expect(html).toContain('data-ting-yang-turn="0"');
+    // The I5 phoenix opens away from the Center in every game (owner, 3 Nov 2026).
+    expect(html).toContain('data-ting-yang-turn="90"');
   });
 });
 
@@ -263,9 +265,11 @@ describe('the 3-player game screen and online play (S63)', () => {
     expect(customInfo({ id: 'mine-2p', name: 'Mine', overrides: {} }).online).toBe(true);
   });
 
-  it('opens a 3-player game from the picker route', () => {
+  it('opens a 3-player game from the home page once 3 players is chosen', () => {
     const html = renderToStaticMarkup(<App path="/" />);
-    expect(html).toContain('Standard (3-player)');
+    expect(html).toMatch(/class="mode" aria-pressed="false" data-players="3"/);
+    const three = renderToStaticMarkup(<RulePicker players={3} onPick={() => {}} />);
+    expect(three).toContain('Standard (3-player)');
   });
 });
 
