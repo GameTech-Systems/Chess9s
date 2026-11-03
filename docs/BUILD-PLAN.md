@@ -462,11 +462,12 @@ Done when: the reports are committed with the comparison in decision 0022 and th
 ### S83 — Owner review of the Limited-to-3 screens · Owner with Claude in chat · Opus 5.5 · medium · `done`
 The owner read the S82 screens (decision 0022) and chose (D82, decision 0023): depth 3 is the 3-player balance measure (no more depth 1 and 2 screens); the Tail gets its own range `tail.3p.range`; first screen `heavy-h3-3p` (Heads 3, Tail 8); a Tail sweep with `set` overrides only if the Dragon screens above the band; Light-Handed dropped from simulations. Claude recorded it (decision 0023, this plan, handoff, log) and built nothing.
 
-### S84 — Tail range parameter and `heavy-h3-3p` · Claude · Sonnet 5.5 · medium · `todo`
+### S84 — Tail range parameter and `heavy-h3-3p` · Claude · Sonnet 5.5 · medium · `done`
 Build [decision 0023](decisions/0023-tail-range.md) as data, each new option tested at its default and every option: parameter `tail.3p.range` (options 1 to 8, default "same as `dragonHead.range`", so no existing ruleset changes), then the experimental ruleset `heavy-h3-3p` "Heavy-Handed Dragon, Heads 3" 0.1.0 (= `heavy-3p` 0.1.0 + `dragonHead.range` 3 + `tail.3p.range` 8). Tests (a Tail capped by its own range, a Head by the Heads' range, the default following `dragonHead.range`, a recorded game), RULES.md, `pnpm rules:index`, `session.test.ts`. After the merge dispatch from Actions → **Sim depth 2**: `heavy-h3-3p`, depth `3`, about 150 games, 30 shards, `set` `turn.3p.order=dark-light-dragon`, `label` `depth3`.
 Done when: the parameter, ruleset and tests are merged and the screen is dispatched.
+Built as data with no engine change: `tail.3p.range` is an enum (`same-as-heads` default, 1 to 8) so a default that follows `dragonHead.range` fits; the Tail's Head-like slide has one move per option. Every earlier ruleset's moves are unchanged (checked before and after); four 3-player locks record the new key. See "Built in S84" in decision 0023.
 
-### S85 — Collect the Tail-8 screen · Claude (workflow) · Opus 5.5 · medium · `todo`
+### S85 — Collect the Tail-8 screen · Claude (workflow) · Sonnet 5.5 · medium · `todo`
 Collect the report, check its game count, commit it as in S82, add the result to decision 0023 (dark / light / Dragon). If the Dragon is above the 28-38% band, dispatch the Tail sweep (`set` `tail.3p.range=4`, `5`, `6`, `7`, Heads at 3, depth 3, about 150 games each, no new ruleset files). If it is below the band, skip the sweep and leave it to the owner. Either way the best result later gets a confirming run of about 450 games before the owner decides.
 Done when: the report is committed with the comparison in decision 0023 and the handoff, and the sweep is dispatched or skipped.
 
