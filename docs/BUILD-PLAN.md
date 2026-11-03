@@ -455,7 +455,7 @@ Done when: the reports are committed and the comparison is in decision 0022 and 
 The owner reads the S80 comparison (decision 0022) and picks what comes next. Claude records the calls and builds nothing the owner has not chosen.
 Owner's call (D81): one more screen of Heavy-Handed with the Heads limited to 3. Built as data: `heavy-limited3-3p` 0.1.0 (= `heavy-3p` + `dragonHead.range` 3, the Tail capped too), tests, RULES.md. Screens dispatched after the merge from Actions → **Sim depth 2**: 400 games at depths `1,2` (20 shards); depth `3`, 150 games, 30 shards, `set` `turn.3p.order=dark-light-dragon`, `label` `depth3`.
 
-### S82 — Collect the Limited-to-3 screens · Claude (workflow) · Opus 5.5 · medium · `todo`
+### S82 — Collect the Limited-to-3 screens · Claude (workflow) · Opus 5.5 · medium · `done`
 Collect the S81 reports (`fairness-report-heavy-limited3-3p`, and `.depth3`), check each report's game count, commit them as in S80, and add the results to the decision 0022 table beside `heavy-3p` and `heavy-limited-3p`. Report seats as dark / light / Dragon.
 Done when: the reports are committed with the comparison in decision 0022 and the handoff.
 
