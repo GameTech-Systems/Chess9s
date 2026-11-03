@@ -1,5 +1,6 @@
 import { useId } from 'react';
 import type { Board as BoardData, Position, Square } from '@chess9s/engine';
+import { EMBLEM_URL } from '../brand';
 import {
   FILES,
   SIZE,
@@ -20,6 +21,13 @@ const PAWN = 'pawn';
 
 const CELL = 100;
 const MARGIN = 64;
+/** The phoenix emblem's size on i5. */
+const EMBLEM = 92;
+/**
+ * The emblem is drawn wings up; this turns it so it opens away from the Center in the standard
+ * diagram (i5 is at the right-hand end of rank 5). The same in 2- and 3-player games.
+ */
+const TING_YANG_TURN = 90;
 const BOARD = CELL * SIZE;
 const TOTAL = BOARD + MARGIN * 2;
 
@@ -106,7 +114,6 @@ export function Board({
   const tetra = tetrahedron(CELL);
   const pts = (...ps: { x: number; y: number }[]) => ps.map((p) => `${p.x},${p.y}`).join(' ');
   const [a, b, c] = tetra.base;
-  const tingYangTurn = players === 3 ? 90 : 0;
 
   return (
     <svg
@@ -211,20 +218,23 @@ export function Board({
         />
       </g>
 
-      {/* Ting Yang: placeholder symbol, no art. Turns 90 degrees clockwise in 3-player games. */}
+      {/* Ting Yang (i5): the phoenix emblem on its white square, turned so its wings open away
+          from the Center. Seen from e5 it is upright and symmetric, so neither light nor dark
+          faces its top (owner, 3 Nov 2026). The art is reserved (assets/brand). */}
       <g
         data-ting-yang=""
-        data-ting-yang-turn={tingYangTurn}
-        transform={`translate(${centerOf('i5').x} ${centerOf('i5').y}) rotate(${rotate + tingYangTurn})`}
-        fill="none"
-        stroke="#1d1b18"
-        strokeWidth="4"
-        strokeLinejoin="round"
+        data-ting-yang-turn={TING_YANG_TURN}
+        transform={`translate(${centerOf('i5').x} ${centerOf('i5').y}) rotate(${rotate + TING_YANG_TURN})`}
         pointerEvents="none"
       >
-        <circle r="26" />
-        <circle r="5" fill="#1d1b18" stroke="none" />
-        <path d="M0 -26L-8 -39H8Z" fill="#1d1b18" />
+        <image
+          href={EMBLEM_URL}
+          x={-EMBLEM / 2}
+          y={-EMBLEM / 2}
+          width={EMBLEM}
+          height={EMBLEM}
+          preserveAspectRatio="xMidYMid meet"
+        />
       </g>
 
       <Marks highlights={highlights} centerOf={centerOf} />

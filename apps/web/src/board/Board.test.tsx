@@ -65,16 +65,24 @@ describe('Board', () => {
     }
   });
 
-  it('draws the tetrahedron on e5 and the Ting Yang placeholder on i5, not an arrow', () => {
+  it('draws the tetrahedron on e5 and the phoenix emblem on i5, not an arrow', () => {
     const html = render();
     expect(html).toContain('data-tetrahedron');
     expect(html).toContain('data-ting-yang');
+    expect(html).toMatch(/data-ting-yang=""[^>]*>\s*<image href="[^"]*emblem[^"]*\.svg"/);
     expect(html).not.toContain('data-arrow');
   });
 
-  it('turns the Ting Yang symbol 90 degrees clockwise in 3-player games', () => {
-    expect(render({ players: 2 })).toContain('data-ting-yang-turn="0"');
+  it('turns the I5 phoenix to open away from the Center, in 2- and 3-player games (owner, 3 Nov 2026)', () => {
+    // Drawn wings up, turned 90 degrees clockwise: seen from e5 it is upright and symmetric.
+    expect(render({ players: 2 })).toContain('data-ting-yang-turn="90"');
     expect(render({ players: 3 })).toContain('data-ting-yang-turn="90"');
+  });
+
+  it('keeps i5 a white square under the emblem', () => {
+    expect(render()).toMatch(
+      /data-square="i5"[^>]*>(<title>[^<]*<\/title>)?<rect[^>]*fill="#ffffff"/,
+    );
   });
 
   it('moves squares with the seat view: a1 is bottom left for light, top right for dark, bottom right for Dragon', () => {

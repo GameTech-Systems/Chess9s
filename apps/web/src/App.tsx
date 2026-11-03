@@ -7,10 +7,17 @@ import { Privacy } from './Privacy';
 import { Tournament } from './Tournament';
 import { CreateRoom } from './CreateRoom';
 import { OnlineRoom } from './OnlineRoom';
-import { DISCUSSIONS_URL, LICENSES_PATH, RIGHTS_HOLDER } from './links';
+import { DISCUSSIONS_URL, LICENSES_PATH, RIGHTS_HOLDER, rulesPath } from './links';
 import { parseShareLink } from './game/share';
 import { loadCustoms, saveCustoms } from './game/custom';
-import { customInfo, type CustomRuleset, type RulesetInfo } from './game/rules';
+import {
+  customInfo,
+  DEFAULT_3P_RULESET_ID,
+  DEFAULT_RULESET_ID,
+  type CustomRuleset,
+  type RulesetInfo,
+} from './game/rules';
+import { EMBLEM_URL } from './brand';
 import type { Store } from './game/guest';
 import { fromGame } from './game/session';
 import { roomPath } from './game/share';
@@ -82,6 +89,10 @@ export function App({
   // The player's own rulesets live in this browser only (privacy page).
   const [customs, setCustoms] = useState<CustomRuleset[]>(() => loadCustoms(store));
   const [editing, setEditing] = useState<string | undefined>(undefined);
+  // The home page's player count: the last game's, so "Change ruleset" comes back to it.
+  const [players, setPlayers] = useState<2 | 3>(2);
+  // The preset a new custom ruleset starts from: the default for the player count it was made for.
+  const [buildBase, setBuildBase] = useState(DEFAULT_RULESET_ID);
   const keepCustom = (c: CustomRuleset) => {
     const next = customs.some((o) => o.id === c.id)
       ? customs.map((o) => (o.id === c.id ? c : o))
@@ -102,7 +113,27 @@ export function App({
   const navigate = (to: string) => {
     window.history.pushState(null, '', to);
     setHere(to);
-    window.scrollTo?.(0, 0);
+  };
+  // Every change of screen starts at its top: a game picked low on the home page opens at the
+  // board, not at the bottom of the game page (owner, 3 Nov 2026).
+  const screen = [
+    here,
+    picked ? `${picked.id}@${picked.version}` : '',
+    creating?.id ?? '',
+    opened?.date ?? '',
+  ].join('|');
+  useEffect(() => {
+    if (typeof window !== 'undefined') window.scrollTo?.(0, 0);
+  }, [screen]);
+  const play = (r: RulesetInfo) => {
+    setPlayers(r.players);
+    setPicked(r);
+  };
+  const home = () => {
+    setCreating(null);
+    setOpened(null);
+    setPicked(null);
+    navigate('/');
   };
   // In-page navigation keeps the app from fetching anything after load.
   const go = (to: string) => (e: React.MouseEvent) => {
@@ -121,13 +152,24 @@ export function App({
             ? 'Online'
             : picked && page === 'game'
               ? `Hot-seat · ${picked.players} players`
-              : 'Hot-seat';
+              : 'Play in your browser · no account needed';
   return (
     <main className="page">
       <header className="masthead">
-        <h1>
-          Chess Nines<span className="tm">™</span>
-        </h1>
+        <a
+          href="/"
+          className="brand"
+          onClick={(e) => {
+            e.preventDefault();
+            home();
+          }}
+          aria-label="Chess Nines home"
+        >
+          <img className="brand-mark" src={EMBLEM_URL} alt="" width="64" height="64" />
+          <h1>
+            Chess Nines<span className="tm">™</span>
+          </h1>
+        </a>
         <p>{subtitle}</p>
       </header>
       {page === 'privacy' ? (
@@ -136,13 +178,14 @@ export function App({
         <Tournament />
       ) : page === 'build' ? (
         <Builder
-          key={editing ?? (shared ? 'shared' : 'new')}
+          key={editing ?? (shared ? 'shared' : `new-${buildBase}`)}
+          base={buildBase}
           {...(editing && { saved: customs.find((c) => c.id === editing) })}
           {...(!editing && shared && { draft: shared })}
           taken={customs.map((c) => c.id)}
           onSave={keepCustom}
           onPlay={(c) => {
-            setPicked(customInfo(c));
+            play(customInfo(c));
             navigate('/');
           }}
         />
@@ -152,7 +195,7 @@ export function App({
           customs={customs.map(customInfo)}
           linkTo={go}
           onPlay={(r) => {
-            setPicked(r);
+            play(r);
             navigate('/');
           }}
         />
@@ -188,19 +231,22 @@ export function App({
           onJoinRoom={(code) => navigate(roomPath(code))}
           onOpenRecord={(r) => {
             setOpened(r);
-            setPicked(r.info);
+            play(r.info);
           }}
         />
       ) : (
         <RulePicker
-          onPick={setPicked}
+          players={players}
+          onPlayers={setPlayers}
+          onPick={play}
           onPlayOnline={setCreating}
           onJoinRoom={(code) => navigate(roomPath(code))}
           linkTo={go}
           customs={customs.map(customInfo)}
-          onBuild={() => {
+          onBuild={(n) => {
             setEditing(undefined);
             setShared(undefined);
+            setBuildBase(n === 3 ? DEFAULT_3P_RULESET_ID : DEFAULT_RULESET_ID);
             navigate(BUILD_PATH);
           }}
           onEdit={(id) => {
@@ -220,6 +266,10 @@ export function App({
             Privacy
           </a>
         )}
+        {' · '}
+        <a href={rulesPath(DEFAULT_RULESET_ID)} onClick={go(rulesPath(DEFAULT_RULESET_ID))}>
+          How to play
+        </a>
         {' · '}
         <a href={TOURNAMENT_PATH} onClick={go(TOURNAMENT_PATH)}>
           Tournaments

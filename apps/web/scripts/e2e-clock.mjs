@@ -113,7 +113,18 @@ async function open(browser, options) {
   return { context, page };
 }
 
+/**
+ * The home page shows one player count's rulesets at a time (owner, 3 Nov 2026): choose the count,
+ * and open "Rulesets under test" so every ruleset of that count has a card.
+ */
+async function showRulesets(page, players) {
+  await page.locator(`button.mode[data-players="${players}"]`).click();
+  const testing = page.locator('details.testing');
+  if ((await testing.count()) > 0) await testing.evaluate((d) => (d.open = true));
+}
+
 async function play(page, name) {
+  await showRulesets(page, name.includes('3-player') ? 3 : 2);
   const card = page.locator('li.ruleset', { has: page.getByText(name, { exact: true }) });
   await card.getByRole('button', { name: 'Play', exact: true }).click();
   return card;

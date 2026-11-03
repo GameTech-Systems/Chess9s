@@ -211,6 +211,7 @@ function rowsOf(settings: Setting[]): Setting[][] {
  */
 export function Builder({
   saved,
+  base: startFrom,
   taken = [],
   draft,
   onSave,
@@ -218,6 +219,8 @@ export function Builder({
 }: {
   /** An already saved ruleset being edited. */
   saved?: CustomRuleset | undefined;
+  /** The preset a new ruleset starts from (the 2-player default when absent). */
+  base?: string;
   /** Ids of the saved rulesets, so a new one gets a free id. */
   taken?: string[];
   /** Start from this draft (a share link, or tests). */
@@ -229,7 +232,7 @@ export function Builder({
   const [state, dispatch] = useReducer(
     builderReducer,
     undefined,
-    () => draft ?? startBuilder(undefined, saved),
+    () => draft ?? startBuilder(startFrom, saved),
   );
   const [id, setId] = useState(state.id);
   const [kept, setKept] = useState<string | null>(null);
