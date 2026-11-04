@@ -66,34 +66,34 @@ describe('the ruleset list', () => {
       'standard-2p',
       'easy-2p',
       'draft-2p',
-      'standard-3p',
+      'heavy-h3-3p',
       'easy-3p',
       'draft-3p',
       'heavy-3p',
-      'heavy-h3-3p',
       'heavy-limited-3p',
       'heavy-limited3-3p',
       'light-3p',
       'light-limited-3p',
+      'standard-3p',
     ]);
     expect(list.map((r) => r.name)).toEqual([
       'Standard',
       'Easy Start',
       'Good Practice',
-      'Standard (3-player)',
+      'Heavy-Handed Dragon, Heads 3',
       'Easy Start (3-player)',
       'Good Practice (3-player)',
       'Heavy-Handed Dragon',
-      'Heavy-Handed Dragon, Heads 3',
       'Heavy-Handed Dragon, Limited',
       'Heavy-Handed Dragon, Limited to 3',
       'Light-Handed Dragon',
       'Light-Handed Dragon, Limited',
+      'Standard (3-player)',
     ]);
     expect(list.filter((r) => r.isDefault).map((r) => r.id)).toEqual(['standard-2p']);
     expect(list.filter((r) => r.defaultFor).map((r) => [r.id, r.defaultFor])).toEqual([
       ['standard-2p', 2],
-      ['standard-3p', 3],
+      ['heavy-h3-3p', 3],
     ]);
     for (const r of list) {
       expect(['proposed', 'experimental', 'candidate', 'official']).toContain(r.status);

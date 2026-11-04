@@ -12,6 +12,7 @@
     "coast.3p.capturable": true,
     "dragon.3p.defeat": "pieces-and-tail",
     "tail.3p.stone": "where-it-stands",
-    "dragonHead.range": 4
+    "dragonHead.range": 4,
+    "tail.3p.range": 4
   }
 }

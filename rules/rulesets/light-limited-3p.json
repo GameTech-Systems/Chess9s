@@ -13,6 +13,7 @@
     "dragon.3p.defeat": "pieces-only",
     "tail.3p.stone": "where-it-stands",
     "tail.3p.captures": "none",
-    "dragonHead.range": 4
+    "dragonHead.range": 4,
+    "tail.3p.range": 4
   }
 }

@@ -50,3 +50,9 @@ Under item 4 the Dragon is not above the band, so the Tail sweep (4 to 7) is **s
 
 The two runs agree: the seats sit within about 2 points of each other and of one third. The report's verdict is "incomplete" only because depth 3 at 449 games is below the 2,000-game rule of decision 0015, and every 3-player ruleset stays experimental (D81, D60). The decision whether to publish `heavy-h3-3p` as the Heavy-Handed default, or to keep it as a variant, is the owner's.
 
+
+## Owner decision after the confirming run (S88, 4 Nov 2026)
+- **`heavy-h3-3p` is the default 3-player ruleset** (`DEFAULT_3P_RULESET_ID`): it starts new 3-player games and takes the home page's first 3-player slot. It stays experimental (D60). `standard-3p` 0.3.0 stays as a ruleset under test, unchanged.
+- **`tail.3p.range` is a plain integer, 1 to 8, default 8** (unlimited), not an enum. `same-as-heads` is gone, along with its Tail moves in `dragon-tail.json`.
+- **Rulesets that relied on `same-as-heads`:** `heavy-limited-3p`, `heavy-limited3-3p` and `light-limited-3p` now override `tail.3p.range` to their `dragonHead.range` (4, 3, 4) so they play as before. Other rulesets have Heads 8, so the Tail is unchanged.
+- **Lock exception (owner-approved):** the four locks that recorded `same-as-heads` (`standard-3p` 0.1.0 and 0.2.0, `draft-3p` 0.3.0, `easy-3p` 0.1.0) were edited by hand to 8, which plays identically (their `dragonHead.range` is 8). No other locked value changed.

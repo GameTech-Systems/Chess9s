@@ -80,14 +80,14 @@ describe('the parameter tail.3p.range (D82)', () => {
     expect(p).toBeDefined();
     expect(p!.piece).toBe('dragon-tail');
     expect(p!.players).toEqual([3]);
-    expect(p!.type).toBe('enum');
+    expect(p!.type).toBe('integer');
     expect(p!.group).toBe('Dragon Tail');
     expect(p!.status).toBe('experimental');
   });
 
-  it('defaults to the Heads’ range and offers 1 to 8', () => {
-    expect(p!.default).toBe('same-as-heads');
-    expect(p!.options).toEqual(['same-as-heads', ...RANGES]);
+  it('defaults to 8 (unlimited), a plain integer, and offers 1 to 8', () => {
+    expect(p!.default).toBe(8);
+    expect(p!.options).toEqual(RANGES);
     for (const o of p!.options) expect(p!.optionLabels).toHaveProperty(String(o));
     expect(p!.optionLabels!['8']).toMatch(/unlimited/i);
   });
@@ -129,34 +129,25 @@ describe('the Tail slides as far as tail.3p.range says', () => {
   });
 });
 
-describe('the default follows dragonHead.range', () => {
-  it.each(RANGES)('Heads %i: the Tail slides %i too', (n) => {
+describe('the default is 8, whatever the Heads’ range (owner, 4 Nov 2026)', () => {
+  it.each(RANGES)('Heads %i: the Tail still slides unlimited', (n) => {
     const rules = rulesFor('heavy-3p', { 'dragonHead.range': n });
-    expect(rules.values['tail.3p.range']).toBe('same-as-heads');
-    expect(tailReach(rules)).toEqual(capped(n));
+    expect(rules.values['tail.3p.range']).toBe(8);
+    expect(tailReach(rules)).toEqual(capped(8));
     expect(headReach(rules)).toEqual(capped(n));
   });
 
-  it.each(threePlayerIds.filter((x) => x !== 'heavy-h3-3p'))(
-    '%s: the default Tail moves exactly like a Tail with the Heads’ range',
-    (id) => {
-      const rules = rulesFor(id);
-      const heads = rules.values['dragonHead.range'] as number;
-      const explicit = rulesFor(id, { 'tail.3p.range': heads });
-      for (const from of ['c3', 'e5']) {
-        expect(movesOf(rules, 'dragon-tail', from, HEAD).sort()).toEqual(
-          movesOf(explicit, 'dragon-tail', from, HEAD).sort(),
-        );
-      }
-    },
-  );
-
-  it('changes no value of an existing ruleset except by adding the new key', () => {
-    for (const id of threePlayerIds.filter((x) => x !== 'heavy-h3-3p')) {
-      const r = ruleset(id);
-      expect(r.overrides).not.toHaveProperty('tail.3p.range');
+  it('rulesets that limited the Heads and the Tail together pin the Tail to the Heads', () => {
+    for (const id of ['heavy-limited-3p', 'heavy-limited3-3p', 'light-limited-3p']) {
       const v = rulesFor(id).values;
-      expect(v['tail.3p.range']).toBe('same-as-heads');
+      expect(v['tail.3p.range']).toBe(v['dragonHead.range']);
+    }
+  });
+
+  it('every other 3-player ruleset has the Tail at 8', () => {
+    const pinned = ['heavy-limited-3p', 'heavy-limited3-3p', 'light-limited-3p'];
+    for (const id of threePlayerIds.filter((x) => !pinned.includes(x))) {
+      expect(rulesFor(id).values['tail.3p.range']).toBe(8);
     }
   });
 });
@@ -178,7 +169,8 @@ describe('Heavy-Handed Dragon, Heads 3 (D82)', () => {
     const v = rulesFor(id).values;
     const b = rulesFor('heavy-3p').values;
     const changed = Object.keys(v).filter((k) => JSON.stringify(v[k]) !== JSON.stringify(b[k]));
-    expect(changed.sort()).toEqual(['dragonHead.range', 'tail.3p.range']);
+    // tail.3p.range 8 is the default, so only the Heads differ from heavy-3p.
+    expect(changed).toEqual(['dragonHead.range']);
     expect(v['dragonHead.range']).toBe(3);
     expect(v['tail.3p.range']).toBe(8);
     expect(unbuiltFeatures(rulesFor(id))).toEqual([]);
