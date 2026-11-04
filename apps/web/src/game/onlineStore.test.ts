@@ -56,10 +56,10 @@ describe('the online store (chess9s.online)', () => {
     const store = memory();
     saveSeat(store, 'K7RX2M', { seat: 'light', token: TOKEN }, NOW);
     saveSeat(store, 'QQ2222', { seat: 'dark', token: OTHER }, NOW);
-    forgetSeat(store, 'K7RX2M');
+    forgetSeat(store, 'K7RX2M', NOW);
     expect(loadSeat(store, 'K7RX2M', NOW)).toBeNull();
     expect(loadSeat(store, 'QQ2222', NOW)).not.toBeNull();
-    forgetSeat(store, 'QQ2222');
+    forgetSeat(store, 'QQ2222', NOW);
     expect(store.data.has(ONLINE_KEY)).toBe(false);
   });
 
@@ -98,7 +98,7 @@ describe('the online store (chess9s.online)', () => {
   it('plays on when storage is blocked', () => {
     expect(() => saveSeat(broken, 'K7RX2M', { seat: 'light', token: TOKEN }, NOW)).not.toThrow();
     expect(loadSeat(broken, 'K7RX2M', NOW)).toBeNull();
-    expect(() => forgetSeat(broken, 'K7RX2M')).not.toThrow();
+    expect(() => forgetSeat(broken, 'K7RX2M', NOW)).not.toThrow();
     expect(loadSeat(null, 'K7RX2M', NOW)).toBeNull();
   });
 });

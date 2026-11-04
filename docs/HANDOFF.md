@@ -3,7 +3,7 @@
 Updated 2026-11-04 by S87 (Sonnet 5.5 · medium). `/end-session` rewrites this file; keep it under 40 lines.
 
 ## State
-- Phase 6. S87 collected the `heavy-h3-3p` confirming run (run 41701030465, 90 shards, **449** of 450 games, none capped): **33.2 / 32.3 / 34.5** dark / light / Dragon at depth 3, intervals 29.0–37.7, 28.1–36.8, 30.3–39.0. All point scores are inside the 28-38% band ([decision 0023](decisions/0023-tail-range.md)); the Dragon's interval ends just past it. Docs only; no engine change.
+- Phase 6. S87 collected the `heavy-h3-3p` confirming run (run 41701030465, 90 shards, **449** of 450 games, none capped): **33.2 / 32.3 / 34.5** dark / light / Dragon at depth 3, intervals 29.0–37.7, 28.1–36.8, 30.3–39.0. All point scores are inside the 28-38% band ([decision 0023](decisions/0023-tail-range.md)); the Dragon's interval ends just past it. Docs only, plus a test fix: `onlineStore.test.ts` passed no clock to `forgetSeat`, so it failed once its fixed date was 7 days old (CI red on S87).
 - It agrees with the 150-game screen (33.7 / 35.3 / 31.0). The report's verdict reads "incomplete" because 449 games at depth 3 is below decision 0015's 2,000-game rule; 3-player rulesets stay experimental (D81, D60).
 - Earlier depth-3 screens (dark / light / Dragon): `heavy-3p` 24.5 / 24.8 / 50.7; `heavy-limited-3p` 28.7 / 28.7 / 42.7; `heavy-limited3-3p` 35.6 / 41.9 / 22.5.
 
