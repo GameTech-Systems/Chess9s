@@ -39,3 +39,14 @@ The S82 screens ([decision 0022](0022-limited-dragon.md)) show range 4 leaves th
 | `heavy-h3-3p` (Heads 3, Tail 8) | 33.7 | 35.3 | 31.0 |
 
 Under item 4 the Dragon is not above the band, so the Tail sweep (4 to 7) is **skipped**. Item 5 applies instead: the next step is a confirming run of about 450 games at depth 3 on `heavy-h3-3p` before the owner decides. 150 games leave wide intervals, so this is still a screen (D60).
+
+## Result of the confirming run (S87)
+`heavy-h3-3p` 0.1.0 (Heads 3, Tail 8), depth 3, 449 games (one short of 450: a shard lost a game), 90 shards, default turn order, run 41701030465, none capped: **33.2 / 32.3 / 34.5** dark / light / Dragon (95% intervals 29.0–37.7, 28.1–36.8, 30.3–39.0). Each seat's point score is inside the 28–38% band, and the dark and light intervals lie wholly inside it; the Dragon's upper end (39.0) is just past it. 150 draws (128 in the duel). Report: `docs/fairness/heavy-h3-3p.depth3-confirm.md`.
+
+| Ruleset (depth 3) | Games | dark | light | Dragon |
+| --- | --- | --- | --- | --- |
+| `heavy-h3-3p` screen (S85) | 150 | 33.7 | 35.3 | 31.0 |
+| `heavy-h3-3p` confirming run | 449 | 33.2 | 32.3 | 34.5 |
+
+The two runs agree: the seats sit within about 2 points of each other and of one third. The report's verdict is "incomplete" only because depth 3 at 449 games is below the 2,000-game rule of decision 0015, and every 3-player ruleset stays experimental (D81, D60). The decision whether to publish `heavy-h3-3p` as the Heavy-Handed default, or to keep it as a variant, is the owner's.
+

@@ -475,7 +475,7 @@ Done when: the report is committed with the comparison in decision 0023 and the 
 Dispatch the Sim depth 2 workflow on `heavy-h3-3p` (depth 3, about 450 games, default turn order, `label` `depth3-confirm`), as D82 item 5 asks for the best screen. Collect and commit the report in a later session and add it to decision 0023; the owner then decides. Provisional: S85 left the choice of dispatching before or after the owner's review of the 150-game result to the owner.
 Done when: the run is dispatched (run id in the log), or the owner has said to wait.
 
-### S87 — Collect the confirming run · Claude (workflow) · Sonnet 5.5 · medium · `todo`
+### S87 — Collect the confirming run · Claude (workflow) · Sonnet 5.5 · medium · `done`
 Collect run 41701030465 (`fairness-report-heavy-h3-3p.depth3-confirm`), check its game count (about 450, shards can lose runners), commit the report, add it to decision 0023 as dark / light / Dragon and tell the owner it is ready to decide.
 Done when: the report is committed with the comparison in decision 0023 and the handoff.
 
