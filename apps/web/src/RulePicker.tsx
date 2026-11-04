@@ -16,6 +16,8 @@ export const PRESET_SUMMARIES: Record<string, string> = {
     'The closest to regular chess, for learning the board: the King may castle, the Queen may cross the void, and pawns have no safe zones.',
   'draft-2p':
     'The full rules with a King that moves up to 2 squares, which makes checkmate harder to force.',
+  'heavy-h3-3p':
+    'Light, dark and the Dragon, who plays the five Coast pieces. The Dragon Heads move up to 3 squares; the King moves one square.',
   'standard-3p':
     'Light, dark and the Dragon, who plays the five Coast pieces. The full Dragon rules; the King moves one square.',
   'easy-3p': 'A shorter Dragon game for learning: the first checkmate wins.',
@@ -203,7 +205,7 @@ export function RulePicker({
             Build a custom ruleset
           </button>
           <p className="facts small">
-            Start from {players === 3 ? 'Standard (3-player)' : 'Standard'} and change any
+            Start from {players === 3 ? 'the 3-player default' : 'Standard'} and change any
             piece&rsquo;s settings. Kept in this browser.
           </p>
         </div>

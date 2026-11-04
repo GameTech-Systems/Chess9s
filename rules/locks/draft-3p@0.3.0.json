@@ -59,6 +59,6 @@
     "turn.3p.order": "dark-light-dragon",
     "dragon.3p.defeat": "tail-or-pieces-in-duel",
     "tail.3p.stone": "swap",
-    "tail.3p.range": "same-as-heads"
+    "tail.3p.range": 8
   }
 }

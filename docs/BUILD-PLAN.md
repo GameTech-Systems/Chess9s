@@ -479,6 +479,10 @@ Done when: the run is dispatched (run id in the log), or the owner has said to w
 Collect run 41701030465 (`fairness-report-heavy-h3-3p.depth3-confirm`), check its game count (about 450, shards can lose runners), commit the report, add it to decision 0023 as dark / light / Dragon and tell the owner it is ready to decide.
 Done when: the report is committed with the comparison in decision 0023 and the handoff.
 
+### S88 — Make `heavy-h3-3p` the 3-player default · Claude · Sonnet 5.5 · medium · `done`
+Owner decision in chat (4 Nov 2026): `heavy-h3-3p` is the default 3-player ruleset, and `tail.3p.range` is a plain integer with default 8. See decision 0023.
+Done when: tests, lint and build pass.
+
 ## Later phases
 
 Each later phase opens with an Opus 5.5 · high planning session that replaces its placeholder with detailed steps.

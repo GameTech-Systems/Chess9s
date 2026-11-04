@@ -32,8 +32,8 @@ const data = loadRules(
 
 /** The ruleset a new game starts on until another is picked (owner, 24 Oct 2026). */
 export const DEFAULT_RULESET_ID = 'standard-2p';
-/** The ruleset that starts 3-player games (D63, owner, 26 Oct 2026). */
-export const DEFAULT_3P_RULESET_ID = 'standard-3p';
+/** The ruleset that starts 3-player games: standard-3p (D63, owner, 26 Oct 2026), then heavy-h3-3p (owner, 4 Nov 2026, after the S87 confirming run). */
+export const DEFAULT_3P_RULESET_ID = 'heavy-h3-3p';
 
 /**
  * The three presets the home page offers for each player count, in this order: Standard, Easy

@@ -781,15 +781,14 @@
     {
       "id": "tail.3p.range",
       "label": "Dragon Tail range (3-player)",
-      "description": "How many squares the Tail may slide in one straight direction in 3-player games, when it moves like a Dragon Head. Same as the Dragon Heads follows dragonHead.range. 8 is unlimited on a 9x9 board.",
+      "description": "How many squares the Tail may slide in one straight direction in 3-player games, when it moves like a Dragon Head. Independent of dragonHead.range. 8 is unlimited on a 9x9 board.",
       "piece": "dragon-tail",
       "players": [
         3
       ],
-      "type": "enum",
-      "default": "same-as-heads",
+      "type": "integer",
+      "default": 8,
       "options": [
-        "same-as-heads",
         1,
         2,
         3,
@@ -801,7 +800,6 @@
       ],
       "group": "Dragon Tail",
       "optionLabels": {
-        "same-as-heads": "Same as the Dragon Heads",
         "1": "1 square",
         "2": "2 squares",
         "3": "3 squares",
@@ -817,8 +815,8 @@
         "check-detection",
         "balance"
       ],
-      "source": "Owner, 2 Nov 2026 (D82, decision 0023): the Tail gets its own range, separate from the Heads.",
-      "notes": "Name, options and default are provisional readings of decision 0023 (S84). The default follows dragonHead.range, so no earlier ruleset changes. Only read when tail.3p.movement = like-dragon-head; the 2-player path ignores it. Modelled as an enum because a default that follows another parameter is not an integer option; the Tail's moves in dragon-tail.json carry one variant per option."
+      "source": "Owner, 2 Nov 2026 (D82, decision 0023): the Tail gets its own range; 4 Nov 2026: integer, default 8.",
+      "notes": "Name provisional (D82). Default 8 and plain integer: owner, 4 Nov 2026, after the heavy-h3-3p confirming run (S88). Only read when tail.3p.movement = like-dragon-head; the 2-player path ignores it. Rulesets that limited the Heads and relied on the old same-as-heads default pin the Tail to the Heads' range."
     },
     {
       "id": "tail.repeatLimit",

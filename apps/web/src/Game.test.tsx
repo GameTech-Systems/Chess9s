@@ -94,7 +94,11 @@ describe('Rule picker', () => {
       const presets = html.slice(html.indexOf('id="presets-title"'), html.indexOf('build-row'));
       const names = [...presets.matchAll(/<strong>([^<]+)<\/strong>/g)].map((m) => m[1]);
       const suffix = players === 3 ? ' (3-player)' : '';
-      expect(names).toEqual([`Standard${suffix}`, `Easy Start${suffix}`, `Good Practice${suffix}`]);
+      expect(names).toEqual([
+        players === 3 ? 'Heavy-Handed Dragon, Heads 3' : 'Standard',
+        `Easy Start${suffix}`,
+        `Good Practice${suffix}`,
+      ]);
       for (const id of HOME_PRESETS[players]) {
         expect(html).toContain(`href="/rules/${id}"`);
         expect(html).toContain(PRESET_SUMMARIES[id]!);
@@ -112,7 +116,7 @@ describe('Rule picker', () => {
     expect(two).toContain('data-status="experimental"');
     const three = renderToStaticMarkup(<RulePicker players={3} onPick={() => {}} />);
     expect(three).toMatch(
-      /Standard \(3-player\)<\/strong>[\s\S]*?class="default-tag"[^>]*>Default for 3 players</,
+      /Heavy-Handed Dragon, Heads 3<\/strong>[\s\S]*?class="default-tag"[^>]*>Default for 3 players</,
     );
   });
 

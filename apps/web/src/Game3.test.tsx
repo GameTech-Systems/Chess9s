@@ -292,7 +292,7 @@ describe('the rules page of each 3-player preset', () => {
   });
 
   it('the default 3-player preset says so', () => {
-    expect(renderToStaticMarkup(<RulesPage id="standard-3p" />)).toContain(
+    expect(renderToStaticMarkup(<RulesPage id="heavy-h3-3p" />)).toContain(
       'the default 3-player ruleset',
     );
   });

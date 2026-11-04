@@ -106,7 +106,7 @@ In 2-player games the Coast stays closed until a player opens it with the Dragon
 
 | Coast piece | 2-player owner | 2-player movement | 3-player movement | Captures |
 |---|---|---|---|---|
-| Dragon Tail | Neither side; either player may move it | Jumps among A5, E5 and I5 only | Any direction, any distance, like a Dragon Head (3-player: as far as `tail.3p.range` says, by default the Heads' range, [decision 0023](decisions/0023-tail-range.md)) | 2-player: never, and never checks. 3-player: any light or dark piece that isn't a Coast piece |
+| Dragon Tail | Neither side; either player may move it | Jumps among A5, E5 and I5 only | Any direction, any distance, like a Dragon Head (3-player: as far as `tail.3p.range` says, an integer 1 to 8, default 8 (unlimited), [decision 0023](decisions/0023-tail-range.md)) | 2-player: never, and never checks. 3-player: any light or dark piece that isn't a Coast piece |
 | Light / Dark Dragon Head (A1 / A9) | Light / Dark | Any direction, any distance | Same | Yes, like any piece |
 | Sun / Moon | Light (A2) / Dark (A8) | 1 square in any direction, or 2 straight forward on its first move. Option: 2 squares in any direction | 1 square at a time on the Coast; off it, up to 2 squares in any direction | Onto any square it can move to |
 

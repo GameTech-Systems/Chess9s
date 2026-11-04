@@ -58,12 +58,17 @@ describe('the Limited rulesets (D80)', () => {
     expect(r.name).toBe(name);
     expect(r.version).toBe('0.1.0');
     expect(r.status).toBe('experimental');
-    expect(r.overrides).toEqual({ ...ruleset(base).overrides, 'dragonHead.range': 4 });
+    expect(r.overrides).toEqual({
+      ...ruleset(base).overrides,
+      'dragonHead.range': 4,
+      'tail.3p.range': 4,
+    });
     const v = rulesFor(id).values;
     const b = rulesFor(base).values;
     const changed = Object.keys(v).filter((k) => JSON.stringify(v[k]) !== JSON.stringify(b[k]));
-    expect(changed).toEqual(['dragonHead.range']);
+    expect(changed.sort()).toEqual(['dragonHead.range', 'tail.3p.range']);
     expect(v['dragonHead.range']).toBe(4);
+    expect(v['tail.3p.range']).toBe(4);
     expect(b['dragonHead.range']).toBe(8);
     expect(unbuiltFeatures(rulesFor(id))).toEqual([]);
   });
@@ -110,11 +115,15 @@ describe('Heavy-Handed Dragon, Limited to 3 (D81)', () => {
     expect(r.name).toBe('Heavy-Handed Dragon, Limited to 3');
     expect(r.version).toBe('0.1.0');
     expect(r.status).toBe('experimental');
-    expect(r.overrides).toEqual({ ...ruleset('heavy-3p').overrides, 'dragonHead.range': 3 });
+    expect(r.overrides).toEqual({
+      ...ruleset('heavy-3p').overrides,
+      'tail.3p.range': 3,
+      'dragonHead.range': 3,
+    });
     const v = rulesFor(id).values;
     const b = rulesFor('heavy-3p').values;
     const changed = Object.keys(v).filter((k) => JSON.stringify(v[k]) !== JSON.stringify(b[k]));
-    expect(changed).toEqual(['dragonHead.range']);
+    expect(changed.sort()).toEqual(['dragonHead.range', 'tail.3p.range']);
     expect(v['dragonHead.range']).toBe(3);
     expect(unbuiltFeatures(rulesFor(id))).toEqual([]);
   });
