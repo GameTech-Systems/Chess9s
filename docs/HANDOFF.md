@@ -1,16 +1,16 @@
 # Handoff
 
-Updated 2026-11-04 by S88 (Sonnet 5.5 · medium). `/end-session` rewrites this file; keep it under 40 lines.
+Updated 2026-11-05 by S89 (Sonnet 5.5 · medium). `/end-session` rewrites this file; keep it under 40 lines.
 
 ## State
-- S88 applied the owner's decisions: `heavy-h3-3p` is the default 3-player ruleset (still experimental, D60) and `tail.3p.range` is an integer 1 to 8, default 8 (decision 0023, "Owner decision after the confirming run"). Four locks were edited by hand from `same-as-heads` to 8 with the owner's approval; the three Limited rulesets pin the Tail to their Heads' range.
-- Phase 6. S87 collected the `heavy-h3-3p` confirming run (run 41701030465, 90 shards, **449** of 450 games, none capped): **33.2 / 32.3 / 34.5** dark / light / Dragon at depth 3, intervals 29.0–37.7, 28.1–36.8, 30.3–39.0. All point scores are inside the 28-38% band ([decision 0023](decisions/0023-tail-range.md)); the Dragon's interval ends just past it. Docs only, plus a test fix: `onlineStore.test.ts` passed no clock to `forgetSeat`, so it failed once its fixed date was 7 days old (CI red on S87).
-- It agrees with the 150-game screen (33.7 / 35.3 / 31.0). The report's verdict reads "incomplete" because 449 games at depth 3 is below decision 0015's 2,000-game rule; 3-player rulesets stay experimental (D81, D60).
-- Earlier depth-3 screens (dark / light / Dragon): `heavy-3p` 24.5 / 24.8 / 50.7; `heavy-limited-3p` 28.7 / 28.7 / 42.7; `heavy-limited3-3p` 35.6 / 41.9 / 22.5.
+- Updated 2026-11-05 by S89 (Sonnet 5.5 · medium). S89 is docs only: the owner keeps `heavy-h3-3p` (Heads 3, Tail 8) as the default 3-player ruleset (done in S88; experimental, D60) and asked for more games toward decision 0015's 2,000-game rule.
+- **Dispatched: run 41946060760** (Sim depth 2 on `main`): `heavy-h3-3p`, depth 3, 256 shards, **2,200 games** (10% over, for games a shard cannot finish in 5 h 40 min), `turn.3p.order=dark-light-dragon`, `label` `depth3-full`. Expect many hours: S86's 5-game shards took 1.4 to 4.5 hours, these have about 8.6. It replays seeds 1 to 2,200, so it replaces the 449-game run rather than adding to it.
+- Earlier depth-3 results (dark / light / Dragon): `heavy-h3-3p` screen 33.7 / 35.3 / 31.0 (150 games) and confirming run 33.2 / 32.3 / 34.5 (449 games, intervals 29.0–37.7, 28.1–36.8, 30.3–39.0); `heavy-3p` 24.5 / 24.8 / 50.7; `heavy-limited-3p` 28.7 / 28.7 / 42.7; `heavy-limited3-3p` 35.6 / 41.9 / 22.5.
+- The merge job can succeed with shards missing; the report's game count is the check. The verdict stays "incomplete" until depths 1 and 2 also have 2,000 games (decision 0015), unless the owner says depth 3 alone is the measure (D82 made depth 3 the 3-player balance measure).
 
 ## Next session
-No step is planned. The owner's brief opens the next one (for example a longer run of `heavy-h3-3p` at depth 3 toward the 2,000-game rule).
-Start with: `/start-session S88` after a BUILD-PLAN entry exists.
+S90, collect run 41946060760 once it has finished: download `fairness-report-heavy-h3-3p.depth3-full`, check at least 2,000 games and every shard reporting, commit the report, add the result to decision 0023 as dark / light / Dragon. If short of 2,000, report the count and ask the owner before dispatching the missing seeds.
+Start with: `/start-session S90`.
 
 ## Decisions in effect for the next step
 - D82: decided (decision 0023). Provisional readings: the name `tail.3p.range`, its default 8, about 150 games per screen, about 450 for the confirming run.
