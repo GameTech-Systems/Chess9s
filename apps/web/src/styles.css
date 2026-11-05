@@ -1185,6 +1185,8 @@ a:hover {
 
 .picker .coast-row {
   gap: 0.25rem;
+  /* `.picker ul` (more specific than .coast-row) zeroes the margin, which left the row at the left on wide screens. */
+  margin: 0 auto;
 }
 
 .coast-row img {
