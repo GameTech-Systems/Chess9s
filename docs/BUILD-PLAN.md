@@ -483,6 +483,14 @@ Done when: the report is committed with the comparison in decision 0023 and the 
 Owner decision in chat (4 Nov 2026): `heavy-h3-3p` is the default 3-player ruleset, and `tail.3p.range` is a plain integer with default 8. See decision 0023.
 Done when: tests, lint and build pass.
 
+### S89 — Full run of `heavy-h3-3p` toward the 2,000-game rule · Claude (workflow) · Sonnet 5.5 · medium · `done`
+Owner brief (5 Nov 2026): keep `heavy-h3-3p` (Heads 3, Tail 8) as the balanced default 3-player ruleset, and run more games to reach the 2,000-game rule of decision 0015. Dispatch the Sim depth 2 workflow on `heavy-h3-3p` (depth 3, 256 shards, 2,200 games, default turn order, `label` `depth3-full`). Provisional: 2,200 rather than 2,000, because a shard keeps only the games it finishes in 5 h 40 min (the S86 shards of 5 games took 1.4 to 4.5 hours) and the 256-shard limit puts about 8.6 games on each; the extra 10% covers games lost to that limit. Seeds 1 to 2,200 replay the 450 games of S86, so this run stands alone and is not merged with the earlier reports.
+Done when: the run is dispatched (run id in the log).
+
+### S90 — Collect the full run · Claude (workflow) · Sonnet 5.5 · medium · `todo`
+Collect the `fairness-report-heavy-h3-3p.depth3-full` artifact of run 41946060760, check its game count (at least 2,000 and every shard reporting; if short, report it and ask the owner whether to dispatch the missing seeds), commit the report and add it to decision 0023 as dark / light / Dragon. The report's verdict is "incomplete" until depths 1 and 2 also have 2,000 games (decision 0015); say so and leave that to the owner.
+Done when: the report is committed with the comparison in decision 0023 and the handoff.
+
 ## Later phases
 
 Each later phase opens with an Opus 5.5 · high planning session that replaces its placeholder with detailed steps.
