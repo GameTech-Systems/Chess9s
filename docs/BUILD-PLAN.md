@@ -488,7 +488,7 @@ Owner brief (5 Nov 2026): keep `heavy-h3-3p` (Heads 3, Tail 8) as the balanced d
 Done when: the run is dispatched (run id in the log).
 
 ### S90 — Collect the full run · Claude (workflow) · Sonnet 5.5 · medium · `todo`
-Collect the `fairness-report-heavy-h3-3p.depth3-full` artifact of run 41946060760, check its game count (at least 2,000 and every shard reporting; if short, report it and ask the owner whether to dispatch the missing seeds), commit the report and add it to decision 0023 as dark / light / Dragon. The report's verdict is "incomplete" until depths 1 and 2 also have 2,000 games (decision 0015); say so and leave that to the owner.
+Collect the `fairness-report-heavy-h3-3p.depth3-full` artifact of run 41946060760, check its game count (at least 2,000 and every shard reporting; if short, report it and ask the owner whether to dispatch the missing seeds), commit the report and add it to decision 0023 as dark / light / Dragon. Depth 3 alone is the measure (owner, 5 Nov 2026), so judge the 2,000-game rule at depth 3; the report's own verdict still reads "incomplete" because decision 0015 counts depths 1 and 2, so say so.
 Done when: the report is committed with the comparison in decision 0023 and the handoff.
 
 ## Later phases
