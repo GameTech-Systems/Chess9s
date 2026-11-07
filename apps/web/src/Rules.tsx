@@ -133,7 +133,7 @@ export function RulesScreen({
         </p>
         {missing.length > 0 && (
           <>
-            <h3>Not in this build yet</h3>
+            <h3>Not available yet</h3>
             <ul>
               {missing.map((m) => (
                 <li key={m}>{m}</li>

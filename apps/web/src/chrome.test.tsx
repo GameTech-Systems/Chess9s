@@ -75,6 +75,10 @@ describe('pages', () => {
     const html = renderToStaticMarkup(<App path="/rules/nope" />);
     expect(html).toContain('No ruleset called');
     expect(html).toContain('href="/rules/standard-2p"');
+    // Only the rulesets a player can pick on the home page, and no project wording.
+    expect(html).toContain('href="/rules/heavy-h3-3p"');
+    expect(html).not.toContain('href="/rules/heavy-3p"');
+    expect(html).not.toMatch(/in this build|<code>/);
   });
 
   it('privacy page states the facts and the storage key', () => {

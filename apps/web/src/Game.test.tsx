@@ -25,7 +25,7 @@ describe('Game screen', () => {
   });
 
   it('lists nothing as not built at the draft defaults (S22a built the rest)', () => {
-    expect(render()).not.toContain('Not in this build yet');
+    expect(render()).not.toContain('Not available yet');
   });
 
   it('shows the end of a full game: checkmate, the winner, the moves, an open Coast', () => {
