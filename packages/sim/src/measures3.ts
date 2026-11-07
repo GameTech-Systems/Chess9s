@@ -2,13 +2,13 @@
 // S61). Change them only with a new version of that decision record.
 export const MEASURES_3P = {
   decision: '0015',
-  version: 1,
+  version: 2,
   /** Every seat's score band, inclusive: a third, plus or minus 5 points. */
   band: { min: 0.28, max: 0.38 },
   /** Fewest games a run needs before its scores count. */
   minGames: 2000,
-  /** Search depths in plies, one per seat (S62). */
-  depths: [1, 2],
+  /** Search depths in plies, one per seat (S62). Version 2: depth 3 alone is the measure (D82, owner 5 Nov). */
+  depths: [3],
   /** Positions the search may visit per move, as in decision 0008. */
   nodes: 100_000,
   /** Random plies that open each game, two per seat. */

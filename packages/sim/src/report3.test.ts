@@ -48,24 +48,33 @@ const RULESET = { id: 'standard-3p', version: '0.1.0' };
 const N = MEASURES_3P.minGames;
 
 describe('buildReport3', () => {
-  it('passes when the ruleset as it is passes at both depths', () => {
+  it('passes when the ruleset as it is passes at depth 3 (decision 0015 version 2)', () => {
     const r = buildReport3(RULESET, '2026-10-27', 'search', [
-      run('default', 1, games(N, [1, 1, 1])),
-      run('default', 2, games(N, [1, 1, 1])),
+      run('default', 3, games(N, [1, 1, 1])),
     ]);
     expect(r.verdict).toBe('pass');
     expect(r).toMatchObject({ players: 3, decision: '0015', mode: 'search' });
   });
 
-  it('is incomplete with one depth or too few games, and fails a full run outside the band', () => {
-    const one = buildReport3(RULESET, 'd', 'search', [run('default', 1, games(N, [1, 1, 1]))]);
-    expect(one.verdict).toBe('incomplete');
-    const few = buildReport3(RULESET, 'd', 'search', [
-      run('default', 1, games(30, [2, 1, 1])),
-      run('default', 2, games(30, [1, 1, 1])),
+  it('ignores depths 1 and 2 for the verdict', () => {
+    const r = buildReport3(RULESET, '2026-10-27', 'search', [
+      run('default', 1, games(N, [1, 1, 1])),
+      run('default', 2, games(N, [1, 1, 1])),
     ]);
+    expect(r.verdict).toBe('incomplete');
+    const pass = buildReport3(RULESET, '2026-10-27', 'search', [
+      run('default', 3, games(N, [1, 1, 1])),
+    ]);
+    expect(pass.verdict).toBe('pass');
+    expect(r).toMatchObject({ players: 3, decision: '0015', mode: 'search' });
+  });
+
+  it('is incomplete with one depth or too few games, and fails a full run outside the band', () => {
+    const none = buildReport3(RULESET, 'd', 'search', [run('default', 2, games(N, [1, 1, 1]))]);
+    expect(none.verdict).toBe('incomplete');
+    const few = buildReport3(RULESET, 'd', 'search', [run('default', 3, games(30, [2, 1, 1]))]);
     expect(few.verdict).toBe('incomplete');
-    const off = buildReport3(RULESET, 'd', 'search', [run('default', 1, games(N, [2, 1, 1]))]);
+    const off = buildReport3(RULESET, 'd', 'search', [run('default', 3, games(N, [2, 1, 1]))]);
     expect(off.verdict).toBe('fail');
   });
 
@@ -106,7 +115,8 @@ describe('toMarkdown3', () => {
   it('has the verdict, the measures and a score column per seat', () => {
     expect(md).toContain('# Balance report: standard-3p 0.1.0');
     expect(md).toContain('Verdict: **incomplete**');
-    expect(md).toContain('decision 0015 (version 1) sets out');
+    expect(md).toContain('decision 0015 (version 2) sets out');
+    expect(md).toContain('at depth 3');
     expect(md).not.toContain('provisional');
     expect(md).toContain('28–38%');
     expect(md).toMatch(/\| Combination \| Depth \| Games \| dark \| light \| dragon \|/);
