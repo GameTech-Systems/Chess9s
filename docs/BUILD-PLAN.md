@@ -502,7 +502,7 @@ Owner, 7 Nov 2026 (D83): the full depth-3 run of `heavy-h3-3p` (2,076 games, 31.
 7. Test first: a test that fails if any player-visible string (ruleset names and descriptions, parameter labels, descriptions and option labels, `PRESET_SUMMARIES`) matches `/\b[DSI]\d{1,3}\b|decision \d{4}|provisional|\d+\.\d+\.\d+/`.
 Done when: the 3-player tab shows Standard as the default, Balance-tested; no page shows a code or version string; the report is re-rendered; tests pass.
 
-### S93 — Retire the Tournaments page; first-visitor pass · Claude · Sonnet 5.5 · medium · `todo`
+### S93 — Retire the Tournaments page; first-visitor pass · Claude · Sonnet 5.5 · medium · `done`
 Owner, 7 Nov 2026 (D86): nothing is official and there are no players yet, so there is no Tournaments page until there are.
 1. Delete `Tournament.tsx`, `tournament.ts` and their tests; `/tournament` goes to the home page. Remove the footer link and the footer line "Rulesets other than Official ones are not tournament rules." Reword tournament mentions in the builder, sharing, the room card and `game/rules.ts`.
 2. README and ROADMAP: tournaments are a later phase, once there are players. GOVERNANCE.md stays as the contributors' process.
