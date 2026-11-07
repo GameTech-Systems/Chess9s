@@ -125,7 +125,7 @@ describe('unofficial until it matches an Official ruleset', () => {
 describe('invitation mail', () => {
   const origin = 'https://chess9s.com';
   it('opens the player’s mail app with subject, link and settings, and no address', () => {
-    const url = inviteMailto('game', mine(), origin);
+    const url = inviteMailto(mine(), origin);
     expect(url.startsWith('mailto:?')).toBe(true);
     const q = new URLSearchParams(url.slice('mailto:?'.length));
     expect(q.get('subject')).toMatch(/game/i);
@@ -135,32 +135,9 @@ describe('invitation mail', () => {
     expect(body).toMatch(/unofficial/i);
     expect(body.length).toBeLessThan(1800);
   });
-
-  it('a tournament invitation says the ruleset is not a tournament ruleset yet', () => {
-    const q = new URLSearchParams(inviteMailto('tournament', mine(), origin).slice(8));
-    expect(q.get('subject')).toMatch(/tournament/i);
-    expect(q.get('body')).toMatch(/not a tournament ruleset/i);
-  });
-
-  it('a tournament invitation says games can be played online by room code, with the Official ruleset only (S53, D46)', () => {
-    const q = new URLSearchParams(inviteMailto('tournament', mine(), origin).slice(8));
-    expect(q.get('body')).toMatch(/online by room code/i);
-    expect(q.get('body')).toMatch(/Official ruleset only/);
-    expect(q.get('body')).not.toMatch(/not played online yet/i);
-  });
 });
 
-describe('tournament invitation links the tournament rules (S46)', () => {
-  const origin = 'https://chess9s.com';
-  it('names the /tournament page on this site, and a game invitation does not', () => {
-    const t = new URLSearchParams(inviteMailto('tournament', mine(), origin).slice(8));
-    expect(t.get('body')).toContain(`Tournament rules: ${origin}/tournament`);
-    const g = new URLSearchParams(inviteMailto('game', mine(), origin).slice(8));
-    expect(g.get('body')).not.toContain('/tournament');
-  });
-});
-
-describe('submit for tournament consideration (S43)', () => {
+describe('submit for consideration (S43)', () => {
   const origin = 'https://chess9s.com';
   const form = (state: BuilderState) => {
     const url = new URL(submitUrl(state, origin));
@@ -298,7 +275,7 @@ describe('3-player rulesets (S64, D64)', () => {
   });
 
   it('invitations compare with Standard (3-player)', () => {
-    const body = decodeURIComponent(inviteMailto('game', three(), 'https://chess9s.com'));
+    const body = decodeURIComponent(inviteMailto(three(), 'https://chess9s.com'));
     expect(body).toContain('Differs from Standard (3-player):');
     expect(body).toContain('A King left in check for an earlier player');
   });

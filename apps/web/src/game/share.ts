@@ -70,7 +70,7 @@ export function exportFile(c: CustomRuleset): string {
       version: CUSTOM_VERSION,
       status: 'proposed',
       players: c.players ?? 2,
-      description: 'A ruleset built by a player. Not fairness-checked; not a tournament ruleset.',
+      description: 'A ruleset built by a player. Not fairness-checked.',
       overrides: c.overrides,
     },
     null,
@@ -160,37 +160,23 @@ export function settingsText(values: Values, players: 2 | 3 = 2): string {
 const differsFrom = (players: 2 | 3) =>
   players === 3 ? 'Differs from Standard (3-player):' : 'Differs from Standard:';
 
-export type InviteKind = 'game' | 'tournament';
-
 /** A `mailto:` link with no address: the player picks who to write to in their own mail app. */
-export function inviteMailto(kind: InviteKind, state: BuilderState, origin: string): string {
+export function inviteMailto(state: BuilderState, origin: string): string {
   const name = state.name.trim() || 'my ruleset';
   const open = matchingOfficial(state.values, state.players);
   const lines = [
-    kind === 'game'
-      ? `Come and play Chess Nines with me, using the ruleset “${name.slice(0, MAX_NAME)}”.`
-      : `I would like to invite you to a Chess Nines tournament, using the ruleset “${name.slice(0, MAX_NAME)}”.`,
+    `Come and play Chess Nines with me, using the ruleset “${name.slice(0, MAX_NAME)}”.`,
     '',
     `Open it here: ${origin}${shareLink(state)}`,
     '',
     open
       ? `This is the Official ruleset ${open.name}.`
       : 'This is an unofficial ruleset: it has not been fairness-checked.',
-    ...(kind === 'tournament' && !open
-      ? ['It is not a tournament ruleset: custom rulesets are not used in official tournaments.']
-      : []),
-    ...(kind === 'tournament'
-      ? [
-          'Tournament games can be played online by room code, with the Official ruleset only.',
-          `Tournament rules: ${origin}/tournament`,
-        ]
-      : []),
     '',
     differsFrom(state.players),
     settingsText(state.values, state.players) || '- None',
   ];
-  const subject =
-    kind === 'game' ? `Invitation to a Chess Nines game` : `Invitation to a Chess Nines tournament`;
+  const subject = 'Invitation to a Chess Nines game';
   let body = lines.join('\n');
   // Mail apps cut very long links; keep the draft well under the usual limit.
   if (body.length > 1700) body = `${body.slice(0, 1690)}\n…`;
@@ -255,7 +241,7 @@ export function submitUrl(
   const file = exportFile(customFrom(state, 'submitted'));
   const idea = (fileNote: string) =>
     [
-      `Ruleset “${name}”, submitted for tournament consideration (GOVERNANCE.md, submitted rulesets).`,
+      `Ruleset “${name}”, submitted for consideration (GOVERNANCE.md, submitted rulesets).`,
       '',
       `Open it: ${origin}${shareLink(state)}`,
       fileNote,

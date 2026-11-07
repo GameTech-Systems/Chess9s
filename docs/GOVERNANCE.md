@@ -39,7 +39,7 @@ Anyone can submit a 2-player ruleset they built at chess9s.com/build. **Submit f
 4. **Public discussion.** Discussion runs for at least 21 days from the date the project owner announces.
 5. **Ratification.** The project owner may ratify it as **Official** and publishes the reasoning in a decision record in `docs/decisions/`. If the ratified ruleset differs from the one checked, it is checked again first.
 
-Online tournament play comes later. Until then a tournament invitation carries the ruleset link, for hot-seat or over-the-board games.
+Tournaments come in a later phase, once there are players; there is no Tournaments page until then (D86). An invitation to a game carries the ruleset link.
 
 ## 3-player rules
 

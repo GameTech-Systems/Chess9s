@@ -281,11 +281,11 @@ export function Builder({
       setLoadProblem(null);
     } else setLoadProblem(parsed.problem);
   };
-  const invite = (kind: 'game' | 'tournament', label: string) => (
+  const invite = (label: string) => (
     <a
       className="again"
       {...(problem === null
-        ? { href: inviteMailto(kind, state, originNow()) }
+        ? { href: inviteMailto(state, originNow()) }
         : { 'aria-disabled': true })}
     >
       {label}
@@ -297,8 +297,8 @@ export function Builder({
       <h2 id="builder-title">Change ruleset</h2>
       <p className="facts">
         Start from a preset, change what you like, then play it. Your ruleset is saved in this
-        browser only, as <em>proposed</em>: it is not fairness-checked and is never a tournament
-        ruleset. To suggest it as a real variant, <a href={DISCUSSIONS_URL}>start a discussion</a>.
+        browser only, as <em>proposed</em>: it is not fairness-checked. To suggest it as a real
+        variant, <a href={DISCUSSIONS_URL}>start a discussion</a>.
       </p>
 
       <section aria-labelledby="builder-start">
@@ -489,8 +489,7 @@ export function Builder({
           )}
         </div>
         <div className="builder-actions">
-          {invite('game', 'Invite to a game')}
-          {invite('tournament', 'Invite to a tournament')}
+          {invite('Invite to a game')}
           {players === 2 && (
             <a
               className="again"
@@ -509,17 +508,15 @@ export function Builder({
         )}
         {players === 3 && (
           <p className="meta" data-submit-note>
-            A 3-player ruleset cannot be submitted: tournament rulesets are 2-player.
+            A 3-player ruleset cannot be submitted yet: only 2-player rulesets are considered.
           </p>
         )}
         <p className="meta">
-          A custom ruleset is never a tournament ruleset: the tournament invitation says so (see the{' '}
-          <a href="/tournament">tournament rules</a>). Tournament games can be played online by room
-          code, still with the Official ruleset only, so an invitation to a game with your own
-          ruleset is for casual play. To have a ruleset considered for tournaments, submit it: that
-          opens a Rule proposals discussion on GitHub with your settings filled in, and it goes
-          through the <a href={GOVERNANCE_URL}>review checklist</a> (a fairness check at both
-          depths, 21 days of discussion, and ratification).
+          An invitation to a game with your own ruleset is for casual play. To have a ruleset
+          considered as a real variant, submit it: that opens a Rule proposals discussion on GitHub
+          with your settings filled in, and it goes through the{' '}
+          <a href={GOVERNANCE_URL}>review checklist</a> (a fairness check at both depths, 21 days of
+          discussion, and ratification).
         </p>
       </section>
 

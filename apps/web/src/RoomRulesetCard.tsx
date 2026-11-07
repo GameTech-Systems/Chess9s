@@ -54,8 +54,7 @@ export function RoomRulesetCard({
       {custom && (
         <>
           <p className="facts">
-            <strong>Unofficial</strong>: this ruleset is not fairness-checked and is not a
-            tournament ruleset.
+            <strong>Unofficial</strong>: this ruleset is not fairness-checked.
           </p>
           <p className="facts small">Differs from Standard:</p>
           {diffs.length > 0 ? (

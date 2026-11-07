@@ -4,7 +4,6 @@ import { RulePicker } from './RulePicker';
 import { Builder } from './Builder';
 import { RulesPage } from './RulesPage';
 import { Privacy } from './Privacy';
-import { Tournament } from './Tournament';
 import { CreateRoom } from './CreateRoom';
 import { OnlineRoom } from './OnlineRoom';
 import { DISCUSSIONS_URL, LICENSES_PATH, RIGHTS_HOLDER, rulesPath } from './links';
@@ -26,7 +25,6 @@ import type { Opened } from './game/record';
 
 export const PRIVACY_PATH = '/privacy';
 export const BUILD_PATH = '/build';
-export const TOURNAMENT_PATH = '/tournament';
 
 function browserStore(): Store | null {
   try {
@@ -48,21 +46,17 @@ export const roomCodeOf = (pathname: string): string | undefined =>
   /^\/room\/([A-Za-z0-9]+)\/?$/.exec(pathname)?.[1]?.toUpperCase();
 
 /** Which page a URL path shows. Anything unknown is the game: the host falls back to index.html. */
-export const pageOf = (
-  pathname: string,
-): 'privacy' | 'rules' | 'build' | 'tournament' | 'room' | 'game' => {
+export const pageOf = (pathname: string): 'privacy' | 'rules' | 'build' | 'room' | 'game' => {
   const bare = pathname.replace(/\/+$/, '');
   return bare === PRIVACY_PATH
     ? 'privacy'
     : bare === BUILD_PATH
       ? 'build'
-      : bare === TOURNAMENT_PATH
-        ? 'tournament'
-        : rulesIdOf(pathname) !== undefined
-          ? 'rules'
-          : roomCodeOf(pathname) !== undefined
-            ? 'room'
-            : 'game';
+      : rulesIdOf(pathname) !== undefined
+        ? 'rules'
+        : roomCodeOf(pathname) !== undefined
+          ? 'room'
+          : 'game';
 };
 
 export function App({
@@ -152,13 +146,11 @@ export function App({
       ? 'Rules'
       : page === 'build'
         ? 'Change ruleset'
-        : page === 'tournament'
-          ? 'Tournaments'
-          : page === 'room' || (creating && page === 'game')
-            ? 'Online'
-            : picked && page === 'game'
-              ? `Hot-seat · ${picked.players} players`
-              : 'Play in your browser · no account needed';
+        : page === 'room' || (creating && page === 'game')
+          ? 'Online'
+          : picked && page === 'game'
+            ? `Hot-seat · ${picked.players} players`
+            : 'Play in your browser · no account needed';
   return (
     <main className="page">
       <header className="masthead">
@@ -180,8 +172,6 @@ export function App({
       </header>
       {page === 'privacy' ? (
         <Privacy />
-      ) : page === 'tournament' ? (
-        <Tournament />
       ) : page === 'build' ? (
         <Builder
           key={editing ?? (shared ? 'shared' : `new-${buildBase}`)}
@@ -277,16 +267,11 @@ export function App({
           How to play
         </a>
         {' · '}
-        <a href={TOURNAMENT_PATH} onClick={go(TOURNAMENT_PATH)}>
-          Tournaments
-        </a>
-        {' · '}
         <a href={DISCUSSIONS_URL}>Suggest a variant</a>
         {' · '}
         <a href={LICENSES_PATH}>Licenses</a>
         <span className="legal">
           © {COPYRIGHT_YEAR} {RIGHTS_HOLDER}. Chess Nines™ is a trademark of {RIGHTS_HOLDER}.
-          Rulesets other than Official ones are not tournament rules.
         </span>
       </footer>
     </main>
