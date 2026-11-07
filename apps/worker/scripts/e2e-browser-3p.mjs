@@ -26,7 +26,7 @@ const game = JSON.parse(
 const PORT = Number(process.env.E2E_PORT ?? 8791);
 const BASE = `http://127.0.0.1:${PORT}`;
 const TIMEOUT = 30_000;
-const NAME = 'Good Practice (3-player)';
+const NAME = 'Good Practice'; // the card's name on the 3-player tab
 
 if (!existsSync(join(root, 'apps/web/dist/index.html'))) {
   console.error('Build the app first (pnpm build).');
@@ -116,12 +116,10 @@ const watch = (label, name, page) => {
 
 /**
  * The home page shows one player count's rulesets at a time (owner, 3 Nov 2026): choose the count,
- * and open "Rulesets under test" so every ruleset of that count has a card.
+ * so the presets of that count have cards.
  */
 async function showRulesets(page, players) {
   await page.locator(`button.mode[data-players="${players}"]`).click();
-  const testing = page.locator('details.testing');
-  if ((await testing.count()) > 0) await testing.evaluate((d) => (d.open = true));
 }
 
 /** The creator opens the picker, chooses Play online for Good Practice, picks Dark and creates the room. */

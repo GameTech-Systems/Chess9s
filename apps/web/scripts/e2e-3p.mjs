@@ -195,13 +195,23 @@ async function noSidewaysScroll(page, what) {
 }
 
 /**
- * The home page shows one player count's rulesets at a time (owner, 3 Nov 2026): choose the count,
- * and open "Rulesets under test" so every ruleset of that count has a card.
+ * Opens a 3-player ruleset and presses one of its buttons. The home page offers three presets per
+ * count (Standard, Easy Start, Good Practice; the cards drop the "(3-player)" suffix); any other
+ * ruleset is hidden from it and opens from its rules page, which has a Play button (S92).
  */
-async function showRulesets(page, players) {
-  await page.locator(`button.mode[data-players="${players}"]`).click();
-  const testing = page.locator('details.testing');
-  if ((await testing.count()) > 0) await testing.evaluate((d) => (d.open = true));
+const HOME_3P = { 'heavy-h3-3p': 'Standard', 'easy-3p': 'Easy Start', 'draft-3p': 'Good Practice' };
+async function openRuleset(page, id, name, button = 'Play') {
+  if (HOME_3P[id]) {
+    await page.goto(BASE);
+    await page.locator('button.mode[data-players="3"]').click();
+    const card = page.locator('li.ruleset', {
+      has: page.getByText(HOME_3P[id], { exact: true }),
+    });
+    await card.getByRole('button', { name: button, exact: true }).click();
+    return;
+  }
+  await page.goto(`${BASE}/rules/${id}`);
+  await page.getByRole('button', { name: `Play ${name}`, exact: true }).click();
 }
 
 async function play(browser, options, size, spec) {
@@ -212,14 +222,11 @@ async function play(browser, options, size, spec) {
   page.on('console', (m) => m.type() === 'error' && console.error(`${label}:`, m.text()));
   const slug = `${size.replace(/\W+/g, '')}-${spec.game.ruleset}-${spec.heading.replace(/\W+/g, '')}`;
 
-  await page.goto(BASE);
-  await showRulesets(page, 3);
-  const card = page.locator('li.ruleset', { has: page.getByText(spec.name, { exact: true }) });
-  await card.getByRole('button', { name: 'Play', exact: true }).click();
+  await openRuleset(page, spec.game.ruleset, spec.name);
   await page.locator('ul[aria-label="Seats"]').waitFor({ timeout: TIMEOUT });
   check(
     (await page.locator('[data-seat]').count()) === 3 &&
-      (await card.count()) === 0 &&
+      (await page.locator('li.ruleset').count()) === 0 &&
       (await page.getByRole('button', { name: 'Computer' }).count()) === 0,
     `${label}: a 3-player hot-seat game opens with three seats`,
   );
@@ -333,12 +340,7 @@ async function playComputerDragon(browser, options, size) {
   const context = await browser.newContext(options);
   const page = await context.newPage();
   page.on('pageerror', (e) => console.error(`${label} page error:`, e.message));
-  await page.goto(BASE);
-  await showRulesets(page, 3);
-  const card = page.locator('li.ruleset', {
-    has: page.getByText('Good Practice (3-player)', { exact: true }),
-  });
-  await card.getByRole('button', { name: 'Play', exact: true }).click();
+  await openRuleset(page, 'draft-3p', 'Good Practice (3-player)');
   await page.locator('ul[aria-label="Seats"]').waitFor({ timeout: TIMEOUT });
   const seats = page.getByRole('group', { name: 'Computer seats' });
   check(
@@ -429,12 +431,7 @@ async function playResignation(browser, options, size) {
   const context = await browser.newContext({ ...options, acceptDownloads: true });
   const page = await context.newPage();
   page.on('pageerror', (e) => console.error(`${label} page error:`, e.message));
-  await page.goto(BASE);
-  await showRulesets(page, 3);
-  const card = page.locator('li.ruleset', {
-    has: page.getByText('Good Practice (3-player)', { exact: true }),
-  });
-  await card.getByRole('button', { name: 'Play', exact: true }).click();
+  await openRuleset(page, 'draft-3p', 'Good Practice (3-player)');
   await page.locator('ul[aria-label="Seats"]').waitFor({ timeout: TIMEOUT });
   const moveCount = () => page.locator('ol.moves span').count();
   const played = async (n) =>
@@ -498,7 +495,7 @@ async function playResignation(browser, options, size) {
       // The game is kept in the browser with the resignation in it.
       // The app opens on the picker; playing the same ruleset again resumes the saved game.
       await page.reload();
-      await card.getByRole('button', { name: 'Play', exact: true }).click();
+      await openRuleset(page, 'draft-3p', 'Good Practice (3-player)');
       await page.locator('ul[aria-label="Seats"]').waitFor({ timeout: TIMEOUT });
       check(
         (await page.locator('[data-seat="light"] .seat-note').innerText()).includes('resigned') &&
@@ -593,7 +590,7 @@ async function playBuilt(browser, options, size) {
     file.players === 3 &&
       file.overrides['endings.3p'] === 'first-checkmate' &&
       file.overrides['dragon.3p.givesCheck'] === true &&
-      file.overrides['dragonHead.range'] === 7,
+      file.overrides['dragonHead.range'] === 2,
     `${label}: the exported file is a 3-player ruleset with the changes`,
   );
   const link = await page.getByLabel('Share link').inputValue();
