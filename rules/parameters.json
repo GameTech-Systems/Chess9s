@@ -142,7 +142,7 @@
     {
       "id": "queen.canCrossVoid",
       "label": "Queen crosses the void",
-      "description": "Whether the Queen may pass over the empty void squares B5, C5, D5, F5, G5 and H5 on her way to a square beyond them. It doesn't let her stop on one (queen.canStandOnVoid).",
+      "description": "Whether the Queen may pass over the empty void squares B5, C5, D5, F5, G5 and H5 on her way to a square beyond them. It doesn't let her stop on one.",
       "piece": "queen",
       "players": [
         2,
@@ -170,7 +170,7 @@
     {
       "id": "queen.canStandOnVoid",
       "label": "Queen may stand on a void square",
-      "description": "Whether the Queen may stop on, or capture on, a void square B5, C5, D5, F5, G5 or H5. It doesn't let her pass over one (queen.canCrossVoid).",
+      "description": "Whether the Queen may stop on, or capture on, a void square B5, C5, D5, F5, G5 or H5. It doesn't let her pass over one.",
       "piece": "queen",
       "players": [
         2,

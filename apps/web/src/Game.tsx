@@ -680,7 +680,7 @@ export function Game({
 
         {missing.length > 0 && (
           <details className="missing">
-            <summary>Not in this build yet ({missing.length})</summary>
+            <summary>Not available yet ({missing.length})</summary>
             <ul>
               {missing.map((f) => (
                 <li key={f.id}>{f.label}</li>

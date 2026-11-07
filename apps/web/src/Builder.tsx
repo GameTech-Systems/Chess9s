@@ -390,7 +390,7 @@ export function Builder({
         )}
         {unbuilt.length > 0 && (
           <p className="flags" role="note">
-            <strong>Not in this build yet:</strong> {unbuilt.join(', ')}. The game plays without
+            <strong>Not available yet:</strong> {unbuilt.join(', ')}. The game plays without
             {unbuilt.length > 1 ? ' them' : ' it'}.
           </p>
         )}

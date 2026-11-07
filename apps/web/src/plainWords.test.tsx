@@ -44,6 +44,11 @@ describe('player-visible text', () => {
     expect(text).not.toMatch(CODE);
     expect(text).not.toMatch(SHORTHAND);
   });
+  it('names no setting id in a description', () => {
+    for (const p of registry.parameters as Param[]) {
+      expect(p.description ?? '').not.toMatch(/\([a-z]+(\.[A-Za-z0-9]+)+\)/);
+    }
+  });
   it('tells a code from a board square', () => {
     for (const code of ['(D5)', '(S7, I9)', 'default D5', 'D5.2', 'D85', 'S92', 'decision I3'])
       expect(code).toMatch(CODE);

@@ -186,7 +186,7 @@ describe('Change ruleset page', () => {
 
   it('says what the build cannot play yet', () => {
     const html = render(draftOf('standard-2p', { type: 'set', id: 'queen.pawnSwap', value: true }));
-    expect(html).toContain('Not in this build yet:');
+    expect(html).toContain('Not available yet:');
     expect(html).toContain('Queen and pawn swap');
   });
 

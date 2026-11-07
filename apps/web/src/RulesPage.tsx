@@ -2,6 +2,7 @@ import { boardData } from './board/data';
 import { pawnColor } from './board/view';
 import {
   findRuleset,
+  HOME_PRESETS,
   listRulesets,
   rulesetSettings,
   statusLabel,
@@ -123,17 +124,17 @@ export function RulesPage({
     return (
       <article className="prose rules-page" aria-labelledby="rules-page-title">
         <h2 id="rules-page-title">Rules</h2>
-        <p>
-          No ruleset called <code>{id}</code>. These are the rulesets in this build:
-        </p>
+        <p>No ruleset called &ldquo;{id}&rdquo;. Try one of these:</p>
         <ul>
-          {listRulesets().map((r) => (
-            <li key={r.id}>
-              <a href={rulesPath(r.id)} onClick={linkTo?.(rulesPath(r.id))}>
-                {r.name}
-              </a>
-            </li>
-          ))}
+          {listRulesets()
+            .filter((r) => r.listed || [...HOME_PRESETS[2], ...HOME_PRESETS[3]].includes(r.id))
+            .map((r) => (
+              <li key={r.id}>
+                <a href={rulesPath(r.id)} onClick={linkTo?.(rulesPath(r.id))}>
+                  {r.name}
+                </a>
+              </li>
+            ))}
         </ul>
       </article>
     );
