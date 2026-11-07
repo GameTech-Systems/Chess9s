@@ -105,7 +105,7 @@ const customFile = (c: Pick<CustomRuleset, 'id' | 'name' | 'overrides' | 'player
   version: CUSTOM_VERSION,
   status: 'proposed',
   players: c.players ?? 2,
-  description: 'A ruleset built by the player. Not fairness-checked; not a tournament ruleset.',
+  description: 'A ruleset built by the player. Not fairness-checked.',
   overrides: c.overrides,
 });
 

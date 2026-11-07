@@ -5,8 +5,6 @@ import { App, pageOf, roomCodeOf, rulesIdOf } from './App';
 import { ErrorBoundary, ErrorScreen } from './ErrorScreen';
 import { installErrorFallback } from './errorFallback';
 import { CONTACT_ADDRESS, DISCUSSIONS_URL } from './links';
-import { Tournament } from './Tournament';
-import { STANDARD_DISCUSSION } from './tournament';
 import { PRIVACY_UPDATED } from './Privacy';
 import { HOME_PRESETS, listRulesets } from './game/rules';
 import { RulePicker } from './RulePicker';
@@ -121,73 +119,21 @@ describe('pages', () => {
   });
 });
 
-describe('tournament page (S46)', () => {
-  const open = {
-    url: 'https://example.test/discussions/1',
-    opened: '2026-10-25',
-    closes: '2026-11-15',
-  };
-
-  it('routes /tournament, with or without a trailing slash', () => {
-    expect(pageOf('/tournament')).toBe('tournament');
-    expect(pageOf('/tournament/')).toBe('tournament');
-  });
-
-  it('says tournaments use Official rulesets only, never custom ones', () => {
-    const html = renderToStaticMarkup(<Tournament discussion={null} />);
-    expect(html).toMatch(/Official rulesets only/);
-    expect(html).toMatch(/never custom/i);
-    expect(html).toContain('hot-seat or over the board');
-    expect(html).not.toContain('Phase 5');
-  });
-
-  it('before the discussion is announced it says it starts when announced', () => {
-    const html = renderToStaticMarkup(<Tournament discussion={null} />);
-    expect(html).toContain('Standard is a Candidate');
-    expect(html).toContain('starts when announced');
-    expect(html).not.toContain('example.test');
-  });
-
-  it('with the discussion open it links it and gives both dates', () => {
-    const html = renderToStaticMarkup(<Tournament discussion={open} />);
-    expect(html).toContain('Standard is a Candidate under public discussion');
-    expect(html).toContain(`href="${open.url}"`);
-    expect(html).toContain('25 October 2026');
-    expect(html).toContain('15 November 2026');
-    expect(html).not.toContain('starts when announced');
-  });
-
-  it('publishes no conduct rules: the organizer announces them with the invitation (D47)', () => {
-    const html = renderToStaticMarkup(<Tournament discussion={null} />);
-    expect(html).toMatch(/organizer announces/);
-    expect(html).toMatch(/with the invitation/);
-  });
-
-  it('summarizes how a ruleset becomes Official and links Governance', () => {
-    const html = renderToStaticMarkup(<Tournament discussion={null} />);
-    expect(html).toMatch(/fairness/i);
-    expect(html).toMatch(/21 days/);
-    expect(html).toMatch(/ratif/i);
-    expect(html).toContain('GOVERNANCE.md');
-  });
-
-  it('the real discussion record is the one from the S44 brief', () => {
-    expect(STANDARD_DISCUSSION).toEqual({
-      url: 'https://github.com/GameTech-Systems/Chess9s/discussions/39',
-      opened: '2026-10-25',
-      closes: '2026-11-15',
-    });
-    const html = renderToStaticMarkup(<App path="/tournament" />);
-    expect(html).toContain('discussions/39');
-  });
-
-  it('is linked from the footer of every page, the rules page and the builder', () => {
-    for (const path of ['/', '/privacy', '/rules/standard-2p', '/build', '/tournament']) {
-      expect(renderToStaticMarkup(<App path={path} />)).toContain('href="/tournament"');
-    }
-    expect(renderToStaticMarkup(<App path="/build" />)).toMatch(
-      /never a tournament ruleset[\s\S]*href="\/tournament"/,
+describe('no Tournaments page (D86)', () => {
+  it('sends /tournament to the home page, with or without a trailing slash', () => {
+    expect(pageOf('/tournament')).toBe('game');
+    expect(pageOf('/tournament/')).toBe('game');
+    expect(renderToStaticMarkup(<App path="/tournament" />)).toBe(
+      renderToStaticMarkup(<App path="/" />),
     );
+  });
+
+  it('has no tournament link or wording on any page', () => {
+    for (const path of ['/', '/privacy', '/rules/standard-2p', '/build', '/tournament']) {
+      const html = renderToStaticMarkup(<App path={path} />);
+      expect(html).not.toContain('href="/tournament"');
+      expect(html).not.toMatch(/tournament/i);
+    }
   });
 
   it('the privacy page says a saved game record is a file on your device, nothing sent', () => {
@@ -266,15 +212,5 @@ describe('online play pages (S53)', () => {
   it('privacy’s date changed with the page', () => {
     expect(PRIVACY_UPDATED).toBe('28 October 2026');
     expect(renderToStaticMarkup(<App path="/privacy" />)).toContain('Last updated 28 October 2026');
-  });
-
-  it('the tournament page, the builder note and the tournament invitation say games can be played online by room code, Official ruleset only (D46)', () => {
-    const t = renderToStaticMarkup(<Tournament discussion={null} />);
-    expect(t).toMatch(/played online by room code/);
-    expect(t).toMatch(/Official ruleset only/);
-    expect(t).not.toContain('Until online play');
-    const b = renderToStaticMarkup(<App path="/build" />);
-    expect(b).toMatch(/played online by room code/);
-    expect(b).not.toContain('not played online yet');
   });
 });

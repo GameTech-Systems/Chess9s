@@ -222,7 +222,7 @@ describe('sharing a ruleset', () => {
     expect(html).toContain('type="file"');
     expect(html).toContain('accept=".json,application/json"');
     expect(html).toContain('Invite to a game');
-    expect(html).toContain('Invite to a tournament');
+    expect(html).not.toMatch(/tournament/i);
     expect(html).toMatch(/href="mailto:\?subject=/);
     expect(html).toContain('/build#ruleset=');
     expect(html).toContain('Submit for consideration');

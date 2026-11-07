@@ -10,10 +10,10 @@ Phases end with exit criteria, not dates. Later phases wait for earlier ones to 
 
 **Phase 3: Public launch on chess9s.com.** Deployment, privacy policy, open Discussions, and a "Suggest a variant" link. *Exit:* outside testers have finished games and sent feedback.
 
-**Phase 4: Official tournament rules.** A public discussion period on the Candidate ruleset, ratification, and a tournament rules page. *Exit:* an immutable Official 2-player ruleset.
+**Phase 4: Official rules.** A public discussion period on the Candidate ruleset and ratification. Waits until there are players (D86); the tournament rules page is part of the tournaments phase. *Exit:* an immutable Official 2-player ruleset.
 
 **Phase 5: Online multiplayer.** Room codes, guest play, reconnection, and a ruleset locked per game.
 
 **Phase 6: 3-player Dragon mode (experimental).** Dragon role, exit rules, timer, win conditions, and balance simulations across variants.
 
-**Phase 7: Growth.** Mobile apps, accounts and stats, and tournaments.
+**Phase 7: Growth.** Mobile apps, accounts and stats, and tournaments (with a Tournaments page, once there are players).

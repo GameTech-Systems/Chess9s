@@ -23,7 +23,7 @@ body:
     attributes:
       label: Ruleset file (optional)
       description: >-
-        A whole ruleset submitted for tournament consideration: the file from "Export as file" on
+        A whole ruleset submitted for consideration: the file from "Export as file" on
         chess9s.com/build ("Submit for consideration" fills this in). Reviewed with the checklist
         in docs/GOVERNANCE.md (Submitted rulesets).
       render: json
