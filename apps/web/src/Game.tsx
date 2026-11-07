@@ -19,7 +19,13 @@ import { clearGuest, loadGuest, saveGuest, type Mode, type Store } from './game/
 import { openRecord, saveRecordFile, type Opened } from './game/record';
 import { Board } from './board/Board';
 import { boardData, pieceLetters } from './board/data';
-import { DEFAULT_RULESET_ID, createRulesFor, listRulesets, type RulesetInfo } from './game/rules';
+import {
+  DEFAULT_RULESET_ID,
+  createRulesFor,
+  listRulesets,
+  statusLabel,
+  type RulesetInfo,
+} from './game/rules';
 import {
   noticeLines,
   phaseLine,
@@ -668,8 +674,8 @@ export function Game({
         </button>
 
         <p className="facts small">
-          {ruleset.name} · {ruleset.id} v{ruleset.version} · {ruleset.status}
-          {ruleset.custom && ' · your own, kept in this browser'}
+          {ruleset.name} · {statusLabel(ruleset.status, ruleset.custom)}
+          {ruleset.custom && ' · kept in this browser'}
         </p>
 
         {missing.length > 0 && (

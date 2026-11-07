@@ -1,11 +1,11 @@
 {
   "$schema": "../schema/ruleset.schema.json",
   "id": "heavy-h3-3p",
-  "name": "Heavy-Handed Dragon, Heads 3",
+  "name": "Standard (3-player)",
   "version": "0.1.0",
-  "status": "experimental",
+  "status": "candidate",
   "players": 3,
-  "description": "A 3-player game to test (D82, decision 0023): the Heavy-Handed Dragon (heavy-3p 0.1.0) with the Dragon Heads limited to 3 squares a move and the Tail free to slide up to 8. Experimental; readings of decision 0023 provisional.",
+  "description": "The default 3-player game: light, dark and the Dragon, who plays the five Coast pieces. The Dragon Heads move up to 3 squares and the Tail up to 8. The King moves one square. Each Coast piece's first way off the Coast is through A5, and on the Coast a Dragon piece attacks only the Coast. The Dragon loses only when the Sun, the Moon and both Dragon Heads are captured and the Tail is checkmated. Bot self-play found the three seats close to even.",
   "overrides": {
     "king.range": 1,
     "coast.3p.attackFrom": "coast-only",

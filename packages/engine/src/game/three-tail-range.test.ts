@@ -157,9 +157,9 @@ describe('Heavy-Handed Dragon, Heads 3 (D82)', () => {
 
   it('is heavy-3p with dragonHead.range 3 and tail.3p.range 8', () => {
     const r = ruleset(id);
-    expect(r.name).toBe('Heavy-Handed Dragon, Heads 3');
+    expect(r.name).toBe('Standard (3-player)');
     expect(r.version).toBe('0.1.0');
-    expect(r.status).toBe('experimental');
+    expect(r.status).toBe('candidate');
     expect(r.players).toBe(3);
     expect(r.overrides).toEqual({
       ...ruleset('heavy-3p').overrides,

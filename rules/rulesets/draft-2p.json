@@ -5,6 +5,6 @@
   "version": "0.2.0",
   "status": "candidate",
   "players": 2,
-  "description": "The draft v0.2 rules (docs/RULES.md) with every 2-player parameter at its default. The King moves up to 2 squares, which makes checkmate harder to force: good practice. Fairness-checked (docs/fairness/draft-2p.md, decision 0010) and published as a Candidate for public discussion. Not official.",
+  "description": "The full Chess Nines rules with every setting at its default. The King moves up to 2 squares, which makes checkmate harder to force. Bot self-play found the two sides evenly matched.",
   "overrides": {}
 }

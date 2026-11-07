@@ -4,45 +4,46 @@ import f0 from '../../../rules/boards/standard-9x9.json';
 import f1 from '../../../rules/locks/draft-2p@0.2.0.json';
 import f2 from '../../../rules/locks/draft-3p@0.3.0.json';
 import f3 from '../../../rules/locks/easy-3p@0.1.0.json';
-import f4 from '../../../rules/locks/standard-2p@0.1.0.json';
-import f5 from '../../../rules/locks/standard-3p@0.1.0.json';
-import f6 from '../../../rules/locks/standard-3p@0.2.0.json';
-import f7 from '../../../rules/parameters.json';
-import f8 from '../../../rules/pieces/bishop.json';
-import f9 from '../../../rules/pieces/dark-dragon-head.json';
-import f10 from '../../../rules/pieces/dragon-tail.json';
-import f11 from '../../../rules/pieces/king.json';
-import f12 from '../../../rules/pieces/knight.json';
-import f13 from '../../../rules/pieces/light-dragon-head.json';
-import f14 from '../../../rules/pieces/moon.json';
-import f15 from '../../../rules/pieces/pawn.json';
-import f16 from '../../../rules/pieces/queen.json';
-import f17 from '../../../rules/pieces/rook.json';
-import f18 from '../../../rules/pieces/sun.json';
-import f19 from '../../../rules/rulesets/archive/draft-3p@0.2.0.json';
-import f20 from '../../../rules/rulesets/archive/draft-3p@0.3.0.json';
-import f21 from '../../../rules/rulesets/archive/easy-3p@0.1.0.json';
-import f22 from '../../../rules/rulesets/archive/standard-3p@0.1.0.json';
-import f23 from '../../../rules/rulesets/archive/standard-3p@0.2.0.json';
-import f24 from '../../../rules/rulesets/draft-2p.json';
-import f25 from '../../../rules/rulesets/draft-3p.json';
-import f26 from '../../../rules/rulesets/easy-2p.json';
-import f27 from '../../../rules/rulesets/easy-3p.json';
-import f28 from '../../../rules/rulesets/heavy-3p.json';
-import f29 from '../../../rules/rulesets/heavy-h3-3p.json';
-import f30 from '../../../rules/rulesets/heavy-limited-3p.json';
-import f31 from '../../../rules/rulesets/heavy-limited3-3p.json';
-import f32 from '../../../rules/rulesets/light-3p.json';
-import f33 from '../../../rules/rulesets/light-limited-3p.json';
-import f34 from '../../../rules/rulesets/standard-2p.json';
-import f35 from '../../../rules/rulesets/standard-3p.json';
-import f36 from '../../../rules/schema/board.schema.json';
-import f37 from '../../../rules/schema/lock.schema.json';
-import f38 from '../../../rules/schema/parameters.schema.json';
-import f39 from '../../../rules/schema/piece.schema.json';
-import f40 from '../../../rules/schema/ruleset.schema.json';
-import f41 from '../../../rules/schema/timeControls.schema.json';
-import f42 from '../../../rules/timeControls.json';
+import f4 from '../../../rules/locks/heavy-h3-3p@0.1.0.json';
+import f5 from '../../../rules/locks/standard-2p@0.1.0.json';
+import f6 from '../../../rules/locks/standard-3p@0.1.0.json';
+import f7 from '../../../rules/locks/standard-3p@0.2.0.json';
+import f8 from '../../../rules/parameters.json';
+import f9 from '../../../rules/pieces/bishop.json';
+import f10 from '../../../rules/pieces/dark-dragon-head.json';
+import f11 from '../../../rules/pieces/dragon-tail.json';
+import f12 from '../../../rules/pieces/king.json';
+import f13 from '../../../rules/pieces/knight.json';
+import f14 from '../../../rules/pieces/light-dragon-head.json';
+import f15 from '../../../rules/pieces/moon.json';
+import f16 from '../../../rules/pieces/pawn.json';
+import f17 from '../../../rules/pieces/queen.json';
+import f18 from '../../../rules/pieces/rook.json';
+import f19 from '../../../rules/pieces/sun.json';
+import f20 from '../../../rules/rulesets/archive/draft-3p@0.2.0.json';
+import f21 from '../../../rules/rulesets/archive/draft-3p@0.3.0.json';
+import f22 from '../../../rules/rulesets/archive/easy-3p@0.1.0.json';
+import f23 from '../../../rules/rulesets/archive/standard-3p@0.1.0.json';
+import f24 from '../../../rules/rulesets/archive/standard-3p@0.2.0.json';
+import f25 from '../../../rules/rulesets/draft-2p.json';
+import f26 from '../../../rules/rulesets/draft-3p.json';
+import f27 from '../../../rules/rulesets/easy-2p.json';
+import f28 from '../../../rules/rulesets/easy-3p.json';
+import f29 from '../../../rules/rulesets/heavy-3p.json';
+import f30 from '../../../rules/rulesets/heavy-h3-3p.json';
+import f31 from '../../../rules/rulesets/heavy-limited-3p.json';
+import f32 from '../../../rules/rulesets/heavy-limited3-3p.json';
+import f33 from '../../../rules/rulesets/light-3p.json';
+import f34 from '../../../rules/rulesets/light-limited-3p.json';
+import f35 from '../../../rules/rulesets/standard-2p.json';
+import f36 from '../../../rules/rulesets/standard-3p.json';
+import f37 from '../../../rules/schema/board.schema.json';
+import f38 from '../../../rules/schema/lock.schema.json';
+import f39 from '../../../rules/schema/parameters.schema.json';
+import f40 from '../../../rules/schema/piece.schema.json';
+import f41 from '../../../rules/schema/ruleset.schema.json';
+import f42 from '../../../rules/schema/timeControls.schema.json';
+import f43 from '../../../rules/timeControls.json';
 
 /** Every JSON file in rules/, keyed by its path under rules/. */
 export const rulesFiles: RulesFiles = {
@@ -50,43 +51,44 @@ export const rulesFiles: RulesFiles = {
   'locks/draft-2p@0.2.0.json': f1,
   'locks/draft-3p@0.3.0.json': f2,
   'locks/easy-3p@0.1.0.json': f3,
-  'locks/standard-2p@0.1.0.json': f4,
-  'locks/standard-3p@0.1.0.json': f5,
-  'locks/standard-3p@0.2.0.json': f6,
-  'parameters.json': f7,
-  'pieces/bishop.json': f8,
-  'pieces/dark-dragon-head.json': f9,
-  'pieces/dragon-tail.json': f10,
-  'pieces/king.json': f11,
-  'pieces/knight.json': f12,
-  'pieces/light-dragon-head.json': f13,
-  'pieces/moon.json': f14,
-  'pieces/pawn.json': f15,
-  'pieces/queen.json': f16,
-  'pieces/rook.json': f17,
-  'pieces/sun.json': f18,
-  'rulesets/archive/draft-3p@0.2.0.json': f19,
-  'rulesets/archive/draft-3p@0.3.0.json': f20,
-  'rulesets/archive/easy-3p@0.1.0.json': f21,
-  'rulesets/archive/standard-3p@0.1.0.json': f22,
-  'rulesets/archive/standard-3p@0.2.0.json': f23,
-  'rulesets/draft-2p.json': f24,
-  'rulesets/draft-3p.json': f25,
-  'rulesets/easy-2p.json': f26,
-  'rulesets/easy-3p.json': f27,
-  'rulesets/heavy-3p.json': f28,
-  'rulesets/heavy-h3-3p.json': f29,
-  'rulesets/heavy-limited-3p.json': f30,
-  'rulesets/heavy-limited3-3p.json': f31,
-  'rulesets/light-3p.json': f32,
-  'rulesets/light-limited-3p.json': f33,
-  'rulesets/standard-2p.json': f34,
-  'rulesets/standard-3p.json': f35,
-  'schema/board.schema.json': f36,
-  'schema/lock.schema.json': f37,
-  'schema/parameters.schema.json': f38,
-  'schema/piece.schema.json': f39,
-  'schema/ruleset.schema.json': f40,
-  'schema/timeControls.schema.json': f41,
-  'timeControls.json': f42,
+  'locks/heavy-h3-3p@0.1.0.json': f4,
+  'locks/standard-2p@0.1.0.json': f5,
+  'locks/standard-3p@0.1.0.json': f6,
+  'locks/standard-3p@0.2.0.json': f7,
+  'parameters.json': f8,
+  'pieces/bishop.json': f9,
+  'pieces/dark-dragon-head.json': f10,
+  'pieces/dragon-tail.json': f11,
+  'pieces/king.json': f12,
+  'pieces/knight.json': f13,
+  'pieces/light-dragon-head.json': f14,
+  'pieces/moon.json': f15,
+  'pieces/pawn.json': f16,
+  'pieces/queen.json': f17,
+  'pieces/rook.json': f18,
+  'pieces/sun.json': f19,
+  'rulesets/archive/draft-3p@0.2.0.json': f20,
+  'rulesets/archive/draft-3p@0.3.0.json': f21,
+  'rulesets/archive/easy-3p@0.1.0.json': f22,
+  'rulesets/archive/standard-3p@0.1.0.json': f23,
+  'rulesets/archive/standard-3p@0.2.0.json': f24,
+  'rulesets/draft-2p.json': f25,
+  'rulesets/draft-3p.json': f26,
+  'rulesets/easy-2p.json': f27,
+  'rulesets/easy-3p.json': f28,
+  'rulesets/heavy-3p.json': f29,
+  'rulesets/heavy-h3-3p.json': f30,
+  'rulesets/heavy-limited-3p.json': f31,
+  'rulesets/heavy-limited3-3p.json': f32,
+  'rulesets/light-3p.json': f33,
+  'rulesets/light-limited-3p.json': f34,
+  'rulesets/standard-2p.json': f35,
+  'rulesets/standard-3p.json': f36,
+  'schema/board.schema.json': f37,
+  'schema/lock.schema.json': f38,
+  'schema/parameters.schema.json': f39,
+  'schema/piece.schema.json': f40,
+  'schema/ruleset.schema.json': f41,
+  'schema/timeControls.schema.json': f42,
+  'timeControls.json': f43,
 };

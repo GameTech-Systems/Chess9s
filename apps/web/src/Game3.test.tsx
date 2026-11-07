@@ -269,7 +269,7 @@ describe('the 3-player game screen and online play (S63)', () => {
     const html = renderToStaticMarkup(<App path="/" />);
     expect(html).toMatch(/class="mode" aria-pressed="false" data-players="3"/);
     const three = renderToStaticMarkup(<RulePicker players={3} onPick={() => {}} />);
-    expect(three).toContain('Standard (3-player)');
+    expect(three).toContain('<strong>Standard</strong>');
   });
 });
 

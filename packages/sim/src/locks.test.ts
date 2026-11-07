@@ -46,7 +46,11 @@ describe('locks in rules/locks', () => {
   const locked = library.current.filter(isLocked);
 
   it('locks the Candidate rulesets that exist today', () => {
-    expect(locked.map(names).sort()).toEqual(['draft-2p@0.2.0', 'standard-2p@0.1.0']);
+    expect(locked.map(names).sort()).toEqual([
+      'draft-2p@0.2.0',
+      'heavy-h3-3p@0.1.0',
+      'standard-2p@0.1.0',
+    ]);
   });
 
   it.each(locked.map((r) => [names(r), r] as const))(
@@ -85,6 +89,7 @@ describe('locks in rules/locks', () => {
         true,
         [
           'draft-2p 0.2.0: king.canJump was false, now true',
+          'heavy-h3-3p 0.1.0: king.canJump was false, now true',
           'standard-2p 0.1.0: king.canJump was false, now true',
         ],
       ],

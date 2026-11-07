@@ -44,6 +44,8 @@ export interface Ruleset {
   description?: string;
   /** Maintainers' notes, such as why an archived version has no lock. */
   notes?: string;
+  /** True to list the ruleset under "More variants to try" on the home page; absent means hidden there. */
+  listed?: boolean;
   extends?: string;
   overrides: Record<string, unknown>;
   ratification?: { decisionRecord: string; date: string };

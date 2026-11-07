@@ -5,7 +5,7 @@
   "version": "0.2.0",
   "status": "experimental",
   "players": 2,
-  "description": "The closest Chess Nines gets to regular chess, for learning the board: light moves first, the King moves one square and may castle, the Queen may cross the void anywhere, e5 is an ordinary square for every piece except the Queen, and pawns have no safe zones. The Coast stays closed until someone moves the Dragon Tail onto e5. Casual play only; not fairness-checked.",
+  "description": "The closest Chess Nines gets to regular chess, for learning the board: light moves first, the King moves one square and may castle, the Queen may cross the void anywhere, e5 is an ordinary square for every piece except the Queen, and pawns have no safe zones. The Coast stays closed until someone moves the Dragon Tail onto e5. Casual play; the balance has not been tested.",
   "overrides": {
     "king.range": 1,
     "castling.enabled": true,

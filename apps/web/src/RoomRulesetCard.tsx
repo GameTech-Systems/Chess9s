@@ -1,6 +1,12 @@
 import { rulesPath } from './links';
 import { differences } from './game/custom';
-import { DEFAULT_RULESET_ID, customValues, findRuleset, rulesetValues } from './game/rules';
+import {
+  DEFAULT_RULESET_ID,
+  customValues,
+  findRuleset,
+  rulesetValues,
+  statusLabel,
+} from './game/rules';
 
 /** The ruleset of a room as the pages that show it before play name it. */
 export interface RoomRulesetLike {
@@ -40,13 +46,11 @@ export function RoomRulesetCard({
         <strong>{ruleset.name}</strong>
         {status && (
           <span className="badge" data-status={status}>
-            {status}
+            {custom ? 'Custom' : statusLabel(status!)}
           </span>
         )}
       </div>
-      <p className="facts small">
-        {custom ? 'A ruleset the creator built' : `${ruleset.id} v${ruleset.version}`}
-      </p>
+      {custom && <p className="facts small">A ruleset the creator built</p>}
       {custom && (
         <>
           <p className="facts">

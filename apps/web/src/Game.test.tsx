@@ -18,7 +18,8 @@ describe('Game screen', () => {
     const html = render();
     expect(html).toContain('Dark to move');
     expect(html).toMatch(/Coast: <strong>closed<\/strong>/);
-    expect(html).toContain(`${ruleset.id} v${ruleset.version}`);
+    expect(html).not.toContain(`${ruleset.id} v${ruleset.version}`);
+    expect(html).toContain('Balance-tested');
     expect(html).toContain('aria-label="Moves"');
     expect(html).toContain('data-hit="e5"');
   });
@@ -93,12 +94,8 @@ describe('Rule picker', () => {
       const html = renderToStaticMarkup(<RulePicker players={players} onPick={() => {}} />);
       const presets = html.slice(html.indexOf('id="presets-title"'), html.indexOf('build-row'));
       const names = [...presets.matchAll(/<strong>([^<]+)<\/strong>/g)].map((m) => m[1]);
-      const suffix = players === 3 ? ' (3-player)' : '';
-      expect(names).toEqual([
-        players === 3 ? 'Heavy-Handed Dragon, Heads 3' : 'Standard',
-        `Easy Start${suffix}`,
-        `Good Practice${suffix}`,
-      ]);
+      // The 3-player tab drops the "(3-player)" suffix (D85).
+      expect(names).toEqual(['Standard', 'Easy Start', 'Good Practice']);
       for (const id of HOME_PRESETS[players]) {
         expect(html).toContain(`href="/rules/${id}"`);
         expect(html).toContain(PRESET_SUMMARIES[id]!);
@@ -115,17 +112,24 @@ describe('Rule picker', () => {
     expect(two).toContain('data-status="candidate"');
     expect(two).toContain('data-status="experimental"');
     const three = renderToStaticMarkup(<RulePicker players={3} onPick={() => {}} />);
+    expect(three).toContain('data-status="candidate">Balance-tested<');
     expect(three).toMatch(
-      /Heavy-Handed Dragon, Heads 3<\/strong>[\s\S]*?class="default-tag"[^>]*>Default for 3 players</,
+      /Standard<\/strong>[\s\S]*?class="default-tag"[^>]*>Default for 3 players</,
     );
   });
 
-  it('lists every other 3-player ruleset under "Rulesets under test", none twice', () => {
+  it('hides the study rulesets; "More variants to try" shows only rulesets marked listed (D84)', () => {
     const html = renderToStaticMarkup(<RulePicker players={3} onPick={() => {}} />);
     const others = listRulesets().filter((r) => r.players === 3 && !HOME_PRESETS[3].includes(r.id));
     expect(others.length).toBeGreaterThan(0);
-    expect(html).toContain(`Rulesets under test (${others.length})`);
-    for (const r of others) expect(html.split(`href="/rules/${r.id}"`)).toHaveLength(2);
+    for (const r of others) {
+      const shown = html.split(`href="/rules/${r.id}"`).length - 1;
+      expect(shown, r.id).toBe(r.listed ? 1 : 0);
+    }
+    // Nothing is marked listed today, so the section is not drawn at all.
+    expect(others.some((r) => r.listed)).toBe(false);
+    expect(html).not.toContain('More variants to try');
+    expect(html).not.toContain('Rulesets under test');
     // No 2-player ruleset on the 3-player page.
     expect(html).not.toContain('href="/rules/standard-2p"');
   });
@@ -211,7 +215,8 @@ describe('play aids, part 2', () => {
       <RulesScreen ruleset={ruleset} missing={['En passant']} onClose={() => {}} />,
     );
     expect(html).toContain('role="dialog"');
-    expect(html).toContain(`${ruleset.id} v${ruleset.version}`);
+    expect(html).not.toContain(`${ruleset.id} v${ruleset.version}`);
+    expect(html).toContain('Balance-tested');
     expect(html).toContain('En passant');
     expect(html).toContain('>Close<');
   });

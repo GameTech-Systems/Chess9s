@@ -98,7 +98,7 @@ describe('the preview before taking a seat', () => {
     await s.controller.start();
     const html = s.html();
     expect(html).toContain('Good Practice');
-    expect(html).toContain('draft-2p v0.2.0');
+    expect(html).not.toContain('draft-2p v0.2.0');
     expect(html).toMatch(/class="badge" data-status="candidate"/);
     expect(html).toMatch(/You will play[\s\S]*Dark/);
     expect(html).toContain('Take the Dark seat');

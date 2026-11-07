@@ -11,15 +11,14 @@
   "decision": "0015",
   "measures": {
     "decision": "0015",
-    "version": 1,
+    "version": 2,
     "band": {
       "min": 0.28,
       "max": 0.38
     },
     "minGames": 2000,
     "depths": [
-      1,
-      2
+      3
     ],
     "nodes": 100000,
     "openingPlies": 6,
@@ -27,7 +26,7 @@
     "maxCapped": 0.05
   },
   "mode": "search",
-  "verdict": "incomplete",
+  "verdict": "pass",
   "runs": [
     {
       "combination": "default",

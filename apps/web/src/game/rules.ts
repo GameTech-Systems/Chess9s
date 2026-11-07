@@ -37,13 +37,27 @@ export const DEFAULT_3P_RULESET_ID = 'heavy-h3-3p';
 
 /**
  * The three presets the home page offers for each player count, in this order: Standard, Easy
- * Start, Good Practice (owner, 3 Nov 2026). Every other bundled ruleset is listed under
- * "Rulesets under test".
+ * Start, Good Practice (owner, 3 Nov 2026). Another bundled ruleset appears under "More variants
+ * to try" only when its data marks it `listed` (D84); the rest stay loadable but are not shown.
  */
 export const HOME_PRESETS: Record<2 | 3, string[]> = {
   2: [DEFAULT_RULESET_ID, 'easy-2p', 'draft-2p'],
   3: [DEFAULT_3P_RULESET_ID, 'easy-3p', 'draft-3p'],
 };
+
+/** A status in plain words, for badges (D85). A player's own ruleset is "Yours". */
+export function statusLabel(status: Ruleset['status'], custom = false): string {
+  if (custom) return 'Yours';
+  return (
+    {
+      candidate: 'Balance-tested',
+      experimental: 'In testing',
+      official: 'Official',
+      proposed: 'Proposed',
+      deprecated: 'Retired',
+    } as const
+  )[status];
+}
 
 /** What the picker shows about a ruleset, and what is recorded with a game. */
 export interface RulesetInfo {
@@ -53,6 +67,8 @@ export interface RulesetInfo {
   status: Ruleset['status'];
   players: 2 | 3;
   description: string;
+  /** Marked as listed in its data: shown under "More variants to try" on the home page (D84). */
+  listed: boolean;
   /** The engine plays it in hot-seat: every bundled ruleset, 2 or 3 players. */
   playable: boolean;
   /** An online room can play it: every bundled ruleset (S63 added the 3-seat room), not a custom 3-player one. */
@@ -111,6 +127,7 @@ const infoOf = (r: Ruleset): RulesetInfo => ({
   status: r.status,
   players: r.players,
   description: r.description ?? '',
+  listed: r.listed === true,
   playable: true,
   online: true,
   isDefault: r.id === DEFAULT_RULESET_ID,
