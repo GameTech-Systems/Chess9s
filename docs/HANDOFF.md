@@ -8,13 +8,9 @@ Updated 2026-11-07 by S91 (Haiku 5.5 · low). `/end-session` rewrites this file;
 - Every 3-player ruleset stays experimental (D82, D81, D80, D60). `heavy-h3-3p` (Heads 3, Tail 8) is the default 3-player ruleset (S88).
 
 ## Next session
-**No step is planned.** Options for the owner:
-- Re-render the `heavy-h3-3p` depth-3 full report under version 2 (verdict should read on the depth-3 result).
-- Publish `heavy-h3-3p` as a Candidate, or keep it experimental.
+**S92** (Sonnet 5.5 · medium): 3-player Standard and plain labels. Then S93 (retire the Tournaments page, first-visitor pass) and S94 (Coast piece art, once the owner uploads the PNGs). Planned in chat on 7 Nov; see BUILD-PLAN and D83 to D87.
 
 ## Open questions for the owner
-- Does the 36.8% Dragon (interval to 38.9) need action, such as a Tail sweep 4 to 7 (D82 item), or is it accepted? Default: accepted, no further runs.
-- Re-render the `heavy-h3-3p` report under version 2 now? Default: not until asked.
 - Carried over: alternating the turn cycle's direction, a rule for the seat before the Dragon; the S74 readings (D76.1), decision 0020 readings, the held-setting rule (S64), Easy Start calls (S67), decision 0017 clock readings, S53 defaults, the draw-offer default (S51), the flag rule (0013), `coast.openToAll`, the I34 contact address, the favicon, the Ting Yang art.
 
 ## Notes for Claude

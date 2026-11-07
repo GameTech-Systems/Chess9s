@@ -491,6 +491,30 @@ Done when: the run is dispatched (run id in the log).
 Collect the `fairness-report-heavy-h3-3p.depth3-full` artifact of run 41946060760, check its game count (at least 2,000 and every shard reporting; if short, report it and ask the owner whether to dispatch the missing seeds), commit the report and add it to decision 0023 as dark / light / Dragon. Depth 3 alone is the measure (owner, 5 Nov 2026), so judge the 2,000-game rule at depth 3; the report's own verdict still reads "incomplete" because decision 0015 counts depths 1 and 2, so say so.
 Done when: the report is committed with the comparison in decision 0023 and the handoff.
 
+### S92 — 3-player Standard and plain labels · Claude · Sonnet 5.5 · medium · `todo`
+Owner, 7 Nov 2026 (D83): the full depth-3 run of `heavy-h3-3p` (2,076 games, 31.0 / 32.2 / 36.8 dark / light / Dragon) is accepted; no Tail sweep. The site is getting ready for the public, so players see plain words, not project shorthand (D84, D85).
+1. Re-render the `heavy-h3-3p` depth-3 full report under decision 0015 version 2, so its verdict reads on depth 3. Record the acceptance and the status change in decision 0023.
+2. `heavy-h3-3p`: name "Standard (3-player)", status `candidate`, version 0.1.0 kept (as D48), id kept (D83). The old `standard-3p` 0.3.0 gives up the name: archive it as earlier versions were archived; if the index needs a current file per id, rename it "Original Dragon rules" and hide it (D84) instead.
+3. Home page (D84): show the three presets of each player count, plus only rulesets marked as listed in their data. Hide `heavy-3p`, `heavy-limited-3p`, `heavy-limited3-3p`, `light-3p`, `light-limited-3p` and the old `standard-3p`; they stay loadable for saved games, rules links and `pnpm sim`. Rename "Rulesets under test" to "More variants to try" and show it only when it lists something; each card gets a one-line summary for players.
+4. Labels (D85): remove `id vX.Y.Z` from the picker cards, rules page header, in-game rules dialog, game header, online room header and room card. Game records and room data keep `id@version`. Status badges in plain words: Candidate "Balance-tested", Experimental "In testing", Official "Official"; custom rulesets "Yours". On the 3-player tab, names drop the "(3-player)" suffix.
+5. Rewrite every ruleset description, and the descriptions of `tail.capturable`, `turn.3p.order`, `dragon.3p.defeat` and `tail.3p.stone`, for players: no D, S or I codes, no "decision NNNN", no "provisional". Keep the references in the decision records and RULES.md, not in the data players read.
+6. Rules page: drop the "Not an official tournament ruleset" line, the tournament link and the raw JSON link; put "Every setting" in a closed details block.
+7. Test first: a test that fails if any player-visible string (ruleset names and descriptions, parameter labels, descriptions and option labels, `PRESET_SUMMARIES`) matches `/\b[DSI]\d{1,3}\b|decision \d{4}|provisional|\d+\.\d+\.\d+/`.
+Done when: the 3-player tab shows Standard as the default, Balance-tested; no page shows a code or version string; the report is re-rendered; tests pass.
+
+### S93 — Retire the Tournaments page; first-visitor pass · Claude · Sonnet 5.5 · medium · `todo`
+Owner, 7 Nov 2026 (D86): nothing is official and there are no players yet, so there is no Tournaments page until there are.
+1. Delete `Tournament.tsx`, `tournament.ts` and their tests; `/tournament` goes to the home page. Remove the footer link and the footer line "Rulesets other than Official ones are not tournament rules." Reword tournament mentions in the builder, sharing, the room card and `game/rules.ts`.
+2. README and ROADMAP: tournaments are a later phase, once there are players. GOVERNANCE.md stays as the contributors' process.
+3. Discussion 39 (closes 15 Nov): Claude posts nothing there. Standard (2-player) stays a Candidate and is not ratified until there are players (D86).
+4. Walk every page as a first-time visitor at 375 px and 1280 px wide: home, rules, a 2-player and a 3-player game, a computer game, an online room, the builder, privacy and the error screen. Remove developer-facing text (file paths, step or decision codes, "provisional", internal names). Where new wording needs the owner, list it in the handoff instead of inventing copy.
+Done when: there is no Tournaments page or link, the walk-through list is in the handoff, and tests pass.
+
+### S94 — Coast piece art from the owner's PNGs · Claude · Sonnet 5.5 · low · `todo`
+Blocked until the owner uploads the five pieces as PNGs to `assets/brand/pieces/src/` (GitHub web upload is fine). D87: raster art, no SVG wrapper.
+Convert each PNG to WebP at 1x (220×382) and 2x (440×764), import them in `brand.ts` and serve them with `srcset`; delete the SVG wrappers. Check the five sit on one baseline at one scale, with no halo or baked shadow on light and dark backgrounds. The emblem and the board's piece symbols stay SVG. Check the page weight and the Content-Security-Policy.
+Done when: the home page shows the new art, sharp on a phone, and the old wrappers are gone.
+
 ## Later phases
 
 Each later phase opens with an Opus 5.5 · high planning session that replaces its placeholder with detailed steps.
@@ -564,6 +588,11 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D80 | Limited Dragon (Heads move at most 4 squares) | Decided (owner, 1 Nov 2026): `heavy-limited-3p` and `light-limited-3p` = the 0.1.0 rulesets + `dragonHead.range` 4, plus a depth-3 screen of `light-3p` as baseline (decision 0022) | S79 |
 | D81 | Limited to 3 (after S80) | Decided (owner, 2 Nov 2026): `heavy-limited3-3p` = `heavy-3p` 0.1.0 + `dragonHead.range` 3, screened at depths 1, 2 and 3 (decision 0022) | S81 |
 | D82 | Balance measure, Tail range, next screens (after S82) | Decided (owner, 2 Nov 2026): depth 3 is the 3-player balance measure; `tail.3p.range` (default = `dragonHead.range`); `heavy-h3-3p` = Heads 3, Tail 8, screened at depth 3; Tail sweep 4 to 7 if the Dragon is above the band; Light-Handed dropped from simulations (decision 0023) | S84 |
+| D83 | 3-player Standard | Decided (owner, 7 Nov 2026): the full depth-3 run of `heavy-h3-3p` is accepted (Dragon 36.8%, inside 28–38%; no Tail sweep); it is renamed Standard (3-player) and published as a Candidate, version 0.1.0 kept. Default: the id stays `heavy-h3-3p` (option: a new id `standard-3p`) | S92 |
+| D84 | Rulesets on the home page | Default: the three presets of each player count, plus rulesets the owner marks as listed; study rulesets are hidden but stay loadable for saved games and simulations | S92 |
+| D85 | Labels players see | Default: no ruleset ids, versions or project codes on any page; status in plain words: Balance-tested (Candidate), In testing (Experimental), Official | S92 |
+| D86 | Tournaments | Decided (owner, 7 Nov 2026): no Tournaments page until there are players. Default: Standard (2-player) stays a Candidate; it is not ratified when discussion 39 closes on 15 Nov | S93 |
+| D87 | Coast piece art format | Default: raster art (WebP made from the owner's PNGs, 1x and 2x), no SVG wrapper; the emblem and the board's piece symbols stay SVG | S94 |
 
 ## Ledger sync format
 
