@@ -4,10 +4,14 @@ import { listRulesets } from './game/rules';
 import { PRESET_SUMMARIES } from './RulePicker';
 
 // What players read must carry no project shorthand: no D/S/I codes, no decision numbers, no
-// "provisional", no version strings (S92, D85). The references live in the decision records.
-// A lone D1 to D9 or I1 to I9 is also a board square (D5, I5) and cannot be told apart from a
-// code, so those are left to review; every code with two digits, and every S code, is caught.
-const SHORTHAND = /\b[DI]\d{2,3}\b|\bS\d{1,3}\b|decision \d{4}|provisional|\d+\.\d+\.\d+/i;
+// "provisional", no version strings (S92, D85, D5). The references live in the decision records.
+// A lone D1 to D9 or I1 to I9 is also a board square (D5, I5), so it is caught by where it sits:
+// in a bracket holding only codes "(D5)" or "(S7, D5)", after "decision" or "default" ("default
+// D5"), or with a sub-number ("D5.2"). Every S code and every code with two digits is caught
+// wherever it is. A bare D5 in a list of squares passes, as it should.
+const CODE =
+  /\b[DI]\d{2,3}\b|\bS\d{1,3}\b|\((?:[DIS]\d{1,3}(?:\.\d+)?(?:,\s*)?)+\)|\b(?:decision|default|ledger)\s+[DI]\d\b|\b[DI]\d\.\d+\b/i;
+const SHORTHAND = /decision \d{4}|provisional|\d+\.\d+\.\d+/i;
 
 type Param = {
   id: string;
@@ -37,7 +41,14 @@ describe('player-visible text', () => {
     expect(strings.length).toBeGreaterThan(100);
   });
   it.each(strings)('%s has no project shorthand', (_where, text) => {
+    expect(text).not.toMatch(CODE);
     expect(text).not.toMatch(SHORTHAND);
+  });
+  it('tells a code from a board square', () => {
+    for (const code of ['(D5)', '(S7, I9)', 'default D5', 'D5.2', 'D85', 'S92', 'decision I3'])
+      expect(code).toMatch(CODE);
+    for (const square of ['D5', 'I5', 'squares B5, C5, D5, F5', 'A5 and I5 (may stop)', 'a5-e5-i5'])
+      expect(square).not.toMatch(CODE);
   });
 });
 
