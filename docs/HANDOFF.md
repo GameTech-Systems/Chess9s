@@ -1,26 +1,27 @@
 # Handoff
 
-Updated 2026-11-07 by S92 (Sonnet 5.5 · medium). `/end-session` rewrites this file; keep it under 40 lines.
+Updated 2026-11-07 by S93 (Sonnet 5.5 · medium). `/end-session` rewrites this file; keep it under 40 lines.
 
 ## State
-- `heavy-h3-3p` is now the Candidate "Standard (3-player)" 0.1.0, locked. Its depth-3 report (2,076 games, 31.0 / 32.2 / 36.8 dark / light / Dragon) was re-rendered under decision 0015 version 2 and reads pass. Recorded in decision 0023.
-- Old `standard-3p` 0.3.0 was not archived (tests, sim and saved games load it by id): renamed "Original Dragon rules", hidden.
-- Home page shows only the three presets per count plus rulesets with `listed: true` (new optional ruleset field; none set; "More variants to try" is not drawn). No ids, versions or codes on any page; plain status badges (Balance-tested, In testing, Official, Yours; room card says Custom). Descriptions rewritten; `plainWords.test.tsx` guards them.
-- **Browser scripts not updated:** `apps/web/scripts/e2e-3p.mjs`, `e2e-clock.mjs` and `apps/worker/scripts/e2e-browser-3p.mjs` pick cards by names with "(3-player)" and by hidden rulesets (Heavy-Handed, Light-Handed). They will fail until fixed; not run this session.
+- No Tournaments page, footer link, tournament invitation or tournament wording in the app. `/tournament` shows the home page. README, ROADMAP and GOVERNANCE say tournaments are a later phase, once there are players (D86). Discussion 39: nothing posted; Standard (2-player) stays a Candidate.
+- Browser e2e scripts fixed and run green: `e2e-3p`, `e2e-clock`, `e2e-browser`, `e2e-browser-3p`, `e2e-browser-clock`. Hidden 3-player rulesets open from `/rules/<id>` with the Play button; the 3-player tab's cards drop "(3-player)".
+- Plain-words test now flags a lone D1–D9 or I1–I9 by context (in a bracket of codes, after "decision"/"default", or with a sub-number); a bare D5 among squares passes. Setting ids removed from two descriptions and guarded by a test.
+- First-visitor walk at 375 and 1280 px (home, rules 2p and 3p, hot-seat 2p and 3p, builder, privacy, room page, unknown-rules screen, `/tournament`): no file paths, step or decision codes, "provisional" or versions found after the fixes above. The unknown-rules screen now lists only the six preset rulesets. "Not in this build yet" became "Not available yet".
 
 ## Next session
-**S93 — Retire the Tournaments page; first-visitor pass** · Sonnet 5.5 · effort medium
-Why: planned next in BUILD-PLAN (D86).
-Start with: `/start-session S93`
+**S94 — Coast piece art from the owner's PNGs** · Sonnet 5.5 · effort low
+Why: planned next; blocked until the PNGs are in `assets/brand/pieces/src/` (not there at the end of S93).
+Start with: `/start-session S94`
 
 ## Decisions in effect for the next step
-- D86: no Tournaments page until there are players; Standard (2-player) stays a Candidate (decided).
-- D84, D85: as built in S92 (defaults).
+- D87: raster art, WebP at 1x and 2x, no SVG wrapper (default).
 
 ## Open questions for the owner
-- None blocking S93. Provisional: the plain-words test cannot tell a lone D1–D9 or I1–I9 code from a board square, so it catches S codes and two-digit D/I codes only. Carried over: the older list (turn-cycle direction, S74/0020 readings, held-setting rule, Easy Start calls, clock readings, S53 defaults, draw-offer default, flag rule, `coast.openToAll`, I34 contact, favicon, Ting Yang art).
+- Upload the five Coast piece PNGs to `assets/brand/pieces/src/` or S94 cannot start.
+- Wording the owner may want to set: the home page line about "hollow tetrahedral bases" (board-game text), and the room page error "Could not reach the room" (fine as is). No new copy was invented.
+- Carried over: turn-cycle direction, S74/0020 readings, held-setting rule, Easy Start calls, clock readings, S53 defaults, draw-offer default, flag rule, `coast.openToAll`, I34 contact, favicon, Ting Yang art.
 
 ## Notes for Claude
-- Fix the three browser e2e scripts (card names without the suffix; hidden rulesets need another way to open them, e.g. the rules page Play button) before relying on them.
 - Reports come from workflow artifacts; restate seats as dark / light / Dragon.
 - A new parameter makes lock tests fail until `pnpm lock add-keys`; new ruleset files need `pnpm rules:index`.
+- Browser scripts need Playwright and `pnpm build` first; `e2e-browser-clock` takes about three minutes.
