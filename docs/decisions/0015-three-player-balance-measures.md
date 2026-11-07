@@ -44,3 +44,8 @@ At depth 2 the Dragon captured light's King in 1,528 games (367 at depth 1) and 
 
 ## S83 update (2 Nov 2026, D82)
 Depth 3 is now the balance measure for 3-player rulesets; they are no longer screened at depths 1 and 2 ([decision 0023](0023-tail-range.md)). The measures, bands and reports above don't change.
+
+## Version 2 (7 Nov 2026, owner request)
+The owner asked for this version after the S90 full run. **Version 2 changes one thing:** the pass is read at **depth 3 alone**. The verdict passes when the ruleset as it is passes at depth 3, and depths 1 and 2 are reported but no longer decide it (owner, 5 Nov 2026: depth 2 is misleading for 3-player games; decision 0023, D82). The measures, the 28–38% band, the 2,000-game minimum, the 5% capped flag, the openings, the budget and the safety cap are unchanged. `MEASURES_3P` in `packages/sim/src/measures3.ts` is now `version: 2` with `depths: [3]`, so a `pnpm sim` on a 3-player ruleset plays depth 3 by default.
+
+Reports made under version 1 keep their version 1 label and verdict, including the S61 standard report and the `heavy-h3-3p` depth-3 reports (their verdicts still read "incomplete", because they were built under version 1). Nothing is re-rendered under version 2 here; re-rendering a report under version 2 is a separate run, for the owner to ask for.
