@@ -491,7 +491,7 @@ Done when: the run is dispatched (run id in the log).
 Collect the `fairness-report-heavy-h3-3p.depth3-full` artifact of run 41946060760, check its game count (at least 2,000 and every shard reporting; if short, report it and ask the owner whether to dispatch the missing seeds), commit the report and add it to decision 0023 as dark / light / Dragon. Depth 3 alone is the measure (owner, 5 Nov 2026), so judge the 2,000-game rule at depth 3; the report's own verdict still reads "incomplete" because decision 0015 counts depths 1 and 2, so say so.
 Done when: the report is committed with the comparison in decision 0023 and the handoff.
 
-### S92 — 3-player Standard and plain labels · Claude · Sonnet 5.5 · medium · `todo`
+### S92 — 3-player Standard and plain labels · Claude · Sonnet 5.5 · medium · `done`
 Owner, 7 Nov 2026 (D83): the full depth-3 run of `heavy-h3-3p` (2,076 games, 31.0 / 32.2 / 36.8 dark / light / Dragon) is accepted; no Tail sweep. The site is getting ready for the public, so players see plain words, not project shorthand (D84, D85).
 1. Re-render the `heavy-h3-3p` depth-3 full report under decision 0015 version 2, so its verdict reads on depth 3. Record the acceptance and the status change in decision 0023.
 2. `heavy-h3-3p`: name "Standard (3-player)", status `candidate`, version 0.1.0 kept (as D48), id kept (D83). The old `standard-3p` 0.3.0 gives up the name: archive it as earlier versions were archived; if the index needs a current file per id, rename it "Original Dragon rules" and hide it (D84) instead.
