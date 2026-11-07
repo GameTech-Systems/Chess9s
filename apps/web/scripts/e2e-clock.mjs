@@ -115,7 +115,7 @@ async function open(browser, options) {
 
 /**
  * The home page shows one player count's rulesets at a time (owner, 3 Nov 2026): choose the count,
- * and open "Rulesets under test" so every ruleset of that count has a card.
+ * so the presets of that count have cards.
  */
 async function showRulesets(page, players) {
   await page.locator(`button.mode[data-players="${players}"]`).click();
@@ -125,7 +125,9 @@ async function showRulesets(page, players) {
 
 async function play(page, name) {
   await showRulesets(page, name.includes('3-player') ? 3 : 2);
-  const card = page.locator('li.ruleset', { has: page.getByText(name, { exact: true }) });
+  // The 3-player tab already says the count, so its cards drop the "(3-player)" suffix (S92).
+  const shown = name.replace(/ \(3-player\)$/, '');
+  const card = page.locator('li.ruleset', { has: page.getByText(shown, { exact: true }) });
   await card.getByRole('button', { name: 'Play', exact: true }).click();
   return card;
 }

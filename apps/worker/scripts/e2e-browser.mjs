@@ -18,6 +18,10 @@ const root = fileURLToPath(new URL('../../../', import.meta.url));
 const game = JSON.parse(
   readFileSync(join(root, 'packages/engine/test/fixtures/games/hot-seat-mate.json'), 'utf8'),
 );
+// Pages show a ruleset's name, never its id or version (D85).
+const rulesetName = JSON.parse(
+  readFileSync(new URL(`../../../rules/rulesets/${game.ruleset.id}.json`, import.meta.url), 'utf8'),
+).name;
 const PORT = Number(process.env.E2E_PORT ?? 8790);
 const BASE = `http://127.0.0.1:${PORT}`;
 const TIMEOUT = 20_000;
@@ -112,7 +116,8 @@ async function play(browser, options, label) {
 
   // The creator makes a room on the ruleset the game was recorded on.
   await a.goto(BASE);
-  const card = a.locator('li.ruleset', { hasText: `${game.ruleset.id} v${game.ruleset.version}` });
+  await a.locator('button.mode[data-players="2"]').click();
+  const card = a.locator('li.ruleset', { has: a.getByText(rulesetName, { exact: true }) });
   await card.getByRole('button', { name: 'Play online' }).click();
   await a.getByRole('button', { name: 'Light', exact: true }).click();
   await a.getByRole('button', { name: 'Create room' }).click();
@@ -134,7 +139,7 @@ async function play(browser, options, label) {
   await b.goto(link);
   await b.getByText('Join a game').waitFor({ timeout: TIMEOUT });
   check(
-    (await b.getByText(game.ruleset.id).count()) > 0 &&
+    (await b.getByText(rulesetName).count()) > 0 &&
       (await b.getByText('You will play').count()) > 0,
     `${label}: the joiner sees the ruleset and the side before taking the seat`,
   );
