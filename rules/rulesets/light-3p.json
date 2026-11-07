@@ -5,7 +5,7 @@
   "version": "0.1.0",
   "status": "experimental",
   "players": 3,
-  "description": "A 3-player game to test (D76, decision 0021), the Heavy-Handed Dragon except the Tail: it only blocks (it captures nothing, gives no check and can't be captured), it is not the Dragon's King, and it moves like a Dragon Head, first off the Coast through A5. The Dragon loses when the Sun, the Moon and both Dragon Heads are captured; then the Tail turns to stone where it stands. Experimental; readings of decision 0021 provisional.",
+  "description": "A 3-player variant, the Heavy-Handed Dragon except the Tail: it only blocks (it captures nothing, gives no check and can't be captured), it is not the Dragon's King, and it moves like a Dragon Head, first off the Coast through A5. The Dragon loses when the Sun, the Moon and both Dragon Heads are captured; then the Tail turns to stone where it stands. The balance between the three seats is still being tested.",
   "overrides": {
     "king.range": 1,
     "coast.3p.attackFrom": "coast-only",

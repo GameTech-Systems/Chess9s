@@ -927,7 +927,7 @@
     {
       "id": "tail.capturable",
       "label": "Dragon Tail can be captured",
-      "description": "Whether the Tail can be captured. In 3-player games the capturing piece switches places with the Tail, which turns to stone, handled as a checkmate of the Tail (decision 0018).",
+      "description": "Whether the Tail can be captured. In 3-player games the capturing piece switches places with the Tail, which turns to stone, handled as a checkmate of the Tail.",
       "piece": "dragon-tail",
       "players": [
         2,
@@ -1258,7 +1258,7 @@
     {
       "id": "turn.3p.order",
       "label": "Turn order (3-player)",
-      "description": "The order of play in 3-player games, always clockwise round the board (D77): dark, light, then the Dragon; light, the Dragon, then dark; or the Dragon, dark, then light. The three share one cycle and differ only in who moves first.",
+      "description": "The order of play in 3-player games, always clockwise round the board: dark, light, then the Dragon; light, the Dragon, then dark; or the Dragon, dark, then light. The three share one cycle and differ only in who moves first.",
       "piece": null,
       "players": [
         3
@@ -1421,7 +1421,7 @@
     {
       "id": "dragon.3p.defeat",
       "label": "How the Dragon loses (3-player)",
-      "description": "Tail or pieces: the full rules (decision 0016): a checkmated Tail turns to stone and the Dragon plays on while both Kings are in, and is out once the four are captured too; in the duel the last Kinged player wins by checkmating the Tail or capturing the four. Pieces and Tail: the Dragon loses only once the Sun, the Moon and both Dragon Heads are captured and the Tail is checkmated, in either order, in the duel too. Pieces only: the Tail only blocks, is never checkmated and need not be kept out of attack; the Dragon loses when the four are captured.",
+      "description": "Tail or pieces: the full rules: a checkmated Tail turns to stone and the Dragon plays on while both Kings are in, and is out once the four are captured too; in the duel the last Kinged player wins by checkmating the Tail or capturing the four. Pieces and Tail: the Dragon loses only once the Sun, the Moon and both Dragon Heads are captured and the Tail is checkmated, in either order, in the duel too. Pieces only: the Tail only blocks, is never checkmated and need not be kept out of attack; the Dragon loses when the four are captured.",
       "piece": null,
       "players": [
         3
@@ -1457,7 +1457,7 @@
     {
       "id": "tail.3p.stone",
       "label": "Where the checkmated Tail turns to stone",
-      "description": "Swap: the checkmated Tail switches places with the checkmating piece and turns to stone there (decision 0016 rule 9). Where it stands: it turns to stone on its own square, and if the Dragon plays on it loses its next turn.",
+      "description": "Swap: the checkmated Tail switches places with the checkmating piece and turns to stone there (the rule for a checkmated Tail). Where it stands: it turns to stone on its own square, and if the Dragon plays on it loses its next turn.",
       "piece": "dragon-tail",
       "players": [
         3

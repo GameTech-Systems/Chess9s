@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { rulesetSettings, type RulesetInfo } from './game/rules';
+import { rulesetSettings, statusLabel, type RulesetInfo } from './game/rules';
 import { RULES_DOC_URL, rulesPath } from './links';
 
 /** What every 2-player game shares; the ruleset's own settings follow. */
@@ -96,9 +96,8 @@ export function RulesScreen({
       >
         <h2 id="rules-title">{ruleset.name}</h2>
         <p className="meta">
-          {ruleset.id} v{ruleset.version} ·{' '}
           <span className="badge" data-status={ruleset.status}>
-            {ruleset.status}
+            {statusLabel(ruleset.status, ruleset.custom)}
           </span>
         </p>
         {ruleset.description && <p>{ruleset.description}</p>}

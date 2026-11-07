@@ -80,7 +80,7 @@ describe('the ruleset list', () => {
       'Standard',
       'Easy Start',
       'Good Practice',
-      'Heavy-Handed Dragon, Heads 3',
+      'Standard (3-player)',
       'Easy Start (3-player)',
       'Good Practice (3-player)',
       'Heavy-Handed Dragon',
@@ -88,7 +88,7 @@ describe('the ruleset list', () => {
       'Heavy-Handed Dragon, Limited to 3',
       'Light-Handed Dragon',
       'Light-Handed Dragon, Limited',
-      'Standard (3-player)',
+      'Original Dragon rules',
     ]);
     expect(list.filter((r) => r.isDefault).map((r) => r.id)).toEqual(['standard-2p']);
     expect(list.filter((r) => r.defaultFor).map((r) => [r.id, r.defaultFor])).toEqual([

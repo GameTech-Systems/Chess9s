@@ -12,6 +12,7 @@
     "players": { "enum": [2, 3] },
     "description": { "type": "string" },
     "notes": { "type": "string" },
+    "listed": { "type": "boolean" },
     "extends": { "type": "string" },
     "overrides": { "type": "object" },
     "ratification": {

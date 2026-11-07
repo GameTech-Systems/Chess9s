@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { HOME_PRESETS, listRulesets, type RulesetInfo } from './game/rules';
+import { HOME_PRESETS, listRulesets, statusLabel, type RulesetInfo } from './game/rules';
 import { rulesPath } from './links';
 import { JoinByCode } from './JoinByCode';
 import { Board } from './board/Board';
@@ -19,7 +19,7 @@ export const PRESET_SUMMARIES: Record<string, string> = {
   'heavy-h3-3p':
     'Light, dark and the Dragon, who plays the five Coast pieces. The Dragon Heads move up to 3 squares; the King moves one square.',
   'standard-3p':
-    'Light, dark and the Dragon, who plays the five Coast pieces. The full Dragon rules; the King moves one square.',
+    'The first 3-player rules: the full Dragon rules, with a King that moves one square.',
   'easy-3p': 'A shorter Dragon game for learning: the first checkmate wins.',
   'draft-3p': 'The full Dragon rules with Kings that move up to 2 squares.',
 };
@@ -42,8 +42,8 @@ const MODES: { players: 2 | 3; title: string; note: string; seat: string }[] = [
 
 /**
  * The home page: join a room, choose 2 or 3 players, then one of that count's three presets
- * (Standard, Easy Start, Good Practice) or a custom ruleset. Other bundled rulesets of that count
- * are listed under "Rulesets under test".
+ * (Standard, Easy Start, Good Practice) or a custom ruleset. Bundled rulesets marked `listed` in
+ * their data follow under "More variants to try"; the others are hidden.
  */
 export function RulePicker({
   players: initialPlayers = 2,
@@ -86,7 +86,10 @@ export function RulePicker({
   const presets = presetIds
     .map((id) => all.find((r) => r.id === id))
     .filter((r): r is RulesetInfo => r !== undefined);
-  const testing = all.filter((r) => !presetIds.includes(r.id));
+  const variants = all.filter((r) => r.listed && !presetIds.includes(r.id));
+  // On the 3-player tab the count is already said (D85).
+  const shownName = (r: RulesetInfo) =>
+    players === 3 ? r.name.replace(/ \(3-player\)$/, '') : r.name;
   const own = customs.filter((r) => r.players === players);
 
   const card = (r: RulesetInfo, summary?: string) => (
@@ -97,14 +100,14 @@ export function RulePicker({
       data-custom={r.custom ? '' : undefined}
     >
       <div className="ruleset-head">
-        <strong>{r.name}</strong>
+        <strong>{shownName(r)}</strong>
         {r.defaultFor && (
           <span className="default-tag">
             {r.defaultFor === 3 ? 'Default for 3 players' : 'Default'}
           </span>
         )}
         <span className="badge" data-status={r.status}>
-          {r.status}
+          {statusLabel(r.status, r.custom)}
         </span>
       </div>
       {summary ? (
@@ -112,9 +115,6 @@ export function RulePicker({
       ) : (
         r.description && <p className="facts small">{r.description}</p>
       )}
-      <p className="facts small id-line">
-        {r.custom ? 'Your own ruleset' : `${r.id} v${r.version}`}
-      </p>
       <div className="ruleset-actions">
         {r.playable ? (
           <button type="button" className="again play" onClick={() => onPick(r)}>
@@ -217,14 +217,10 @@ export function RulePicker({
           <p className="facts">None yet. Start from a preset and change what you like.</p>
         )}
 
-        {testing.length > 0 && (
+        {variants.length > 0 && (
           <details className="testing">
-            <summary>Rulesets under test ({testing.length})</summary>
-            <p className="facts small">
-              Experimental {players}-player rulesets being checked for balance. Not tournament
-              rules.
-            </p>
-            <ul>{testing.map((r) => card(r))}</ul>
+            <summary>More variants to try ({variants.length})</summary>
+            <ul>{variants.map((r) => card(r, PRESET_SUMMARIES[r.id] ?? r.description))}</ul>
           </details>
         )}
       </div>

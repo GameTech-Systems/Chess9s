@@ -8,7 +8,7 @@ import { CONTACT_ADDRESS, DISCUSSIONS_URL } from './links';
 import { Tournament } from './Tournament';
 import { STANDARD_DISCUSSION } from './tournament';
 import { PRIVACY_UPDATED } from './Privacy';
-import { listRulesets } from './game/rules';
+import { HOME_PRESETS, listRulesets } from './game/rules';
 import { RulePicker } from './RulePicker';
 
 describe('error screen', () => {
@@ -223,7 +223,8 @@ describe('online play pages (S53)', () => {
     const three = renderToStaticMarkup(
       <RulePicker players={3} onPick={() => {}} onPlayOnline={() => {}} />,
     );
-    const online3 = listRulesets().filter((r) => r.online && r.players === 3).length;
+    // Only the three presets are shown; the study rulesets are hidden (D84).
+    const online3 = HOME_PRESETS[3].length;
     expect(three.split('>Play online<')).toHaveLength(online3 + 1);
   });
 

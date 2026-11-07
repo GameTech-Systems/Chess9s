@@ -261,8 +261,7 @@ describe('the picker with the player’s own rulesets', () => {
 
   it('lists a saved ruleset as proposed, with Play, Rules, Edit and Delete', () => {
     const html = renderToStaticMarkup(<RulePicker onPick={() => {}} customs={[info]} />);
-    expect(html).toContain('Your own ruleset');
-    expect(html).toMatch(/data-status="proposed">proposed</);
+    expect(html).toMatch(/data-status="proposed">Yours</);
     expect(html).toContain('>Edit<');
     expect(html).toContain('>Delete<');
     expect(html).toContain('href="/rules/custom-1"');
@@ -289,7 +288,7 @@ describe('a ruleset built from Standard, played against the computer, found agai
     // A reload: nothing but the browser's storage carries over.
     const picker = renderToStaticMarkup(<App path="/" store={store} />);
     expect(picker).toContain('Castle Walk');
-    expect(picker).toContain('Your own ruleset');
+    expect(picker).toContain('>Yours<');
     const page = renderToStaticMarkup(<App path="/rules/custom-1" store={store} />);
     expect(page).toContain('Castle Walk');
     expect(page).toContain('Queen crosses the void');
@@ -349,7 +348,7 @@ describe('privacy page covers the saved rulesets', () => {
 });
 
 describe('3-player rulesets in the builder (S64, D64)', () => {
-  const three = (...actions: BuilderAction[]) => draftOf('standard-3p', ...actions);
+  const three = (...actions: BuilderAction[]) => draftOf('heavy-h3-3p', ...actions);
 
   it('offers the player count and the 3-player presets', () => {
     const html = render(three());

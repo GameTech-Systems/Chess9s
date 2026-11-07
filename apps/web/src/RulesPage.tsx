@@ -4,11 +4,12 @@ import {
   findRuleset,
   listRulesets,
   rulesetSettings,
+  statusLabel,
   type RulesetInfo,
   type Setting,
 } from './game/rules';
 import { howToPlay } from './Rules';
-import { RULES_DOC_URL, rulesPath, rulesetDataUrl } from './links';
+import { RULES_DOC_URL, rulesPath } from './links';
 
 /** The registry's groups, in the order the page lists them. */
 const GROUP_ORDER = [
@@ -146,21 +147,16 @@ export function RulesPage({
         <h2 id="rules-page-title">
           {info.name}{' '}
           <span className="badge" data-status={info.status}>
-            {info.status}
+            {statusLabel(info.status, info.custom)}
           </span>
         </h2>
         <p className="meta">
-          {info.id} v{info.version} · {info.players} players
+          {info.players} players
           {info.defaultFor === 2 && ' · the default ruleset'}
           {info.defaultFor === 3 && ' · the default 3-player ruleset'}
         </p>
         {info.description && <p>{info.description}</p>}
-        {info.status !== 'official' && (
-          <p className="meta">
-            Not an official tournament ruleset (see Governance in the repository).
-            {info.custom && ' Your own ruleset: it is kept in this browser only.'}
-          </p>
-        )}
+        {info.custom && <p className="meta">Your own ruleset: it is kept in this browser only.</p>}
         {info.playable && onPlay && (
           <button type="button" className="again" onClick={() => onPlay(info)}>
             Play {info.name}
@@ -204,8 +200,10 @@ export function RulesPage({
         </section>
       )}
 
-      <section>
-        <h3>Every setting</h3>
+      <details className="every-setting">
+        <summary>
+          <h3>Every setting</h3>
+        </summary>
         <p className="meta">
           Every rule is a setting with a default and a list of options. Marked settings differ from
           the default.
@@ -234,7 +232,7 @@ export function RulesPage({
             </dl>
           </section>
         ))}
-      </section>
+      </details>
 
       <section>
         <h3>More</h3>
@@ -244,18 +242,7 @@ export function RulesPage({
             rules guide
           </a>{' '}
           explains every piece and square at the Chess Nines defaults; where it differs from this
-          page, the settings here are the rules of {info.name}. For tournaments, see the{' '}
-          <a href="/tournament">tournament rules</a>.
-          {!info.custom && (
-            <>
-              {' '}
-              The ruleset&apos;s data:{' '}
-              <a href={rulesetDataUrl(info.id)} target="_blank" rel="noopener noreferrer">
-                rules/rulesets/{info.id}.json
-              </a>
-              .
-            </>
-          )}
+          page, the settings here are the rules of {info.name}..
         </p>
       </section>
     </article>

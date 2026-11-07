@@ -5,7 +5,7 @@
   "version": "0.2.0",
   "status": "experimental",
   "players": 3,
-  "description": "A shorter Dragon game for learning (D65, decision 0016): Easy Start's piece settings, every attack on a King is check, the Tail is the Dragon's King on A5, E5 and I5, each Coast piece's first way off the Coast is through A5 (decision 0019), and the first checkmate wins. Casual play only; not fairness-checked.",
+  "description": "A shorter Dragon game for learning: Easy Start's piece settings, every attack on a King is check, the Tail is the Dragon's King on A5, E5 and I5, each Coast piece's first way off the Coast is through A5, and the first checkmate wins. Casual play; the balance has not been tested.",
   "overrides": {
     "king.range": 1,
     "castling.enabled": true,

@@ -484,8 +484,8 @@ function OnlineGame({
         </button>
 
         <p className="facts small">
-          {ruleset.name} · {ruleset.id} v{ruleset.version}
-          {status ? ' · Unofficial' : ''}
+          {ruleset.name}
+          {status ? ' · Custom' : ''}
         </p>
       </aside>
     </div>
