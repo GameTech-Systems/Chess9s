@@ -59,3 +59,14 @@ The two runs agree: the seats sit within about 2 points of each other and of one
 
 ## Full run toward the 2,000-game rule (S89, 5 Nov 2026)
 The owner keeps `heavy-h3-3p` (Heads 3, Tail 8) as the default 3-player ruleset and asked for more games to reach the 2,000-game rule of decision 0015. Dispatched: run 41946060760, depth 3, 256 shards, 2,200 games (the extra 10% covers games a shard cannot finish in 5 h 40 min), default turn order, `label` `depth3-full`. Seeds 1 to 2,200 replay the earlier 450, so the result replaces the 449-game run rather than adding to it. Result: S90. Decision 0015 asks for depths 1 and 2 as well. **Owner (5 Nov 2026): depth 2 is misleading for 3-player games, so depth 3 alone is the measure for now.** The 2,000-game rule is therefore read at depth 3 only, and no depth-1 or depth-2 run of `heavy-h3-3p` is needed. Provisional reading: decision 0015 itself is not rewritten yet; a new version of it, naming depth 3, is for the owner to ask for.
+
+## Result of the full run (S90, 7 Nov 2026)
+`heavy-h3-3p` 0.1.0 (Heads 3, Tail 8), depth 3, **2,076 games** of the 2,200 dispatched (run 41946060760, 256 shards, default turn order; the workflow was cancelled on 7 Nov and the merge covers the shards that had reported, so 124 games are missing), none capped: **31.0 / 32.2 / 36.8** dark / light / Dragon (95% intervals 29.1–33.0, 30.2–34.2, 34.8–38.9). 697 draws (600 in the duel). Report: `docs/fairness/heavy-h3-3p.depth3-full.md`.
+
+| Run | Games | dark | light | Dragon |
+| --- | --- | --- | --- | --- |
+| first screen | 150 | 33.7 | 35.3 | 31.0 |
+| confirming run | 449 | 33.2 | 32.3 | 34.5 |
+| full run | 2,076 | 31.0 | 32.2 | 36.8 |
+
+Reading: 2,076 is above the 2,000-game rule, read at depth 3 alone (owner, 5 Nov 2026). All three point scores are inside the 28–38% band; dark and light intervals lie wholly inside it, and the Dragon's upper end (38.9) is just past 38. The Dragon drifts up as games accumulate (31.0, 34.5, 36.8), so the fair-looking early screens were slightly kind to it. The report's verdict still reads "incomplete" only because decision 0015 (version 1) counts depths 1 and 2; a version naming depth 3 is for the owner to ask for. `heavy-h3-3p` stays experimental (D81, D60).
