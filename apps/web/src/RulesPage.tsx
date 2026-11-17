@@ -242,8 +242,8 @@ export function RulesPage({
           <a href={RULES_DOC_URL} target="_blank" rel="noopener noreferrer">
             rules guide
           </a>{' '}
-          explains every piece and square at the Chess Nines defaults; where it differs from this
-          page, the settings here are the rules of {info.name}..
+          explains every piece and square in detail; where it differs from this page, the settings
+          here are the rules of {info.name}.
         </p>
       </section>
     </article>

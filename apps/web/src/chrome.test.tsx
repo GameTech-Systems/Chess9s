@@ -106,19 +106,61 @@ describe('pages', () => {
   });
 
   it('every page carries the copyright and trademark notice and links to the licenses', () => {
-    for (const path of ['/', '/privacy', '/rules/standard-2p']) {
+    for (const path of ['/', '/privacy', '/how-to-play', '/rules/standard-2p']) {
       const html = renderToStaticMarkup(<App path={path} />);
       expect(html).toContain('Chess Nines™');
-      expect(html).toMatch(/© 2026 Duke Johnson/);
+      // The rights holder's name appears once in the line, not twice.
+      expect(html).toContain('© 2026 Chess Nines™ is a trademark of Duke Johnson.');
+      expect(html.match(/Duke Johnson/g)).toHaveLength(1);
       expect(html).toContain('href="/third-party-licenses.txt"');
     }
   });
 
   it('every page links to Suggest a variant', () => {
-    for (const path of ['/', '/privacy', '/rules/standard-2p']) {
+    for (const path of ['/', '/privacy', '/how-to-play', '/rules/standard-2p']) {
       expect(renderToStaticMarkup(<App path={path} />)).toContain(
         `href="${DISCUSSIONS_URL}">Suggest a variant`,
       );
+    }
+  });
+});
+
+describe('How to play page', () => {
+  it('routes /how-to-play, with or without a trailing slash, and the footer link goes there', () => {
+    expect(pageOf('/how-to-play')).toBe('how');
+    expect(pageOf('/how-to-play/')).toBe('how');
+    const html = renderToStaticMarkup(<App path="/" />);
+    expect(html).toContain('href="/how-to-play">How to play');
+    expect(html).not.toMatch(/href="\/rules\/standard-2p">How to play/);
+  });
+
+  it('walks a newcomer through the game without naming a ruleset until the presets', () => {
+    const html = renderToStaticMarkup(<App path="/how-to-play" />);
+    for (const part of ['The board', 'The pieces', 'The Coast', 'Pawns', 'Playing with three']) {
+      expect(html).toContain(`<h3>${part}</h3>`);
+    }
+    const [walkthrough = '', presets = ''] = html.split('<h3>Rules you can switch</h3>');
+    expect(presets).not.toBe('');
+    expect(walkthrough).not.toMatch(/Standard|Easy Start|Good Practice|default|Balance-tested/);
+    // The old first section of this page is gone.
+    expect(html).not.toContain('the default ruleset');
+    expect(html).not.toContain('Bot self-play found the two sides evenly matched.</p>');
+  });
+
+  it('offers the three presets of each player count, and the builder, by their names', () => {
+    const html = renderToStaticMarkup(<App path="/how-to-play" />);
+    for (const id of [...HOME_PRESETS[2], ...HOME_PRESETS[3]]) {
+      expect(html).toContain(`href="/rules/${id}"`);
+    }
+    expect(html).toContain('>Choose a game<');
+    expect(html).toContain('>Build a custom ruleset<');
+    // Ids live in the link addresses only; the words players read carry none.
+    expect(html.replace(/href="[^"]*"/g, '')).not.toMatch(/heavy-h3-3p|draft-3p| v\d+\.\d+/);
+  });
+
+  it('has no doubled full stop anywhere on the rules pages', () => {
+    for (const path of ['/how-to-play', '/rules/standard-2p', '/rules/heavy-h3-3p']) {
+      expect(renderToStaticMarkup(<App path={path} />)).not.toMatch(/[a-z]\.\.(?!\.)/);
     }
   });
 });
@@ -133,7 +175,14 @@ describe('no Tournaments page (D86)', () => {
   });
 
   it('has no tournament link or wording on any page', () => {
-    for (const path of ['/', '/privacy', '/rules/standard-2p', '/build', '/tournament']) {
+    for (const path of [
+      '/',
+      '/privacy',
+      '/how-to-play',
+      '/rules/standard-2p',
+      '/build',
+      '/tournament',
+    ]) {
       const html = renderToStaticMarkup(<App path={path} />);
       expect(html).not.toContain('href="/tournament"');
       expect(html).not.toMatch(/tournament/i);
