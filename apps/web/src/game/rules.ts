@@ -257,6 +257,34 @@ export function settingsFor(values: Record<string, ParamValue>, players: 2 | 3 =
 }
 
 /**
+ * A ruleset's settings read against Standard, the default for its player count, which is what
+ * players mean by "the default": `changed`, `defaultValue` and `defaultLabel` then describe Standard.
+ * The registry's own defaults stay as they are for saved rulesets and locks.
+ */
+export function settingsVsStandard(
+  ruleset: Parameters<typeof rulesetSettings>[0],
+  players: 2 | 3 = 2,
+): Setting[] {
+  const standard = new Map(
+    rulesetSettings(players === 3 ? DEFAULT_3P_RULESET_ID : DEFAULT_RULESET_ID).map((s) => [
+      s.id,
+      s,
+    ]),
+  );
+  return rulesetSettings(ruleset).map((s) => {
+    const base = standard.get(s.id);
+    return base
+      ? {
+          ...s,
+          defaultValue: base.value,
+          defaultLabel: base.valueLabel,
+          changed: !same(s.value, base.value),
+        }
+      : s;
+  });
+}
+
+/**
  * Every live parameter for the ruleset's player count, in registry order, with the value the
  * ruleset plays. Read from the data only. A custom ruleset is given as its info.
  */

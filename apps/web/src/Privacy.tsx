@@ -1,7 +1,7 @@
 import { CONTACT_ADDRESS, DISCUSSIONS_URL } from './links';
 
 /** When this page last changed. Update it with any change to what the app does with data. */
-export const PRIVACY_UPDATED = '28 October 2026';
+export const PRIVACY_UPDATED = '17 November 2026';
 
 /** What Chess Nines does and does not do with a visitor's data. Keep in step with the app. */
 export function Privacy() {
@@ -50,7 +50,9 @@ export function Privacy() {
           Save game record downloads the game as a file on your device: the ruleset, the moves, the
           result and the date (and for a game with a clock, the time control and each seat's time
           left), with no names. Open game record reads a file you pick, on your device. Nothing is
-          sent or stored by us.
+          sent or stored by us. Save board image makes a picture of the board, the result and the
+          ruleset in your browser and saves it as a file, or hands it to the share sheet of your
+          device, which is your choice; we never receive it.
         </li>
         <li>
           The site is hosted by Cloudflare, which keeps standard request logs (such as IP address,

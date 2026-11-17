@@ -5,6 +5,6 @@
   "version": "0.4.0",
   "status": "experimental",
   "players": 3,
-  "description": "The full 3-player Dragon rules with every setting at its default and Kings that move up to 2 squares. Each Coast piece's first way off the Coast is through A5. The balance between the three seats is still being tested.",
+  "description": "The full 3-player Dragon rules, with Kings that move up to 2 squares and Dragon Heads that slide as far as they like. Each Coast piece's first way off the Coast is through A5. The balance between the three seats is still being tested.",
   "overrides": {}
 }

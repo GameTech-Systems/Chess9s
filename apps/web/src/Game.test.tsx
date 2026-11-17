@@ -189,6 +189,11 @@ describe('Rule picker', () => {
     expect(html).toContain('Open game record');
     expect(html).toMatch(/<button[^>]*disabled=""[^>]*>Save game record/);
   });
+
+  it('the game screen offers a board image to share, off until a move is made', () => {
+    const html = render();
+    expect(html).toMatch(/<button[^>]*disabled=""[^>]*>Save board image/);
+  });
 });
 
 describe('play aids on the screen', () => {
@@ -229,12 +234,13 @@ describe('play aids, part 2', () => {
     );
     expect(html).toMatch(/href="\/rules\/draft-2p"[^>]*>Full rules for Good Practice</);
     expect(html).toContain(`href="${RULES_DOC_URL}"`);
-    // What sets this ruleset apart from the others is named.
-    expect(html).toContain('Every setting at its default');
+    // Standard is the default, so only the others say how they differ from it.
+    expect(html).toContain('How it differs from Standard');
+    expect(html).toMatch(/King range<\/strong>: 2 squares[\s\S]*?Standard: 1 square/);
     const standard = renderToStaticMarkup(
       <RulesScreen ruleset={ruleset} missing={[]} onClose={() => {}} />,
     );
-    expect(standard).toMatch(/King range[\s\S]*?1/);
+    expect(standard).not.toMatch(/differs from Standard|\(default /);
   });
 });
 

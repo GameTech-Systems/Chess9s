@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /room/
+
+Sitemap: https://chess9s.com/sitemap.xml

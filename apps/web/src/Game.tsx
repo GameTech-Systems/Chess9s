@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { deadline, unbuiltFeatures } from '@chess9s/engine';
 import { RulesScreen } from './Rules';
+import { BoardImageButton } from './BoardImageButton';
+import { detailLine } from './game/boardImage';
 import { JoinByCode } from './JoinByCode';
 import { addSpent, formatElapsed, formatLeft, play, soundsFor } from './game/aids';
 import { clockSeats, controlText } from './game/clockText';
@@ -641,6 +643,13 @@ export function Game({
           <button type="button" disabled={game.moves.length === 0} onClick={saveRecord}>
             Save game record
           </button>
+          <BoardImageButton
+            disabled={game.moves.length === 0}
+            caption={{
+              headline: statusLine(game),
+              detail: detailLine(ruleset.name, game.moves.length),
+            }}
+          />
           <button type="button" onClick={() => picker.current?.click()}>
             Open game record
           </button>

@@ -5,7 +5,7 @@
   "version": "0.1.0",
   "status": "candidate",
   "players": 2,
-  "description": "The default 2-player game: the full Chess Nines rules, except the King moves one square in any direction, as in regular chess. Bot self-play found the two sides evenly matched.",
+  "description": "The default 2-player game: the full Chess Nines rules, with a King that moves one square in any direction, as in regular chess. Bot self-play found the two sides evenly matched.",
   "overrides": {
     "king.range": 1
   }
