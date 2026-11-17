@@ -4,9 +4,10 @@ import { RulePicker } from './RulePicker';
 import { Builder } from './Builder';
 import { RulesPage } from './RulesPage';
 import { Privacy } from './Privacy';
+import { HowToPlay } from './HowToPlay';
 import { CreateRoom } from './CreateRoom';
 import { OnlineRoom } from './OnlineRoom';
-import { DISCUSSIONS_URL, LICENSES_PATH, RIGHTS_HOLDER, rulesPath } from './links';
+import { DISCUSSIONS_URL, LICENSES_PATH, RIGHTS_HOLDER } from './links';
 import { parseShareLink } from './game/share';
 import { loadCustoms, saveCustoms } from './game/custom';
 import {
@@ -25,6 +26,7 @@ import type { Opened } from './game/record';
 
 export const PRIVACY_PATH = '/privacy';
 export const BUILD_PATH = '/build';
+export const HOW_PATH = '/how-to-play';
 
 function browserStore(): Store | null {
   try {
@@ -46,17 +48,21 @@ export const roomCodeOf = (pathname: string): string | undefined =>
   /^\/room\/([A-Za-z0-9]+)\/?$/.exec(pathname)?.[1]?.toUpperCase();
 
 /** Which page a URL path shows. Anything unknown is the game: the host falls back to index.html. */
-export const pageOf = (pathname: string): 'privacy' | 'rules' | 'build' | 'room' | 'game' => {
+export const pageOf = (
+  pathname: string,
+): 'privacy' | 'how' | 'rules' | 'build' | 'room' | 'game' => {
   const bare = pathname.replace(/\/+$/, '');
   return bare === PRIVACY_PATH
     ? 'privacy'
-    : bare === BUILD_PATH
-      ? 'build'
-      : rulesIdOf(pathname) !== undefined
-        ? 'rules'
-        : roomCodeOf(pathname) !== undefined
-          ? 'room'
-          : 'game';
+    : bare === HOW_PATH
+      ? 'how'
+      : bare === BUILD_PATH
+        ? 'build'
+        : rulesIdOf(pathname) !== undefined
+          ? 'rules'
+          : roomCodeOf(pathname) !== undefined
+            ? 'room'
+            : 'game';
 };
 
 export function App({
@@ -142,15 +148,17 @@ export function App({
   };
   const page = pageOf(here);
   const subtitle =
-    page === 'rules'
-      ? 'Rules'
-      : page === 'build'
-        ? 'Change ruleset'
-        : page === 'room' || (creating && page === 'game')
-          ? 'Online'
-          : picked && page === 'game'
-            ? `Hot-seat · ${picked.players} players`
-            : 'Play in your browser · no account needed';
+    page === 'how'
+      ? 'How to play'
+      : page === 'rules'
+        ? 'Rules'
+        : page === 'build'
+          ? 'Change ruleset'
+          : page === 'room' || (creating && page === 'game')
+            ? 'Online'
+            : picked && page === 'game'
+              ? `Hot-seat · ${picked.players} players`
+              : 'Play in your browser · no account needed';
   return (
     <main className="page">
       <header className="masthead">
@@ -172,6 +180,17 @@ export function App({
       </header>
       {page === 'privacy' ? (
         <Privacy />
+      ) : page === 'how' ? (
+        <HowToPlay
+          linkTo={go}
+          onHome={home}
+          onBuild={() => {
+            setEditing(undefined);
+            setShared(undefined);
+            setBuildBase(DEFAULT_RULESET_ID);
+            navigate(BUILD_PATH);
+          }}
+        />
       ) : page === 'build' ? (
         <Builder
           key={editing ?? (shared ? 'shared' : `new-${buildBase}`)}
@@ -263,7 +282,7 @@ export function App({
           </a>
         )}
         {' · '}
-        <a href={rulesPath(DEFAULT_RULESET_ID)} onClick={go(rulesPath(DEFAULT_RULESET_ID))}>
+        <a href={HOW_PATH} onClick={go(HOW_PATH)}>
           How to play
         </a>
         {' · '}
@@ -271,7 +290,7 @@ export function App({
         {' · '}
         <a href={LICENSES_PATH}>Licenses</a>
         <span className="legal">
-          © {COPYRIGHT_YEAR} {RIGHTS_HOLDER}. Chess Nines™ is a trademark of {RIGHTS_HOLDER}.
+          © {COPYRIGHT_YEAR} Chess Nines™ is a trademark of {RIGHTS_HOLDER}.
         </span>
       </footer>
     </main>
