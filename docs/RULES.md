@@ -1,28 +1,28 @@
-# Chess Nines rules (draft v0.2, 3-player v0.3)
+# Chess Nines rules
 
-This page explains the Chess Nines rules at their defaults (rule set v0.2): the 2-player ruleset `draft-2p` 0.2.0, shown in the game as **Good Practice** (a **Candidate** since the fairness check passed: [report](fairness/draft-2p.md), [decision 0010](decisions/0010-draft-2p-candidate.md)), and the experimental 3-player Dragon mode, rule set v0.3 (ruleset `draft-3p` 0.4.0, [decision 0016](decisions/0016-three-player-rules-v0.3.md), with the Coast pieces' way out through A5 built in S68, [decision 0019](decisions/0019-three-player-coast-exit.md)). None of it is **official**. Official tournament rules come only after public discussion and ratification ([Governance](GOVERNANCE.md)).
+This page explains the Chess Nines rules. The default is **Standard**, for 2 players (ruleset `standard-2p`) and for 3 players (ruleset `heavy-h3-3p`, shown as Standard on the 3-player tab). Both are **Candidates**: bot self-play found the seats evenly matched ([2-player report](fairness/standard-2p.md), [decision 0012](decisions/0012-standard-2p-candidate.md); [3-player decision 0023](decisions/0023-tail-range.md)). Where a rule below depends on a setting, the text says what Standard plays and what the other options do. None of it is **official**. Official tournament rules come only after public discussion and ratification ([Governance](GOVERNANCE.md)).
 
 ## Presets
 
 The game offers these 2-player presets ([decision 0011](decisions/0011-presets.md)). Each has its own rules page in the game, at `chess9s.com/rules/<id>`, listing every setting it plays.
 
-| Preset | Ruleset | Status | Differs from this page |
+| Preset | Ruleset | Status | What it plays |
 |---|---|---|---|
-| **Standard** (the default) | `standard-2p` | Candidate, since its fairness check passed ([report](fairness/standard-2p.md), [decision 0012](decisions/0012-standard-2p-candidate.md)) | The King moves one square in any direction, as in regular chess (`king.range` = 1) |
-| **Good Practice** | `draft-2p` | Candidate | Nothing: every setting at its default. The 2-square King makes checkmate harder to force, which is good practice |
+| **Standard** (the default) | `standard-2p` | Candidate, since its fairness check passed ([report](fairness/standard-2p.md), [decision 0012](decisions/0012-standard-2p-candidate.md)) | The rules on this page. The King moves one square in any direction, as in regular chess (`king.range` = 1) |
+| **Good Practice** | `draft-2p` | Candidate ([report](fairness/draft-2p.md), [decision 0010](decisions/0010-draft-2p-candidate.md)) | Standard, except the King moves up to 2 squares (`king.range` = 2, the registry default), which makes checkmate harder to force |
 | **Easy Start** | `easy-2p` | Experimental, casual play | Closest to regular chess: light moves first, a 1-square King that may castle, the Queen may cross the void anywhere, e5 is an ordinary square for every piece but the Queen, and no pawn-safe zones |
 
-The 3-player presets are all experimental, and none is fairness-checked yet ([decision 0016](decisions/0016-three-player-rules-v0.3.md)). In all of them, each of the Dragon's pieces first leaves the Coast through A5 ([decision 0019](decisions/0019-three-player-coast-exit.md)):
+The 3-player game is Standard (`heavy-h3-3p`), a Candidate: the full depth-3 run found the three seats close to even (dark 31.0%, light 32.2%, Dragon 36.8%; [decision 0023](decisions/0023-tail-range.md)). The other 3-player presets are experimental. In all of them, each of the Dragon's pieces first leaves the Coast through A5 ([decision 0019](decisions/0019-three-player-coast-exit.md)):
 
 | Preset | Ruleset | What it plays |
 |---|---|---|
-| **Standard** (the 3-player default, D63) | `standard-3p` | Good Practice, except the King moves one square (`king.range` = 1), as in the 2-player Standard, and the Dragon's pieces attack nothing from the Coast, where Kings and Queens may capture them ([below](#standard-no-attacks-from-the-coast-3-player), [decision 0020](decisions/0020-three-player-coast-attacks.md)) |
-| **Good Practice** | `draft-3p` | Every 3-player setting at its default: the full Dragon rules below |
+| **Standard** (the 3-player default) | `heavy-h3-3p` | The Heavy-Handed Dragon rules ([below](#heavy-handed-and-light-handed-dragon-3-player)), with the Dragon Heads sliding at most 3 squares and the Tail up to 8 (`dragonHead.range` = 3, `tail.3p.range` = 8; [decision 0023](decisions/0023-tail-range.md)) and a King that moves one square (`king.range` = 1) |
+| **Good Practice** | `draft-3p` | Every 3-player setting at its registry default: the full Dragon rules below, with Kings that move up to 2 squares |
 | **Easy Start** | `easy-3p` | Easy Start's piece settings and a shorter Dragon game: the first checkmate wins ([below](#easy-start-for-3-players-the-first-checkmate-wins)) |
-| **Heavy-Handed Dragon** | `heavy-3p` | Standard, except that from the Coast the Dragon's pieces attack only the Coast, and the Dragon loses only once the four are captured and the Tail is checkmated ([below](#heavy-handed-and-light-handed-dragon-3-player), [decision 0021](decisions/0021-heavy-and-light-handed-dragon.md)). To test |
+| **Original Dragon rules** | `standard-3p` | The first 3-player rules, kept for earlier games and no longer offered: Good Practice with a 1-square King, where the Dragon's pieces attack nothing from the Coast and Kings and Queens may capture them ([below](#original-dragon-rules-no-attacks-from-the-coast-3-player), [decision 0020](decisions/0020-three-player-coast-attacks.md)) |
+| **Heavy-Handed Dragon** | `heavy-3p` | The Dragon Heads and the Tail slide any distance and the King moves one square. From the Coast the Dragon's pieces attack only the Coast, and the Dragon loses only once the four are captured and the Tail is checkmated ([below](#heavy-handed-and-light-handed-dragon-3-player), [decision 0021](decisions/0021-heavy-and-light-handed-dragon.md)). To test |
 | **Light-Handed Dragon** | `light-3p` | Heavy-Handed, except that the Tail only blocks and the Dragon loses once the four are captured ([below](#heavy-handed-and-light-handed-dragon-3-player)). To test |
 | **Heavy-Handed Dragon, Limited** | `heavy-limited-3p` | Heavy-Handed, except that Dragon Heads (and so a Tail that moves like one) slide at most 4 squares ([decision 0022](decisions/0022-limited-dragon.md)). To test |
-| **Heavy-Handed Dragon, Heads 3** | `heavy-h3-3p` | Heavy-Handed, except that the Dragon Heads slide at most 3 squares and the Tail keeps its full slide (`dragonHead.range` = 3, `tail.3p.range` = 8; [decision 0023](decisions/0023-tail-range.md)). To test |
 | **Heavy-Handed Dragon, Limited to 3** | `heavy-limited3-3p` | Heavy-Handed, except that Dragon Heads (and so the Tail) slide at most 3 squares ([decision 0022](decisions/0022-limited-dragon.md)). To test |
 | **Light-Handed Dragon, Limited** | `light-limited-3p` | Light-Handed, with the same limit of 4 on the Dragon Heads and the Tail ([decision 0022](decisions/0022-limited-dragon.md)). To test |
 
@@ -69,8 +69,8 @@ Rooks, Knights and Bishops move exactly as in regular chess, except that Rooks a
 
 ### King
 
-- The King moves up to 2 squares in any one straight direction (`king.range` = 2). It slides, so it can't jump a piece on the first square (`king.canJump` = false). In the Standard and Easy Start presets it moves one square, as in regular chess.
-- It attacks every square it could move to, so it gives check from 2 squares away, and two Kings can never stand within 2 open squares of each other.
+- The King's `king.range` setting is how far it moves in any one straight direction: 1 in Standard, up to 2 in the registry default. It slides, so it can't jump a piece on the first square (`king.canJump` = false). Standard and Easy Start set it to one square, as in regular chess; Good Practice keeps 2.
+- It attacks every square it could move to, so with range 2 it gives check from 2 squares away, and two Kings can never stand within `king.range` open squares of each other.
 - No castling by default (`castling.enabled` = false). As an option, castling works as in chess: the King moves 2 squares toward an unmoved Rook, and the Rook lands on the square the King crossed (light short: King F1 to H1, Rook I1 to G1; light long: King F1 to D1, Rook B1 to E1). The usual chess conditions apply.
 - Kings may enter the Coast and may pass over an empty E5.
 
@@ -137,9 +137,9 @@ All Coast pieces move in straight lines and stop when blocked; none may turn a c
 
 Two options, for players to try: `coast.3p.exit` = a5-always (every way off the Coast is from A5, for the whole game), and any-legal-move (Coast pieces leave with any legal move from the first turn, which is how every 3-player game played before S68; [decision 0019](decisions/0019-three-player-coast-exit.md)).
 
-### Standard: no attacks from the Coast (3-player)
+### Original Dragon rules: no attacks from the Coast (3-player)
 
-Standard (`standard-3p` 0.3.0) plays two more Coast rules ([decision 0020](decisions/0020-three-player-coast-attacks.md)); Good Practice and Easy Start offer them as options:
+The Original Dragon rules (`standard-3p` 0.3.0, no longer offered on the home page) play two more Coast rules ([decision 0020](decisions/0020-three-player-coast-attacks.md)); Good Practice and Easy Start offer them as options:
 
 1. **No attacks from the Coast** (`coast.3p.attackFrom` = blocked). A Coast piece standing on a Coast square, A5 included, attacks nothing: it can't capture, gives no check and guards no square, so a King may stand in its line or next to it. It still blocks lines like any piece. Off the Coast it attacks as usual, and it may capture a piece standing on the Coast by landing there.
 2. Each piece still first leaves the Coast through A5, and may come back onto any Coast square afterwards.
@@ -147,7 +147,7 @@ Standard (`standard-3p` 0.3.0) plays two more Coast rules ([decision 0020](decis
 
 ### Heavy-Handed and Light-Handed Dragon (3-player)
 
-Two experimental rulesets to test ([decision 0021](decisions/0021-heavy-and-light-handed-dragon.md)), each on Standard's rules. The **four** are the Sun, the Moon and both Dragon Heads.
+Two experimental rulesets to test ([decision 0021](decisions/0021-heavy-and-light-handed-dragon.md)), each with a 1-square King. The **four** are the Sun, the Moon and both Dragon Heads.
 
 **Heavy-Handed Dragon** (`heavy-3p`):
 
@@ -187,12 +187,12 @@ Only the 3 dragons (both Dragon Heads and the Dragon Tail) may ever stand on E5,
 
 ## 3-player Dragon mode (experimental)
 
-The third player is the Dragon: it moves third each round (dark, light, Dragon) and plays all 5 Coast pieces, each of which first emerges from the Coast through A5. The two players with Kings are the **Kinged players**. 3-player stays experimental until bot self-play shows the seats are balanced. These are the full Dragon rules of Good Practice and Standard ([decision 0016](decisions/0016-three-player-rules-v0.3.md)).
+The third player is the Dragon: it moves third each round (dark, light, Dragon) and plays all 5 Coast pieces, each of which first emerges from the Coast through A5. The two players with Kings are the **Kinged players**. These are the full Dragon rules of Good Practice; Standard changes some of them, as the presets table says ([decision 0016](decisions/0016-three-player-rules-v0.3.md)).
 
 - **First Coast move**: the Sun or Moon one square, or the Tail off A5 to any legal square, which frees A5.
 - **Movement**: Dragon Heads and the Tail any distance in any direction; the Sun and Moon one square at a time on the Coast, then up to 2 squares in any direction. All in straight lines.
 - **The Tail** can capture any light or dark piece that isn't a Coast piece, and can't be captured.
-- Both Kinged sides may capture Dragon Heads and the Sun and Moon once they are off the Coast; in Standard, Kings and Queens may also capture them on it ([above](#standard-no-attacks-from-the-coast-3-player)).
+- Both Kinged sides may capture Dragon Heads and the Sun and Moon once they are off the Coast; Kings and Queens may also capture them on the Coast in Standard and in the Original Dragon rules ([above](#original-dragon-rules-no-attacks-from-the-coast-3-player)).
 
 ### Check
 
@@ -256,7 +256,7 @@ After a King checkmates the other King, the Dragon may play on against the winni
 
 ## Fairness testing
 
-The 2-player start is a mirror image across the void, so the only built-in edge is moving first. Bot self-play checked these risks before the default became a Candidate (first-player score 49.0% at depth 1 and 49.3% at depth 2, 2,000 games each):
+The 2-player start is a mirror image across the void, so the only built-in edge is moving first. Bot self-play checked these risks before Good Practice became a Candidate (first-player score 49.0% at depth 1 and 49.3% at depth 2, 2,000 games each; Standard's own report is [here](fairness/standard-2p.md)):
 
 | Risk | Why it matters | Plan |
 |---|---|---|
