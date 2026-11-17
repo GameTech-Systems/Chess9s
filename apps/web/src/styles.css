@@ -1175,8 +1175,11 @@ a:hover {
 .coast-row {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 0.25rem;
-  align-items: end;
+  gap: 0 0.25rem;
+  /* Each piece spans an image row and a label row shared by all five (subgrid below), so the five
+     bases sit on one baseline however many lines a label wraps to. */
+  grid-template-rows: auto auto;
+  align-items: start;
   max-width: 40rem;
   margin: 0 auto;
   padding: 0;
@@ -1189,6 +1192,13 @@ a:hover {
   margin: 0 auto;
 }
 
+.coast-row li {
+  display: grid;
+  grid-row: span 2;
+  grid-template-rows: subgrid;
+  align-items: end;
+}
+
 .coast-row img {
   display: block;
   width: 100%;
@@ -1197,6 +1207,7 @@ a:hover {
 
 .coast-row span {
   display: block;
+  align-self: start;
   margin-top: 0.15rem;
   color: var(--gold-text);
   font-size: clamp(0.62rem, 1.6vw, 0.78rem);
