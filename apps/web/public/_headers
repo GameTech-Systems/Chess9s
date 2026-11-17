@@ -3,7 +3,7 @@
 # this origin. The only connections are to this origin's rooms (connect-src 'self': /api/* and the
 # room WebSocket). The Worker sets the same headers on its own responses (apps/worker/src/index.ts).
 /*
-  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; worker-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; manifest-src 'self'; worker-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-ancestors 'none'
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: no-referrer
@@ -12,3 +12,17 @@
 
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
+
+# Fixed addresses (not hashed): a day in caches, so a changed icon or manifest reaches people soon.
+/favicon.ico
+  Cache-Control: public, max-age=86400
+/apple-touch-icon.png
+  Cache-Control: public, max-age=86400
+/icon-192.png
+  Cache-Control: public, max-age=86400
+/icon-512.png
+  Cache-Control: public, max-age=86400
+/site.webmanifest
+  Cache-Control: public, max-age=86400
+/.well-known/security.txt
+  Cache-Control: public, max-age=86400

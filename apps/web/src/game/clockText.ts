@@ -17,6 +17,13 @@ export interface ClockSeat {
   ms: number;
 }
 
+/**
+ * What "Show only" does, in plain words, for the screens that offer it. Without it a seat whose
+ * time runs out is out (D66); with it the clock is only marked and play goes on.
+ */
+export const SHOW_ONLY_HELP =
+  'Normally a player whose time runs out is out of the game. Turn on Show only to keep playing instead: a clock that reaches zero is marked “out of time”, and nobody loses on time. It needs a timed control.';
+
 /** A seat's note on its clock: out of time (shown with Show only), or out of the game. */
 export const clockNote = (line: ClockLine): string => (line.flagged ? 'out of time' : '');
 

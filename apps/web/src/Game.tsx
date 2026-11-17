@@ -5,7 +5,7 @@ import { BoardImageButton } from './BoardImageButton';
 import { detailLine } from './game/boardImage';
 import { JoinByCode } from './JoinByCode';
 import { addSpent, formatElapsed, formatLeft, play, soundsFor } from './game/aids';
-import { clockSeats, controlText } from './game/clockText';
+import { clockSeats, controlText, SHOW_ONLY_HELP } from './game/clockText';
 import { controlById, hotSeatControls, timeControls } from './game/timeControls';
 import { searchMove, type BotSearch } from './game/botClient';
 import {
@@ -428,37 +428,41 @@ export function Game({
         </p>
 
         {!begun && !over ? (
-          <div className="timecontrol" role="group" aria-label="Time control">
-            <label>
-              Time control{' '}
-              <select
-                aria-label="Time control"
-                value={timed?.control.id ?? timeControls.default}
-                onChange={(e) => {
-                  const control = controlById(e.target.value);
-                  if (control) setModel((m) => startTimed(m, control, m.timed?.showOnly ?? false));
-                }}
-              >
-                {hotSeatControls().map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <div className="segmented">
-              <button
-                type="button"
-                aria-pressed={timed?.showOnly ?? false}
-                disabled={!timed}
-                onClick={() =>
-                  timed && setModel((m) => startTimed(m, timed.control, !timed.showOnly))
-                }
-              >
-                Show only
-              </button>
+          <>
+            <div className="timecontrol" role="group" aria-label="Time control">
+              <label>
+                Time control{' '}
+                <select
+                  aria-label="Time control"
+                  value={timed?.control.id ?? timeControls.default}
+                  onChange={(e) => {
+                    const control = controlById(e.target.value);
+                    if (control)
+                      setModel((m) => startTimed(m, control, m.timed?.showOnly ?? false));
+                  }}
+                >
+                  {hotSeatControls().map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <div className="segmented">
+                <button
+                  type="button"
+                  aria-pressed={timed?.showOnly ?? false}
+                  disabled={!timed}
+                  onClick={() =>
+                    timed && setModel((m) => startTimed(m, timed.control, !timed.showOnly))
+                  }
+                >
+                  Show only
+                </button>
+              </div>
             </div>
-          </div>
+            <p className="facts small">{SHOW_ONLY_HELP}</p>
+          </>
         ) : (
           timed && (
             <p className="facts">

@@ -7,6 +7,7 @@ import type { Store } from './game/guest';
 import { saveSeat } from './game/onlineStore';
 import type { RulesetInfo } from './game/rules';
 import { chooseSeat, sidesOf, toggleComputer } from './game/roomSetup';
+import { SHOW_ONLY_HELP } from './game/clockText';
 import { controlById, timeControls } from './game/timeControls';
 
 const title = (id: string) => id.charAt(0).toUpperCase() + id.slice(1);
@@ -63,47 +64,60 @@ export function CreateRoom({
     <section className="picker" aria-labelledby="create-title">
       <h2 id="create-title">Play online</h2>
       <RoomRulesetCard ruleset={{ ...ruleset, name: ruleset.name }} linkTo={linkTo} />
-      <div className="segmented" role="group" aria-label="Your side">
-        {[...sides, RANDOM_SEAT].map((id) => (
-          <button
-            key={id}
-            type="button"
-            aria-pressed={seat === id}
-            onClick={() => {
-              const plan = chooseSeat(seat, computer, id);
-              setSeat(plan.seat);
-              setComputer(plan.computer);
-            }}
-          >
-            {title(id)}
-          </button>
-        ))}
-      </div>
-      {three && (
-        <>
-          <div className="segmented" role="group" aria-label="Computer plays">
-            {sides.map((id) => (
+      <div className="seatpick">
+        <div className="seatpick-group">
+          <span className="seatpick-label" aria-hidden="true">
+            Your seat
+          </span>
+          <div className="segmented" role="group" aria-label="Your seat">
+            {[...sides, RANDOM_SEAT].map((id) => (
               <button
                 key={id}
                 type="button"
-                aria-pressed={computer.includes(id)}
-                disabled={
-                  (id === seat && seat !== RANDOM_SEAT) ||
-                  toggleComputer(seat, computer, id).length === computer.length
-                }
-                onClick={() => setComputer(toggleComputer(seat, computer, id))}
+                aria-pressed={seat === id}
+                onClick={() => {
+                  const plan = chooseSeat(seat, computer, id);
+                  setSeat(plan.seat);
+                  setComputer(plan.computer);
+                }}
               >
                 {title(id)}
               </button>
             ))}
           </div>
-          <p className="facts small">
-            Pick up to two seats for the computer to play. This browser plays them, so keep the room
-            open in this browser: if it is closed, the game waits for it, as it would for a person.
-            Every other seat is for a person with the link.
-          </p>
-        </>
-      )}
+        </div>
+        {three && (
+          <div className="seatpick-group">
+            <span className="seatpick-label" aria-hidden="true">
+              Played by computer
+            </span>
+            <div className="segmented" role="group" aria-label="Computer plays">
+              {sides.map((id) => (
+                <button
+                  key={id}
+                  type="button"
+                  aria-pressed={computer.includes(id)}
+                  disabled={
+                    (id === seat && seat !== RANDOM_SEAT) ||
+                    toggleComputer(seat, computer, id).length === computer.length
+                  }
+                  onClick={() => setComputer(toggleComputer(seat, computer, id))}
+                >
+                  {title(id)}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+      <p className="facts small">
+        {seat === RANDOM_SEAT
+          ? 'Your seat is drawn at random when the room is made. '
+          : `You will play ${title(seat)}. `}
+        {three
+          ? 'Pick up to two other seats for the computer to play. This browser plays them, so keep the room open in this browser: if it is closed, the game waits for it, as it would for a person. Every seat the computer does not play is for a person with the link.'
+          : 'Your opponent takes the other seat when they open the link.'}
+      </p>
       <div className="timecontrol" role="group" aria-label="Time control">
         <label>
           Time control{' '}
@@ -131,8 +145,7 @@ export function CreateRoom({
         </div>
       </div>
       <p className="facts small">
-        The room keeps the clocks, and they keep running while a player is away. Show only shows
-        when time runs out and play goes on.
+        The room keeps the clocks, and they keep running while a player is away. {SHOW_ONLY_HELP}
       </p>
       <p className="facts small">
         You get a room code and a link to send to {three ? 'the other players' : 'your opponent'}.

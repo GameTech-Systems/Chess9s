@@ -292,6 +292,24 @@ describe('making a room', () => {
     expect(out).toContain('>Create room<');
   });
 
+  it('labels who plays: your seat, and for 3 players the seats the computer plays (S63)', () => {
+    const two = html();
+    expect(two).toContain('>Your seat<');
+    expect(two).not.toContain('Played by computer');
+    expect(two).toContain('Your seat is drawn at random');
+    expect(two).toContain('Your opponent takes the other seat');
+    const three = html(findRuleset('standard-3p')!);
+    expect(three).toContain('>Your seat<');
+    expect(three).toContain('>Played by computer<');
+  });
+
+  it('says in plain words what Show only does', () => {
+    const out = html();
+    expect(out).toContain('Normally a player whose time runs out is out of the game.');
+    expect(out).toContain('nobody loses on time');
+    expect(out).not.toContain('Show only shows');
+  });
+
   it('lists the sides of a 2-player game in turn order, and no seat for the stones', () => {
     const out = html();
     expect(out).not.toContain('Neutral');
