@@ -10,6 +10,7 @@ Unreleased art and lore never belong in this public repository. Art enters it on
 
 - `brand/emblem.svg`: the phoenix emblem, a glowing egg with nine feathers on each wing. The logo, and the symbol on the Ting Yang square (i5).
 - `brand/favicon.svg`, `brand/favicon-32.png`, `brand/apple-touch-icon.png`: the emblem as the site icon.
+- `apps/web/public/apple-touch-icon.png` (a copy of the one above), `icon-192.png`, `icon-512.png` and `favicon.ico`: the same emblem on the dark ground, for home screens, the web app manifest and the `/favicon.ico` request.
 - `brand/pieces/`: the five Coast pieces (Light Dragon Head, Sun, Dragon Tail, Moon, Dark Dragon Head) as turned board-game pieces, WebP at 1x (220×382) and 2x (440×764), made from the owner's PNGs in `brand/pieces/src/`. The three Dragon pieces stand on hollow tetrahedral bases that fit over the Center (e5).
 
 - `apps/web/public/share.png`: the link-preview card (1200×630), made from the board, the emblem and the Coast pieces above by the app's own "Save board image" code. Players can save the same kind of card of a game in play.

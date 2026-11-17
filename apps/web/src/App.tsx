@@ -65,6 +65,22 @@ export const pageOf = (
             : 'game';
 };
 
+/**
+ * The canonical address of a page (index.html names the home page's). Rooms, the ruleset builder
+ * and unknown paths are the home page: they are not for search results.
+ */
+export const canonicalOf = (pathname: string): string => {
+  const bare = pathname.replace(/\/+$/, '');
+  const page = pageOf(pathname);
+  const path =
+    page === 'privacy' || page === 'how'
+      ? bare
+      : page === 'rules'
+        ? `/rules/${rulesIdOf(pathname)}`
+        : '';
+  return `https://chess9s.com${path || '/'}`;
+};
+
 /** The browser tab title of a page. */
 export const SITE_TITLE = 'Chess Nines: a 9×9 chess variant';
 export const titleOf = (page: ReturnType<typeof pageOf>, rulesName?: string): string => {
@@ -170,8 +186,10 @@ export function App({
       ? (findRuleset(rulesIdOf(here)!)?.name ?? customs.find((c) => c.id === rulesIdOf(here))?.name)
       : undefined;
   useEffect(() => {
-    if (typeof document !== 'undefined') document.title = titleOf(page, rulesName);
-  }, [page, rulesName]);
+    if (typeof document === 'undefined') return;
+    document.title = titleOf(page, rulesName);
+    document.querySelector('link[rel="canonical"]')?.setAttribute('href', canonicalOf(here));
+  }, [page, rulesName, here]);
   const subtitle =
     page === 'how'
       ? 'How to play'

@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
-import { App, pageOf, roomCodeOf, rulesIdOf, titleOf, SITE_TITLE } from './App';
+import { App, canonicalOf, pageOf, roomCodeOf, rulesIdOf, titleOf, SITE_TITLE } from './App';
 import { detailLine, wrapLines } from './game/boardImage';
 import { ErrorBoundary, ErrorScreen } from './ErrorScreen';
 import { installErrorFallback } from './errorFallback';
@@ -9,6 +9,8 @@ import { CONTACT_ADDRESS, DISCUSSIONS_URL } from './links';
 import { PRIVACY_UPDATED } from './Privacy';
 import { HOME_PRESETS, listRulesets } from './game/rules';
 import { RulePicker } from './RulePicker';
+
+const file = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf8');
 
 describe('error screen', () => {
   it('replaces the app with a message and a way to report it', () => {
@@ -279,9 +281,83 @@ describe('online play pages (S53)', () => {
   it('links the favicon, the home-screen icon and the share card in index.html', () => {
     const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
     expect(html).toContain('rel="icon" type="image/svg+xml" href="../../assets/brand/favicon.svg"');
-    expect(html).toContain('rel="apple-touch-icon" href="../../assets/brand/apple-touch-icon.png"');
+    expect(html).toContain('rel="apple-touch-icon" href="/apple-touch-icon.png"');
+    expect(html).toContain('rel="icon" href="/favicon.ico"');
+    expect(html).toContain('rel="manifest" href="/site.webmanifest"');
     expect(html).toContain('property="og:title" content="Chess Nines"');
     expect(html).not.toContain('href="data:,"');
+  });
+
+  it('index.html has a canonical link, Open Graph and Twitter tags, and real text without JavaScript', () => {
+    const html = file('../index.html');
+    expect(html).toContain('rel="canonical" href="https://chess9s.com/"');
+    for (const tag of ['og:site_name', 'og:image', 'og:description', 'og:url']) {
+      expect(html, tag).toContain(`property="${tag}"`);
+    }
+    for (const tag of ['title', 'description', 'image', 'image:alt']) {
+      expect(html, tag).toContain(`name="twitter:${tag}"`);
+    }
+    const noscript = /<noscript>([\s\S]*?)<\/noscript>/.exec(html)?.[1] ?? '';
+    expect(noscript).toContain('<h1>Chess Nines</h1>');
+    expect(noscript).toContain('9×9 chess variant');
+    expect(noscript).toContain('JavaScript');
+  });
+
+  it('ships the icons, the manifest and security.txt at fixed addresses', () => {
+    const size = (name: string) => {
+      const png = readFileSync(new URL(`../public/${name}`, import.meta.url));
+      return [png.readUInt32BE(16), png.readUInt32BE(20)];
+    };
+    expect(size('apple-touch-icon.png')).toEqual([180, 180]);
+    expect(size('icon-192.png')).toEqual([192, 192]);
+    expect(size('icon-512.png')).toEqual([512, 512]);
+    const ico = readFileSync(new URL('../public/favicon.ico', import.meta.url));
+    expect([ico.readUInt16LE(0), ico.readUInt16LE(2)]).toEqual([0, 1]); // an icon file
+    expect(ico.readUInt16LE(4)).toBeGreaterThan(0); // with at least one image
+
+    const manifest = JSON.parse(file('../public/site.webmanifest'));
+    expect(manifest).toMatchObject({
+      name: 'Chess Nines',
+      start_url: '/',
+      display: 'standalone',
+    });
+    expect(manifest.icons.map((i: { sizes: string }) => i.sizes)).toEqual(['192x192', '512x512']);
+    for (const icon of manifest.icons) {
+      expect(readFileSync(new URL(`../public${icon.src}`, import.meta.url)).length).toBeGreaterThan(
+        0,
+      );
+    }
+
+    const security = file('../public/.well-known/security.txt');
+    expect(security).toContain(
+      'Contact: https://github.com/GameTech-Systems/Chess9s/security/advisories/new',
+    );
+    expect(security).toMatch(/^Expires: 2027-11-01T00:00:00\.000Z$/m);
+    expect(security).not.toMatch(/mailto:|@/);
+
+    const headers = file('../public/_headers');
+    for (const path of [
+      '/favicon.ico',
+      '/apple-touch-icon.png',
+      '/icon-192.png',
+      '/icon-512.png',
+      '/site.webmanifest',
+      '/.well-known/security.txt',
+    ]) {
+      expect(headers, path).toMatch(
+        new RegExp(`^${path.replace(/[.]/g, '\\.')}\\n\\s+Cache-Control:`, 'm'),
+      );
+    }
+    expect(headers).toContain("manifest-src 'self'");
+  });
+
+  it('names the canonical address of each page', () => {
+    expect(canonicalOf('/')).toBe('https://chess9s.com/');
+    expect(canonicalOf('/how-to-play/')).toBe('https://chess9s.com/how-to-play');
+    expect(canonicalOf('/privacy')).toBe('https://chess9s.com/privacy');
+    expect(canonicalOf('/rules/standard-2p')).toBe('https://chess9s.com/rules/standard-2p');
+    expect(canonicalOf('/room/K7RX2M')).toBe('https://chess9s.com/');
+    expect(canonicalOf('/nothing-here')).toBe('https://chess9s.com/');
   });
 
   it('privacy says what online play sends, what the server keeps and for how long (D53)', () => {

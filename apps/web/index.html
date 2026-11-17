@@ -4,9 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#0f1116" />
+    <link rel="canonical" href="https://chess9s.com/" />
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
     <link rel="icon" type="image/svg+xml" href="../../assets/brand/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="../../assets/brand/favicon-32.png" />
-    <link rel="apple-touch-icon" href="../../assets/brand/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <meta
       name="description"
       content="Chess Nines: a 9×9 chess variant with custom pieces and special squares. Play against the computer or a friend in your browser. No account needed."
@@ -17,6 +20,8 @@
       content="A 9×9 chess variant with a Coast, a void and five new pieces. Play in your browser, against the computer or a friend, or online by room code."
     />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Chess Nines" />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:url" content="https://chess9s.com/" />
     <meta property="og:image" content="https://chess9s.com/share.png" />
     <meta property="og:image:width" content="1200" />
@@ -26,10 +31,34 @@
       content="The Chess Nines board, a 9×9 chess variant, with its Coast on the left."
     />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Chess Nines" />
+    <meta
+      name="twitter:description"
+      content="A 9×9 chess variant with a Coast, a void and five new pieces. Play in your browser, against the computer or a friend, or online by room code."
+    />
+    <meta name="twitter:image" content="https://chess9s.com/share.png" />
+    <meta
+      name="twitter:image:alt"
+      content="The Chess Nines board, a 9×9 chess variant, with its Coast on the left."
+    />
     <title>Chess Nines: a 9×9 chess variant</title>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <main>
+        <h1>Chess Nines</h1>
+        <p>
+          Chess Nines is a 9×9 chess variant with custom pieces and special squares. You can play
+          against the computer or a friend in your browser, or online by room code, with no account
+          needed.
+        </p>
+        <p>
+          The board runs as a web app, so it needs JavaScript. Turn JavaScript on in your browser
+          and reload this page to play.
+        </p>
+      </main>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
