@@ -13,7 +13,7 @@ export function CoastPieces() {
       <ul className="coast-row" aria-label="The five Coast pieces">
         {COAST_PIECES.map((p) => (
           <li key={p.id} data-piece={p.id}>
-            <img src={p.src} alt="" width="220" height="382" decoding="async" />
+            <img src={p.src} srcSet={p.srcSet} alt="" width="220" height="382" decoding="async" />
             <span>{p.name}</span>
           </li>
         ))}

@@ -10,6 +10,6 @@ Unreleased art and lore never belong in this public repository. Art enters it on
 
 - `brand/emblem.svg`: the phoenix emblem, a glowing egg with nine feathers on each wing. The logo, and the symbol on the Ting Yang square (i5).
 - `brand/favicon.svg`, `brand/favicon-32.png`, `brand/apple-touch-icon.png`: the emblem as the site icon.
-- `brand/pieces/`: the five Coast pieces (Light Dragon Head, Sun, Dragon Tail, Moon, Dark Dragon Head) as turned board-game pieces. The three Dragon pieces stand on hollow tetrahedral bases that fit over the Center (e5).
+- `brand/pieces/`: the five Coast pieces (Light Dragon Head, Sun, Dragon Tail, Moon, Dark Dragon Head) as turned board-game pieces, WebP at 1x (220×382) and 2x (440×764), made from the owner's PNGs in `brand/pieces/src/`. The three Dragon pieces stand on hollow tetrahedral bases that fit over the Center (e5).
 
 The game board itself still draws the pieces as plain lettered discs.
