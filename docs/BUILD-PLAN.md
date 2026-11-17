@@ -510,7 +510,7 @@ Owner, 7 Nov 2026 (D86): nothing is official and there are no players yet, so th
 4. Walk every page as a first-time visitor at 375 px and 1280 px wide: home, rules, a 2-player and a 3-player game, a computer game, an online room, the builder, privacy and the error screen. Remove developer-facing text (file paths, step or decision codes, "provisional", internal names). Where new wording needs the owner, list it in the handoff instead of inventing copy.
 Done when: there is no Tournaments page or link, the walk-through list is in the handoff, and tests pass.
 
-### S94 — Coast piece art from the owner's PNGs · Claude · Sonnet 5.5 · low · `todo`
+### S94 — Coast piece art from the owner's PNGs · Claude · Sonnet 5.5 · low · `done`
 Blocked until the owner uploads the five pieces as PNGs to `assets/brand/pieces/src/` (GitHub web upload is fine). D87: raster art, no SVG wrapper.
 Convert each PNG to WebP at 1x (220×382) and 2x (440×764), import them in `brand.ts` and serve them with `srcset`; delete the SVG wrappers. Check the five sit on one baseline at one scale, with no halo or baked shadow on light and dark backgrounds. The emblem and the board's piece symbols stay SVG. Check the page weight and the Content-Security-Policy.
 Done when: the home page shows the new art, sharp on a phone, and the old wrappers are gone.
