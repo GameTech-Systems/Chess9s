@@ -65,6 +65,24 @@ export const pageOf = (
             : 'game';
 };
 
+/** The browser tab title of a page. */
+export const SITE_TITLE = 'Chess Nines: a 9×9 chess variant';
+export const titleOf = (page: ReturnType<typeof pageOf>, rulesName?: string): string => {
+  const part =
+    page === 'how'
+      ? 'How to play'
+      : page === 'privacy'
+        ? 'Privacy'
+        : page === 'build'
+          ? 'Change ruleset'
+          : page === 'rules'
+            ? `${rulesName ?? 'Rules'} rules`
+            : page === 'room'
+              ? 'Online room'
+              : undefined;
+  return part ? `${part} · Chess Nines` : SITE_TITLE;
+};
+
 export function App({
   path,
   hash,
@@ -147,6 +165,13 @@ export function App({
     navigate(to);
   };
   const page = pageOf(here);
+  const rulesName =
+    page === 'rules'
+      ? (findRuleset(rulesIdOf(here)!)?.name ?? customs.find((c) => c.id === rulesIdOf(here))?.name)
+      : undefined;
+  useEffect(() => {
+    if (typeof document !== 'undefined') document.title = titleOf(page, rulesName);
+  }, [page, rulesName]);
   const subtitle =
     page === 'how'
       ? 'How to play'

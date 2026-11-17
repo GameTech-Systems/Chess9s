@@ -7,7 +7,8 @@ Updated 2026-11-17 by S94 (Sonnet 5.5 · low). `/end-session` rewrites this file
 - One crop (248×430 px of each 952×1652 PNG) is used for all five, so they share one scale and one baseline. No halo or baked shadow on light or dark backgrounds. The home row's labels sit on a subgrid so the bases line up however a label wraps.
 - Page weight: about 97 KB at 1x, about 247 KB at 2x (a device loads one set). Images are same-origin, so the Content-Security-Policy (`img-src 'self' data:`) is unchanged and the browser logged no violations.
 - How to play (`/how-to-play`, footer link) is a general walkthrough with no ruleset named until its presets list; per-ruleset pages stay at `/rules/<id>`. Footer legal line: "© 2026 Chess Nines™ is a trademark of Duke Johnson."
-- Typecheck, lint, validate:rules green; 3,006 tests pass.
+- Rules pages and the rules dialog compare a ruleset with Standard (the default for 2 and 3 players), not the registry defaults, which are unchanged. "Save board image" (games and rooms) makes a 1200×630 PNG card in the browser; `share.png`, `robots.txt`, `sitemap.xml` and per-page tab titles are in.
+- Typecheck, lint, validate:rules green; 3,011 tests pass.
 
 ## Next session
 **S33 — Phase 7: Growth (planning)** · Opus 5.5 · effort high
@@ -19,7 +20,6 @@ Start with: `/start-session S33`
 
 ## Open questions for the owner
 - The source PNGs are only about 215×390 px of art inside a 952×1652 canvas, so the 2x files are upscaled and not truly sharper than 1x. For crisp art on phones, upload larger PNGs (about 880×1530 px of art, same framing) and S94's script step can be rerun. Default: keep what is there.
-- Rules pages still list settings against the registry default (Standard shows "King range 1, default 2"), and ruleset descriptions say "except the King moves one square". Fixing that wording needs a decision on the registry defaults.
 - Carried over: turn-cycle direction, S74/0020 readings, held-setting rule, Easy Start calls, clock readings, S53 defaults, draw-offer default, flag rule, `coast.openToAll`, I34 contact, favicon, Ting Yang art, wording of the home page "hollow tetrahedral bases" line.
 
 ## Notes for Claude

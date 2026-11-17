@@ -1,7 +1,8 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
-import { App, pageOf, roomCodeOf, rulesIdOf } from './App';
+import { App, pageOf, roomCodeOf, rulesIdOf, titleOf, SITE_TITLE } from './App';
+import { detailLine, wrapLines } from './game/boardImage';
 import { ErrorBoundary, ErrorScreen } from './ErrorScreen';
 import { installErrorFallback } from './errorFallback';
 import { CONTACT_ADDRESS, DISCUSSIONS_URL } from './links';
@@ -50,12 +51,18 @@ describe('pages', () => {
     expect(rulesIdOf('/rules/')).toBeUndefined();
   });
 
-  it('the rules page lists every setting of the ruleset, marking what it changes', () => {
+  it('the rules page lists every setting; Standard is the default, so others mark what differs', () => {
     const html = renderToStaticMarkup(<App path="/rules/standard-2p" />);
     expect(html).toContain('Standard');
     expect(html).toContain('King range');
-    expect(html).toMatch(/data-setting="king.range" data-changed=""/);
-    expect(html).not.toMatch(/data-setting="queen.canCrossVoid" data-changed=""/);
+    expect(html).not.toMatch(/data-changed=""/);
+    expect(html).not.toMatch(/differs from Standard|changed · default|\(default /);
+    const practice = renderToStaticMarkup(<App path="/rules/draft-2p" />);
+    expect(practice).toMatch(/data-setting="king.range" data-changed=""/);
+    expect(practice).not.toMatch(/data-setting="queen.canCrossVoid" data-changed=""/);
+    expect(practice).toContain('How it differs from Standard');
+    // The 3-player Standard is the baseline of the 3-player rulesets.
+    expect(renderToStaticMarkup(<App path="/rules/heavy-h3-3p" />)).not.toMatch(/data-changed=""/);
     expect(html).toContain('Pawn colors and safe zones');
     expect(html).toContain('>Play Standard<');
   });
@@ -63,7 +70,7 @@ describe('pages', () => {
   it('the rules page shows option labels, not raw values, under the registry groups', () => {
     const html = renderToStaticMarkup(<App path="/rules/standard-2p" />);
     expect(html).toContain('>1 square<');
-    expect(html).toContain('default 2 squares');
+    expect(renderToStaticMarkup(<App path="/rules/draft-2p" />)).toContain('Standard: 1 square');
     expect(html).toContain('A5, E5 and I5');
     expect(html).not.toContain('<code>a5-e5-i5</code>');
     for (const g of ['King', 'Queen', 'Pawns', 'Center', 'Coast', 'Dragon Tail', 'Setup']) {
@@ -165,6 +172,48 @@ describe('How to play page', () => {
   });
 });
 
+describe('launch files', () => {
+  const file = (p: string) => readFileSync(new URL(p, import.meta.url), 'utf8');
+
+  it('the sitemap lists the pages and every preset rules page, and nothing private', () => {
+    const sitemap = file('../public/sitemap.xml');
+    for (const path of ['/', '/how-to-play', '/privacy']) {
+      expect(sitemap).toContain(`<loc>https://chess9s.com${path}</loc>`);
+    }
+    for (const id of [...HOME_PRESETS[2], ...HOME_PRESETS[3]]) {
+      expect(sitemap).toContain(`<loc>https://chess9s.com/rules/${id}</loc>`);
+    }
+    expect(sitemap).not.toMatch(/\/room\/|\/api\//);
+    expect(file('../public/robots.txt')).toMatch(/Sitemap: https:\/\/chess9s\.com\/sitemap\.xml/);
+  });
+
+  it('the home page carries a share image of the right size', () => {
+    const html = file('../index.html');
+    expect(html).toContain('content="https://chess9s.com/share.png"');
+    expect(html).toContain('name="twitter:card" content="summary_large_image"');
+    const png = readFileSync(new URL('../public/share.png', import.meta.url));
+    expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([1200, 630]);
+  });
+
+  it('each page names itself in the browser tab', () => {
+    expect(titleOf('game')).toBe(SITE_TITLE);
+    expect(titleOf('how')).toBe('How to play · Chess Nines');
+    expect(titleOf('rules', 'Easy Start')).toBe('Easy Start rules · Chess Nines');
+    expect(titleOf('privacy')).toBe('Privacy · Chess Nines');
+  });
+});
+
+describe('board image', () => {
+  it('wraps a result line to the room it has', () => {
+    const width = (l: string) => l.length * 10;
+    expect(wrapLines('Checkmate · Dark wins', width, 120)).toEqual(['Checkmate ·', 'Dark wins']);
+    expect(wrapLines('Draw', width, 120)).toEqual(['Draw']);
+    expect(wrapLines('', width, 120)).toEqual([]);
+    expect(detailLine('Standard', 1)).toBe('Standard · 1 move');
+    expect(detailLine('Standard', 24)).toBe('Standard · 24 moves');
+  });
+});
+
 describe('no Tournaments page (D86)', () => {
   it('sends /tournament to the home page, with or without a trailing slash', () => {
     expect(pageOf('/tournament')).toBe('game');
@@ -263,7 +312,9 @@ describe('online play pages (S53)', () => {
   });
 
   it('privacy’s date changed with the page', () => {
-    expect(PRIVACY_UPDATED).toBe('28 October 2026');
-    expect(renderToStaticMarkup(<App path="/privacy" />)).toContain('Last updated 28 October 2026');
+    expect(PRIVACY_UPDATED).toBe('17 November 2026');
+    expect(renderToStaticMarkup(<App path="/privacy" />)).toContain(
+      'Last updated 17 November 2026',
+    );
   });
 });

@@ -23,7 +23,9 @@ import {
 import { saveRecordFile } from './game/record';
 import { RoomController, type Phase } from './game/roomController';
 import { roomInviteMailto, roomPath } from './game/share';
-import { clockLines, rounds } from './game/session';
+import { clockLines, rounds, statusLine } from './game/session';
+import { BoardImageButton } from './BoardImageButton';
+import { detailLine } from './game/boardImage';
 import { noticeLines, phaseLine, resignPrompt, resultCard, seatLines } from './game/threeText';
 
 const title = (id: string) => id.charAt(0).toUpperCase() + id.slice(1);
@@ -477,6 +479,13 @@ function OnlineGame({
           >
             Save game record
           </button>
+          <BoardImageButton
+            disabled={game.moves.length === 0}
+            caption={{
+              headline: statusLine(game),
+              detail: detailLine(ruleset.name, game.moves.length),
+            }}
+          />
         </div>
 
         <button type="button" className="again" onClick={onLeave}>

@@ -4,7 +4,7 @@ import {
   findRuleset,
   HOME_PRESETS,
   listRulesets,
-  rulesetSettings,
+  settingsVsStandard,
   statusLabel,
   type RulesetInfo,
   type Setting,
@@ -139,7 +139,7 @@ export function RulesPage({
       </article>
     );
   }
-  const settings = rulesetSettings(info);
+  const settings = settingsVsStandard(info, info.players);
   const changed = settings.filter((s) => s.changed);
   const safeZones = settings.find((s) => s.id === 'pawn.safeZones')?.value;
   return (
@@ -174,21 +174,23 @@ export function RulesPage({
         </ul>
       </section>
 
-      <section>
-        <h3>What this ruleset changes</h3>
-        {changed.length === 0 ? (
-          <p>Every setting at its default.</p>
-        ) : (
-          <ul>
-            {changed.map((s) => (
-              <li key={s.id}>
-                <strong>{s.label}</strong>: {s.valueLabel}{' '}
-                <span className="meta">(default {s.defaultLabel})</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+      {!info.defaultFor && (
+        <section>
+          <h3>How it differs from Standard</h3>
+          {changed.length === 0 ? (
+            <p>Nothing: every setting is the same as Standard.</p>
+          ) : (
+            <ul>
+              {changed.map((s) => (
+                <li key={s.id}>
+                  <strong>{s.label}</strong>: {s.valueLabel}{' '}
+                  <span className="meta">(Standard: {s.defaultLabel})</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
 
       {info.players === 2 && (
         <section>
@@ -206,8 +208,8 @@ export function RulesPage({
           <h3>Every setting</h3>
         </summary>
         <p className="meta">
-          Every rule is a setting with a default and a list of options. Marked settings differ from
-          the default.
+          Every rule is a setting with a list of options.
+          {!info.defaultFor && ' Marked settings differ from Standard.'}
         </p>
         {grouped(settings).map((g) => (
           <section key={g.title} className="setting-group">
@@ -224,7 +226,7 @@ export function RulesPage({
                   <dd className="value">
                     <span className="value-label">{s.valueLabel}</span>
                     {s.changed && (
-                      <span className="changed-tag">changed · default {s.defaultLabel}</span>
+                      <span className="changed-tag">differs · Standard: {s.defaultLabel}</span>
                     )}
                   </dd>
                   {s.description && <dd className="desc">{s.description}</dd>}

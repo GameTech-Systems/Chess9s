@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { rulesetSettings, statusLabel, type RulesetInfo } from './game/rules';
+import { settingsVsStandard, statusLabel, type RulesetInfo } from './game/rules';
 import { RULES_DOC_URL, rulesPath } from './links';
 
 /** What every 2-player game shares; the ruleset's own settings follow. */
@@ -55,7 +55,7 @@ export function RulesScreen({
 }: {
   ruleset: Pick<
     RulesetInfo,
-    'name' | 'id' | 'version' | 'status' | 'description' | 'custom' | 'overrides'
+    'name' | 'id' | 'version' | 'status' | 'description' | 'custom' | 'overrides' | 'defaultFor'
   > & { players?: 2 | 3 };
   missing: string[];
   onClose: () => void;
@@ -82,7 +82,7 @@ export function RulesScreen({
       opener?.focus?.();
     };
   }, []);
-  const changed = rulesetSettings(ruleset).filter((s) => s.changed);
+  const changed = settingsVsStandard(ruleset, ruleset.players).filter((s) => s.changed);
   return (
     <>
       <div className="rules-backdrop" aria-hidden="true" onClick={onClose} />
@@ -107,18 +107,22 @@ export function RulesScreen({
             <li key={line}>{line}</li>
           ))}
         </ul>
-        <h3>What this ruleset changes</h3>
-        {changed.length === 0 ? (
-          <p>Every setting at its default (the Chess Nines defaults in the rules guide).</p>
-        ) : (
-          <ul>
-            {changed.map((s) => (
-              <li key={s.id}>
-                <strong>{s.label}</strong>: {s.valueLabel}{' '}
-                <span className="meta">(default {s.defaultLabel})</span>
-              </li>
-            ))}
-          </ul>
+        {!ruleset.defaultFor && (
+          <>
+            <h3>How it differs from Standard</h3>
+            {changed.length === 0 ? (
+              <p>Nothing: every setting is the same as Standard.</p>
+            ) : (
+              <ul>
+                {changed.map((s) => (
+                  <li key={s.id}>
+                    <strong>{s.label}</strong>: {s.valueLabel}{' '}
+                    <span className="meta">(Standard: {s.defaultLabel})</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
         )}
         <p className="rules-links">
           {/* A custom ruleset lives in this browser's storage; its page opens in the app only. */}
