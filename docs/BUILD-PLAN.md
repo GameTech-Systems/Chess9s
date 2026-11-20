@@ -515,12 +515,44 @@ Blocked until the owner uploads the five pieces as PNGs to `assets/brand/pieces/
 Convert each PNG to WebP at 1x (220×382) and 2x (440×764), import them in `brand.ts` and serve them with `srcset`; delete the SVG wrappers. Check the five sit on one baseline at one scale, with no halo or baked shadow on light and dark backgrounds. The emblem and the board's piece symbols stay SVG. Check the page weight and the Content-Security-Policy.
 Done when: the home page shows the new art, sharp on a phone, and the old wrappers are gone.
 
-## Later phases
+## Phase 7: Growth
 
-Each later phase opens with an Opus 5.5 · high planning session that replaces its placeholder with detailed steps.
+Phase 7 opens with the public launch (`docs/LAUNCH.md`): readiness, offline play, a soft launch, the announcement and the first month. The longer tracks (mobile apps, accounts and stats, tournaments) are planned after the four-week review (S102), from what players do. Gates and their checks are in `docs/LAUNCH.md`.
 
-### S33 — Phase 7: Growth · `todo`
-Mobile apps (Capacitor), accounts and stats, tournaments.
+### S33 — Phase 7 planning · Opus 5.5 · high · `done`
+Launch strategy (`docs/LAUNCH.md`), offline play (decision 0025), two outside audits and an outside reading of the plan (`docs/audits/2026-11-20/`), and the steps below. Decisions D88 to D94.
+
+### S95 — Launch-readiness fixes from the S33 audits · Opus 5.5 · high · `todo`
+Fix every finding marked "fix in S95" in `docs/audits/2026-11-20/SUMMARY.md`, test first for each code change. Findings the summary marks "owner" go to S98; "later" ones become issues. Also I37: the 3-player reports print their seat columns in the fixed order dark / light / Dragon.
+Done when: every "fix in S95" row is fixed or answered in the summary, `pnpm worker:check` and the five browser scripts pass, and tests pass.
+
+### S96 — Offline play · Opus 5.5 · high · `todo`
+Build decision 0025: a service worker with a build-time precache list (D89), the update flow (D90), the online-only notices, `sw.js` headers, the privacy line and date, and `apps/web/scripts/e2e-offline.mjs`. Decision 0025 lists the checks.
+Done when: after one visit, a 2-player hot-seat game, a computer game and a 3-player hot-seat game play to a result and reload with the network off, at desktop and Pixel 7 width; Play online says it needs a connection; an update waits during a game; tests pass.
+
+### S97 — Front door and launch materials · Sonnet 5.5 · medium · `todo`
+README rewritten for today (play now at chess9s.com, what is built, how to run rooms locally with `wrangler dev`); a press page in `docs/launch/press.md` (one-line pitch, facts, screenshots made with Playwright from the built app, links); post drafts for each D91 channel in `docs/launch/posts.md`, in plain words (D85), for the owner to edit and post. No new art; screenshots only. Wording the owner must approve is listed in the handoff.
+Done when: the README has no "coming soon" or phase status that is out of date, the press page and drafts exist, and the screenshots are committed.
+
+### S98 — Launch decisions · Owner with Claude in chat · Opus 5.5 · medium · `todo`
+The owner settles D91 to D94 and I34, confirms S2 (GitHub security settings) and the Cloudflare settings S95 asks for (a rate-limit rule if the summary says so), reads the post drafts, and picks the testers for the soft launch.
+
+### S29 — Outside testers (soft launch) · Owner · `doing`
+Continues on the final build: five to ten testers, including one 3-player room and one offline game on a phone, feedback through Discussions. Gate 2 in `docs/LAUNCH.md`.
+
+### S99 — Soft-launch fixes · Sonnet 5.5 · medium · `todo`
+Fix what the testers found (issues filed from Discussions), test first; anything larger than one session is split out as new steps. Model and effort may change with the findings.
+Done when: no open blocker or high issue from the soft launch, and tests pass.
+
+### S100 — Public announcement · Owner · `todo`
+The owner posts in the D91 order, one channel a day, from the S97 drafts, and answers replies for the first 48 hours. Gate 3 in `docs/LAUNCH.md`.
+
+### S101 — First-week triage · Sonnet 5.5 · medium · `todo`
+A week after S100: read Discussions and issues, file what is new, fix the small bugs (test first), and list the rest by severity in the handoff for S102. Claude posts nothing on GitHub or elsewhere unless the owner asks.
+Done when: every new report has an issue or an answer, the small fixes are merged, and tests pass.
+
+### S102 — Four-week review and the next track · Owner with Claude in chat · Opus 5.5 · high · `todo`
+The owner reviews the launch with Claude in chat: Cloudflare's dashboard numbers (requests, rooms, errors), Discussions, issues and submitted rulesets (D94). Then picks the next track, each opening with its own planning session: mobile apps (Capacitor, built on the offline app), accounts and stats, or Phase 4 again (S47 to S50: discussion and ratification of Standard once there are players, then tournaments).
 
 ## Decision defaults
 
@@ -592,7 +624,14 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D84 | Rulesets on the home page | Default: the three presets of each player count, plus rulesets the owner marks as listed; study rulesets are hidden but stay loadable for saved games and simulations | S92 |
 | D85 | Labels players see | Default: no ruleset ids, versions or project codes on any page; status in plain words: Balance-tested (Candidate), In testing (Experimental), Official | S92 |
 | D86 | Tournaments | Decided (owner, 7 Nov 2026): no Tournaments page until there are players. Default: Standard (2-player) stays a Candidate; it is not ratified when discussion 39 closes on 15 Nov | S93 |
-| D87 | Coast piece art format | Default: raster art (WebP made from the owner's PNGs, 1x and 2x), no SVG wrapper; the emblem and the board's piece symbols stay SVG | S94 |
+| D87 | Coast piece art format | Default (applied, S94): raster art (WebP made from the owner's PNGs, 1x and 2x), no SVG wrapper; the emblem and the board's piece symbols stay SVG | S94 |
+| D88 | Offline play | Decided (owner, 20 Nov 2026): after one visit, hot-seat and computer games (2 and 3 players) play with no network; online rooms stay online-only and say so (decision 0025) | S96 |
+| D89 | How offline is built | Default: a hand-written service worker with a precache list written at build time from Vite's output, no new dependency; option: `vite-plugin-pwa` with Workbox (MIT) (decision 0025) | S96 |
+| D90 | App updates | Default: a new version installs in the background and waits; "Reload for the new version" is offered when no game is in progress, never mid-game; option: take over silently on the next launch (decision 0025) | S96 |
+| D91 | Launch channels and who posts | Default: the owner posts, one channel a day: The Chess Variant Pages, r/chessvariants (then r/chess), Show HN, the lichess and chess.com variant forums; Product Hunt and BoardGameGeek later. Claude drafts and never posts (`docs/LAUNCH.md`) | S97 |
+| D92 | Public contact (I34) | Default: GitHub Discussions for questions and feedback, private vulnerability reporting for security, no email address; option: a role address on chess9s.com through Cloudflare Email Routing, shown on the privacy page | S98 |
+| D93 | Launch window | Default: the first full week after the soft launch passes (Gate 2), on a Tuesday, avoiding 21 Dec to 4 Jan; option: a date the owner names | S100 |
+| D94 | Measuring the launch | Default: no analytics script; Cloudflare's own dashboard (requests, Durable Object counts, errors), Discussions, issues and submitted rulesets; option: Cloudflare Web Analytics (cookieless beacon), which changes the CSP and the privacy page | S102 |
 
 ## Ledger sync format
 
