@@ -16,4 +16,4 @@ Phases end with exit criteria, not dates. Later phases wait for earlier ones to 
 
 **Phase 6: 3-player Dragon mode (experimental).** Dragon role, exit rules, timer, win conditions, and balance simulations across variants.
 
-**Phase 7: Growth.** Mobile apps, accounts and stats, and tournaments (with a Tournaments page, once there are players).
+**Phase 7: Growth.** Opens with the public launch (`docs/LAUNCH.md`): audit fixes, offline play for hot-seat and computer games (decision 0025), a soft launch with outside testers, the announcement and a four-week review. Then mobile apps, accounts and stats, and tournaments (with a Tournaments page, once there are players), planned from what players do. *Exit of the launch:* players outside the project have found the game through the announcement and played it, and the four-week review has picked the next track.
