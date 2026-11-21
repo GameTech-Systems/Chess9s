@@ -11,6 +11,7 @@ import {
   CLOSE_GONE,
   CLOSE_IDLE,
   CLOSE_REPLACED,
+  MAX_CLIENT_MESSAGE_BYTES,
   PING,
   PONG,
   encode,
@@ -51,6 +52,38 @@ export const IDLE_MS = 15 * 60_000;
 export const MAX_SOCKETS = 4;
 /** A 3-seat room (S63) has room for the same in each of its seats; the computer's seats connect from the creator's browser. */
 const socketCap = (seats: number) => (seats > 2 ? seats * 2 : MAX_SOCKETS);
+
+// Per-socket limits (K2, S95; provisional, from the S33 security reading). A socket may send a
+// burst of 40 messages, then 20 a second (PING does not count: the runtime answers it). A message
+// over the limit is dropped unanswered; the tenth dropped message closes the socket.
+export const MESSAGES_PER_SECOND = 20;
+export const MESSAGE_BURST = 40;
+export const FLOOD_STRIKES = 10;
+// Standard close codes (RFC 6455): the client reconnects after any of them, as after a drop.
+/** A binary frame: the protocol is JSON text. */
+export const CLOSE_BINARY = 1003;
+/** Too many messages, again and again. */
+export const CLOSE_FLOOD = 1008;
+/** A message over MAX_CLIENT_MESSAGE_BYTES. */
+export const CLOSE_TOO_BIG = 1009;
+/** Handling the message failed on the server (K5). */
+export const CLOSE_ERROR = 1011;
+
+/** The UTF-8 size of a message is at most three bytes a character: count exactly only near the cap. */
+const tooBig = (text: string) =>
+  text.length > MAX_CLIENT_MESSAGE_BYTES ||
+  (text.length * 3 > MAX_CLIENT_MESSAGE_BYTES &&
+    new TextEncoder().encode(text).byteLength > MAX_CLIENT_MESSAGE_BYTES);
+
+/** The socket's bucket after one more message at `now`: whether it fits, and what to keep. */
+function take(a: Attachment, now: number): { ok: boolean; tokens: number; strikes: number } {
+  const refill = ((now - a.seen) / 1000) * MESSAGES_PER_SECOND;
+  const tokens = Math.min(MESSAGE_BURST, (a.tokens ?? MESSAGE_BURST) + Math.max(0, refill));
+  const strikes = a.strikes ?? 0;
+  return tokens >= 1
+    ? { ok: true, tokens: tokens - 1, strikes }
+    : { ok: false, tokens, strikes: strikes + 1 };
+}
 
 /** What the runtime gives a Room; the real DurableObjectState fits it. */
 export interface Socket {
@@ -163,6 +196,9 @@ interface Attachment {
   seat: string | null;
   /** When it last sent a message (or connected). */
   seen: number;
+  /** K2 (S95): messages it may still send now (a full bucket when missing), and dropped so far. */
+  tokens?: number;
+  strikes?: number;
 }
 
 const json = (status: number, body: unknown) =>
@@ -394,18 +430,56 @@ export class Room {
   }
 
   async webSocketMessage(ws: Socket, message: string | ArrayBuffer): Promise<void> {
+    try {
+      await this.message(ws, message);
+    } catch {
+      // K5 (S95): the socket closes with 1011 and its seat turns away; the client reconnects.
+      this.room = undefined;
+      await this.close(ws, CLOSE_ERROR, 'Server error.').catch(() => undefined);
+    }
+  }
+
+  /** Close a socket for something it did (or the server's failure): its seat turns away. */
+  private async close(ws: Socket, code: number, reason: string): Promise<void> {
+    const { seat } = this.attachment(ws);
+    this.shut(ws, code, reason);
+    if (seat !== null) {
+      this.vacate(ws, seat);
+      await this.schedule();
+    }
+  }
+
+  private async message(ws: Socket, message: string | ArrayBuffer): Promise<void> {
     const before = this.load();
     if (!before) return this.shut(ws, CLOSE_GONE, 'This room is gone.');
+    if (typeof message !== 'string') return this.close(ws, CLOSE_BINARY, 'Messages are JSON text.');
+    if (tooBig(message)) {
+      return this.close(
+        ws,
+        CLOSE_TOO_BIG,
+        `A message may be at most ${MAX_CLIENT_MESSAGE_BYTES} bytes.`,
+      );
+    }
     const now = Date.now();
     const a = this.attachment(ws);
-    if (typeof message !== 'string') {
-      ws.serializeAttachment({ ...a, seen: now } satisfies Attachment);
-      return this.deliver(ws, [
-        { to: 'sender', message: refused('malformed', 'Messages are JSON text.') },
-      ]);
+    const bucket = take(a, now);
+    if (!bucket.ok) {
+      if (bucket.strikes >= FLOOD_STRIKES) return this.close(ws, CLOSE_FLOOD, 'Too many messages.');
+      // Dropped: `seen` stays, so the bucket refills from the last message that counted.
+      ws.serializeAttachment({
+        ...a,
+        tokens: bucket.tokens,
+        strikes: bucket.strikes,
+      } satisfies Attachment);
+      return;
     }
     const step = receive({ data, random, code: before.code, now }, before, a.seat, message);
-    ws.serializeAttachment({ seat: step.seat, seen: now } satisfies Attachment);
+    ws.serializeAttachment({
+      seat: step.seat,
+      seen: now,
+      tokens: bucket.tokens,
+      strikes: bucket.strikes,
+    } satisfies Attachment);
     if (a.seat === null && step.seat !== null) {
       // The seat was taken back here: an older socket on it closes, and its seat stays present.
       for (const other of this.state.getWebSockets()) {

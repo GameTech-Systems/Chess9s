@@ -2,7 +2,7 @@
 // repo's wrangler.jsonc, then two Node 22 WebSocket clients (built in, no dependency) play the
 // S17 80-move game through a room. One drops mid-game and comes back with its seat token; the
 // result must match the game's. Also checks the static app, the SPA fallback, the room peek and
-// the Origin check. Usage: pnpm worker:e2e
+// the Origin check, and the per-address room limit (S95). Usage: pnpm worker:e2e
 import { spawn } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -199,6 +199,28 @@ async function main() {
   check(JSON.stringify(after.result) === JSON.stringify(game.result), 'the room keeps the result');
   light.ws.close();
   dark.ws.close();
+
+  // K1 (S95): one address may make 10 rooms a minute; the 11th is a secured 429.
+  const statuses = [];
+  for (let i = 0; i < 10; i++) {
+    const res = await fetch(`${BASE}/api/rooms`, {
+      method: 'POST',
+      headers: { Origin: ORIGIN, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ v: 1, type: 'create', ruleset: game.ruleset, seat: 'light' }),
+    });
+    statuses.push(res.status);
+    if (res.status === 429) {
+      check(
+        res.headers.get('Retry-After') === '60' &&
+          /connect-src 'self'/.test(res.headers.get('Content-Security-Policy') ?? ''),
+        'the 429 says when to try again and carries the security headers',
+      );
+    }
+  }
+  check(
+    statuses.join(' ') === `${'201 '.repeat(9)}429`,
+    'the 11th room from one address in a minute is refused (429)',
+  );
 }
 
 main().then(

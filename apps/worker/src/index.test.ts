@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import headersFile from '../../web/public/_headers?raw';
 import wranglerFile from '../../../wrangler.jsonc?raw';
 import { FakeRooms } from './fakes';
+import * as entry from './index';
 import { LIMITS, SECURITY_HEADERS, allowedOrigin, handle, type Env, type Limiter } from './index';
 
 const APP = 'https://chess9s.com';
@@ -272,6 +273,13 @@ describe('errors (K5, S95)', () => {
     for (const [name, value] of Object.entries(SECURITY_HEADERS))
       expect(res.headers.get(name), name).toBe(value);
     expect(res.headers.get('Retry-After')).toBeTruthy();
+  });
+});
+
+describe('the entry module', () => {
+  it('exports only functions and objects: workerd refuses to start on any other export', () => {
+    for (const [name, value] of Object.entries(entry))
+      expect(['function', 'object'], name).toContain(typeof value);
   });
 });
 
