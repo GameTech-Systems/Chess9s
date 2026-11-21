@@ -169,7 +169,9 @@ describe('footer feedback link', () => {
   it('links Feedback to the launch-feedback thread on the game and on other pages', () => {
     expect(FEEDBACK_URL.startsWith(DISCUSSIONS_URL)).toBe(true);
     for (const path of ['/', '/how-to-play']) {
-      expect(renderToStaticMarkup(<App path={path} />)).toContain(`href="${FEEDBACK_URL}">Feedback`);
+      expect(renderToStaticMarkup(<App path={path} />)).toContain(
+        `href="${FEEDBACK_URL}">Feedback`,
+      );
     }
   });
 });
