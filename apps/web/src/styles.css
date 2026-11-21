@@ -36,6 +36,17 @@ body {
   padding: 1.25rem 16px 2rem;
 }
 
+/* Gate 1 (S95): people who ask for reduced motion get none. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    transition-duration: 0s !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 .skip-link {
   position: absolute;
   top: 0.5rem;

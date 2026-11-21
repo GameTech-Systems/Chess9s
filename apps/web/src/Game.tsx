@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useConfirmFocus } from './confirmFocus';
 import { deadline, unbuiltFeatures } from '@chess9s/engine';
 import { RulesScreen } from './Rules';
 import { BoardImageButton } from './BoardImageButton';
@@ -150,6 +151,10 @@ export function Game({
   const [showRules, setShowRules] = useState(false);
   // 3-player games: the seat whose Resign button was pressed and awaits its confirm step (S67).
   const [resigning, setResigning] = useState<string | null>(null);
+  const resignFrom = useRef<string | null>(null);
+  const keepPlaying = useConfirmFocus(resigning !== null, () =>
+    document.querySelector<HTMLElement>(`[data-resign="${resignFrom.current}"]`),
+  );
   const [elapsed, setElapsed] = useState(0);
   // 3-player games: the time each seat has had the move, for display only (untimed, decision 0017).
   const [spent, setSpent] = useState<Record<string, number>>({});
@@ -400,7 +405,15 @@ export function Game({
             {resigning === null ? (
               <div className="segmented">
                 {resignable(game, bots).map((side) => (
-                  <button key={side} type="button" onClick={() => setResigning(side)}>
+                  <button
+                    key={side}
+                    type="button"
+                    data-resign={side}
+                    onClick={() => {
+                      resignFrom.current = side;
+                      setResigning(side);
+                    }}
+                  >
                     Resign as {title(side)}
                   </button>
                 ))}
@@ -417,7 +430,7 @@ export function Game({
                 >
                   Confirm
                 </button>
-                <button type="button" onClick={() => setResigning(null)}>
+                <button type="button" ref={keepPlaying} onClick={() => setResigning(null)}>
                   Keep playing
                 </button>
               </div>
