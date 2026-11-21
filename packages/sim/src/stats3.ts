@@ -6,6 +6,18 @@ import { MEASURES_3P, type Measures3 } from './measures3';
 import type { Summary3 } from './play3';
 import { wilson } from './stats';
 
+/**
+ * The seats as reports print them (I37, S95): dark, light, then the Dragon, whatever the turn
+ * order, so reports of different turn orders line up. A seat with another id comes after them.
+ */
+const SEAT_ORDER = ['dark', 'light', 'dragon'];
+const rank = (id: string) => {
+  const i = SEAT_ORDER.indexOf(id);
+  return i === -1 ? SEAT_ORDER.length : i;
+};
+export const inSeatOrder = <T>(seats: Record<string, T>): [string, T][] =>
+  Object.entries(seats).sort(([a], [b]) => rank(a) - rank(b));
+
 /** The rows of decision 0016's end tables a game can end on, in the order reports list them. */
 export const ENDINGS = {
   'king-mates-king': 'A Kinged player checkmates the other King',
@@ -132,7 +144,7 @@ export function summarize3(games: Summary3[], measures: Measures3 = MEASURES_3P)
 
   const flags: string[] = [];
   if (finished > 0) {
-    for (const [id, s] of Object.entries(seats)) {
+    for (const [id, s] of inSeatOrder(seats)) {
       // Rounded to a hundredth of a percent first, as decision 0008 does.
       const rounded = Math.round(s.score * 10000) / 10000;
       if (rounded < measures.band.min || rounded > measures.band.max) {

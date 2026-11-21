@@ -3,7 +3,7 @@
 // Written as JSON for tools and Markdown for people, beside the 2-player reports (report.ts).
 import { MEASURES_3P, type Measures3 } from './measures3';
 import type { RunReport, Skipped, Verdict } from './report';
-import { band3Label, ENDINGS, type Ending, type Run3Summary } from './stats3';
+import { band3Label, ENDINGS, inSeatOrder, type Ending, type Run3Summary } from './stats3';
 
 /**
  * Who plays: the search on every seat (scored against D60), the greedy player on every seat (S58),
@@ -32,13 +32,14 @@ export interface FairnessReport3 {
 }
 
 const SCREENING = 'too few games';
+
 const pct = (x: number) => `${(x * 100).toFixed(1)}%`;
 
 /** A sweep run's flags; a screening run is flagged for a seat only when its whole interval misses. */
 function sweepFlags(s: Run3Summary, m: Measures3): string[] {
   if (!s.flags.includes(SCREENING)) return s.flags;
   const flags = s.flags.filter((f) => f !== SCREENING && !f.includes(' score outside '));
-  const seats = Object.entries(s.seats).flatMap(([id, seat]) => {
+  const seats = inSeatOrder(s.seats).flatMap(([id, seat]) => {
     const [lo, hi] = seat.interval;
     return s.finished > 0 && (hi < m.band.min || lo > m.band.max)
       ? [`${id} interval ${(lo * 100).toFixed(1)}–${pct(hi)} outside ${band3Label(m)}`]
@@ -101,7 +102,7 @@ const PLAYERS: Record<Mode3, string> = {
 
 export function toMarkdown3(report: FairnessReport3): string {
   const { measures: m } = report;
-  const seats = Object.keys(report.runs[0]?.summary.seats ?? {});
+  const seats = inSeatOrder(report.runs[0]?.summary.seats ?? {}).map(([id]) => id);
   const extra = Object.entries(report.overrides).map(([k, v]) => `${k}=${JSON.stringify(v)}`);
   const lines = [
     `# Balance report: ${report.ruleset.id} ${report.ruleset.version}${extra.length ? ` with ${extra.join(', ')}` : ''}${report.mode === 'search' ? '' : ` (${report.mode})`}`,
@@ -147,7 +148,7 @@ export function toMarkdown3(report: FairnessReport3): string {
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([k, v]) => `${k} ${v}`)
         .join(', ') || 'none';
-    const wins = Object.entries(s.seats)
+    const wins = inSeatOrder(s.seats)
       .map(([id, seat]) => `${id} ${seat.wins} (${list(seat.winsBy)})`)
       .join('; ');
     lines.push(

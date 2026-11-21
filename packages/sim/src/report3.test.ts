@@ -123,6 +123,20 @@ describe('toMarkdown3', () => {
     expect(md).toContain('| default | 1 | 40 |');
   });
 
+  it('prints the seats in the fixed order dark, light, dragon whatever the turn order (I37, S95)', () => {
+    const turned = games(30, [1, 2, 3]).map((g) => ({ ...g, order: ['light', 'dragon', 'dark'] }));
+    const r = buildReport3(RULESET, '2026-10-27', 'search', [run('default', 1, turned)]);
+    expect(Object.keys(r.runs[0]!.summary.seats)).not.toEqual(['dark', 'light', 'dragon']);
+    const text = toMarkdown3(r);
+    expect(text).toMatch(/\| Combination \| Depth \| Games \| dark \| light \| dragon \|/);
+    expect(text).toMatch(/\| default \| 1 \| 30 \| 16\.7% [^|]+\| 33\.3% [^|]+\| 50\.0% /);
+    expect(text).toMatch(/Wins by seat: dark 5 [^;]+; light 10 [^;]+; dragon 15 /);
+    expect(r.runs[0]!.summary.flags.filter((f) => f.includes('score outside'))).toEqual([
+      'dark score outside 28–38%',
+      'dragon score outside 28–38%',
+    ]);
+  });
+
   it('lists the endings by the rows of decision 0016, and the skipped combinations', () => {
     expect(md).toContain('A Kinged player checkmates the other King');
     expect(md).toContain('- x=1: not built yet: x');
