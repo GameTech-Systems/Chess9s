@@ -532,7 +532,7 @@ Done when: after one visit, a 2-player hot-seat game, a computer game and a 3-pl
 ### S98 — Launch decisions · Owner with Claude in chat · Opus 5.5 · medium · `todo`
 D91 to D94 and I34 are settled in the ledger (21 Nov 2026; `docs/decisions/LEDGER-SNAPSHOT.md`). Left for the owner: confirm S2 (GitHub security settings) and the Cloudflare settings S95 asks for, sets up the feedback intake (a pinned "Launch feedback" Discussion, labels, the 72-hour answer rule), and picks the soft-launch testers by the quotas in `docs/LAUNCH.md`. The owner reads S97's post drafts before S100.
 
-### S97 — Front door and launch materials · Sonnet 5.5 · medium · `todo`
+### S97 — Front door and launch materials · Sonnet 5.5 · medium · `done`
 README rewritten for today (play now at chess9s.com, what is built, how to run rooms locally with `wrangler dev`); a press page in `docs/launch/press.md` (one-line pitch, facts, screenshots made with Playwright from the built app, links); a Feedback link in the footer to the pinned Discussion; post drafts for each D91 channel in `docs/launch/posts.md`, in plain words (D85), for the owner to edit and post. No new art; screenshots only. Wording the owner must approve is listed in the handoff.
 Done when: the README has no "coming soon" or phase status that is out of date, the press page and drafts exist, and the screenshots are committed.
 
