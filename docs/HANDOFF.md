@@ -1,35 +1,32 @@
 # Handoff
 
-Updated 2026-11-21 by the S95/S96 ledger review (Opus 5.5 · high). `/end-session` rewrites this file; keep it under 40 lines.
+Updated 2026-11-21 by S97 (Sonnet 5.5 · medium). `/end-session` rewrites this file; keep it under 40 lines.
 
 ## State
-- Phase 7. S96 (offline play, PR 95) and S95 (launch-readiness fixes, PR 100) are both done and merged, in that order. They work together: the precache takes every file under `assets/`, so the six on-demand pages work offline, and `/api/*` skips the service worker, so 429 and 503 answers are never cached.
-- The ledger is read straight from the repo now: `docs/decisions/LEDGER-SNAPSHOT.md` (made by `scripts/claude/ledger-snapshot.mjs` from an export). S95 and S96 are synced into the ledger: I34, I37, I39 to I41 and I43 to I45 resolved; I46 to I50 and D95 to D98 added from their sync blocks.
-- D89, D90, D91 and D94 are decided as their defaults, so S95 and S96 built what the owner chose. D93 is the owner's own answer (see below).
-- `/end-session` now lists every fixed issue and, when the session has `ArtifactData` and the ledger link, syncs the ledger and regenerates the snapshot itself.
-- Outside audit of the S95+S96 code (Nemotron 3 Ultra, `docs/audits/2026-11-21/`): a dropped room message counted its token refill twice, so a flood got more than 20 messages a second; fixed with a test. Its other four findings were checked and are by design or wrong.
-- Typecheck, lint, validate:rules and build are green; 3,072 tests pass.
+- Phase 7. S97 done: README rewritten for today (play now, what is built, `wrangler dev` for rooms); `docs/launch/press.md`; post drafts for each D91 channel in `docs/launch/posts.md`; ten screenshots in `docs/launch/screenshots/` made from the built app by `apps/web/scripts/press-shots.mjs` (no new art); a Feedback link in the footer (`FEEDBACK_URL`, `apps/web/src/links.ts`).
+- The Feedback link points at the Discussions page for now (provisional). When the owner pins the "Launch feedback" Discussion (S98), set `FEEDBACK_URL` to its address and replace `[Feedback link]` in `docs/launch/posts.md`.
+- I removed the README's "Story and lore (coming soon)" line (chessnines.com is not live as far as the repo says); add it back when the site is.
+- Typecheck, lint, validate:rules and build are green; 3,073 tests pass.
 
 ## Next session
-**S97 — Front door and launch materials** · Sonnet 5.5 · effort medium
-Why: D91 to D94 are settled, so S97 no longer waits on S98; S98's owner items can run alongside.
-Start with: `/start-session S97`
+**S98 — Launch decisions** · Opus 5.5 · effort medium (owner with Claude in chat)
+Why: Gate 1 still needs the owner's items: GitHub settings (S2), Cloudflare checks (D96), the pinned Discussion, testers; the owner reads the S97 drafts. No Claude build step is ready until the soft launch (S29) finds something for S99.
+Start with: `/start-session S98`
 
 ## Decisions in effect for the next step
-- D91: the owner posts, one channel a day, in the `docs/LAUNCH.md` order; Claude drafts, never posts (decided, default).
-- D93: "The sooner the better. As soon as it's ready we can decide the exact date." No fixed launch day in the drafts (decided).
-- D94: no analytics script (decided, default). D92: GameTypeBrand@gmail.com (decided).
-- D98: the privacy page's IP-counting wording stays as written (open, default).
+- D91: the owner posts, one channel a day; Claude drafts, never posts (decided). D93: no fixed launch day (decided).
+- D94: no analytics script (decided). D92: GameTypeBrand@gmail.com (decided).
+- D98: privacy page IP-counting wording stays (open, default).
+- D44: the owner says its note is stale (the game was tested since); S40's "open to every piece" stands.
 
 ## Open questions for the owner
-- D7 and D10 in the ledger conflict with the repo: D7 says "Claude pushes straight to main" and D10 says opusplan, but CLAUDE.md requires PRs, green CI and rebase merges, and `.claude/settings.json` pins Sonnet. CLAUDE.md and the step's model apply until you settle them.
-- D44's owner text ("same as Good Practice") may not match `coast.openToAll` as built in S40. Worth a look; no change made.
-- S98 (owner): S2 GitHub settings, the Cloudflare rate-limit check after deploy (D96), the pinned "Launch feedback" Discussion (S97's footer link waits on it), and testers.
+- D7: you prefer Claude pushing straight to main. Today CLAUDE.md requires PRs, green CI and rebase merge, and `.claude/settings.json` denies `git push origin main*`. Say "change it" and a session edits CLAUDE.md, the skills, `ship.sh` use and the deny rule; until then PRs apply. D10 (opusplan) still conflicts with the pinned Sonnet.
+- Wording to approve before S100: the "about 50%" fairness claims (bot results), the press page contact line, and all post drafts.
 - D95: GameTypeBrand@gmail.com in `security.txt` and SECURITY.md? Default: no.
 - Carried over: OpenRouter credits, turn-cycle direction, S74/0020 readings, held-setting rule, Easy Start calls, clock readings, S53 defaults, draw-offer default, flag rule, favicon, Ting Yang art, the "hollow tetrahedral bases" line, larger source PNGs, security.txt renewal before 2027-11-01.
 
 ## Notes for Claude
 - Read `docs/decisions/LEDGER-SNAPSHOT.md` for decisions; its precedence line says what wins.
-- workerd refuses a number (or string) export from `apps/worker/src/index.ts`; a test checks that it exports only functions and objects.
-- Pages that render the app in tests need `beforeAll(preloadPages)` (`apps/web/src/pages.tsx`); add new on-demand pages to `ON_DEMAND`.
-- Room tests run on frozen time: advance it between bursts of messages, or the per-socket limit drops them.
+- Regenerate screenshots with `pnpm build && node apps/web/scripts/press-shots.mjs` (needs Playwright).
+- workerd refuses a number (or string) export from `apps/worker/src/index.ts`; a test checks it.
+- Pages that render the app in tests need `beforeAll(preloadPages)`; add new on-demand pages to `ON_DEMAND`.
