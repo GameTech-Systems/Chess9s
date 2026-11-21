@@ -1,7 +1,7 @@
 import { CONTACT_ADDRESS, DISCUSSIONS_URL } from './links';
 
 /** When this page last changed. Update it with any change to what the app does with data. */
-export const PRIVACY_UPDATED = '17 November 2026';
+export const PRIVACY_UPDATED = '21 November 2026';
 
 /** What Chess Nines does and does not do with a visitor's data. Keep in step with the app. */
 export function Privacy() {
@@ -13,8 +13,14 @@ export function Privacy() {
         <li>There are no accounts, no analytics and no cookies.</li>
         <li>
           Once the page and its own files have loaded, the app makes no network requests until you
-          choose Play online or open a room link. Everything else on this page applies to play
-          without a room.
+          choose Play online or open a room link, apart from the copy of its own files below.
+          Everything else on this page applies to play without a room.
+        </li>
+        <li>
+          So that it can run offline, your browser keeps a copy of the app&apos;s own files (its
+          pages, code, pictures and icons) in Cache Storage, and checks for a new version of them
+          when you visit. The copy holds no game data and nothing about you; clearing your site data
+          removes it.
         </li>
         <li>
           Online play: when you make or join a room, your browser sends the room code, the ruleset

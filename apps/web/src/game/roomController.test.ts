@@ -109,6 +109,31 @@ describe('looking for the room', () => {
     expect(h.phase.kind).toBe('preview');
   });
 
+  it('looks again on its own when the browser is back online (decision 0025)', async () => {
+    let up = false;
+    const h = harness({
+      peek: async () => {
+        if (!up) throw new TypeError('network');
+        return new Response(JSON.stringify(info()), { status: 200 });
+      },
+    });
+    await h.controller.start();
+    expect(h.phase).toMatchObject({ kind: 'problem', problem: 'offline' });
+    up = true;
+    // The page nudges the controller on the browser's online event.
+    h.controller.nudge();
+    await vi.waitFor(() => expect(h.phase.kind).toBe('preview'));
+    expect(h.peeks).toHaveLength(2);
+  });
+
+  it('a nudge does not look again for a room that is gone', async () => {
+    const h = harness({ peek: async () => new Response('{"error":"no-room"}', { status: 404 }) });
+    await h.controller.start();
+    h.controller.nudge();
+    await Promise.resolve();
+    expect(h.peeks).toHaveLength(1);
+  });
+
   it('a room made on a ruleset this app does not have asks to reload, and offers no seat', async () => {
     const h = harness({
       peek: async () =>

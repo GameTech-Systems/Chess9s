@@ -27,6 +27,7 @@ import { clockLines, rounds, statusLine } from './game/session';
 import { BoardImageButton } from './BoardImageButton';
 import { detailLine } from './game/boardImage';
 import { noticeLines, phaseLine, resignPrompt, resultCard, seatLines } from './game/threeText';
+import { ONLINE_ONLY_TEXT, useOnline } from './offline/online';
 
 const title = (id: string) => id.charAt(0).toUpperCase() + id.slice(1);
 
@@ -512,9 +513,12 @@ export function OnlineRoom({
   origin = typeof window === 'undefined' ? '' : window.location.origin,
   onLeave = () => {},
   linkTo,
+  online,
 }: {
   code: string;
   controller?: RoomController;
+  /** Whether the browser is online; the browser says by default (tests set it). */
+  online?: boolean;
   store?: Store | null;
   origin?: string;
   /** The player leaves the room page (back to the game). */
@@ -534,6 +538,8 @@ export function OnlineRoom({
     [controller, code],
   );
   const phase = useSyncExternalStore(room.subscribe, room.getSnapshot, room.getSnapshot);
+  const live = useOnline();
+  const connected = online ?? live;
   useEffect(() => {
     void room.start();
     // Back on the network, or the page shown again: reconnect now rather than after the wait.
@@ -546,6 +552,33 @@ export function OnlineRoom({
       room.stop();
     };
   }, [room]);
+  // Offline, the room page says so above whatever the room shows; the room's own reconnect logic
+  // is unchanged, and the controller looks again once the browser is back online (decision 0025).
+  return (
+    <>
+      {!connected && (
+        <p className="facts banner offline-notice" role="status">
+          {ONLINE_ONLY_TEXT}
+        </p>
+      )}
+      <RoomPhase phase={phase} room={room} origin={origin} onLeave={onLeave} linkTo={linkTo} />
+    </>
+  );
+}
+
+function RoomPhase({
+  phase,
+  room,
+  origin,
+  onLeave,
+  linkTo,
+}: {
+  phase: Phase;
+  room: RoomController;
+  origin: string;
+  onLeave: () => void;
+  linkTo?: LinkTo | undefined;
+}) {
   switch (phase.kind) {
     case 'loading':
       return (
