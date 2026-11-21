@@ -1,32 +1,32 @@
 # Handoff
 
-Updated 2026-11-21 by S33 (Opus 5.5 · high). `/end-session` rewrites this file; keep it under 40 lines.
+Updated 2026-11-21 by S96 (Opus 5.5 · high). `/end-session` rewrites this file; keep it under 40 lines.
 
 ## State
-- Phase 7 is planned: `docs/LAUNCH.md` (gates, channels, timeline, success signals, risks), decision 0025 (offline play for hot-seat and computer games, D88 decided by the owner), steps S95 to S102 in `docs/BUILD-PLAN.md`, defaults D88 to D94. No app code changed.
-- Outside audits in `docs/audits/2026-11-20/`: product (NVIDIA Nemotron 3 Ultra), security (Kimi K3.1 Pro on NVIDIA), and a reading of the plan (Ernie 5.5 Flash on OpenRouter). `SUMMARY.md` verifies every finding and says which step takes it; the wrong ones are marked "no".
-- Blockers for the public launch: offline play (S96), per-address limits on making rooms and opening sockets (S95, K1), README (S97).
-- Claude's own checks: axe-core finds no violations on seven pages at 1280 and 375 px; no overflow, no console errors; a reload offline fails today (no service worker).
-- Typecheck, lint, validate:rules green; 3,016 tests pass.
+- Phase 7. Offline play works (decision 0025, "Built" section). After one visit, 2- and 3-player hot-seat and computer games play, reload and end with no network. Play online, Join a room and room pages say they need a connection. A new version waits and is offered only when no game is in progress. Code: `apps/web/src/offline/`; `dist/sw.js` is written by the build.
+- `apps/web/scripts/e2e-offline.mjs` passes (desktop, Pixel 7, 320/375/430 px, landscape, blocked workers, cleared site data, update). The clock, 3-player and room browser scripts still pass with the worker in place. Chromium only: Safari and Firefox were not run.
+- The contact address GameTypeBrand@gmail.com is on the privacy page (D92 decided, public ledger entry). The privacy page is dated 21 November 2026.
+- S95 was skipped at the owner's request and is still `todo`. Typecheck, lint, validate:rules green; 3,048 tests pass.
 
 ## Next session
 **S95 — Launch-readiness fixes from the S33 audits** · Opus 5.5 · effort high
-Why: the room limits (K1, K2) and the Worker's error boundary are security work on the live site, and S96 builds on the code-split bundle.
+Why: room limits (K1, K2) and the Worker's error boundary are security work on the live site, and the last launch blocker in code.
 Start with: `/start-session S95`
 
 ## Decisions in effect for the next step
-- D88: offline play for hot-seat and computer games only (decided, S96 builds it).
-- D89 to D94: defaults as in the table (hand-written service worker, update waits for no game in progress, owner posts, no email address, launch Tue 12 Jan 2027, no analytics script).
+- D88: offline play for hot-seat and computer games only (decided, built in S96).
+- D89, D90: applied as their defaults (hand-written worker; the update waits for no game in progress). Provisional until the ledger brief says otherwise.
+- D92: GameTypeBrand@gmail.com on the privacy page (decided, owner, 21 Nov 2026).
+- D91, D93, D94: the owner says they are decided in the ledger, but the values have not reached the repo; the table still shows the defaults.
 
 ## Open questions for the owner
-- D91 to D94 and I34 (contact address): settle them in S98, before S97 writes the posts. Defaults apply until then.
-- OpenRouter's account has no credits, so only free models run there; NVIDIA's API ran the paid-tier models. Add credits if you want GPT or Gemini readings next time.
-- S2 (GitHub security settings) is still `todo`; S98 asks you to confirm it.
-- Carried over: turn-cycle direction, S74/0020 readings, held-setting rule, Easy Start calls, clock readings, S53 defaults, draw-offer default, flag rule, `coast.openToAll`, favicon, Ting Yang art, the "hollow tetrahedral bases" line, larger source PNGs for sharper 2x art, security.txt renewal before 2027-11-01.
+- Paste the ledger brief for D89 to D91, D93 and D94, so the table and S97's drafts use your choices. Defaults apply until then.
+- Should GameTypeBrand@gmail.com also go in `security.txt` and SECURITY.md as a second contact? Default: no; security reports stay with GitHub private reporting.
+- Carried over: OpenRouter credits, S2 (GitHub security settings), turn-cycle direction, S74/0020 readings, held-setting rule, Easy Start calls, clock readings, S53 defaults, draw-offer default, flag rule, `coast.openToAll`, favicon, Ting Yang art, the "hollow tetrahedral bases" line, larger source PNGs, security.txt renewal before 2027-11-01.
 
 ## Notes for Claude
-- S95: read only `SUMMARY.md`'s rows marked "fix in S95" (rows 3, 4, 6, 8, 9, 11 and K1 to K5, K7) and I37. Check whether the Workers rate-limiting binding works on the free plan and in `wrangler dev`; if not, say so for S98.
-- Outside readings: `curl` or Python to `integrate.api.nvidia.com` and `openrouter.ai` (the proxy adds the keys). NVIDIA reasoning models time out unless streamed; Kimi needs `reasoning_effort: low` or it spends every token thinking.
-- Reports come from workflow artifacts; restate seats as dark / light / Dragon.
+- S95: read only `SUMMARY.md`'s rows marked "fix in S95" (rows 3, 4, 6, 8, 9, 11 and K1 to K5, K7) and I37. The precache list follows Vite's output, so code-splitting needs no change in `offline/`. Run `e2e-offline.mjs` after it.
+- Shipping the recovery worker also means removing the registration in `main.tsx`; otherwise pages reload without end (decision 0025, Built).
+- `pnpm dev` registers no worker; offline behaviour needs `pnpm build` and the e2e script (its own server, port 4175).
+- Outside readings: `curl` or Python to `integrate.api.nvidia.com` and `openrouter.ai` (the proxy adds the keys).
 - A new parameter makes lock tests fail until `pnpm lock add-keys`; new ruleset files need `pnpm rules:index`.
-- Browser scripts need Playwright and `pnpm build` first; `e2e-browser-clock` takes about three minutes.
