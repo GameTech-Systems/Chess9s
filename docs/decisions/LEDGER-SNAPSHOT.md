@@ -1,0 +1,117 @@
+# Ledger snapshot
+
+Generated from the owner's ledger by `scripts/claude/ledger-snapshot.mjs`. Do not edit by hand; regenerate it.
+Private items are left out. **This file overrides the "Decision defaults" table in `docs/BUILD-PLAN.md`** wherever the two differ. Rows marked CHANGED are owner choices that are not the default.
+
+## Decisions (91)
+
+| Id | Decision | Choice in effect | Status | Needed by |
+| --- | --- | --- | --- | --- |
+| D1 | Where do the board and pieces come from? | Formats first, real data in S10: Code designs the formats and renderer against a neutral test layout. You give the real layout and pieces in S10; piece batches (S13+) wait for it. | decided, default | S9 |
+| D2 | Pawn promotion targets | Queen, Rook, Bishop, Knight: As in standard chess. Provisional. | decided, default | S8 |
+| D3 | Dragons in 2-player games | Blocking: Frozen Dragons stay on their starting squares and block movement. | decided, default | S8 |
+| D4 | Dragon range mode | Squares: Range counts squares along one line. | decided, CHANGED | S32 |
+| D5 | Which player counts do Dragon movement rules apply to? | 2- and 3-player: Use [2, 3] if a 2-player variant may let Dragons move. | decided, CHANGED | S8 |
+| D6 | Sun and Moon pawn capture | Add it, options from you: Add sunMoon.capture with default null and needsDecision true. You name the options before S15. | decided, default | S8 |
+| D7 | Branch rules and who merges | Claude pushes straight to main: No PRs; Claude merges locally after tests. Fastest, no CI gate or PR record. | decided, CHANGED | S7 |
+| D8 | Merge method | Rebase: Keeps each task's commit, authored by Claude. Used for PR #2. | decided, default | S7 |
+| D10 | Default model for Code sessions | opusplan: Opus in plan mode, Sonnet while executing. | decided, CHANGED | S7 |
+| D11 | When to turn on Discussions | Now: Turn them on in S5 so the links work and early ideas have a home. | decided, default | S5 |
+| D12 | Fairness measures and thresholds | Chess-like tolerance: Accept up to about 55% for the first player, similar to White's score in classical chess. | decided, CHANGED | S24 |
+| D13 | How TRADEMARKS describes "Chess9s" | Domain and repo name: Reword TRADEMARKS so Chess9s is the web address and repository name, still claimed, not a second product name. | decided, default | S4 |
+| D14 | Public wording for 3-player features | Name them now: Add Omega exit and stone pieces to the public ROADMAP. | decided, CHANGED | S4 |
+| D15 | Hosting | I'll decide which host is optimal for this game this week. Sonnet suggested Cloudflare, perhaps there's a better option. | decided, CHANGED | S27 |
+| D17 | Role of ChessNines repo and site | Story, lore and company info: As this project's description says. | decided, default | S4 |
+| D18 | Online multiplayer backend | Cloudflare Durable Objects: Same platform as hosting. | decided, default | S52 |
+| D20 | Discussion period before ratification | 21 days | decided, default | S30 |
+| D21 | Phase 1 dependencies | Pre-approve the list: typescript, vite, react, react-dom, @vitejs/plugin-react, vitest, eslint, typescript-eslint, prettier, ajv, ajv-formats. Added to NOTICE as they land. | decided, default | S7 |
+| D22 | DCO check alongside the CLA | Keep it; Claude signs off: Claude adds Signed-off-by to every commit (git commit -s). Revisit at the attorney consult. | decided, default | S7 |
+| D23 | Who is the 4th player? | The 4th player is for table-top board games, the Phoenix, the judge player. Online games do this automatically, so only 3 player e-games. | decided, CHANGED | S9 |
+| D24 | Queens and the void | Center hop, only when empty: Queens can't land on or cross the void, except by hopping over its center square when that square is unoccupied. Needs a new setting in the registry. Which square is the center comes from the board data. | decided, default | S14 |
+| D25 | Colored squares: pawn-safe for which pawn? | Pawn takes the color of its starting column: My reading of your images, not confirmed. A pawn is safe on the colored squares that match the color of the column it starts in. | decided, CHANGED | S9 |
+| D26 | Who moves first ("Left on white") | The dark side's left most corner is on a white square, where the light side's left corner is a coast square. So the dark side moves first.: Turn order flows clockwise: (1) dark, (2) light, (3) dragon, and so on. (Restored from your message of 18 Oct in my own words; the original text was cut off by the old 140-character limit.) | decided, CHANGED | S17 |
+| D27 | How games are won (2-player and 3-player) | Checkmate, as in the v1 plan: A player whose King is attacked with no legal escape loses, and the King is never taken. This is what S16 is written for today. | decided, CHANGED | S16 |
+| D28 | Which square is Omega, and what does the yin-yang square do? | Swirl is the Dragon Tail on Omega; yin-yang is a marked end square: The Tail starts on the Coast's center square, which is the Omega square. The yin-yang square is stored as a special square with no rule until you describe one. | decided, default | S9 |
+| D29 | Where do the dark side's King and Queen start? | Oh yes, correct, the Kings will both begin on dark squares. Queens will both begin on the white squares in the center column.: We should generate a coordinate map of A-I 1-9 for clarity. (Restored from your message of 18 Oct.) | decided, CHANGED | S10 |
+| D30 | King and Queen swap as a player option | Experimental setup option, off by default: A ruleset setting (suggested name setup.swapKingQueen, default off). Both sides swap: King on E (white), Queen on F (dark). It starts as Experimental on the status ladder and is never used in tournaments until it has been tested and ratified. | decided, default | S10 |
+| D31 | Extended play: Dragon continues with captured pieces | Agreed per game by both players: Entry point and piece count are set by the Dragon player and the winning King before extended play starts. | decided, CHANGED | S32 |
+| D32 | Override set to null in a ruleset | Reject null overrides: A ruleset must give a real value or omit the key. Loosening later is easy; tightening later could break saved rulesets. | decided, default | S8 |
+| D33 | extends parent must match player count | Same player count only: Safe default. Shared settings are copied between 2-player and 3-player rulesets. | decided, default | S8 |
+| D34 | How the board looks from dark's seat | Turned 180°: Rank 9 at the bottom, Coast on the right, as in regular chess. | decided, CHANGED | S12 |
+| D35 | Sun and Moon promotion targets | Same targets as pawns, including the lost list: Default option: Dragon Head, Queen, Rook, Bishop, Knight. In the lost-pieces option (captured-piece): whatever is available to choose from. Told to Claude on 19 Oct after S15. Build with sunMoon.canPromote when a step needs it. | decided, CHANGED | S15 |
+| D36 | Does the e5 arrow carry a rule? | The aarow is supposed to symbolize a tetrahedron pyramid, not a rule. It will also be on…: The aarow is supposed to symbolize a tetrahedron pyramid, not a rule. It will also be on the home-play board game. The three Dragon pieces will have hollow pyramidal-type bases to fit onto the center 3-D space like a cap. Perhaps the best shape for this game’s green-colored Center Space is a tetrahedron, though not regular, but rather three corners of a cube for the base. The most appropriate placement, it seems, would be to align a side of the tetrahedron’s base parallel to the Coast column so the opposing vertex points at the Ting Yang symbol. Its apex placement can be centered, and the size can be Phi (φ) significant. Owner note: 19 Oct: tetrahedron size confirmed as written in your option (three corners of a cube for the base, one base side parallel to the Coast column, apex centered, size phi-significant). | decided, CHANGED | S12 |
+| D37 | 3-player Tail passing over e5 | Yes, like a Dragon Head: No restriction in the data. Owner note: 19 Oct: confirmed, the 3-player Tail passes an empty e5 like a Dragon Head. | decided, default | S32 |
+| D38 | Promoting to a lost piece: does it leave the lost list? | Removed from the list once back on the board: Confirmed by you on 19 Oct. | decided, default | S16 |
+| D39 | How to get the depth-2 fairness run done before S26 | Speed up the search first, then a sharded run on GitHub Actions: S35 makes depth 2 finish inside the cap and adds --shard, a matrix workflow and a merge script. About 20 parallel 4-core jobs, free. | decided, default | S26 |
+| D40 | Which fairness band the Candidate is published under | Keep 47% to 53%: The band published before any run. draft-2p passes it, and keeping it avoids any look of tuning. | decided, default | S26 |
+| D41 | How S27 deploys to the host | Host's own Git connection: You link the GitHub repo in the host's dashboard; every merge to main builds and deploys. No token is stored in GitHub. | decided, default | S27 |
+| D42 | Player sign-in and where player data lives | Guests until Phase 7, then accounts in our own host account: Phase 5 games use guest room codes. Accounts later use the host's own database, so player data stays in an account you control. | decided, default | S31 |
+| D43 | Which ruleset goes to the tournament discussion | Standard, once it passes at both depths: Good Practice stays a Candidate for practice play. The 21-day discussion starts when S38 publishes Standard. | decided, default | S38 |
+| D44 | "Every piece may enter the Coast at any time": what it covers | In the current default, the same as preset "good practice". When a new optional ruleset p…: In the current default, the same as preset "good practice". When a new optional ruleset permits it, it can be variable depending on how it's specified. | decided, CHANGED | S40 |
+| D45 | How pawns use the Coast when allowed | By capturing onto it, then forward along file A: Promotes on its last rank as usual. | decided, default | S40 |
+| D46 | Can a player's custom ruleset become Official? | Never directly: You adapt good ideas into your own presets, which then follow the same checklist. | decided, CHANGED | S43 |
+| D47 | Tournament conduct rules (clock, draw offers, touch-move, disputes) | None published yet: /tournament says the organizer announces conduct rules with the invitation. | decided, default | S46 |
+| D48 | Version number of the ratified ruleset | Keep 0.1.0: The version that passed the fairness check at both depths. Matches how 0010 and 0012 kept versions on status changes. | decided, default | S50 |
+| D49 | New discussion if the ruleset changes during the discussion | No new discussion: The changed ruleset is re-checked at both depths and ratified, with the change named in the decision record. | decided, default | S50 |
+| D50 | Worker layout for rooms | One Worker for app and rooms: Same origin, one deploy, no version skew. Fallback to a second Worker only if preview builds refuse a Durable Object. | decided, default | S52 |
+| D51 | Online results and conduct | Resign and draw by agreement only: Offer, accept, decline. No clock, no takebacks, no forfeit for a disconnection: an abandoned game stays open until its room expires. | decided, default | S51 |
+| D52 | Seats | Creator chooses, two seats, no spectators: Light, dark or random (random preselected). | decided, default | S51 |
+| D53 | Room retention | 24 hours after the end, or 7 days idle: The server keeps no other copy. | decided, default | S52 |
+| D54 | Room codes | 6 characters, no look-alikes: 31 letters and digits (no 0, O, 1, I, L), about 887 million codes. | decided, default | S51 |
+| D55 | 3-player check and the Dragon's win | From your earlier notes (decision 0016, rules 1 to 6): (a) Yes. With Dragon check off, a Kinged player may leave its King on, or move it onto, a square a Dragon piece attacks; the Dragon may capture it on its turn. With Dragon check on, those attacks are check, and a Dragon checkmate counts as the capture. (b) Once one King is captured, Dragon attacks on the last King are check and the Dragon wins by checkmating it (your D27 words). New option dragon.3p.lastKing = capture lets the Dragon win by capturing it instead. (c) Yes: the Tail is the Dragon's King, so the Dragon must end any attack on it and may not leave it attacked. A King left in check by a third player's move is the new question D62. | decided, default | S56 |
+| D56 | Tail checkmate and stones | From your earlier notes (decision 0016, rules 7 to 11): (a) Right after the attacking move, as your fairness rule does for King checkmates, so light can't undo dark's checkmate of the Tail. New option tail.3p.mateTiming = dragon-turn judges it at the start of the Dragon's turn instead. (b) The piece that just moved if it gives the check, otherwise the only attacker; with two attackers and neither just moved, the player who moved picks one. (c) No swap: the Tail turns to stone where it stands, as your E5 rule does. A pawn swapped onto its last rank promotes at once, as in the Queen and green pawn swap. (d) No: stones only block (your 'permanent walls'); they don't give check or guard squares. | decided, default | S56 |
+| D57 | 3-player draws and stalls | From your earlier notes (decision 0016, rules 12 to 17): (a) Repetition and the 50-move rule apply (new switches, on by default). While both Kings are on the board, a draw is between the Kinged players, as your stalemate rule says; in the duel it is between the last King and the Dragon; insufficient material counts only after the Dragon is out. (b) With both Kings on the board, the Dragon's turn is skipped; in the duel it is stalemate, a draw. (c) A draw between the last Kinged player and the Dragon. | decided, default | S56 |
+| D58 | 3-player timer | Keep the default, but add these options for players to choose. we can use several options…: Keep the default, but add these options for players to choose. we can use several options such as what's used in Apex Chess: https://github.com/GameTech-Systems/ApexChess | decided, CHANGED | S57 |
+| D59 | 3-player search | Greedy heuristic for the Dragon first: Your note, 26 Oct: the computer can play the 3rd player in matches, using a greedy heuristic for the Dragon initially. S58 builds the greedy player (any seat, usually the Dragon); paranoid search follows in S62 for every seat and for the balance runs. | decided, CHANGED | S58 |
+| D60 | 3-player balance measure | Each seat 28% to 38%: A third ± 5 points over at least 2,000 games at depths 1 and 2; a win scores 1; a draw splits the point among the players who share it (½ each for two, ⅓ each for three); capped games reported, not scored. | decided, default | S59 |
+| D61 | 3-player scope in Phase 6 | Also 3-seat online rooms: Adds a rooms step to Phase 6. | decided, CHANGED | S57 |
+| D62 | A King left in check by a third player's move | Stick with the default, but make this an option in the "build your own ruleset" list for…: Stick with the default, but make this an option in the "build your own ruleset" list for players to experiment with. | decided, CHANGED | S56 |
+| D63 | 3-player default preset | Standard (standard-3p): The 1-square King, matching the 2-player default. | decided, default | S57 |
+| D64 | 3-player rulesets in the builder | Yes, a new step S64: The builder starts from a 3-player preset with a control per 3-player setting; export, load and share links take 3-player rulesets. Submit stays 2-player, since tournament rulesets are 2-player (D46). | decided, default | S64 |
+| D65 | Easy Start for 3 players: how the Dragon plays and wins | First checkmate wins: Every attack on a King is check, Dragon pieces included, and every King must get out of check. The Tail is the Dragon's King: it jumps among A5, E5 and I5, never captures or checks, and can't be captured. A Kinged player wins by checkmating the other King or the Tail; the Dragon wins by checkmating either King. Coast pieces can be captured on the Coast. No stones, no King captures. Draws are shared by all three. Pieces as in the 2-player Easy Start. | decided, default | S56 |
+| D66 | Running out of time | The seat is out: 2 players: it loses, or it's a draw if the other player could not checkmate with what it has left. 3 players, full rules: a Kinged player's side turns to stone and its turn is skipped, as if its King were captured, and the duel begins; the Dragon out of time is out and the Kinged players play on; in the duel, the player out of time loses. Easy Start: the seat is out and the other two play on to the first checkmate. | decided, default | S65 |
+| D67 | Easy Start: resignation and Tail capture | Keep Claude's calls: A resignation in Easy Start also turns that seat's pieces to stone (the only stones in that preset), and the others play on to the first checkmate. Its Tail stays uncapturable; the swap and stone are for the full rules and the builder option. | decided, default | S67 |
+| D68 | 3-player resignation and Tail capture | As 0018 records it: Resignation turns the seat's pieces to stone and the duel continues; Tail capture is a swap and stone, counted as a Tail checkmate. | decided, default | S67 |
+| D69 | How the Dragon's pieces leave the Coast (3-player) | Build A5 as written: First way off the Coast through A5, then any move; any-legal-move as an option | decided, default | S68 |
+| D70 | Dragon pieces don't attack from the Coast (3-player) | No attack from the Coast: No captures, no check, no guarding from any Coast square; still blocks; return to any Coast square; first exit through A5 | decided, default | S71 |
+| D71 | Who may enter the Coast (3-player) | Kings and Queens only: They may enter and capture Coast pieces | decided, default | S71 |
+| D72 | Dragon wins by King capture or checkmate only (3-player option) | Keep King capture as default; checkmate-only as a sweep option: Screened alone in S72 | decided, default | S71 |
+| D73 | 3-player turn order option | Keep D26 as default; dark → Dragon → light as a sweep option: Screened alone in S72 | decided, default | S71 |
+| D74 | Which 3-player presets get the Coast rule | standard-3p only (new version); the others keep 0.2.0 rules: Good Practice and Easy Start screened with the rule as an option | decided, default | S71 |
+| D75 | Heavy-Handed Dragon (3-player) | As described (owner) | decided, default | S74 |
+| D76 | Light-Handed Dragon (3-player) | As described (owner) | decided, default | S74 |
+| D77 | 3-player turn orders | Clockwise only | decided, default | S74 |
+| D78 | What to screen after S73 | Six screens, full runs only if in band | decided, default | S75 |
+| D79 | Next step on the pre-Dragon seat effect (I38) | Depth-3 diagnostic screen first: heavy-3p clockwise, about 100–200 games at depth 3 (each seat then sees a full round); if light recovers, the depth-2 measure misleads for 3 players; if not, it is the seat | decided, default | S76 |
+| D80 | Limited Dragon: Dragon Heads move at most 4 squares (3-player) | Both Heavy and Light, plus a light-3p depth-3 baseline: heavy-limited-3p and light-limited-3p, each = its 0.1.0 ruleset + dragonHead.range 4 | decided, default | S79 |
+| D81 | Limited to 3 (after S80) | `heavy-limited3-3p` = `heavy-3p` 0.1.0 + `dragonHead.range` 3, screened at depths 1, 2 and 3 (decision 0022): Decided (owner, 2 Nov 2026): `heavy-limited3-3p` = `heavy-3p` 0.1.0 + `dragonHead.range` 3, screened at depths 1, 2 and 3 (decision 0022) | decided, default | S81 |
+| D82 | Balance measure, Tail range, next screens (after S82) | depth 3 is the 3-player balance measure; `tail.3p.range` (default = `dragonHead.range`); `heavy-h3-3p` = Heads 3, Tail 8: Decided (owner, 2 Nov 2026): depth 3 is the 3-player balance measure; `tail.3p.range` (default = `dragonHead.range`); `heavy-h3-3p` = Heads 3, Tail 8, screened at depth 3; Tail sweep 4 to 7 if the Dragon is above the band; Light-Handed dropped from simulations (decision 0023) | decided, default | S84 |
+| D83 | 3-player Standard: keep the id heavy-h3-3p? | New id standard-3p: Cleaner address (/rules/standard-3p); the old standard-3p is archived and the reports are noted as run under the old id | decided, CHANGED | S92 |
+| D84 | Which rulesets the home page lists | Presets only, plus rulesets the owner lists: Section renamed 'More variants to try' and shown only when it lists something | decided, default | S92 |
+| D85 | Status labels players see | Plain words: Balance-tested (Candidate), In testing (Experimental), Official | decided, default | S92 |
+| D86 | Tournaments and the 2-player ratification | Already decided. Stale. | decided, CHANGED | S93 |
+| D87 | Coast piece art format | Stale. | decided, CHANGED | S94 |
+| D88 | Offline play | Hot-seat and computer games offline; rooms online-only: After one visit, 2- and 3-player hot-seat and computer games play with no network; rooms say they need a connection (decision 0025) | decided, default | S96 |
+| D89 | How offline is built | Hand-written service worker: Precache list written at build time from Vite output; no new dependency | decided, default | S96 |
+| D90 | App updates | Wait; offer Reload when no game is in progress: Never swap the app mid-game; old caches deleted on takeover | decided, default | S96 |
+| D91 | Launch channels and who posts | Owner posts, one channel a day: The Chess Variant Pages (submitted 7-10 days ahead), r/chessvariants then r/chess, Show HN, lichess and chess.com variant forums; Product Hunt and BoardGameGeek after S102. Claude drafts, never posts | decided, default | S97 |
+| D92 | Public contact (I34) | The new email is GameTypeBrand@gmail.com | decided, CHANGED | S98 |
+| D93 | Launch window | The sooner the better. As soon as it's ready we can decide the exact date. | decided, CHANGED | S100 |
+| D94 | Measuring the launch | No analytics script: Cloudflare dashboard (requests, Durable Object counts, errors), Discussions, issues, submitted rulesets | decided, default | S102 |
+
+## Open issues (14)
+
+- I23 (med): ChessNines role already answered
+- I27 (med): Claude can't change repo settings from chat
+- I34 (high): No public contact address yet
+- I35 (low): Durable Objects and Cloudflare preview builds
+- I36 (low): Greedy Easy Start Dragon loses its Tail within about 9 plies
+- I37 (medium): S75 handoff table mislabels the seat columns in 4 of 6 rows
+- I38 (high): At depth 2 the Kinged seat that moves just before the Dragon collapses (light, under clockwise order)
+- I39 (high): No per-address limit on making rooms, opening sockets or room info
+- I40 (med): No per-socket message rate limit; oversized and binary frames not closed
+- I41 (high): No service worker: the app does not run offline
+- I42 (high): README says Phase 1 built and Play coming soon
+- I43 (med): Durable Object exceptions escape the Worker without a secured JSON error
+- I44 (med): Expired seat records stay in local storage until the next write
+- I45 (med): One 503 KB script loads every page
