@@ -32,7 +32,9 @@ export function Privacy() {
           seat tokens (two, or three in a 3-player room), so a player who drops can come back; it
           keeps no other copy. It deletes the room and its moves 24 hours after the game ends, or
           after 7 days with no move. Cloudflare handles the connection and sees the IP address of
-          each player under its own terms and policies; we do not receive or use it. Your browser
+          each player under its own terms and policies. So that no one can make rooms without end,
+          making a room, joining one and looking one up are counted by IP address for one minute
+          (Cloudflare keeps the count); the server never stores or logs the address. Your browser
           keeps the room code and your seat token (and the tokens of any seats you gave to the
           computer, which this browser plays) in local storage under the key{' '}
           <code>chess9s.online</code>, one entry per room, removed when the room ends or expires;

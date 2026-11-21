@@ -381,6 +381,13 @@ describe('online play pages (S53)', () => {
     expect(html).not.toContain('never sent anywhere');
   });
 
+  it('privacy says the server counts requests by IP address for a minute, and keeps no address (K1, S95)', () => {
+    const html = renderToStaticMarkup(<App path="/privacy" />);
+    expect(html).toContain('counted by IP address for one minute');
+    expect(html).toContain('never stores or logs the address');
+    expect(html).not.toContain('we do not receive or use it');
+  });
+
   it('privacy says the server keeps each seat’s time left with the moves (S66, D53)', () => {
     const html = renderToStaticMarkup(<App path="/privacy" />);
     expect(html).toContain('time left after each move');

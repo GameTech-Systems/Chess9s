@@ -1,7 +1,7 @@
 // Online play keeps one thing in the browser: for each room the player sits in, the seat and its
 // secret token, so a reload or a drop can take the seat back (S53). Nothing else: no name, no
 // address. An entry is removed when the room ends or expires (the server says so), and any entry
-// older than a room can live is dropped on the next read. A load checks every entry's shape.
+// older than a room can live is removed from storage by the next read. A load checks every entry's shape.
 import { MAX_COMPUTER_SEATS, isRoomCode, isSeatToken } from '@chess9s/online/protocol';
 import type { Store } from './guest';
 
@@ -32,35 +32,53 @@ function computerTokens(value: unknown, own: string): Record<string, string> | u
   return fine ? (value as Record<string, string>) : undefined;
 }
 
-/** Every well-formed, unexpired entry, by room code. Anything else in the key is dropped. */
+/**
+ * Every well-formed, unexpired entry, by room code. Anything else in the key is dropped, and
+ * written out of the browser at once (K3, S95), so the privacy page's "removed" holds without
+ * waiting for the next save.
+ */
 function read(store: Store | null, now: number): Record<string, Entry> {
   if (!store) return {};
+  let text: string | null;
   try {
-    const text = store.getItem(ONLINE_KEY);
-    if (text === null) return {};
-    const saved: unknown = JSON.parse(text);
-    if (typeof saved !== 'object' || saved === null) return {};
-    const { v, rooms } = saved as { v?: unknown; rooms?: unknown };
-    if (v !== 1 || typeof rooms !== 'object' || rooms === null) return {};
-    const out: Record<string, Entry> = {};
-    for (const [code, e] of Object.entries(rooms)) {
-      const { seat, token, at, computer } = (e ?? {}) as Partial<Entry> & { computer?: unknown };
-      if (
-        isRoomCode(code) &&
-        typeof seat === 'string' &&
-        SIDE.test(seat) &&
-        isSeatToken(token) &&
-        typeof at === 'number' &&
-        now - at < KEEP_MS
-      ) {
-        const kept = computerTokens(computer, seat);
-        out[code] = { seat, token, at, ...(kept && { computer: kept }) };
-      }
-    }
-    return out;
+    text = store.getItem(ONLINE_KEY);
   } catch {
     return {};
   }
+  if (text === null) return {};
+  const out = entries(text, now);
+  if (out === null) write(store, {});
+  else if (JSON.stringify({ v: 1, rooms: out }) !== text) write(store, out);
+  return out ?? {};
+}
+
+/** The good entries of the key's text, or null when the text is not this version's record. */
+function entries(text: string, now: number): Record<string, Entry> | null {
+  let saved: unknown;
+  try {
+    saved = JSON.parse(text);
+  } catch {
+    return null;
+  }
+  if (typeof saved !== 'object' || saved === null) return null;
+  const { v, rooms } = saved as { v?: unknown; rooms?: unknown };
+  if (v !== 1 || typeof rooms !== 'object' || rooms === null) return null;
+  const out: Record<string, Entry> = {};
+  for (const [code, e] of Object.entries(rooms)) {
+    const { seat, token, at, computer } = (e ?? {}) as Partial<Entry> & { computer?: unknown };
+    if (
+      isRoomCode(code) &&
+      typeof seat === 'string' &&
+      SIDE.test(seat) &&
+      isSeatToken(token) &&
+      typeof at === 'number' &&
+      now - at < KEEP_MS
+    ) {
+      const kept = computerTokens(computer, seat);
+      out[code] = { seat, token, ...(kept && { computer: kept }), at };
+    }
+  }
+  return out;
 }
 
 function write(store: Store | null, rooms: Record<string, Entry>): void {

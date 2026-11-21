@@ -71,6 +71,33 @@ describe('the online store (chess9s.online)', () => {
     expect(Object.keys(JSON.parse(store.data.get(ONLINE_KEY)!).rooms)).toEqual(['QQ2222']);
   });
 
+  it('purges expired and broken entries as soon as they are read (K3, S95)', () => {
+    const store = memory();
+    saveSeat(store, 'K7RX2M', { seat: 'light', token: TOKEN }, NOW - 8 * DAY);
+    saveSeat(store, 'QQ2222', { seat: 'dark', token: OTHER }, NOW - 8 * DAY + DAY);
+    expect(loadSeat(store, 'QQ2222', NOW)).toEqual({ seat: 'dark', token: OTHER });
+    // The reading alone wrote the expired entry out of the browser.
+    expect(Object.keys(JSON.parse(store.data.get(ONLINE_KEY)!).rooms)).toEqual(['QQ2222']);
+    loadSeat(store, 'QQ2222', NOW + 8 * DAY);
+    expect(store.data.has(ONLINE_KEY)).toBe(false);
+    for (const text of ['nope', JSON.stringify({ v: 2, rooms: {} })]) {
+      store.setItem(ONLINE_KEY, text);
+      expect(loadSeat(store, 'K7RX2M', NOW)).toBeNull();
+      expect(store.data.has(ONLINE_KEY), text).toBe(false);
+    }
+  });
+
+  it('writes nothing on a read when every entry is good', () => {
+    const store = memory();
+    saveSeat(store, 'K7RX2M', { seat: 'light', token: TOKEN }, NOW);
+    const before = store.data.get(ONLINE_KEY);
+    let writes = 0;
+    const counted: Store = { ...store, setItem: (k, v) => (writes++, store.setItem(k, v)) };
+    loadSeat(counted, 'K7RX2M', NOW);
+    expect(writes).toBe(0);
+    expect(store.data.get(ONLINE_KEY)).toBe(before);
+  });
+
   it.each([
     ['not JSON', 'nope'],
     ['another version', JSON.stringify({ v: 2, rooms: {} })],
