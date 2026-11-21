@@ -50,12 +50,14 @@ export class AppUpdates {
    */
   async start(container: ContainerLike | undefined, doc: DocumentLike): Promise<void> {
     if (!container) return;
-    let reg: RegistrationLike;
+    let reg: RegistrationLike | undefined;
     try {
       reg = await container.register('/sw.js', { scope: '/', updateViaCache: 'none' });
     } catch {
       return;
     }
+    // A browser that blocks workers may answer with no registration at all.
+    if (!reg) return;
     this.reg = reg;
     // A version left waiting by an earlier visit (another tab kept the old one in use).
     if (reg.waiting && container.controller) this.setReady();
