@@ -7,13 +7,32 @@ import { Room } from './room';
 
 export { Room };
 
+/** Cloudflare's rate-limiting binding: one more request under `key`, and whether it fits. */
+export interface Limiter {
+  limit(options: { key: string }): Promise<{ success: boolean }>;
+}
+
 export interface Env {
   ASSETS: { fetch(request: Request): Promise<Response> };
   ROOMS: {
     idFromName(name: string): DurableObjectId;
     get(id: DurableObjectId): { fetch(request: Request): Promise<Response> };
   };
+  // Per-address limits (K1, S95), set in wrangler.jsonc. Optional: without a binding the request
+  // goes on unlimited, and the dashboard's rate-limit rule (S98) is the backstop.
+  ROOM_LIMIT?: Limiter;
+  SOCKET_LIMIT?: Limiter;
+  INFO_LIMIT?: Limiter;
 }
+
+/**
+ * Requests per address per minute (K1, S95; provisional, from the S33 security reading): making
+ * rooms, opening room sockets and reading room info. wrangler.jsonc holds the same numbers (a test
+ * keeps them equal).
+ */
+export const LIMITS = { rooms: 10, sockets: 30, info: 60 } as const;
+/** The limits' window in seconds: an address over a limit is told to wait this long. */
+export const LIMIT_PERIOD_S = 60;
 
 type Random = (n: number) => Uint8Array;
 const cryptoRandom: Random = (n) => crypto.getRandomValues(new Uint8Array(n));
@@ -38,11 +57,14 @@ const LOCAL_ORIGIN = /^http:\/\/(localhost|127\.0\.0\.1)(:\d{1,5})?$/;
 
 /**
  * Whether a browser page at `origin` may make rooms and open sockets: the app at chess9s.com, the
- * origin this Worker is served on (a preview's own address), or a local dev server.
+ * origin this Worker is served on (a preview's own address), or a local dev server while this
+ * Worker runs locally too (`wrangler dev`; K7, S95).
  */
 export function allowedOrigin(origin: string | null, own: string): boolean {
   if (origin === null) return false;
-  return origin === APP_ORIGIN || origin === own || LOCAL_ORIGIN.test(origin);
+  return (
+    origin === APP_ORIGIN || origin === own || (LOCAL_ORIGIN.test(own) && LOCAL_ORIGIN.test(origin))
+  );
 }
 
 /** Tries before giving up on drawing an unused code (31^6 codes: a clash is already rare). */
@@ -115,6 +137,23 @@ async function createRoom(request: Request, env: Env, random: Random): Promise<R
   return problem(503, 'no-code', 'No free room code was found; try again.');
 }
 
+/**
+ * Whether the address may make one more request of this kind. The key is the connecting address
+ * Cloudflare sets; it is passed to the binding and kept nowhere else (nothing is logged).
+ */
+async function within(limiter: Limiter | undefined, request: Request): Promise<boolean> {
+  if (!limiter) return true;
+  const key = request.headers.get('CF-Connecting-IP') ?? 'unknown';
+  return (await limiter.limit({ key })).success;
+}
+
+const tooMany = () =>
+  secured(
+    problem(429, 'rate', 'Too many requests from this address; wait a minute and try again.', {
+      'Retry-After': String(LIMIT_PERIOD_S),
+    }),
+  );
+
 /** Route one request. `random` is for room codes (tests pass a fixed one). */
 export async function handle(
   request: Request,
@@ -123,6 +162,20 @@ export async function handle(
 ): Promise<Response> {
   const url = new URL(request.url);
   if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
+  try {
+    return await api(request, url, env, random);
+  } catch {
+    // K5 (S95): a Durable Object call that throws (a reset, an overload) still gets the app's
+    // secured JSON answer. Nothing about the error is logged or shown.
+    return secured(
+      problem(503, 'unavailable', 'Rooms are not answering just now; try again soon.', {
+        'Retry-After': '5',
+      }),
+    );
+  }
+}
+
+async function api(request: Request, url: URL, env: Env, random: Random): Promise<Response> {
   const origin = request.headers.get('Origin');
   const parts = url.pathname.split('/').slice(1); // ['api', 'rooms', code?, 'socket'?]
   if (parts[1] !== 'rooms' || parts.length > 4) {
@@ -137,6 +190,7 @@ export async function handle(
     if (!allowedOrigin(origin, url.origin)) {
       return secured(problem(403, 'origin', 'Rooms are made from the Chess Nines app.'));
     }
+    if (!(await within(env.ROOM_LIMIT, request))) return tooMany();
     return secured(await createRoom(request, env, random));
   }
   if (!isRoomCode(code) || (socket !== undefined && socket !== 'socket')) {
@@ -146,6 +200,7 @@ export async function handle(
     return secured(problem(405, 'method', 'Use GET.', { Allow: 'GET' }));
   }
   if (socket === undefined) {
+    if (!(await within(env.INFO_LIMIT, request))) return tooMany();
     return secured(await stub(env, code).fetch(new Request('https://room/info')));
   }
   if (!allowedOrigin(origin, url.origin)) {
@@ -156,6 +211,7 @@ export async function handle(
       problem(426, 'upgrade', 'This address takes a WebSocket.', { Upgrade: 'websocket' }),
     );
   }
+  if (!(await within(env.SOCKET_LIMIT, request))) return tooMany();
   return secured(await stub(env, code).fetch(new Request('https://room/socket', request)));
 }
 
