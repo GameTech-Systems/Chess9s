@@ -12,7 +12,7 @@ Chess Nines is a 9×9 chess variant (custom pieces and special squares). 2-playe
 4. **End** automatically with `/end-session` when the step is done (no prompt needed). Keep replies brief: facts, plus problems the owner must resolve before the next session. `/end-session`: checks, handoff, log, PR, CI, merge, and the next-session recommendation with a `ledger-sync` block. If usage is running low, run it early; unfinished work stays on its branch.
 
 ## Decisions and defaults
-- Owner decisions are made in a private ledger. Public ones reach you through the owner's brief, the "Decision defaults" table in `docs/BUILD-PLAN.md`, and `docs/decisions/`.
+- Owner decisions are made in a private ledger. Public ones reach you through `docs/decisions/LEDGER-SNAPSHOT.md` (every non-private decision as decided; it overrides the defaults table), the owner's brief, the "Decision defaults" table in `docs/BUILD-PLAN.md`, and `docs/decisions/`. Regenerate the snapshot with `scripts/claude/ledger-snapshot.mjs` when the owner says the ledger changed.
 - **Defaults, not stalls.** When a step needs an open decision, apply its default, mark it provisional (in the data's `source` or `notes`, or a code comment), list it in the handoff, and keep going.
 - **Never invent rules.** You may only choose among options already listed in `rules/parameters.json` or in a decision. New pieces, movement, squares, parameters, or options come from the owner. If none exists, record the question in the handoff and work on the rest of the step.
 
