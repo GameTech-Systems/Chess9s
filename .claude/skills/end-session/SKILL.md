@@ -23,3 +23,6 @@ Finish the current step.
    Start with: /start-session S<n>
 
    Then a fenced code block tagged `ledger-sync` holding one JSON object in the format at the end of `docs/BUILD-PLAN.md`. Include issue ids from the owner's brief under `resolved` when this step fixed them, new problems under `newIssues`, and anything the owner must choose under `questions` (with a default option index so work can continue).
+   List under `resolved` every ledger issue the step fixed, not only those in the brief: check the open issues in `docs/decisions/LEDGER-SNAPSHOT.md` against what the PR fixed (S95 fixed I39, I40 and I43 to I45 but listed only I37).
+
+10. **Ledger, when reachable.** If this session has the `ArtifactData` tool and the owner gave the ledger's link, apply the `ledger-sync` block to the ledger the way its "Import from Code" button does (step status and `closed`; `resolved` issues get `status: resolved`, `closed`, `resolvedBy`; new issues and questions get the next free I and D ids; a `sessions` row; `meta/state` `next` and `lastSync`), in one `batch` pinned to the versions just read. Then export `items` again, run `node scripts/claude/ledger-snapshot.mjs <export dir>`, and commit the new snapshot in the same PR. Say in the reply that the ledger is already synced, so the owner doesn't import the block twice.
