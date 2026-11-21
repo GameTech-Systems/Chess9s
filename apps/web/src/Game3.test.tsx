@@ -2,7 +2,7 @@
 // seats and their states, a result screen for every end, the rules page of each preset and the
 // game record.
 import { renderToStaticMarkup } from 'react-dom/server';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import {
   newGame,
   playMove,
@@ -27,6 +27,10 @@ import { choose, click, fromGame, newModel, type Model } from './game/session';
 import registry from '../../../rules/parameters.json';
 import dragonMates from '../scripts/draft-3p-dragon-mates.json';
 import resignedGame from '../scripts/draft-3p-resigned.json';
+import { preloadPages } from './pages';
+
+// The app's on-demand pages (row 4, S95) render at once once loaded.
+beforeAll(preloadPages);
 
 const info = (id: string) => listRulesets().find((r) => r.id === id)!;
 const render = (model: Model, id = 'standard-3p') =>

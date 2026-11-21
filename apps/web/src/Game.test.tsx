@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { PRESET_SUMMARIES, RulePicker } from './RulePicker';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { newGame, playMove, toNotation, type Position } from '@chess9s/engine';
 import hotSeatMate from '../../../packages/engine/test/fixtures/games/hot-seat-mate.json';
 import { Game } from './Game';
@@ -8,6 +8,10 @@ import { App } from './App';
 import { createRules, HOME_PRESETS, listRulesets, ruleset } from './game/rules';
 import { fromGame, newModel } from './game/session';
 import { saveGuest } from './game/guest';
+import { preloadPages } from './pages';
+
+// The app's on-demand pages (row 4, S95) render at once once loaded.
+beforeAll(preloadPages);
 
 const render = (initial = newModel(), info = ruleset) =>
   renderToStaticMarkup(<Game initial={initial} ruleset={info} />);
