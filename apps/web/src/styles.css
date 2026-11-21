@@ -36,6 +36,32 @@ body {
   padding: 1.25rem 16px 2rem;
 }
 
+.skip-link {
+  position: absolute;
+  top: 0.5rem;
+  left: 16px;
+  z-index: 20;
+  padding: 0.5rem 0.9rem;
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--gold-text);
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+/* Only a board to play on is a target: elsewhere the link is gone, and out of the tab order. */
+.page:not(:has(#board)) .skip-link {
+  display: none;
+}
+
+#board:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
+}
+
 .masthead {
   display: grid;
   justify-items: center;

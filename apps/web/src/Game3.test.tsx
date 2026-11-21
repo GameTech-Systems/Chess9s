@@ -102,6 +102,12 @@ describe('the board turns to the side to move', () => {
 });
 
 describe('the seats', () => {
+  it('gives the playing board the skip link’s target (row 6, S95)', () => {
+    const html = render(fresh());
+    expect(html.match(/id="board"/g)).toHaveLength(1);
+    expect(html).toMatch(/<svg class="board"[^>]* id="board" tabindex="-1"/);
+  });
+
   it('lists the three seats in turn order with whose turn it is', () => {
     const html = render(fresh());
     expect(html).toContain('aria-label="Seats"');

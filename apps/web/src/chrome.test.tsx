@@ -388,6 +388,23 @@ describe('online play pages (S53)', () => {
     expect(canonicalOf('/nothing-here')).toBe('https://chess9s.com/');
   });
 
+  it('a skip link to the board comes first on the game and room pages (row 6, S95)', () => {
+    for (const path of ['/', '/room/K7RX2M']) {
+      const html = renderToStaticMarkup(<App path={path} />);
+      const link = html.indexOf('<a class="skip-link" href="#board">Skip to the board</a>');
+      expect(link, path).toBeGreaterThan(-1);
+      expect(html.slice(0, link), path).not.toMatch(/<(a|button|input|select|textarea)\b/);
+    }
+    // The home page's mode cards draw boards, but none of them is the board to play on.
+    expect(renderToStaticMarkup(<App path="/" />)).not.toContain('id="board"');
+    for (const path of ['/privacy', '/how-to-play', '/rules/standard-2p'])
+      expect(renderToStaticMarkup(<App path={path} />), path).not.toContain('skip-link');
+    // Where no board is drawn, the link is hidden (and so out of the tab order).
+    expect(file('./styles.css')).toMatch(
+      /\.page:not\(:has\(#board\)\) \.skip-link \{\s*display: none;/,
+    );
+  });
+
   it('privacy says what online play sends, what the server keeps and for how long (D53)', () => {
     const html = renderToStaticMarkup(<App path="/privacy" />);
     for (const fact of [

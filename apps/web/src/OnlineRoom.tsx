@@ -233,6 +233,7 @@ function OnlineGame({
           position={game.position}
           highlights={onlineHighlights(online)}
           onSquareClick={(at) => controller.press(at)}
+          target
         />
       </div>
 

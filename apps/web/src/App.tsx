@@ -19,6 +19,7 @@ import {
   type RulesetInfo,
 } from './game/rules';
 import { EMBLEM_URL } from './brand';
+import { BOARD_ID } from './board/Board';
 import { savedRulesetId, type Store } from './game/guest';
 import { fromGame } from './game/session';
 import { roomPath } from './game/share';
@@ -211,6 +212,20 @@ export function App({
               : 'Play in your browser · no account needed';
   return (
     <main className="page">
+      {/* Row 6 (S95): first in the tab order wherever a board may be played; hidden (CSS) when none is drawn. */}
+      {(page === 'game' || page === 'room') && (
+        <a
+          className="skip-link"
+          href={`#${BOARD_ID}`}
+          onClick={(e) => {
+            // Focus the board without putting #board in the address (a share link lives there).
+            e.preventDefault();
+            document.getElementById(BOARD_ID)?.focus();
+          }}
+        >
+          Skip to the board
+        </a>
+      )}
       <header className="masthead">
         <a
           href="/"
