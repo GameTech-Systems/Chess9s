@@ -69,6 +69,11 @@ describe('app updates (D90)', () => {
     expect(s.updates.getSnapshot()).toBe(false);
     const failing = { ...s.container, register: () => Promise.reject(new Error('denied')) };
     await expect(s.updates.start(failing as ContainerLike, s.doc)).resolves.toBeUndefined();
+    // A browser that blocks workers may answer with no registration at all.
+    const empty = { ...s.container, register: () => Promise.resolve(undefined) };
+    await expect(
+      s.updates.start(empty as unknown as ContainerLike, s.doc),
+    ).resolves.toBeUndefined();
   });
 
   it('a first install is not an update: nothing to offer', async () => {
