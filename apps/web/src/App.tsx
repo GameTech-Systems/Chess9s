@@ -1,12 +1,7 @@
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Game } from './Game';
 import { RulePicker } from './RulePicker';
-import { Builder } from './Builder';
-import { RulesPage } from './RulesPage';
-import { Privacy } from './Privacy';
-import { HowToPlay } from './HowToPlay';
-import { CreateRoom } from './CreateRoom';
-import { OnlineRoom } from './OnlineRoom';
+import { Builder, CreateRoom, HowToPlay, OnlineRoom, Privacy, RulesPage } from './pages';
 import { DISCUSSIONS_URL, LICENSES_PATH, RIGHTS_HOLDER } from './links';
 import { parseShareLink } from './game/share';
 import { loadCustoms, saveCustoms } from './game/custom';
@@ -248,100 +243,108 @@ export function App({
         updates={updates}
         busy={page === 'room' || (page === 'game' && !creating && !!picked && gameBusy)}
       />
-      {page === 'privacy' ? (
-        <Privacy />
-      ) : page === 'how' ? (
-        <HowToPlay
-          linkTo={go}
-          onHome={home}
-          onBuild={() => {
-            setEditing(undefined);
-            setShared(undefined);
-            setBuildBase(DEFAULT_RULESET_ID);
-            navigate(BUILD_PATH);
-          }}
-        />
-      ) : page === 'build' ? (
-        <Builder
-          key={editing ?? (shared ? 'shared' : `new-${buildBase}`)}
-          base={buildBase}
-          {...(editing && { saved: customs.find((c) => c.id === editing) })}
-          {...(!editing && shared && { draft: shared })}
-          taken={customs.map((c) => c.id)}
-          onSave={keepCustom}
-          onPlay={(c) => {
-            play(customInfo(c));
-            navigate('/');
-          }}
-        />
-      ) : page === 'rules' ? (
-        <RulesPage
-          id={rulesIdOf(here)!}
-          customs={customs.map(customInfo)}
-          linkTo={go}
-          onPlay={(r) => {
-            play(r);
-            navigate('/');
-          }}
-        />
-      ) : page === 'room' ? (
-        <OnlineRoom
-          key={roomCodeOf(here)}
-          code={roomCodeOf(here)!}
-          store={store}
-          onLeave={() => navigate('/')}
-          linkTo={go}
-        />
-      ) : creating ? (
-        <CreateRoom
-          ruleset={creating}
-          store={store}
-          linkTo={go}
-          onCancel={() => setCreating(null)}
-          onCreated={(code) => {
-            setCreating(null);
-            navigate(roomPath(code));
-          }}
-        />
-      ) : picked ? (
-        <Game
-          key={opened ? `record-${opened.date}-${picked.id}` : picked.id}
-          ruleset={picked}
-          {...(opened && { initial: fromGame(opened.game, opened.timed) })}
-          onChangeRuleset={() => {
-            setOpened(null);
-            setPicked(null);
-          }}
-          onPlayOnline={() => setCreating(picked)}
-          onBusy={setGameBusy}
-          onJoinRoom={(code) => navigate(roomPath(code))}
-          onOpenRecord={(r) => {
-            setOpened(r);
-            play(r.info);
-          }}
-        />
-      ) : (
-        <RulePicker
-          players={players}
-          onPlayers={setPlayers}
-          onPick={play}
-          onPlayOnline={setCreating}
-          onJoinRoom={(code) => navigate(roomPath(code))}
-          linkTo={go}
-          customs={customs.map(customInfo)}
-          onBuild={(n) => {
-            setEditing(undefined);
-            setShared(undefined);
-            setBuildBase(n === 3 ? DEFAULT_3P_RULESET_ID : DEFAULT_RULESET_ID);
-            navigate(BUILD_PATH);
-          }}
-          onEdit={(id) => {
-            setEditing(id);
-            navigate(BUILD_PATH);
-          }}
-          onDelete={dropCustom}
-        />
-      )}
+      <Suspense
+        fallback={
+          <p className="facts" role="status">
+            Loading…
+          </p>
+        }
+      >
+        {page === 'privacy' ? (
+          <Privacy />
+        ) : page === 'how' ? (
+          <HowToPlay
+            linkTo={go}
+            onHome={home}
+            onBuild={() => {
+              setEditing(undefined);
+              setShared(undefined);
+              setBuildBase(DEFAULT_RULESET_ID);
+              navigate(BUILD_PATH);
+            }}
+          />
+        ) : page === 'build' ? (
+          <Builder
+            key={editing ?? (shared ? 'shared' : `new-${buildBase}`)}
+            base={buildBase}
+            {...(editing && { saved: customs.find((c) => c.id === editing) })}
+            {...(!editing && shared && { draft: shared })}
+            taken={customs.map((c) => c.id)}
+            onSave={keepCustom}
+            onPlay={(c) => {
+              play(customInfo(c));
+              navigate('/');
+            }}
+          />
+        ) : page === 'rules' ? (
+          <RulesPage
+            id={rulesIdOf(here)!}
+            customs={customs.map(customInfo)}
+            linkTo={go}
+            onPlay={(r) => {
+              play(r);
+              navigate('/');
+            }}
+          />
+        ) : page === 'room' ? (
+          <OnlineRoom
+            key={roomCodeOf(here)}
+            code={roomCodeOf(here)!}
+            store={store}
+            onLeave={() => navigate('/')}
+            linkTo={go}
+          />
+        ) : creating ? (
+          <CreateRoom
+            ruleset={creating}
+            store={store}
+            linkTo={go}
+            onCancel={() => setCreating(null)}
+            onCreated={(code) => {
+              setCreating(null);
+              navigate(roomPath(code));
+            }}
+          />
+        ) : picked ? (
+          <Game
+            key={opened ? `record-${opened.date}-${picked.id}` : picked.id}
+            ruleset={picked}
+            {...(opened && { initial: fromGame(opened.game, opened.timed) })}
+            onChangeRuleset={() => {
+              setOpened(null);
+              setPicked(null);
+            }}
+            onPlayOnline={() => setCreating(picked)}
+            onBusy={setGameBusy}
+            onJoinRoom={(code) => navigate(roomPath(code))}
+            onOpenRecord={(r) => {
+              setOpened(r);
+              play(r.info);
+            }}
+          />
+        ) : (
+          <RulePicker
+            players={players}
+            onPlayers={setPlayers}
+            onPick={play}
+            onPlayOnline={setCreating}
+            onJoinRoom={(code) => navigate(roomPath(code))}
+            linkTo={go}
+            customs={customs.map(customInfo)}
+            onBuild={(n) => {
+              setEditing(undefined);
+              setShared(undefined);
+              setBuildBase(n === 3 ? DEFAULT_3P_RULESET_ID : DEFAULT_RULESET_ID);
+              navigate(BUILD_PATH);
+            }}
+            onEdit={(id) => {
+              setEditing(id);
+              navigate(BUILD_PATH);
+            }}
+            onDelete={dropCustom}
+          />
+        )}
+      </Suspense>
       <footer className="site-footer">
         {page !== 'game' ? (
           <a href="/" onClick={go('/')}>

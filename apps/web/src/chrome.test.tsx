@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { readFileSync } from 'node:fs';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { App, canonicalOf, pageOf, roomCodeOf, rulesIdOf, titleOf, SITE_TITLE } from './App';
 import { detailLine, wrapLines } from './game/boardImage';
 import { ErrorBoundary, ErrorScreen } from './ErrorScreen';
@@ -9,6 +9,10 @@ import { CONTACT_ADDRESS, DISCUSSIONS_URL } from './links';
 import { PRIVACY_UPDATED } from './Privacy';
 import { HOME_PRESETS, listRulesets } from './game/rules';
 import { RulePicker } from './RulePicker';
+import { preloadPages } from './pages';
+
+// The app's on-demand pages (row 4, S95) render at once once loaded.
+beforeAll(preloadPages);
 
 const file = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf8');
 

@@ -1,5 +1,5 @@
 import { renderToStaticMarkup } from 'react-dom/server';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { newGame, playMove, toNotation } from '@chess9s/engine';
 import { App, pageOf } from './App';
 import { Builder } from './Builder';
@@ -18,6 +18,10 @@ import {
 import { loadGuest, saveGuest, type Store } from './game/guest';
 import { createRulesFor, customInfo, type CustomRuleset } from './game/rules';
 import { PRIVACY_UPDATED } from './Privacy';
+import { preloadPages } from './pages';
+
+// The app's on-demand pages (row 4, S95) render at once once loaded.
+beforeAll(preloadPages);
 
 const memory = (): Store & { data: Map<string, string> } => {
   const data = new Map<string, string>();
