@@ -1,6 +1,6 @@
 # 0025: Offline play
 
-**Status:** Accepted for scope (owner, 20 Nov 2026, D88). The way it is built (D89) and the update flow (D90) are Claude's defaults, provisional until the owner decides in the ledger. Planned in S33; built in S96.
+**Status:** Accepted for scope (owner, 20 Nov 2026, D88). The way it is built (D89) and the update flow (D90) are Claude's defaults, provisional until the owner decides in the ledger. Planned in S33; built in S96 (see Built below).
 
 ## Owner's request
 "I'd also like for the game to be played offline (hot-seat and computer opponent only)."
@@ -24,3 +24,13 @@
 
 ## Not changed
 Online rooms, the room protocol, the Worker's routes, rulesets, locks and fairness runs. Native apps (Capacitor) are a later Phase 7 track that will reuse this offline app.
+
+## Built (S96, 21 Nov 2026)
+- **Files.** `apps/web/src/offline/`: `routes.js` (how each request is answered, plain functions), `worker.js` (the worker's events), `build-sw.mjs` (writes `dist/sw.js` from those two with the precache list and a version hashed from the precached files' contents; the `chess9s-offline` plugin in `apps/web/vite.config.ts` runs it after each build), `updates.ts` (registration and the update flow), `online.ts` (the browser's online state and the notice text), `UpdateNotice.tsx`, `recovery-sw.js` (item 8, with its test). `scripts/check-dist.mjs` fails a build whose `sw.js` is missing, is not a plain script, or misses a file in `assets/`, or whose `_headers` lacks `/sw.js` `no-cache`.
+- **Precache.** `/` (index.html), every file in `assets/` (about 1.1 MB today: scripts, styles, piece art, emblem), the icons, `site.webmanifest`, `third-party-licenses.txt`. Not `robots.txt`, `sitemap.xml`, `share.png`, `_headers`, `.well-known/`.
+- **One refinement of item 4.** Navigations are answered from the cached shell first, the network only if the cache has lost it, rather than network first. That keeps the page and its worker on one version, so a new version reaches a page only through "Reload for the new version" (item 5) and an update can never change the files under a game. Browsers still check `sw.js` on every visit (`no-cache`, `updateViaCache: 'none'`), and a page left open checks when it is shown again.
+- **Game in progress.** From the first move or resignation until the result (`gameInProgress` in `game/session.ts`); a room page always counts as one. The notice shows on any other page, or once the game ends.
+- **Online-only.** Create room and Join are disabled with the notice while offline; a room page shows the notice above the room, and a room that could not be reached looks again when the browser is back online.
+- **Shipping the recovery worker.** In `vite.config.ts`, copy `src/offline/recovery-sw.js` to `dist/sw.js` in place of `writeServiceWorker`, and remove the registration from `main.tsx` in the same release (otherwise each reload installs the recovery worker again and it reloads the page again, without end); deploy, and keep it deployed for weeks so that browsers visit and pick it up.
+- **Checks run.** Unit tests for the routes, the precache list, the built `sw.js` in a fake worker scope (install, offline answers, `/api/*` untouched, take-over only when asked, old caches deleted), the recovery worker, the update flow and the notices. `apps/web/scripts/e2e-offline.mjs` passes at desktop and Pixel 7 width, plus 320, 375, 430 px and landscape, blocked workers, cleared site data and the update test. Safari and Firefox were not run (Chromium only).
+

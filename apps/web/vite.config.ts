@@ -8,7 +8,8 @@ const engineRules = (file: string) =>
 
 // Offline play (decision 0025, D89): once the build has written every file, write dist/sw.js with
 // the precache list made from them. To ship the recovery worker instead (item 8), copy
-// src/offline/recovery-sw.js to dist/sw.js here in place of writeServiceWorker.
+// src/offline/recovery-sw.js to dist/sw.js here in place of writeServiceWorker, and remove the
+// registration from main.tsx in the same release (see recovery-sw.js).
 const offline = (): Plugin => {
   let outDir = 'dist';
   return {
