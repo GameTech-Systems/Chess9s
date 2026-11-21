@@ -140,8 +140,7 @@ Deploy the static app per D15 at chess9s.com, add a privacy policy page, an erro
 
 ### S28 — Owner task (tracked privately) · `todo`
 
-### S29 — Outside testers · Owner · `doing`
-A handful of outside testers finish games and send feedback. Phase 3 exit.
+S29 (outside testers, the Phase 3 exit) moved to Phase 7 as the soft launch (S33).
 
 ## Presets and the ruleset builder
 
@@ -523,19 +522,19 @@ Phase 7 opens with the public launch (`docs/LAUNCH.md`): readiness, offline play
 Launch strategy (`docs/LAUNCH.md`), offline play (decision 0025), two outside audits and an outside reading of the plan (`docs/audits/2026-11-20/`), and the steps below. Decisions D88 to D94.
 
 ### S95 — Launch-readiness fixes from the S33 audits · Opus 5.5 · high · `todo`
-Fix every finding marked "fix in S95" in `docs/audits/2026-11-20/SUMMARY.md`, test first for each code change. Findings the summary marks "owner" go to S98; "later" ones become issues. Also I37: the 3-player reports print their seat columns in the fixed order dark / light / Dragon.
+Fix every finding marked "fix in S95" in `docs/audits/2026-11-20/SUMMARY.md`, test first for each code change. Findings the summary marks "owner" go to S98; "later" ones become issues. Also I37: the 3-player reports print their seat columns in the fixed order dark / light / Dragon. Then the manual accessibility pass of Gate 1 (a whole game by keyboard alone, focus in dialogs, 200% zoom, reduced motion) and the widths 320, 430 and landscape; fix what fails or list it.
 Done when: every "fix in S95" row is fixed or answered in the summary, `pnpm worker:check` and the five browser scripts pass, and tests pass.
 
 ### S96 — Offline play · Opus 5.5 · high · `todo`
-Build decision 0025: a service worker with a build-time precache list (D89), the update flow (D90), the online-only notices, `sw.js` headers, the privacy line and date, and `apps/web/scripts/e2e-offline.mjs`. Decision 0025 lists the checks.
+Build decision 0025: a service worker with a build-time precache list (D89), the update flow (D90), the online-only notices, `sw.js` headers, the recovery `sw.js` kept ready with a test, the privacy line and date, and `apps/web/scripts/e2e-offline.mjs`. Decision 0025 lists the checks.
 Done when: after one visit, a 2-player hot-seat game, a computer game and a 3-player hot-seat game play to a result and reload with the network off, at desktop and Pixel 7 width; Play online says it needs a connection; an update waits during a game; tests pass.
 
-### S97 — Front door and launch materials · Sonnet 5.5 · medium · `todo`
-README rewritten for today (play now at chess9s.com, what is built, how to run rooms locally with `wrangler dev`); a press page in `docs/launch/press.md` (one-line pitch, facts, screenshots made with Playwright from the built app, links); post drafts for each D91 channel in `docs/launch/posts.md`, in plain words (D85), for the owner to edit and post. No new art; screenshots only. Wording the owner must approve is listed in the handoff.
-Done when: the README has no "coming soon" or phase status that is out of date, the press page and drafts exist, and the screenshots are committed.
-
 ### S98 — Launch decisions · Owner with Claude in chat · Opus 5.5 · medium · `todo`
-The owner settles D91 to D94 and I34, confirms S2 (GitHub security settings) and the Cloudflare settings S95 asks for (a rate-limit rule if the summary says so), reads the post drafts, and picks the testers for the soft launch.
+Before the launch materials are written: the owner settles D91 to D94 and I34, confirms S2 (GitHub security settings) and the Cloudflare settings S95 asks for, sets up the feedback intake (a pinned "Launch feedback" Discussion, labels, the 72-hour answer rule), and picks the soft-launch testers by the quotas in `docs/LAUNCH.md`. The owner reads S97's post drafts before S100.
+
+### S97 — Front door and launch materials · Sonnet 5.5 · medium · `todo`
+README rewritten for today (play now at chess9s.com, what is built, how to run rooms locally with `wrangler dev`); a press page in `docs/launch/press.md` (one-line pitch, facts, screenshots made with Playwright from the built app, links); a Feedback link in the footer to the pinned Discussion; post drafts for each D91 channel in `docs/launch/posts.md`, in plain words (D85), for the owner to edit and post. No new art; screenshots only. Wording the owner must approve is listed in the handoff.
+Done when: the README has no "coming soon" or phase status that is out of date, the press page and drafts exist, and the screenshots are committed.
 
 ### S29 — Outside testers (soft launch) · Owner · `doing`
 Continues on the final build: five to ten testers, including one 3-player room and one offline game on a phone, feedback through Discussions. Gate 2 in `docs/LAUNCH.md`.
@@ -630,8 +629,8 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D90 | App updates | Default: a new version installs in the background and waits; "Reload for the new version" is offered when no game is in progress, never mid-game; option: take over silently on the next launch (decision 0025) | S96 |
 | D91 | Launch channels and who posts | Default: the owner posts, one channel a day: The Chess Variant Pages, r/chessvariants (then r/chess), Show HN, the lichess and chess.com variant forums; Product Hunt and BoardGameGeek later. Claude drafts and never posts (`docs/LAUNCH.md`) | S97 |
 | D92 | Public contact (I34) | Default: GitHub Discussions for questions and feedback, private vulnerability reporting for security, no email address; option: a role address on chess9s.com through Cloudflare Email Routing, shown on the privacy page | S98 |
-| D93 | Launch window | Default: the first full week after the soft launch passes (Gate 2), on a Tuesday, avoiding 21 Dec to 4 Jan; option: a date the owner names | S100 |
-| D94 | Measuring the launch | Default: no analytics script; Cloudflare's own dashboard (requests, Durable Object counts, errors), Discussions, issues and submitted rulesets; option: Cloudflare Web Analytics (cookieless beacon), which changes the CSP and the privacy page | S102 |
+| D93 | Launch window | Default: soft launch in December, holiday freeze 21 Dec to 4 Jan, public launch Tuesday 12 Jan 2027 (`docs/LAUNCH.md`, Timeline); options: Tuesday 8 Dec 2026 if Gate 2 passes by 4 Dec, or a date the owner names | S100 |
+| D94 | Measuring the launch | Default: no analytics script; Cloudflare's own dashboard (requests, Durable Object counts, errors), Discussions, issues and submitted rulesets; options: Cloudflare Web Analytics (cookieless beacon), or an aggregate count of rooms per day by player count in the Worker (no addresses, no codes); either changes the privacy page, the first also the CSP | S102 |
 
 ## Ledger sync format
 
