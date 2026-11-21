@@ -27,3 +27,9 @@ export const LICENSES_PATH = '/third-party-licenses.txt';
 
 /** The rights holder named in NOTICE and TRADEMARKS.md. */
 export const RIGHTS_HOLDER = 'Duke Johnson';
+
+/**
+ * Where the footer's Feedback link goes. Provisional (S97): the Discussions page, until the owner
+ * pins the "Launch feedback" thread (S98); then point this at that thread's address.
+ */
+export const FEEDBACK_URL: string = DISCUSSIONS_URL;
