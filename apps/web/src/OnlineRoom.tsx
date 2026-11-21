@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { useConfirmFocus } from './confirmFocus';
 import { RoomRulesetCard } from './RoomRulesetCard';
 import { Board } from './board/Board';
 import { boardData, pieceLetters } from './board/data';
@@ -188,6 +189,8 @@ function OnlineGame({
   const out = mySeatOut(online);
   const card = threeSeats ? resultCard(game) : null;
   const [resigning, setResigning] = useState(false);
+  const resignButton = useRef<HTMLButtonElement>(null);
+  const keepPlaying = useConfirmFocus(resigning, () => resignButton.current);
   const [sound, setSound] = useState(true);
   const list = useRef<HTMLOListElement>(null);
   const moveCount = useRef(game.moves.length);
@@ -412,13 +415,18 @@ function OnlineGame({
                 >
                   Yes, resign
                 </button>
-                <button type="button" onClick={() => setResigning(false)}>
+                <button type="button" ref={keepPlaying} onClick={() => setResigning(false)}>
                   Keep playing
                 </button>
               </>
             ) : (
               <>
-                <button type="button" disabled={!acts} onClick={() => setResigning(true)}>
+                <button
+                  type="button"
+                  ref={resignButton}
+                  disabled={!acts}
+                  onClick={() => setResigning(true)}
+                >
                   Resign
                 </button>
                 {!threeSeats && offer === null && (

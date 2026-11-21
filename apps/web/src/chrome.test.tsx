@@ -409,6 +409,14 @@ describe('online play pages (S53)', () => {
     );
   });
 
+  it('stops every transition and animation for people who ask for reduced motion (Gate 1, S95)', () => {
+    const css = file('./styles.css');
+    const block = /@media \(prefers-reduced-motion: reduce\) \{([^@]*?)\n\}/.exec(css)?.[1] ?? '';
+    expect(block).toContain('transition-duration: 0s !important;');
+    expect(block).toContain('animation: none !important;');
+    expect(block).toContain('scroll-behavior: auto !important;');
+  });
+
   it('privacy says what online play sends, what the server keeps and for how long (D53)', () => {
     const html = renderToStaticMarkup(<App path="/privacy" />);
     for (const fact of [

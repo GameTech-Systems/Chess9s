@@ -459,11 +459,23 @@ async function playResignation(browser, options, size) {
   );
   await shot(page, `${slug}-1-confirm`);
   await noSidewaysScroll(page, `${label} (confirm step)`);
-  await confirm.getByRole('button', { name: 'Keep playing' }).click();
+  // Gate 1's keyboard pass (S95): the confirm step takes focus, on its safe choice, and gives it
+  // back to the button that opened it.
+  const focused = () =>
+    page.evaluate(() => (document.activeElement?.textContent ?? '').trim() || 'nothing');
+  check(
+    (await focused()) === 'Keep playing',
+    `${label}: the confirm step takes focus on "Keep playing" (${await focused()})`,
+  );
+  await page.keyboard.press('Enter');
   check(
     (await confirm.count()) === 0 &&
       (await page.locator('[data-seat="light"]').getAttribute('data-state')) === 'active',
     `${label}: "Keep playing" leaves Light in the game`,
+  );
+  check(
+    (await focused()) === 'Resign as Light',
+    `${label}: focus goes back to "Resign as Light" (${await focused()})`,
   );
   await resign.getByRole('button', { name: 'Resign as Light' }).click();
   await confirm.getByRole('button', { name: 'Confirm', exact: true }).click();
