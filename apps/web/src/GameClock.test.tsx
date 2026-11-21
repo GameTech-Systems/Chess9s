@@ -55,6 +55,9 @@ describe('the clocks', () => {
     expect(html).toContain('aria-label="Clocks"');
     expect(html).toMatch(/data-seat="dark" data-turn="true"/);
     expect(html).toMatch(/data-seat="light" data-turn="false"/);
+    expect(html.match(/<li [^>]*aria-current="true"[^>]*>/g)).toEqual([
+      expect.stringContaining('data-seat="dark"'),
+    ]);
     expect(html).toMatch(/aria-label="Dark time"[^>]*>3:00</);
     expect(html).toMatch(/aria-label="Light time"[^>]*>3:00</);
   });

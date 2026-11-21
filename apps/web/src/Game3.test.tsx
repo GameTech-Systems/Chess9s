@@ -112,6 +112,10 @@ describe('the seats', () => {
     ]);
     expect(html).toMatch(/data-seat="dark" data-turn="true"/);
     expect(html).toMatch(/data-seat="light" data-turn="false"/);
+    // Row 11 (S95): the seat to move is the current one for screen readers too, and only it.
+    expect(html.match(/<li [^>]*aria-current="true"[^>]*>/g)).toEqual([
+      expect.stringContaining('data-seat="dark"'),
+    ]);
   });
 
   it('shows each seat with a clock, for display only (untimed, decision 0017)', () => {

@@ -22,8 +22,13 @@ export function installErrorFallback(
   target.addEventListener('unhandledrejection', onError);
 }
 
+/** The tab's title while an error screen shows (row 8, S95). */
+export const ERROR_TITLE = 'Something went wrong · Chess Nines';
+
 /** Plain-DOM message for `installErrorFallback`: no React, no styles needed. */
 export function showPlainError(root: HTMLElement): void {
+  const document = root.ownerDocument;
+  document.title = ERROR_TITLE;
   const h = document.createElement('h1');
   h.textContent = 'Something went wrong';
   const p = document.createElement('p');

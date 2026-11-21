@@ -1,8 +1,12 @@
-import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { Component, useEffect, type ErrorInfo, type ReactNode } from 'react';
+import { ERROR_TITLE } from './errorFallback';
 import { DISCUSSIONS_URL } from './links';
 
 /** Shown in place of the app when something breaks, so the page is never blank. */
 export function ErrorScreen() {
+  useEffect(() => {
+    document.title = ERROR_TITLE;
+  }, []);
   return (
     <main className="page" role="alert">
       <h1>Something went wrong</h1>
