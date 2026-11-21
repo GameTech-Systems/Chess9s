@@ -7,7 +7,8 @@ Updated 2026-11-21 by the S95/S96 ledger review (Opus 5.5 · high). `/end-sessio
 - The ledger is read straight from the repo now: `docs/decisions/LEDGER-SNAPSHOT.md` (made by `scripts/claude/ledger-snapshot.mjs` from an export). S95 and S96 are synced into the ledger: I34, I37, I39 to I41 and I43 to I45 resolved; I46 to I50 and D95 to D98 added from their sync blocks.
 - D89, D90, D91 and D94 are decided as their defaults, so S95 and S96 built what the owner chose. D93 is the owner's own answer (see below).
 - `/end-session` now lists every fixed issue and, when the session has `ArtifactData` and the ledger link, syncs the ledger and regenerates the snapshot itself.
-- Typecheck, lint, validate:rules and build are green; 3,071 tests pass. Outside audit of the S95+S96 diff: `docs/audits/2026-11-21/`.
+- Outside audit of the S95+S96 code (Nemotron 3 Ultra, `docs/audits/2026-11-21/`): a dropped room message counted its token refill twice, so a flood got more than 20 messages a second; fixed with a test. Its other four findings were checked and are by design or wrong.
+- Typecheck, lint, validate:rules and build are green; 3,072 tests pass.
 
 ## Next session
 **S97 — Front door and launch materials** · Sonnet 5.5 · effort medium
