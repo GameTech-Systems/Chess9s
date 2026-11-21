@@ -156,10 +156,21 @@ describe('pages', () => {
     }
   });
 
+  it('the Suggest a variant, Feedback and Licenses footer links open in a new tab', () => {
+    for (const path of ['/', '/privacy', '/how-to-play']) {
+      const footer = renderToStaticMarkup(<App path={path} />).split('<footer')[1] ?? '';
+      for (const name of ['Suggest a variant', 'Feedback', 'Licenses']) {
+        expect(footer).toMatch(
+          new RegExp(`<a href="[^"]+" target="_blank" rel="noopener noreferrer">${name}</a>`),
+        );
+      }
+    }
+  });
+
   it('every page links to Suggest a variant', () => {
     for (const path of ['/', '/privacy', '/how-to-play', '/rules/standard-2p']) {
       expect(renderToStaticMarkup(<App path={path} />)).toContain(
-        `href="${DISCUSSIONS_URL}">Suggest a variant`,
+        `href="${DISCUSSIONS_URL}" target="_blank" rel="noopener noreferrer">Suggest a variant`,
       );
     }
   });
@@ -170,7 +181,7 @@ describe('footer feedback link', () => {
     expect(FEEDBACK_URL.startsWith(DISCUSSIONS_URL)).toBe(true);
     for (const path of ['/', '/how-to-play']) {
       expect(renderToStaticMarkup(<App path={path} />)).toContain(
-        `href="${FEEDBACK_URL}">Feedback`,
+        `href="${FEEDBACK_URL}" target="_blank" rel="noopener noreferrer">Feedback`,
       );
     }
   });

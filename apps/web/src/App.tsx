@@ -360,11 +360,17 @@ export function App({
           How to play
         </a>
         {' · '}
-        <a href={DISCUSSIONS_URL}>Suggest a variant</a>
+        <a href={DISCUSSIONS_URL} target="_blank" rel="noopener noreferrer">
+          Suggest a variant
+        </a>
         {' · '}
-        <a href={FEEDBACK_URL}>Feedback</a>
+        <a href={FEEDBACK_URL} target="_blank" rel="noopener noreferrer">
+          Feedback
+        </a>
         {' · '}
-        <a href={LICENSES_PATH}>Licenses</a>
+        <a href={LICENSES_PATH} target="_blank" rel="noopener noreferrer">
+          Licenses
+        </a>
         <span className="legal">
           © {COPYRIGHT_YEAR} Chess Nines™ is a trademark of {RIGHTS_HOLDER}.
         </span>
