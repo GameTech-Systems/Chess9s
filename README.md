@@ -2,10 +2,18 @@
 
 **A 9×9 chess variant with custom pieces, special squares, and rules the community helps decide.**
 
-- Play (coming soon): [chess9s.com](https://chess9s.com)
-- Story and lore (coming soon): [chessnines.com](https://chessnines.com)
+- Play now, free, no account: [chess9s.com](https://chess9s.com)
 
-> **Status: Phase 1 built.** The engine and a 2-player hot-seat game run locally (`pnpm dev`): click a piece to see its legal moves, and check, checkmate and stalemate end the game. Several rules are not built yet (en passant, castling, pawn-safe zones, three of the four draws), and there is no 3-player play, computer opponent or hosted build. The draft rules are unverified until they are fairness-checked. See the [roadmap](docs/ROADMAP.md).
+## What you can play today
+
+- **2 players or 3.** Hot-seat on one screen, against a computer opponent (it can play any seat), or in an online room you share by link.
+- **The 3-player Dragon mode.** A third player, the Dragon, plays the five Coast pieces and wins a different way. Only the Standard 3-player ruleset has been balance-tested; the others are marked "In testing".
+- **Time controls**, on one screen and in rooms.
+- **Offline.** After one visit the game works with no network, on a phone too. Online rooms need a connection and say so.
+- **A ruleset builder.** Change any setting, export the ruleset, load it back or share it as a link.
+- **Rules pages** for every ruleset, generated from the same data the game plays.
+
+The default rulesets, Standard for 2 players and Standard for 3, are Candidates: bot self-play found the seats evenly matched, and the [fairness reports](docs/fairness/) are public. Nothing is Official until there are players to discuss it ([Governance](docs/GOVERNANCE.md)). There is no tournament page yet. The [roadmap](docs/ROADMAP.md) lists what comes next, and the [press page](docs/launch/press.md) has the facts in one place.
 
 ## Core-source, not open source
 
@@ -36,11 +44,30 @@ Learn more: [Draft rules](docs/RULES.md) · [Rules framework](docs/RULES-FRAMEWO
 docs/              roadmap, rules framework, governance, workflow, decision records
 rules/             parameter registry, schemas, boards, pieces, rulesets
 packages/engine/   rules loader, move generator, check and game state (TypeScript)
+packages/sim/      bot self-play and the fairness reports
+packages/online/   room protocol shared by the app and the server
 apps/web/          the browser game (Vite and React)
+apps/worker/       the Cloudflare Worker: serves the app and keeps the rooms
 assets/            reserved materials (see assets/README.md)
 ```
 
-Run it: Node 22 and pnpm 10, then `pnpm install` and `pnpm dev`. `pnpm test` runs the whole suite.
+## Run it yourself
+
+Node 22 and pnpm 10, then:
+
+```bash
+pnpm install
+pnpm dev
+```
+
+`pnpm dev` serves the game for hot-seat and computer play. To try online rooms locally, build the app and run the same Worker that chess9s.com uses:
+
+```bash
+pnpm build
+pnpm exec wrangler dev
+```
+
+Open the address it prints, make a room, and open the room link in a second browser window. `pnpm test` runs the whole suite, and `pnpm sim` runs the fairness simulation (see `CLAUDE.md` for every command).
 
 ## Legal
 
