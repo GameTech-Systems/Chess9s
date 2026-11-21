@@ -5,7 +5,7 @@ import { App, canonicalOf, pageOf, roomCodeOf, rulesIdOf, titleOf, SITE_TITLE } 
 import { detailLine, wrapLines } from './game/boardImage';
 import { ErrorBoundary, ErrorScreen } from './ErrorScreen';
 import { ERROR_TITLE, installErrorFallback, showPlainError } from './errorFallback';
-import { CONTACT_ADDRESS, DISCUSSIONS_URL } from './links';
+import { CONTACT_ADDRESS, DISCUSSIONS_URL, FEEDBACK_URL } from './links';
 import { PRIVACY_UPDATED } from './Privacy';
 import { HOME_PRESETS, listRulesets } from './game/rules';
 import { RulePicker } from './RulePicker';
@@ -161,6 +161,15 @@ describe('pages', () => {
       expect(renderToStaticMarkup(<App path={path} />)).toContain(
         `href="${DISCUSSIONS_URL}">Suggest a variant`,
       );
+    }
+  });
+});
+
+describe('footer feedback link', () => {
+  it('links Feedback to the launch-feedback thread on the game and on other pages', () => {
+    expect(FEEDBACK_URL.startsWith(DISCUSSIONS_URL)).toBe(true);
+    for (const path of ['/', '/how-to-play']) {
+      expect(renderToStaticMarkup(<App path={path} />)).toContain(`href="${FEEDBACK_URL}">Feedback`);
     }
   });
 });

@@ -2,7 +2,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { Game } from './Game';
 import { RulePicker } from './RulePicker';
 import { Builder, CreateRoom, HowToPlay, OnlineRoom, Privacy, RulesPage } from './pages';
-import { DISCUSSIONS_URL, LICENSES_PATH, RIGHTS_HOLDER } from './links';
+import { DISCUSSIONS_URL, FEEDBACK_URL, LICENSES_PATH, RIGHTS_HOLDER } from './links';
 import { parseShareLink } from './game/share';
 import { loadCustoms, saveCustoms } from './game/custom';
 import {
@@ -361,6 +361,8 @@ export function App({
         </a>
         {' · '}
         <a href={DISCUSSIONS_URL}>Suggest a variant</a>
+        {' · '}
+        <a href={FEEDBACK_URL}>Feedback</a>
         {' · '}
         <a href={LICENSES_PATH}>Licenses</a>
         <span className="legal">
