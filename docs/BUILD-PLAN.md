@@ -525,7 +525,7 @@ Launch strategy (`docs/LAUNCH.md`), offline play (decision 0025), two outside au
 Fix every finding marked "fix in S95" in `docs/audits/2026-11-20/SUMMARY.md`, test first for each code change. Findings the summary marks "owner" go to S98; "later" ones become issues. Also I37: the 3-player reports print their seat columns in the fixed order dark / light / Dragon. Then the manual accessibility pass of Gate 1 (a whole game by keyboard alone, focus in dialogs, 200% zoom, reduced motion) and the widths 320, 430 and landscape; fix what fails or list it.
 Done when: every "fix in S95" row is fixed or answered in the summary, `pnpm worker:check` and the five browser scripts pass, and tests pass.
 
-### S96 — Offline play · Opus 5.5 · high · `todo`
+### S96 — Offline play · Opus 5.5 · high · `done`
 Build decision 0025: a service worker with a build-time precache list (D89), the update flow (D90), the online-only notices, `sw.js` headers, the recovery `sw.js` kept ready with a test, the privacy line and date, and `apps/web/scripts/e2e-offline.mjs`. Decision 0025 lists the checks.
 Done when: after one visit, a 2-player hot-seat game, a computer game and a 3-player hot-seat game play to a result and reload with the network off, at desktop and Pixel 7 width; Play online says it needs a connection; an update waits during a game; tests pass.
 
@@ -628,7 +628,7 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D89 | How offline is built | Default: a hand-written service worker with a precache list written at build time from Vite's output, no new dependency; option: `vite-plugin-pwa` with Workbox (MIT) (decision 0025) | S96 |
 | D90 | App updates | Default: a new version installs in the background and waits; "Reload for the new version" is offered when no game is in progress, never mid-game; option: take over silently on the next launch (decision 0025) | S96 |
 | D91 | Launch channels and who posts | Default: the owner posts, one channel a day: The Chess Variant Pages, r/chessvariants (then r/chess), Show HN, the lichess and chess.com variant forums; Product Hunt and BoardGameGeek later. Claude drafts and never posts (`docs/LAUNCH.md`) | S97 |
-| D92 | Public contact (I34) | Default: GitHub Discussions for questions and feedback, private vulnerability reporting for security, no email address; option: a role address on chess9s.com through Cloudflare Email Routing, shown on the privacy page | S98 |
+| D92 | Public contact (I34) | Decided (owner, 21 Nov 2026): the address GameTypeBrand@gmail.com (capitals as written) on the privacy page; GitHub Discussions for questions and feedback and private vulnerability reporting for security stay as they are (S96 put the address on the privacy page) | S98 |
 | D93 | Launch window | Default: soft launch in December, holiday freeze 21 Dec to 4 Jan, public launch Tuesday 12 Jan 2027 (`docs/LAUNCH.md`, Timeline); options: Tuesday 8 Dec 2026 if Gate 2 passes by 4 Dec, or a date the owner names | S100 |
 | D94 | Measuring the launch | Default: no analytics script; Cloudflare's own dashboard (requests, Durable Object counts, errors), Discussions, issues and submitted rulesets; options: Cloudflare Web Analytics (cookieless beacon), or an aggregate count of rooms per day by player count in the Worker (no addresses, no codes); either changes the privacy page, the first also the CSP | S102 |
 

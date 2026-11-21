@@ -1,8 +1,9 @@
 // The recovery service worker (decision 0025, item 8). Kept ready, never deployed as it is.
 // If a released sw.js misbehaves, ship this file as the service worker instead: in
 // apps/web/vite.config.ts, make the offline plugin copy this file to dist/sw.js in place of
-// writeServiceWorker (and stop registering in main.tsx if the app should stay online-only). Since
-// sw.js is served with `Cache-Control: no-cache`, every browser fetches it on its next visit.
+// writeServiceWorker, and in the same release remove the registration from main.tsx (otherwise
+// each reload installs this worker again and it reloads the page again, without end). Since sw.js
+// is served with `Cache-Control: no-cache`, every browser fetches it on its next visit.
 // It takes over at once, deletes every Chess Nines cache, unregisters itself and reloads the open
 // pages, which then load from the network with no worker.
 

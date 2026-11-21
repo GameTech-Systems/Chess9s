@@ -1031,9 +1031,33 @@ a:hover {
   background: color-mix(in srgb, var(--gold) 18%, transparent);
 }
 
-.builder button:disabled {
+.builder button:disabled,
+.ruleset-actions .again:disabled,
+.join button:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+/* "Reload for the new version" (decision 0025): a line above the page, its button a pill. */
+.update-notice {
+  margin: 0 auto 1rem;
+  text-align: center;
+}
+
+.update-notice button {
+  min-height: 44px;
+  margin-left: 0.5rem;
+  padding: 0 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--gold) 55%, transparent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.update-notice button:hover {
+  background: color-mix(in srgb, var(--gold) 18%, transparent);
 }
 
 .builder .segmented button {
