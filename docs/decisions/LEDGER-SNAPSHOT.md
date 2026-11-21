@@ -3,7 +3,9 @@
 Generated from the owner's ledger by `scripts/claude/ledger-snapshot.mjs`. Do not edit by hand; regenerate it.
 Private items are left out. **This file overrides the "Decision defaults" table in `docs/BUILD-PLAN.md`** wherever the two differ. Rows marked CHANGED are owner choices that are not the default.
 
-## Decisions (91)
+Precedence: the owner's brief in the session, then `CLAUDE.md` and the accepted records in `docs/decisions/`, then this file, then the defaults table. A later decision on the same subject replaces an earlier one; rows marked CONFLICT or Superseded say which applies.
+
+## Decisions (95)
 
 | Id | Decision | Choice in effect | Status | Needed by |
 | --- | --- | --- | --- | --- |
@@ -13,11 +15,11 @@ Private items are left out. **This file overrides the "Decision defaults" table 
 | D4 | Dragon range mode | Squares: Range counts squares along one line. | decided, CHANGED | S32 |
 | D5 | Which player counts do Dragon movement rules apply to? | 2- and 3-player: Use [2, 3] if a 2-player variant may let Dragons move. | decided, CHANGED | S8 |
 | D6 | Sun and Moon pawn capture | Add it, options from you: Add sunMoon.capture with default null and needsDecision true. You name the options before S15. | decided, default | S8 |
-| D7 | Branch rules and who merges | Claude pushes straight to main: No PRs; Claude merges locally after tests. Fastest, no CI gate or PR record. | decided, CHANGED | S7 |
+| D7 | Branch rules and who merges | Claude pushes straight to main: No PRs; Claude merges locally after tests. Fastest, no CI gate or PR record. **CONFLICT with CLAUDE.md (PRs, green CI, rebase merge; never push to main). CLAUDE.md applies until the owner settles it.** | decided, CHANGED | S7 |
 | D8 | Merge method | Rebase: Keeps each task's commit, authored by Claude. Used for PR #2. | decided, default | S7 |
-| D10 | Default model for Code sessions | opusplan: Opus in plan mode, Sonnet while executing. | decided, CHANGED | S7 |
+| D10 | Default model for Code sessions | opusplan: Opus in plan mode, Sonnet while executing. **CONFLICT with `.claude/settings.json` (Sonnet pinned, model per step in BUILD-PLAN). The step's model applies until the owner settles it.** | decided, CHANGED | S7 |
 | D11 | When to turn on Discussions | Now: Turn them on in S5 so the links work and early ideas have a home. | decided, default | S5 |
-| D12 | Fairness measures and thresholds | Chess-like tolerance: Accept up to about 55% for the first player, similar to White's score in classical chess. | decided, CHANGED | S24 |
+| D12 | Fairness measures and thresholds | Chess-like tolerance: Accept up to about 55% for the first player, similar to White's score in classical chess. **Superseded by D40 (47% to 53%, decision 0008).** | decided, CHANGED | S24 |
 | D13 | How TRADEMARKS describes "Chess9s" | Domain and repo name: Reword TRADEMARKS so Chess9s is the web address and repository name, still claimed, not a second product name. | decided, default | S4 |
 | D14 | Public wording for 3-player features | Name them now: Add Omega exit and stone pieces to the public ROADMAP. | decided, CHANGED | S4 |
 | D15 | Hosting | I'll decide which host is optimal for this game this week. Sonnet suggested Cloudflare, perhaps there's a better option. | decided, CHANGED | S27 |
@@ -98,20 +100,21 @@ Private items are left out. **This file overrides the "Decision defaults" table 
 | D92 | Public contact (I34) | The new email is GameTypeBrand@gmail.com | decided, CHANGED | S98 |
 | D93 | Launch window | The sooner the better. As soon as it's ready we can decide the exact date. | decided, CHANGED | S100 |
 | D94 | Measuring the launch | No analytics script: Cloudflare dashboard (requests, Durable Object counts, errors), Discussions, issues, submitted rulesets | decided, default | S102 |
+| D95 | Add GameTypeBrand@gmail.com to security.txt and SECURITY.md as a second contact? | No, GitHub private reporting only | OPEN, default applies | S98 |
+| D96 | Confirm the Cloudflare rate-limiting binding on the account's plan, and add a dashboard rate-limit rule and usage alerts | Confirm after the first deploy and add the rule and alerts | OPEN, default applies | S98 |
+| D97 | Room and socket limits (10 rooms, 30 sockets, 60 room-info requests a minute per address; 20 messages a second, burst 40) | Keep the provisional values | OPEN, default applies | S99 |
+| D98 | Privacy wording: requests counted by IP address for one minute; the address never stored | Keep as written | OPEN, default applies | S97 |
 
-## Open issues (14)
+## Open issues (11)
 
 - I23 (med): ChessNines role already answered
 - I27 (med): Claude can't change repo settings from chat
-- I34 (high): No public contact address yet
 - I35 (low): Durable Objects and Cloudflare preview builds
 - I36 (low): Greedy Easy Start Dragon loses its Tail within about 9 plies
-- I37 (medium): S75 handoff table mislabels the seat columns in 4 of 6 rows
 - I38 (high): At depth 2 the Kinged seat that moves just before the Dragon collapses (light, under clockwise order)
-- I39 (high): No per-address limit on making rooms, opening sockets or room info
-- I40 (med): No per-socket message rate limit; oversized and binary frames not closed
-- I41 (high): No service worker: the app does not run offline
 - I42 (high): README says Phase 1 built and Play coming soon
-- I43 (med): Durable Object exceptions escape the Worker without a secured JSON error
-- I44 (med): Expired seat records stay in local storage until the next write
-- I45 (med): One 503 KB script loads every page
+- I46 (low): Arrow keys between board squares
+- I47 (low): A not-found page for unknown paths
+- I48 (low): Warm up the computer's worker when a computer game opens
+- I49 (low): Manifest shortcuts
+- I50 (low): Accessibility not checked in Safari, Firefox or with a screen reader

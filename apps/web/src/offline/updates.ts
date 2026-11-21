@@ -1,5 +1,5 @@
 /**
- * The page's side of the service worker (decision 0025, D90, provisional default): register
+ * The page's side of the service worker (decision 0025, D90): register
  * /sw.js, notice when a new version has installed and is waiting, and let it take over only when
  * the page asks (the "Reload for the new version" notice, which the app shows only when no game is
  * in progress). The shapes below are the parts of the browser's API this uses, so tests can fake

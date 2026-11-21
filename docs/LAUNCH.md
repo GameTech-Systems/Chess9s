@@ -26,7 +26,7 @@ Each gate is a set of checks. The next gate opens when they all pass.
 ### Gate 1: Ready (S95, S96, S98, S97)
 - Audit fixes: every blocker and high finding fixed or answered in writing (S95).
 - Offline: after one visit, hot-seat and computer games start, play and reload with no network, on desktop and phone; online-only screens say so instead of failing (S96, D88 to D90).
-- Decisions first: the owner settles the launch decisions with Claude in chat (S98) before the materials are written: contact address (I34, D92), channels and order (D91), launch week (D93), measurement (D94); confirms the GitHub settings (S2); and sets up the feedback intake: a pinned "Launch feedback" Discussion, labels for bug, rules and idea, and a rule that every report gets an answer or an issue within 72 hours.
+- Decisions first: the launch decisions are settled in the ledger (21 Nov 2026): contact address (I34, D92), channels and order (D91), launch date set by the owner once ready (D93), measurement (D94). In S98 the owner confirms the GitHub settings (S2); and sets up the feedback intake: a pinned "Launch feedback" Discussion, labels for bug, rules and idea, and a rule that every report gets an answer or an issue within 72 hours.
 - Front door: README, home page and share image say what Chess Nines is today; a press page with screenshots, the one-line pitch and facts; post drafts for each channel; a Feedback link in the footer to the pinned Discussion (S97).
 - Checks green: unit tests, the five browser scripts, the new offline script, and a Lighthouse-style pass (no console errors, no layout overflow at 320, 375 and 430 px and in landscape, axe with no violations: already true on seven pages in S33), plus a manual pass: a whole game by keyboard alone, visible focus, dialogs that keep and return focus, 200% zoom, and reduced motion.
 
@@ -47,10 +47,12 @@ Each post links chess9s.com and the Discussions; none asks for an account or an 
 
 ### Gate 4: After launch (S101 onward)
 - Week 1: a triage session reads Discussions and issues (S101), files issues, and ships the fixes; the owner answers people.
-- Measure without tracking: Cloudflare's own dashboard (requests, rooms made per day from Durable Object counts, errors), Discussions and issue counts, and the number of submitted rulesets. No analytics script is added (D91 keeps the privacy page true).
+- Measure without tracking: Cloudflare's own dashboard (requests, rooms made per day from Durable Object counts, errors), Discussions and issue counts, and the number of submitted rulesets. No analytics script is added (D94 keeps the privacy page true).
 - Week 4: the owner reviews the numbers with Claude in chat and picks the next Phase 7 track: mobile apps (Capacitor, built on the offline app), accounts and stats, or reopening Phase 4 (a discussion and ratification of Standard once players exist, then tournaments).
 
 ## Timeline (targets, D93)
+The owner decided D93 on 21 Nov 2026: "The sooner the better. As soon as it's ready we can decide the exact date." The dates below are the earliest targets, not a fixed launch day; the owner names the day once Gate 2 passes.
+
 | When | What |
 |---|---|
 | 20 Nov to 4 Dec 2026 | S95, S96, S98, S97 (Gate 1) |

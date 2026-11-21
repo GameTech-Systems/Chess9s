@@ -25,6 +25,14 @@ const one = (s) =>
     .replace(/\s+/g, ' ')
     .trim();
 
+// Old ledger rows that the repo's practice or a later decision has overtaken. They are printed with
+// this note so no session acts on them over CLAUDE.md. Clear an entry once the owner settles it.
+const OVERTAKEN = {
+  D7: 'CONFLICT with CLAUDE.md (PRs, green CI, rebase merge; never push to main). CLAUDE.md applies until the owner settles it.',
+  D10: "CONFLICT with `.claude/settings.json` (Sonnet pinned, model per step in BUILD-PLAN). The step's model applies until the owner settles it.",
+  D12: 'Superseded by D40 (47% to 53%, decision 0008).',
+};
+
 const decisions = items.filter((x) => x.kind === 'decision').sort((a, b) => num(a.id) - num(b.id));
 const issues = items
   .filter((x) => x.kind === 'issue' && x.status !== 'resolved')
@@ -35,6 +43,8 @@ const lines = [
   '',
   "Generated from the owner's ledger by `scripts/claude/ledger-snapshot.mjs`. Do not edit by hand; regenerate it.",
   'Private items are left out. **This file overrides the "Decision defaults" table in `docs/BUILD-PLAN.md`** wherever the two differ. Rows marked CHANGED are owner choices that are not the default.',
+  '',
+  "Precedence: the owner's brief in the session, then `CLAUDE.md` and the accepted records in `docs/decisions/`, then this file, then the defaults table. A later decision on the same subject replaces an earlier one; rows marked CONFLICT or Superseded say which applies.",
   '',
   `## Decisions (${decisions.length})`,
   '',
@@ -53,7 +63,9 @@ for (const d of decisions) {
     : i === (d.defaultIndex ?? 0)
       ? 'decided, default'
       : 'decided, CHANGED';
-  const note = one(d.notes) ? ` Owner note: ${one(d.notes)}` : '';
+  const note =
+    (one(d.notes) ? ` Owner note: ${one(d.notes)}` : '') +
+    (OVERTAKEN[d.id] ? ` **${OVERTAKEN[d.id]}**` : '');
   lines.push(
     `| ${d.id} | ${one(d.title).replace(/\|/g, '/')} | ${(choice + note).replace(/\|/g, '/')} | ${status} | ${d.neededBy ?? ''} |`,
   );
