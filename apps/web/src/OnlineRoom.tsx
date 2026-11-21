@@ -281,6 +281,7 @@ function OnlineGame({
                 data-seat={s.side}
                 data-turn={s.toMove ? 'true' : 'false'}
                 data-state={s.state}
+                {...(s.toMove && { 'aria-current': true })}
               >
                 <span className="seat-name">
                   {s.name}
@@ -321,6 +322,7 @@ function OnlineGame({
                 key={c.side}
                 data-seat={c.side}
                 data-turn={c.toMove ? 'true' : 'false'}
+                {...(c.toMove && { 'aria-current': true })}
                 {...(c.flagged && { 'data-flag': 'true' })}
               >
                 <span className="seat-name">

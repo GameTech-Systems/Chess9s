@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { App, canonicalOf, pageOf, roomCodeOf, rulesIdOf, titleOf, SITE_TITLE } from './App';
 import { detailLine, wrapLines } from './game/boardImage';
 import { ErrorBoundary, ErrorScreen } from './ErrorScreen';
-import { installErrorFallback } from './errorFallback';
+import { ERROR_TITLE, installErrorFallback, showPlainError } from './errorFallback';
 import { CONTACT_ADDRESS, DISCUSSIONS_URL } from './links';
 import { PRIVACY_UPDATED } from './Privacy';
 import { HOME_PRESETS, listRulesets } from './game/rules';
@@ -22,6 +22,33 @@ describe('error screen', () => {
   it('the boundary moves to the failed state when a child throws', () => {
     expect(ErrorBoundary.getDerivedStateFromError()).toEqual({ failed: true });
     expect(renderToStaticMarkup(<ErrorBoundary>fine</ErrorBoundary>)).toBe('fine');
+  });
+
+  it('the plain error message names the tab too (row 8, S95)', () => {
+    const made: { tag: string; text?: string; href?: string; parts: unknown[] }[] = [];
+    const doc = {
+      title: SITE_TITLE,
+      createElement(tag: string) {
+        const el = {
+          tag,
+          parts: [] as unknown[],
+          set textContent(t: string) {
+            (this as { text?: string }).text = t;
+          },
+          append(...p: unknown[]) {
+            this.parts.push(...p);
+          },
+        };
+        made.push(el);
+        return el;
+      },
+    };
+    const root = { ownerDocument: doc, replaceChildren: vi.fn() };
+    showPlainError(root as unknown as HTMLElement);
+    expect(doc.title).toBe(ERROR_TITLE);
+    expect(ERROR_TITLE).toBe('Something went wrong · Chess Nines');
+    expect(root.replaceChildren).toHaveBeenCalledTimes(1);
+    expect(made.map((e) => e.tag)).toEqual(['h1', 'p', 'a']);
   });
 
   it('the window fallback speaks only while the page is empty', () => {
@@ -343,6 +370,7 @@ describe('online play pages (S53)', () => {
       '/icon-512.png',
       '/site.webmanifest',
       '/.well-known/security.txt',
+      '/share.png',
     ]) {
       expect(headers, path).toMatch(
         new RegExp(`^${path.replace(/[.]/g, '\\.')}\\n\\s+Cache-Control:`, 'm'),

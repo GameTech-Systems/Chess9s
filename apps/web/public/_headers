@@ -31,3 +31,5 @@
   Cache-Control: public, max-age=86400
 /.well-known/security.txt
   Cache-Control: public, max-age=86400
+/share.png
+  Cache-Control: public, max-age=86400

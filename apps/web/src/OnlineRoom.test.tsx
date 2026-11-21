@@ -408,6 +408,9 @@ describe('a room with three seats (S63)', () => {
     expect(html).toContain('<span class="seat-bot">Computer</span>');
     expect(html).toContain('Your move');
     expect(html).toContain('data-turn="true"');
+    expect(html.match(/<li [^>]*aria-current="true"[^>]*>/g)).toEqual([
+      expect.stringContaining('data-seat="dark"'),
+    ]);
   });
 
   it('lists the moves three to a round, the third seat’s too', async () => {

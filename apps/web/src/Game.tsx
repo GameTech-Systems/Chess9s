@@ -335,6 +335,7 @@ export function Game({
                 data-seat={s.side}
                 data-turn={s.toMove ? 'true' : 'false'}
                 data-state={s.state}
+                {...(s.toMove && { 'aria-current': true })}
                 {...(clocks.find((c) => c.side === s.side)?.flagged && { 'data-flag': 'true' })}
               >
                 <span className="seat-name">{s.name}</span>
@@ -366,6 +367,7 @@ export function Game({
                 key={c.side}
                 data-seat={c.side}
                 data-turn={c.toMove ? 'true' : 'false'}
+                {...(c.toMove && { 'aria-current': true })}
                 {...(c.flagged && { 'data-flag': 'true' })}
               >
                 <span className="seat-name">{c.name}</span>
