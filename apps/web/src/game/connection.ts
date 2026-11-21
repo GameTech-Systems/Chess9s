@@ -126,11 +126,16 @@ export class RoomConnection {
       this.wait = setTimeout(() => {
         this.wait = null;
         if (neverOpened && this.options.probe) {
-          void this.options.probe().then((state) => {
-            if (this.stopped) return;
-            if (state === 'gone') this.end('gone');
-            else this.connect();
-          });
+          // A probe that fails (K4, S95) says nothing about the room: try the socket again, and
+          // a failed try waits longer, as after any drop.
+          void this.options
+            .probe()
+            .catch(() => 'ok' as const)
+            .then((state) => {
+              if (this.stopped) return;
+              if (state === 'gone') this.end('gone');
+              else this.connect();
+            });
         } else this.connect();
       }, delay);
     };

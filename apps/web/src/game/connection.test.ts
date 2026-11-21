@@ -209,6 +209,23 @@ describe('the room connection', () => {
     expect(h.sockets).toHaveLength(2);
   });
 
+  it('keeps trying when the probe itself fails (K4, S95)', async () => {
+    const probe = vi.fn(async (): Promise<'gone' | 'ok'> => {
+      throw new Error('offline');
+    });
+    const h = harness({ probe });
+    h.conn.start();
+    h.last.drop(1006);
+    await vi.advanceTimersByTimeAsync(1_000);
+    expect(probe).toHaveBeenCalledTimes(1);
+    expect(h.sockets).toHaveLength(2);
+    expect(h.statuses.at(-1)).not.toBe('closed:gone');
+    h.last.drop(1006);
+    await vi.advanceTimersByTimeAsync(1_000);
+    expect(probe).toHaveBeenCalledTimes(2);
+    expect(h.sockets).toHaveLength(3);
+  });
+
   it('asks to reload when the server speaks another protocol version or nonsense', () => {
     const h = harness();
     h.conn.start();
