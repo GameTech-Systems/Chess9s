@@ -27,6 +27,24 @@ if (/unsafe-(eval|inline)/.test(csp))
   problems.push('_headers: CSP allows unsafe-eval or unsafe-inline');
 if (!/worker-src 'self'/.test(csp)) problems.push("_headers: CSP lacks worker-src 'self'");
 
+// Offline play (decision 0025): sw.js is a plain script that precaches the shell and every file
+// in assets/, and it is checked on every visit.
+let sw = '';
+try {
+  sw = readFileSync(join(dist, 'sw.js'), 'utf8');
+} catch {
+  problems.push('sw.js: missing (the offline plugin in apps/web/vite.config.ts)');
+}
+if (sw) {
+  if (/^\s*(import|export)\s/m.test(sw)) problems.push('sw.js: not a plain script');
+  const list = JSON.parse(/const PRECACHE = (\[[^\]]*\]);/.exec(sw)?.[1] ?? '[]');
+  if (!list.includes('/')) problems.push('sw.js: the shell (/) is not precached');
+  for (const name of readdirSync(join(dist, 'assets')))
+    if (!list.includes(`/assets/${name}`)) problems.push(`sw.js: assets/${name} is not precached`);
+}
+if (!/^\/sw\.js\n\s+Cache-Control: no-cache$/m.test(headers))
+  problems.push('_headers: /sw.js lacks Cache-Control: no-cache');
+
 // The bundles carry no license comments, so the notices of every bundled package must ship in
 // this file (Vite's build.license), and React's must be among them.
 const licensesFile = join(dist, 'third-party-licenses.txt');

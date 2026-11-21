@@ -13,6 +13,11 @@
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
+# The service worker (decision 0025): checked on every visit, so an update or the recovery worker
+# reaches every browser on its next visit.
+/sw.js
+  Cache-Control: no-cache
+
 # Fixed addresses (not hashed): a day in caches, so a changed icon or manifest reaches people soon.
 /favicon.ico
   Cache-Control: public, max-age=86400

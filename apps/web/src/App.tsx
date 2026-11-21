@@ -23,6 +23,8 @@ import { savedRulesetId, type Store } from './game/guest';
 import { fromGame } from './game/session';
 import { roomPath } from './game/share';
 import type { Opened } from './game/record';
+import { UpdateNotice } from './offline/UpdateNotice';
+import { appUpdates, type AppUpdates } from './offline/updates';
 
 export const PRIVACY_PATH = '/privacy';
 export const BUILD_PATH = '/build';
@@ -103,8 +105,11 @@ export function App({
   path,
   hash,
   store = browserStore(),
+  updates = appUpdates,
 }: {
   path?: string;
+  /** The service worker's updates (decision 0025); tests pass their own. */
+  updates?: AppUpdates;
   /** The URL hash (a share link carries its ruleset there). */
   hash?: string;
   store?: Store | null;
@@ -131,6 +136,8 @@ export function App({
     if (!id) return 2;
     return findRuleset(id)?.players ?? customs.find((c) => c.id === id)?.players ?? 2;
   });
+  // A hot-seat or computer game is in progress (D90: no update offered until it ends).
+  const [gameBusy, setGameBusy] = useState(false);
   // The preset a new custom ruleset starts from: the default for the player count it was made for.
   const [buildBase, setBuildBase] = useState(DEFAULT_RULESET_ID);
   const keepCustom = (c: CustomRuleset) => {
@@ -221,6 +228,11 @@ export function App({
         </a>
         <p>{subtitle}</p>
       </header>
+      {/* A room page counts as a game in progress: its game is never reloaded under it. */}
+      <UpdateNotice
+        updates={updates}
+        busy={page === 'room' || (page === 'game' && !creating && !!picked && gameBusy)}
+      />
       {page === 'privacy' ? (
         <Privacy />
       ) : page === 'how' ? (
@@ -286,6 +298,7 @@ export function App({
             setPicked(null);
           }}
           onPlayOnline={() => setCreating(picked)}
+          onBusy={setGameBusy}
           onJoinRoom={(code) => navigate(roomPath(code))}
           onOpenRecord={(r) => {
             setOpened(r);

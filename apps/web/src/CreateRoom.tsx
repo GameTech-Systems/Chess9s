@@ -9,6 +9,7 @@ import type { RulesetInfo } from './game/rules';
 import { chooseSeat, sidesOf, toggleComputer } from './game/roomSetup';
 import { SHOW_ONLY_HELP } from './game/clockText';
 import { controlById, timeControls } from './game/timeControls';
+import { ONLINE_ONLY_TEXT, useOnline } from './offline/online';
 
 const title = (id: string) => id.charAt(0).toUpperCase() + id.slice(1);
 
@@ -26,6 +27,7 @@ export function CreateRoom({
   onCreated,
   fetcher = (url, init) => fetch(url, init),
   linkTo,
+  online,
 }: {
   ruleset: RulesetInfo;
   store: Store | null;
@@ -34,7 +36,11 @@ export function CreateRoom({
   onCreated: (code: string) => void;
   fetcher?: Fetch;
   linkTo?: (to: string) => (e: React.MouseEvent) => void;
+  /** Whether the browser is online; the browser says by default (tests set it). */
+  online?: boolean;
 }) {
+  const live = useOnline();
+  const connected = online ?? live;
   const [seat, setSeat] = useState<SeatChoice>(RANDOM_SEAT);
   const [computer, setComputer] = useState<string[]>([]);
   const [control, setControl] = useState(timeControls.default);
@@ -161,8 +167,18 @@ export function CreateRoom({
           {problem}
         </p>
       )}
+      {!connected && (
+        <p className="facts offline-notice" role="status">
+          {ONLINE_ONLY_TEXT}
+        </p>
+      )}
       <div className="ruleset-actions">
-        <button type="button" className="again" disabled={busy} onClick={() => void create()}>
+        <button
+          type="button"
+          className="again"
+          disabled={busy || !connected}
+          onClick={() => void create()}
+        >
           Create room
         </button>
         <button type="button" className="again" onClick={onCancel}>

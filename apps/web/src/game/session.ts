@@ -92,6 +92,13 @@ export const fromGame = (game: GameState, timed: Timed | null = null): Model => 
   timed,
 });
 
+/**
+ * A game is in progress from its first move or resignation until it ends: the app offers an update
+ * only when none is (D90).
+ */
+export const gameInProgress = (game: GameState): boolean =>
+  (game.moves.length > 0 || game.resignations.length > 0) && game.result.status === 'ongoing';
+
 export function newModel(
   rules: MoveRules = createRules(),
   info: Pick<RulesetInfo, 'id' | 'version' | 'overrides'> = ruleset,

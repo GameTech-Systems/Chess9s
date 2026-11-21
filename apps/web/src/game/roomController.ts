@@ -287,6 +287,8 @@ export class RoomController {
   }
   /** The network is back or the page is visible again: reconnect now. */
   nudge(): void {
+    // The room could not be reached: look again now (back online, or the page shown again).
+    if (this.phase.kind === 'problem' && this.phase.problem === 'offline') return void this.start();
     this.conn?.nudge();
     for (const bot of this.computerSeats) bot.nudge();
   }

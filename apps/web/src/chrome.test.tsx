@@ -388,9 +388,9 @@ describe('online play pages (S53)', () => {
   });
 
   it('privacy’s date changed with the page', () => {
-    expect(PRIVACY_UPDATED).toBe('17 November 2026');
+    expect(PRIVACY_UPDATED).toBe('21 November 2026');
     expect(renderToStaticMarkup(<App path="/privacy" />)).toContain(
-      'Last updated 17 November 2026',
+      'Last updated 21 November 2026',
     );
   });
 });

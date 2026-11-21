@@ -48,6 +48,7 @@ import {
   pauseTimed,
   playFor,
   fromGame,
+  gameInProgress,
   promote,
   resignFor,
   resumeTimed,
@@ -101,9 +102,12 @@ export function Game({
   onOpenRecord,
   onPlayOnline,
   onJoinRoom,
+  onBusy,
   store = browserStore(),
 }: {
   initial?: Model;
+  /** Whether a game is in progress (moved and not over): no update is offered while it is (D90). */
+  onBusy?: (busy: boolean) => void;
   /** Where guest play is kept; the browser's localStorage by default. */
   store?: Store | null;
   ruleset?: RulesetInfo;
@@ -180,6 +184,11 @@ export function Game({
       search?.cancel();
     };
   }, [botTurn, game, levels]);
+  const inProgress = gameInProgress(game);
+  useEffect(() => {
+    onBusy?.(inProgress);
+  }, [inProgress]);
+  useEffect(() => () => onBusy?.(false), []);
   // Keep the game in the browser, with its clock: it comes back paused.
   const latest = useRef({ game, mode, bots, levels, timed });
   latest.current = { game, mode, bots, levels, timed };

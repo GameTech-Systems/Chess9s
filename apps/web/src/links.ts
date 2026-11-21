@@ -17,10 +17,10 @@ export const rulesetDataUrl = (id: string) => `${REPO_URL}/blob/main/rules/rules
 export const rulesPath = (id: string) => `/rules/${id}`;
 
 /**
- * The project's public contact address (a project address, never a personal one). Empty until
- * the owner supplies it (ledger I34); until then the privacy page points to Discussions.
+ * The project's public contact address (a project address, never a personal one), shown on the
+ * privacy page: the owner's choice (ledger I34, D92, 21 Nov 2026). Keep its capitals as written.
  */
-export const CONTACT_ADDRESS: string = '';
+export const CONTACT_ADDRESS: string = 'GameTypeBrand@gmail.com';
 
 /** The licenses of the third-party code in the app, written by the build (vite build.license). */
 export const LICENSES_PATH = '/third-party-licenses.txt';
