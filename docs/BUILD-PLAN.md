@@ -521,7 +521,7 @@ Phase 7 opens with the public launch (`docs/LAUNCH.md`): readiness, offline play
 ### S33 — Phase 7 planning · Opus 5.5 · high · `done`
 Launch strategy (`docs/LAUNCH.md`), offline play (decision 0025), two outside audits and an outside reading of the plan (`docs/audits/2026-11-20/`), and the steps below. Decisions D88 to D94.
 
-### S95 — Launch-readiness fixes from the S33 audits · Opus 5.5 · high · `todo`
+### S95 — Launch-readiness fixes from the S33 audits · Opus 5.5 · high · `done`
 Fix every finding marked "fix in S95" in `docs/audits/2026-11-20/SUMMARY.md`, test first for each code change. Findings the summary marks "owner" go to S98; "later" ones become issues. Also I37: the 3-player reports print their seat columns in the fixed order dark / light / Dragon. Then the manual accessibility pass of Gate 1 (a whole game by keyboard alone, focus in dialogs, 200% zoom, reduced motion) and the widths 320, 430 and landscape; fix what fails or list it.
 Done when: every "fix in S95" row is fixed or answered in the summary, `pnpm worker:check` and the five browser scripts pass, and tests pass.
 
