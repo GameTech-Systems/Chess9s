@@ -57,7 +57,12 @@ export interface BoardProps {
   highlights?: Highlights;
   /** Makes the board playable: called with the square clicked (or chosen by keyboard). */
   onSquareClick?: (at: string) => void;
+  /** The board played on: the skip link's target (row 6, S95), focusable by script only. */
+  target?: boolean;
 }
+
+/** The id of the board played on, which the page's skip link moves focus to. */
+export const BOARD_ID = 'board';
 
 const unique = <T,>(xs: T[]): T[] => [...new Set(xs)];
 
@@ -71,6 +76,7 @@ export function Board({
   position,
   highlights = EMPTY,
   onSquareClick,
+  target = false,
 }: BoardProps) {
   const uid = useId();
   const rotate = viewRotation(board.sides.find((s) => s.id === seat));
@@ -121,6 +127,7 @@ export function Board({
       viewBox={`0 0 ${TOTAL} ${TOTAL}`}
       role={onSquareClick ? 'group' : 'img'}
       aria-label={`Chess Nines board, ${seat} seat`}
+      {...(target && { id: BOARD_ID, tabIndex: -1 })}
     >
       <defs>
         <linearGradient id={`${uid}-frame`} x1="0" y1="0" x2="1" y2="1">

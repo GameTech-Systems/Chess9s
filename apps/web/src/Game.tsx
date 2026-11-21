@@ -314,6 +314,7 @@ export function Game({
           position={game.position}
           highlights={highlights(model)}
           onSquareClick={(at) => !botTurn && setModel((m) => click(m, at))}
+          target
         />
       </div>
 
