@@ -465,12 +465,10 @@ export class Room {
     const bucket = take(a, now);
     if (!bucket.ok) {
       if (bucket.strikes >= FLOOD_STRIKES) return this.close(ws, CLOSE_FLOOD, 'Too many messages.');
-      // Dropped: `seen` stays, so the bucket refills from the last message that counted.
-      ws.serializeAttachment({
-        ...a,
-        tokens: bucket.tokens,
-        strikes: bucket.strikes,
-      } satisfies Attachment);
+      // Dropped: `seen` and `tokens` both stay, so the next message refills once from the last
+      // message that counted (storing the refilled tokens here would count that refill twice), and
+      // a flood does not keep the socket from going idle.
+      ws.serializeAttachment({ ...a, strikes: bucket.strikes } satisfies Attachment);
       return;
     }
     const step = receive({ data, random, code: before.code, now }, before, a.seat, message);

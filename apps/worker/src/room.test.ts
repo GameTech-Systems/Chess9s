@@ -298,6 +298,23 @@ describe('socket limits (K2, K5, S95)', () => {
     expect(light.take()).toEqual([]);
   });
 
+  it('a dropped message adds no refill, so later messages are not counted twice (S95/S96 audit)', async () => {
+    const h = harness();
+    const { light } = await h.seated();
+    vi.setSystemTime(Date.now() + 5000);
+    for (let i = 0; i < MESSAGE_BURST; i++) await h.send(light, 'not json');
+    expect(light.take()).toHaveLength(MESSAGE_BURST);
+    // Every 20 ms: 0.4 of a message refills at 20 a second, so only the third send fits.
+    for (let i = 0; i < 2; i++) {
+      vi.setSystemTime(Date.now() + 20);
+      await h.send(light, 'not json');
+    }
+    expect(light.take()).toEqual([]);
+    vi.setSystemTime(Date.now() + 20);
+    await h.send(light, 'not json');
+    expect(light.take()).toHaveLength(1);
+  });
+
   it('keeps the count through hibernation, and closes a repeat offender with 1008', async () => {
     const h = harness();
     const { light, dark } = await h.seated();
