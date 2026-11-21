@@ -19,7 +19,14 @@ import {
   JOIN_WITHIN_MS,
   KEEP_AFTER_END_MS,
   KEEP_WITHOUT_MOVE_MS,
+  CLOSE_BINARY,
+  CLOSE_ERROR,
+  CLOSE_FLOOD,
+  CLOSE_TOO_BIG,
   MAX_SOCKETS,
+  MESSAGE_BURST,
+  MESSAGES_PER_SECOND,
+  FLOOD_STRIKES,
   Room,
 } from './room';
 
@@ -175,8 +182,9 @@ describe('playing', () => {
         expect(light.take()).toEqual([{ v: 1, type: 'opponent', status: 'present' }]);
       }
       if (i % 10 === 5) h.restart();
-      // Dark moves first on this board.
+      // Dark moves first on this board; a second a move (K2: a socket's messages are limited).
       const mover = i % 2 === 0 ? dark : light;
+      vi.setSystemTime(Date.now() + 1000);
       await h.send(mover, { v: 1, type: 'move', move });
       const saved = h.state.data.get('room') as { moves: string[] };
       expect(saved.moves).toHaveLength(i + 1);
@@ -236,13 +244,14 @@ describe('playing', () => {
     expect(light.take()).toEqual([]);
   });
 
-  it('refuses binary messages and holds at most a few sockets', async () => {
+  it('closes a socket that sends binary, and holds at most a few sockets', async () => {
     const h = harness();
     await h.create();
     const ws = await h.connect();
     await h.room.webSocketMessage(ws, new ArrayBuffer(4));
-    expect(ws.take()).toMatchObject([{ type: 'refused', reason: 'malformed' }]);
-    for (let i = 1; i < MAX_SOCKETS; i++) await h.connect();
+    expect(ws.take()).toEqual([]);
+    expect(ws.closed?.code).toBe(CLOSE_BINARY);
+    for (let i = 0; i < MAX_SOCKETS; i++) await h.connect();
     const res = await h.room.fetch(
       new Request('https://room/socket', { headers: { Upgrade: 'websocket' } }),
     );
@@ -258,6 +267,58 @@ describe('playing', () => {
     await h.send(light, { v: 1, type: 'resign' });
     expect(light.closed?.code).toBe(CLOSE_GONE);
     expect((await h.info()).status).toBe(404);
+  });
+});
+
+describe('socket limits (K2, K5, S95)', () => {
+  const resign = { v: 1, type: 'offer-draw' };
+
+  it('closes a socket whose message is over the size cap, and its seat turns away', async () => {
+    const h = harness();
+    const { light, dark } = await h.seated();
+    await h.send(light, 'x'.repeat(24_001));
+    expect(light.closed?.code).toBe(CLOSE_TOO_BIG);
+    expect(light.take()).toEqual([]);
+    expect(dark.take()).toEqual([{ v: 1, type: 'opponent', status: 'away' }]);
+  });
+
+  it(`takes a burst of ${MESSAGE_BURST}, then ${MESSAGES_PER_SECOND} a second; more are dropped unanswered`, async () => {
+    const h = harness();
+    const { light } = await h.seated();
+    vi.setSystemTime(Date.now() + 5000); // the bucket is full again after the join
+    for (let i = 0; i < MESSAGE_BURST; i++) await h.send(light, 'not json');
+    expect(light.take()).toHaveLength(MESSAGE_BURST);
+    await h.send(light, 'not json');
+    expect(light.take()).toEqual([]);
+    expect(light.closed).toBeNull();
+    vi.setSystemTime(Date.now() + 1000);
+    for (let i = 0; i < MESSAGES_PER_SECOND; i++) await h.send(light, 'not json');
+    expect(light.take()).toHaveLength(MESSAGES_PER_SECOND);
+    await h.send(light, resign);
+    expect(light.take()).toEqual([]);
+  });
+
+  it('keeps the count through hibernation, and closes a repeat offender with 1008', async () => {
+    const h = harness();
+    const { light, dark } = await h.seated();
+    vi.setSystemTime(Date.now() + 5000);
+    for (let i = 0; i < MESSAGE_BURST; i++) await h.send(light, 'not json');
+    h.restart();
+    for (let i = 1; i < FLOOD_STRIKES; i++) await h.send(light, 'not json');
+    expect(light.closed).toBeNull();
+    await h.send(light, 'not json');
+    expect(light.closed?.code).toBe(CLOSE_FLOOD);
+    expect(dark.take()).toEqual([{ v: 1, type: 'opponent', status: 'away' }]);
+  });
+
+  it('closes a socket with 1011 when handling its message throws', async () => {
+    const h = harness();
+    const { light } = await h.seated();
+    h.state.storage.kv.put = () => {
+      throw new Error('storage reset');
+    };
+    await h.send(light, resign);
+    expect(light.closed?.code).toBe(CLOSE_ERROR);
   });
 });
 

@@ -31,8 +31,11 @@ export interface Env {
  * keeps them equal).
  */
 export const LIMITS = { rooms: 10, sockets: 30, info: 60 } as const;
-/** The limits' window in seconds: an address over a limit is told to wait this long. */
-export const LIMIT_PERIOD_S = 60;
+/**
+ * The limits' window in seconds: an address over a limit is told to wait this long. Not exported:
+ * workerd takes every export of this module as a handler, and refuses a number.
+ */
+const LIMIT_PERIOD_S = 60;
 
 type Random = (n: number) => Uint8Array;
 const cryptoRandom: Random = (n) => crypto.getRandomValues(new Uint8Array(n));
