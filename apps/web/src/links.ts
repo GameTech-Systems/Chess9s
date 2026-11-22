@@ -29,7 +29,7 @@ export const LICENSES_PATH = '/third-party-licenses.txt';
 export const RIGHTS_HOLDER = 'Duke Johnson';
 
 /**
- * Where the footer's Feedback link goes. Provisional (S97): the Discussions page, until the owner
- * pins the "Launch feedback" thread (S98); then point this at that thread's address.
+ * Where the footer's Feedback link goes: the Discussions' playtest-feedback category, where the
+ * owner pins the feedback post (owner, S98, 22 Nov 2026).
  */
-export const FEEDBACK_URL: string = DISCUSSIONS_URL;
+export const FEEDBACK_URL: string = `${DISCUSSIONS_URL}/categories/playtest-feedback`;
