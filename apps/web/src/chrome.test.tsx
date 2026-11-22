@@ -386,7 +386,9 @@ describe('online play pages (S53)', () => {
       'Contact: https://github.com/GameTech-Systems/Chess9s/security/advisories/new',
     );
     expect(security).toMatch(/^Expires: 2027-11-01T00:00:00\.000Z$/m);
-    expect(security).not.toMatch(/mailto:|@/);
+    // D95 (owner, 22 Nov 2026): the public contact address is listed as a second contact.
+    expect(security).toMatch(/^Contact: mailto:GameTypeBrand@gmail\.com$/m);
+    expect(security.indexOf('Contact: https://')).toBeLessThan(security.indexOf('Contact: mailto:'));
 
     const headers = file('../public/_headers');
     for (const path of [

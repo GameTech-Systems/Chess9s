@@ -2,7 +2,7 @@
 
 ## Reporting a vulnerability
 
-Please report security problems **privately**: open the repository's **Security** tab and choose **Report a vulnerability** (GitHub private vulnerability reporting). Do not open a public issue for a vulnerability.
+Please report security problems **privately**: open the repository's **Security** tab and choose **Report a vulnerability** (GitHub private vulnerability reporting). If you can't use GitHub, email the project's public contact address, GameTypeBrand@gmail.com. Do not open a public issue for a vulnerability.
 
 In scope: the web app, the build and deploy pipeline, and tampering with rules data or published rulesets. If you find a leaked credential or personal information in this repository or its history, report it the same way.
 
