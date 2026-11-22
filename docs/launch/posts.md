@@ -1,6 +1,6 @@
 # Launch post drafts
 
-Drafted in S97 for the owner to edit and post (D91: the owner posts, one channel a day, in this order; Claude never posts). Plain words (D85): no ruleset ids or version numbers. No launch date is written anywhere (D93). Each post links chess9s.com and the Discussions, and asks for no account or email. Check each site's self-promotion rules before posting. `[Feedback link]` stands for the pinned "Launch feedback" Discussion, which the owner makes in S98.
+Drafted in S97 for the owner to edit and post (D91: the owner posts, one channel a day, in this order; Claude never posts). Plain words (D85): no ruleset ids or version numbers. No launch date is written anywhere (D93). Each post links chess9s.com and the Discussions, and asks for no account or email. Check each site's self-promotion rules before posting. The feedback link is the Discussions' playtest-feedback category, where the owner pins the feedback post (S98).
 
 Screenshots to attach are in `docs/launch/screenshots/` (see `press.md`).
 
@@ -36,7 +36,7 @@ I've been building a chess variant called Chess Nines. It's chess on a 9×9 boar
 
 Play: https://chess9s.com · Rules and code: https://github.com/GameTech-Systems/Chess9s
 
-It's new, so I'd like to hear what feels off or unfair. Tell me here, or in the feedback thread: [Feedback link]
+It's new, so I'd like to hear what feels off or unfair. Tell me here, or in the feedback thread: https://github.com/GameTech-Systems/Chess9s/discussions/categories/playtest-feedback
 
 *(For r/chess, shorten to the first paragraph and the "free, no account" line, attach the 2-player screenshot, and follow the subreddit's self-promotion rules.)*
 
@@ -70,7 +70,7 @@ Chess Nines is a 9×9 chess variant with five extra pieces and a few special squ
 
 https://chess9s.com
 
-I'm looking for people to try it and tell me where the rules feel unbalanced. Feedback thread: [Feedback link]
+I'm looking for people to try it and tell me where the rules feel unbalanced. Feedback thread: https://github.com/GameTech-Systems/Chess9s/discussions/categories/playtest-feedback
 
 ## Later (after the four-week review, not on launch week)
 
