@@ -36,7 +36,7 @@ I've been building a chess variant called Chess Nines. It's chess on a 9×9 boar
 
 Play: https://chess9s.com · Rules and code: https://github.com/GameTech-Systems/Chess9s
 
-It's new, so I'd like to hear what feels off or unfair. Tell me here, or in the feedback thread: https://github.com/GameTech-Systems/Chess9s/discussions/categories/playtest-feedback
+It's new, so I'd like to hear what feels off or unfair. Tell me here, or in the feedback thread: https://github.com/GameTech-Systems/Chess9s/discussions/106
 
 *(For r/chess, shorten to the first paragraph and the "free, no account" line, attach the 2-player screenshot, and follow the subreddit's self-promotion rules.)*
 
@@ -70,7 +70,7 @@ Chess Nines is a 9×9 chess variant with five extra pieces and a few special squ
 
 https://chess9s.com
 
-I'm looking for people to try it and tell me where the rules feel unbalanced. Feedback thread: https://github.com/GameTech-Systems/Chess9s/discussions/categories/playtest-feedback
+I'm looking for people to try it and tell me where the rules feel unbalanced. Feedback thread: https://github.com/GameTech-Systems/Chess9s/discussions/106
 
 ## Later (after the four-week review, not on launch week)
 

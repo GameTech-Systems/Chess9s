@@ -28,8 +28,5 @@ export const LICENSES_PATH = '/third-party-licenses.txt';
 /** The rights holder named in NOTICE and TRADEMARKS.md. */
 export const RIGHTS_HOLDER = 'Duke Johnson';
 
-/**
- * Where the footer's Feedback link goes: the Discussions' playtest-feedback category, where the
- * owner pins the feedback post (owner, S98, 22 Nov 2026).
- */
-export const FEEDBACK_URL: string = `${DISCUSSIONS_URL}/categories/playtest-feedback`;
+/** Where the footer's Feedback link goes: the pinned feedback post (Discussion 106, owner, 22 Nov 2026). */
+export const FEEDBACK_URL: string = `${DISCUSSIONS_URL}/106`;

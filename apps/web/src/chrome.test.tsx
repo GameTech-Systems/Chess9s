@@ -177,8 +177,8 @@ describe('pages', () => {
 });
 
 describe('footer feedback link', () => {
-  it('links Feedback to the launch-feedback thread on the game and on other pages', () => {
-    expect(FEEDBACK_URL).toBe(`${DISCUSSIONS_URL}/categories/playtest-feedback`);
+  it('links Feedback to the pinned feedback post on the game and on other pages', () => {
+    expect(FEEDBACK_URL).toBe(`${DISCUSSIONS_URL}/106`);
     for (const path of ['/', '/how-to-play']) {
       expect(renderToStaticMarkup(<App path={path} />)).toContain(
         `href="${FEEDBACK_URL}" target="_blank" rel="noopener noreferrer">Feedback`,

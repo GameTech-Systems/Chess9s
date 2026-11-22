@@ -7,7 +7,7 @@ How to post it:
 1. Open https://github.com/GameTech-Systems/Chess9s/discussions/new/choose and pick the playtest-feedback category (the Playtest form will appear; replace its fields with the body below, or post from a category that has no form if you prefer).
 2. Paste the title and body below.
 3. On the finished post, use **Pin discussion** (the pin icon, top right). The footer's Feedback link goes to the playtest-feedback category, so the pinned post is the first thing a visitor sees there.
-4. Optional: to link the post itself from the page, paste its URL into `FEEDBACK_URL` in `apps/web/src/links.ts` (a test in `apps/web/src/chrome.test.tsx` checks the current value and needs the same edit).
+4. Done: the footer and the post drafts link to this post (Discussion 106).
 
 Wording follows D85: plain words, no ruleset ids or version numbers in the text. It asks for no account beyond GitHub and no email. Posting there is a Contribution under the CLA, as the form says.
 
