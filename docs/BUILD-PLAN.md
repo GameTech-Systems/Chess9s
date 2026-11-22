@@ -529,7 +529,7 @@ Done when: every "fix in S95" row is fixed or answered in the summary, `pnpm wor
 Build decision 0025: a service worker with a build-time precache list (D89), the update flow (D90), the online-only notices, `sw.js` headers, the recovery `sw.js` kept ready with a test, the privacy line and date, and `apps/web/scripts/e2e-offline.mjs`. Decision 0025 lists the checks.
 Done when: after one visit, a 2-player hot-seat game, a computer game and a 3-player hot-seat game play to a result and reload with the network off, at desktop and Pixel 7 width; Play online says it needs a connection; an update waits during a game; tests pass.
 
-### S98 — Launch decisions · Owner with Claude in chat · Opus 5.5 · medium · `todo`
+### S98 — Launch decisions · Owner with Claude in chat · Opus 5.5 · medium · `done`
 D91 to D94 and I34 are settled in the ledger (21 Nov 2026; `docs/decisions/LEDGER-SNAPSHOT.md`). Left for the owner: confirm S2 (GitHub security settings) and the Cloudflare settings S95 asks for, sets up the feedback intake (a pinned "Launch feedback" Discussion, labels, the 72-hour answer rule), and picks the soft-launch testers by the quotas in `docs/LAUNCH.md`. The owner reads S97's post drafts before S100.
 
 ### S97 — Front door and launch materials · Sonnet 5.5 · medium · `done`
@@ -631,6 +631,10 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D92 | Public contact (I34) | Decided (owner, 21 Nov 2026): the address GameTypeBrand@gmail.com (capitals as written) on the privacy page; GitHub Discussions for questions and feedback and private vulnerability reporting for security stay as they are (S96 put the address on the privacy page) | S98 |
 | D93 | Launch window | Decided (owner, 21 Nov 2026): "The sooner the better. As soon as it's ready we can decide the exact date." No fixed launch day: the owner names the date once Gate 2 passes; the `docs/LAUNCH.md` Timeline holds the earliest targets only | S100 |
 | D94 | Measuring the launch | Decided (ledger, 21 Nov 2026, default kept): no analytics script; Cloudflare's own dashboard (requests, Durable Object counts, errors), Discussions, issues and submitted rulesets | S102 |
+| D95 | Email in security.txt | Decided (owner, 22 Nov 2026): GameTypeBrand@gmail.com listed as a second contact in `security.txt` and SECURITY.md; GitHub private reporting stays first | S98 |
+| D96 | Cloudflare rate limits | Decided (owner, 22 Nov 2026): the bindings answer 429 after 60 room-info requests a minute from one address (checked on chess9s.com); the dashboard rate-limit rule is in place; no usage alerts on the Free plan, so the owner checks the dashboard weekly; Workers Logs stays off | S98 |
+| D97 | Room and socket limits | Default: keep 10 rooms, 30 sockets, 60 room-info a minute per address, 20 messages a second (burst 40); settle from soft-launch reports | S99 |
+| D98 | Privacy wording on IP counting | Decided (S98, 22 Nov 2026): kept as written; the page already says Cloudflare keeps standard request logs | S97 |
 
 ## Ledger sync format
 

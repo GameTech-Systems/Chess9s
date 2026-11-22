@@ -100,10 +100,10 @@ Precedence: the owner's brief in the session, then `CLAUDE.md` and the accepted 
 | D92 | Public contact (I34) | The new email is GameTypeBrand@gmail.com | decided, CHANGED | S98 |
 | D93 | Launch window | The sooner the better. As soon as it's ready we can decide the exact date. | decided, CHANGED | S100 |
 | D94 | Measuring the launch | No analytics script: Cloudflare dashboard (requests, Durable Object counts, errors), Discussions, issues, submitted rulesets | decided, default | S102 |
-| D95 | Add GameTypeBrand@gmail.com to security.txt and SECURITY.md as a second contact? | No, GitHub private reporting only | OPEN, default applies | S98 |
-| D96 | Confirm the Cloudflare rate-limiting binding on the account's plan, and add a dashboard rate-limit rule and usage alerts | Confirm after the first deploy and add the rule and alerts | OPEN, default applies | S98 |
+| D95 | Add GameTypeBrand@gmail.com to security.txt and SECURITY.md as a second contact? | Yes, add it as a second Contact Owner note: Owner, S98: fine to list it. Added as a second Contact after GitHub private reporting. | decided, CHANGED | S98 |
+| D96 | Confirm the Cloudflare rate-limiting binding on the account's plan, and add a dashboard rate-limit rule and usage alerts | Confirm after the first deploy and add the rule and alerts Owner note: Free plan. Binding checked 22 Nov 2026: 429 after 60 room-info requests from one address. Dashboard rate-limit rule in place. No usage alerts on Free: weekly dashboard check instead. Workers Logs off. | decided, default | S98 |
 | D97 | Room and socket limits (10 rooms, 30 sockets, 60 room-info requests a minute per address; 20 messages a second, burst 40) | Keep the provisional values | OPEN, default applies | S99 |
-| D98 | Privacy wording: requests counted by IP address for one minute; the address never stored | Keep as written | OPEN, default applies | S97 |
+| D98 | Privacy wording: requests counted by IP address for one minute; the address never stored | Keep as written | decided, default | S97 |
 
 ## Open issues (11)
 
