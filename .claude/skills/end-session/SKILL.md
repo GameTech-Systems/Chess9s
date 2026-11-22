@@ -1,20 +1,20 @@
 ---
 name: end-session
-description: Finish a Chess Nines build session. Runs the checks, rewrites the handoff, logs the session, ships the pull request (open, wait for CI, merge), and recommends the next session's step, model, and effort. Use at the end of every session, or early when usage is running low.
+description: Finish a Chess Nines build session. Runs the checks, rewrites the handoff, logs the session, ships to `main` (push, wait for CI), and recommends the next session's step, model, and effort. Use at the end of every session, or early when usage is running low.
 ---
 
 Finish the current step.
 
-1. **Verify.** Run every check that exists: `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm validate:rules`. Before S7 there are no scripts; check that every changed JSON file parses. Record pass and fail counts.
+1. **Verify.** Run every check that exists: `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm validate:rules`. Before S7 there are no scripts; check that every changed JSON file parses. Record pass and fail counts. All must pass before step 7 ships to `main`.
 2. **Outcome.** `done` (all done-when checks pass), `partial` (some work is green, the step isn't finished), or `blocked` (say why).
 3. **Handoff.** Rewrite `docs/HANDOFF.md` from `handoff-template.md` in this folder. Keep it under 40 lines. No private information.
 4. **Log.** Append one row to `docs/sessions/LOG.md`.
 5. **Plan updates.** Set the step's status in `docs/BUILD-PLAN.md`. If public decisions changed through the owner's brief, update the "Decision defaults" table, and add a record in `docs/decisions/` for lasting choices.
 6. **Commit** with a clear message, signed off (`git commit -s`), so the DCO check passes.
-7. **Ship.** Write a PR body from `.github/PULL_REQUEST_TEMPLATE.md` (tick "Owner or Claude PR") to a temp file, then run `scripts/claude/ship.sh "<step-id>: <title>" <body-file>`. It pushes the branch, opens or reuses the PR, waits for CI, and merges.
-   - CI fails: fix it if the fix is small and in scope, commit, and run the script again. Otherwise stop and report.
-   - Outcome `partial` or `blocked`: run `scripts/claude/ship.sh --no-merge ...` so the PR stays open, and name the branch to resume in the handoff.
-   - Never merge red CI, never push to `main`, never force-push `main`.
+7. **Ship** (decision 0026, D7). Write a summary from `.github/PULL_REQUEST_TEMPLATE.md` (tick "Owner or Claude PR") to a temp file, then run `scripts/claude/ship.sh "<step-id>: <title>" <body-file>`. It rebases nothing: if the branch is behind `origin/main`, run `git rebase origin/main`, re-run the checks, and try again. It fast-forwards `main` to the branch and waits for CI on `main`; if GitHub refuses the direct push, it opens a PR, waits for CI and merges instead.
+   - CI on `main` fails: fix it forward at once (test first), check, and ship again. If you can't, say so at the top of the reply.
+   - Outcome `partial` or `blocked`: run `scripts/claude/ship.sh --no-merge ...` so the work stays on its branch with a draft PR, and name the branch to resume in the handoff.
+   - Never force-push `main` or rewrite its history.
 8. **Choose the next session.** Start from the next step's recommendation in `docs/BUILD-PLAN.md`, then adjust: raise effort one level, or switch Sonnet → Opus, if this session needed repeated attempts on design or correctness; lower it when the next step is mechanical; Haiku 5.5 · low for docs-only follow-ups.
 9. **Close** with exactly this as the end of your reply:
 

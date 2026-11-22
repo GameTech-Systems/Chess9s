@@ -565,7 +565,7 @@ The owner decides in the ledger. Until a decision is made, its default applies w
 | D4 | `dragon.rangeMode` | Decided: straight-line squares for all 5 Coast pieces, no corner option (rule set v0.2) | S32 |
 | D5 | Dragon movement parameters' player count | Superseded by rule set v0.2: Coast piece parameters are tagged per mode | S8 |
 | D6 | Sun and Moon capture | Decided: `sunMoon.capture` = any-move-square, options diagonal-only and none (rule set v0.2) | S8 |
-| D7 | Branch rules and merging | Default: ruleset on `main` requires a PR with 0 approvals and the `ci` check, blocks force-push and deletion; Claude merges after green CI | S7 |
+| D7 | Branch rules and merging | Decided (owner, 22 Nov 2026): Claude pushes finished steps straight to `main` after the local checks pass; CI runs on `main` and red is fixed forward; the ruleset keeps the PR and `ci` rules for everyone but repository admins, and blocks force-push and deletion (record 0026) | S7 |
 | D8 | Merge method | Default: rebase | S7 |
 | D10 | Default model | Default (applied): Sonnet 5.5 pinned in `.claude/settings.json`; Opus per step | S7 |
 | D11 | Discussions timing | Default: enable now | S5 |
