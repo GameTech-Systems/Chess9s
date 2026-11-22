@@ -388,7 +388,9 @@ describe('online play pages (S53)', () => {
     expect(security).toMatch(/^Expires: 2027-11-01T00:00:00\.000Z$/m);
     // D95 (owner, 22 Nov 2026): the public contact address is listed as a second contact.
     expect(security).toMatch(/^Contact: mailto:GameTypeBrand@gmail\.com$/m);
-    expect(security.indexOf('Contact: https://')).toBeLessThan(security.indexOf('Contact: mailto:'));
+    expect(security.indexOf('Contact: https://')).toBeLessThan(
+      security.indexOf('Contact: mailto:'),
+    );
 
     const headers = file('../public/_headers');
     for (const path of [
