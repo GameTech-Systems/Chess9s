@@ -6,20 +6,20 @@
 Chess Nines is a 9×9 chess variant (custom pieces and special squares). 2-player ships first; 3-player Dragon mode comes later. Rules are published as data so players can pick rulesets and propose new ones. Gameplay lives at chess9s.com. This repo is public and source-available (PolyForm Shield 1.0.0), never "open source".
 
 ## Session protocol
-1. **Start** with `/start-session S<n>`. One build-plan step per session, one pull request per step. The step list is `docs/BUILD-PLAN.md`; read only your step's section.
+1. **Start** with `/start-session S<n>`. One build-plan step per session, shipped to `main` at the end. The step list is `docs/BUILD-PLAN.md`; read only your step's section.
 2. **Model and effort** come from the step (or the owner's pasted ledger brief). If the session runs on something else, give the owner the exact commands (`/model sonnet`, `/effort medium`) at the top of your first reply. Don't switch models mid-session yourself: it drops the prompt cache.
 3. **Plan** before any change that touches several files: write the plan in your reply and go ahead without waiting for approval (owner instruction, S11). Don't use plan mode. **Write the failing test first.** Commit after every green task.
-4. **End** automatically with `/end-session` when the step is done (no prompt needed). Keep replies brief: facts, plus problems the owner must resolve before the next session. `/end-session`: checks, handoff, log, PR, CI, merge, and the next-session recommendation with a `ledger-sync` block. If usage is running low, run it early; unfinished work stays on its branch.
+4. **End** automatically with `/end-session` when the step is done (no prompt needed). Keep replies brief: facts, plus problems the owner must resolve before the next session. `/end-session`: checks, handoff, log, ship to `main`, CI, and the next-session recommendation with a `ledger-sync` block. If usage is running low, run it early; unfinished work stays on its branch.
 
 ## Decisions and defaults
 - Owner decisions are made in a private ledger. Public ones reach you through `docs/decisions/LEDGER-SNAPSHOT.md` (every non-private decision as decided; it overrides the defaults table), the owner's brief, the "Decision defaults" table in `docs/BUILD-PLAN.md`, and `docs/decisions/`. Regenerate the snapshot with `scripts/claude/ledger-snapshot.mjs` when the owner says the ledger changed.
 - **Defaults, not stalls.** When a step needs an open decision, apply its default, mark it provisional (in the data's `source` or `notes`, or a code comment), list it in the handoff, and keep going.
 - **Never invent rules.** You may only choose among options already listed in `rules/parameters.json` or in a decision. New pieces, movement, squares, parameters, or options come from the owner. If none exists, record the question in the handoff and work on the rest of the step.
 
-## Pull requests and merging
-- Claude opens and merges its own PRs; the owner does not approve them. Use `scripts/claude/ship.sh` (it uses the GitHub REST API, because `gh pr` and `gh issue` fail in cloud sessions).
-- Merge only when CI is green. Never push to `main`, never force-push `main`, never merge a partial step with failing tests.
-- Merge method: rebase (decision D8). It keeps per-task commits and their authorship.
+## Shipping to main
+- Claude pushes finished steps straight to `main` (owner decision D7, record 0026); the owner does not review. Work on a `claude/...` branch, then run `scripts/claude/ship.sh`: it fast-forwards `main` to the branch and waits for CI on `main`. If GitHub refuses the push, it opens and merges a PR instead (rebase, D8). It uses the GitHub REST API, because `gh pr` and `gh issue` fail in cloud sessions.
+- Before shipping, `pnpm typecheck`, `pnpm lint`, `pnpm test` and `pnpm validate:rules` must all pass locally: CI on `main` runs after the push, not before. If CI on `main` goes red, fix it forward in the same session.
+- Never force-push `main`, never rewrite its history, never ship a partial step or failing tests (partial work stays on its branch, `ship.sh --no-merge`).
 - Sign off every commit (`git commit -s`). A DCO check runs on every PR and fails without it (decision D22).
 
 ## Non-negotiables

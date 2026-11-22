@@ -1,6 +1,6 @@
 # 0005: Claude Code session workflow and merging
 
-**Status:** Accepted
+**Status:** Accepted; its merging part is replaced by 0026 (direct pushes to `main`, D7, 22 Nov 2026).
 
 ## Context
 The project is built in Claude Code cloud sessions on a Pro plan with usage limits. Sessions start without memory of earlier sessions, and the owner wants work to continue without waiting on approvals or on undecided rules.
