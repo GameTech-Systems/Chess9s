@@ -76,10 +76,11 @@ describe('playGame3', () => {
   }, 60_000);
 
   it('counts a King the Dragon captured among the events', () => {
-    // Greedy games in draft-3p: some seed in the first few has the Dragon take a King.
+    // Greedy games in draft-3p 0.5.0 (Standard with a 2-square King): with 8 random opening plies,
+    // seed 108 has the Dragon take a King (found by seeded self-play, decision 0027).
     const { rules, ruleset } = rulesFor(source, 'draft-3p');
-    const games = [1, 2, 3, 4, 5, 6].map((seed) =>
-      playGame3(rules, ruleset, { openingPlies: 4, maxPlies: 1500, seed }),
+    const games = [108].map((seed) =>
+      playGame3(rules, ruleset, { openingPlies: 8, maxPlies: 1500, seed }),
     );
     const captured = games.filter((g) => g.events.some((e) => e.startsWith('king-captured:')));
     expect(captured.length).toBeGreaterThan(0);
