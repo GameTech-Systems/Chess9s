@@ -1,0 +1,11 @@
+{
+  "$schema": "../../schema/ruleset.schema.json",
+  "id": "draft-3p",
+  "name": "Good Practice (3-player)",
+  "version": "0.4.0",
+  "status": "deprecated",
+  "players": 3,
+  "description": "The full 3-player Dragon rules, with Kings that move up to 2 squares and Dragon Heads that slide as far as they like. Each Coast piece's first way off the Coast is through A5. The balance between the three seats is still being tested.",
+  "overrides": {},
+  "notes": "Kept without a lock: it was never a Candidate or Official, so it does not replay."
+}

@@ -2,9 +2,17 @@
   "$schema": "../schema/ruleset.schema.json",
   "id": "draft-3p",
   "name": "Good Practice (3-player)",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "status": "experimental",
   "players": 3,
-  "description": "The Standard 3-player ruleset, but Kings move up to 2 squares in any direction and Dragon Heads slide as far as they like. Each Coast piece's first way off the Coast is through A5. The balance between the three seats is still being tested.",
-  "overrides": {}
+  "description": "The Standard 3-player ruleset, but Kings move up to 2 squares in any direction. The balance between the three seats is still being tested.",
+  "overrides": {
+    "king.range": 2,
+    "coast.3p.attackFrom": "coast-only",
+    "coast.3p.capturable": true,
+    "dragon.3p.defeat": "pieces-and-tail",
+    "tail.3p.stone": "where-it-stands",
+    "dragonHead.range": 3,
+    "tail.3p.range": 8
+  }
 }
