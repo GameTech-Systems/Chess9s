@@ -15,13 +15,13 @@ export const PRESET_SUMMARIES: Record<string, string> = {
   'easy-2p':
     'The closest to regular chess, for learning the board: the King may castle, the Queen may cross the void, and pawns have no safe zones.',
   'draft-2p':
-    'The full rules with a King that moves up to 2 squares, which makes checkmate harder to force.',
+    'The Standard rules, but the King moves up to 2 squares, which makes checkmate harder to force.',
   'heavy-h3-3p':
     'Light, dark and the Dragon, who plays the five Coast pieces. The Dragon Heads move up to 3 squares; the King moves one square.',
   'standard-3p':
     'The first 3-player rules: the full Dragon rules, with a King that moves one square.',
   'easy-3p': 'A shorter Dragon game for learning: the first checkmate wins.',
-  'draft-3p': 'The full Dragon rules with Kings that move up to 2 squares.',
+  'draft-3p': 'The Standard Dragon rules, but Kings move up to 2 squares.',
 };
 
 /** The two ways to play, as the home page offers them, each board drawn from its own seat. */

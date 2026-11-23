@@ -17,7 +17,7 @@ export const HOW_TO_PRESETS: Record<string, string> = {
   'easy-3p':
     'A shorter Dragon game for learning. The King may castle, the Queen may cross the void anywhere, pawns have no safe squares, the Dragon’s pieces give check, and the first checkmate wins. Casual play.',
   'draft-3p':
-    'Kings move up to 2 squares and the Dragon Heads slide as far as they like. Everything else is the same as Standard (default). Still being tested.',
+    'Kings move up to 2 squares. Everything else is the same as Standard (default). Still being tested.',
 };
 
 function Presets({
