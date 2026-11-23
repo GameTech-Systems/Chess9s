@@ -50,7 +50,7 @@ describe('the result of a 3-player game, for every row of both end tables', () =
     ['easy-3p', 'kinged-checkmates-tail', 'Dark wins', "Dark checkmated the Dragon's Tail."],
     ['easy-3p', 'dragon-checkmates-king', 'The Dragon wins', "The Dragon checkmated Light's King."],
     ['standard-3p', 'duel-dragon-wins', 'The Dragon wins', "The Dragon checkmated Light's King."],
-    ['draft-3p', 'duel-dragon-wins', 'The Dragon wins', "The Dragon captured Dark's King."],
+    ['draft-3p', 'duel-dragon-wins', 'The Dragon wins', "The Dragon checkmated Light's King."],
     [
       'standard-3p',
       'duel-kinged-wins',
@@ -58,8 +58,8 @@ describe('the result of a 3-player game, for every row of both end tables', () =
       'Light captured both Dragon Heads, the Sun and the Moon.',
     ],
     ['draft-3p', 'draw-both-kings', 'Draw', 'Fifty-move rule. Dark and Light share the draw.'],
-    ['draft-3p', 'draw-duel', 'Draw', 'Fifty-move rule. Dark and the Dragon share the draw.'],
-    ['draft-3p', 'dragon-out', 'Draw', 'Insufficient material. Dark and Light share the draw.'],
+    ['draft-3p', 'draw-duel', 'Draw', 'Threefold repetition. Dark and the Dragon share the draw.'],
+    ['draft-3p', 'dragon-out', 'Draw', 'Fifty-move rule. Dark and Light share the draw.'],
     ['easy-3p', 'draw', 'Draw', 'Stalemate. Dark, Light and the Dragon share the draw.'],
   ];
 
