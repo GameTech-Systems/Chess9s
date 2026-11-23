@@ -101,7 +101,7 @@ describe('privacy page', () => {
   it('names the public contact address (I34, owner, 21 Nov 2026)', () => {
     expect(CONTACT_ADDRESS).toBe('GameTypeBrand@gmail.com');
     expect(renderToStaticMarkup(<Privacy />)).toContain(
-      'href="mailto:GameTypeBrand@gmail.com">GameTypeBrand@gmail.com<',
+      'href="mailto:GameTypeBrand@gmail.com" target="_blank" rel="noopener noreferrer">GameTypeBrand@gmail.com<',
     );
   });
 });

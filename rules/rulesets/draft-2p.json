@@ -5,6 +5,6 @@
   "version": "0.2.0",
   "status": "candidate",
   "players": 2,
-  "description": "The full Chess Nines rules, with a King that moves up to 2 squares, which makes checkmate harder to force. Bot self-play found the two sides evenly matched.",
+  "description": "The Standard ruleset, but the King moves up to 2 squares in any direction, which makes checkmate harder to force. Bot self-play found the two sides evenly matched.",
   "overrides": {}
 }

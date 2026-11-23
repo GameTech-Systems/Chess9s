@@ -11,13 +11,13 @@ export const HOW_TO_PRESETS: Record<string, string> = {
   'easy-2p':
     'The closest to regular chess, for learning the board. Light moves first, the King may castle, the Queen may cross the void anywhere, any piece except the Queen may stand on E5, and pawns have no safe squares. Casual play.',
   'draft-2p':
-    'The King moves up to 2 squares, which makes checkmate harder to force. Everything else is as described above. Bot self-play found the two sides evenly matched.',
+    'The King moves up to 2 squares, which makes checkmate harder to force. Everything else is the same as Standard (default). Bot self-play found the two sides evenly matched.',
   'heavy-h3-3p':
     'The Dragon game as described above. Bot self-play found the three seats close to even.',
   'easy-3p':
     'A shorter Dragon game for learning. The King may castle, the Queen may cross the void anywhere, pawns have no safe squares, the Dragon’s pieces give check, and the first checkmate wins. Casual play.',
   'draft-3p':
-    'Kings move up to 2 squares and the Dragon Heads slide as far as they like. Still being tested.',
+    'Kings move up to 2 squares and the Dragon Heads slide as far as they like. Everything else is the same as Standard (default). Still being tested.',
 };
 
 function Presets({
@@ -215,9 +215,10 @@ export function HowToPlay({
       <Presets players={2} {...(linkTo && { linkTo })} />
       <h4>3 players</h4>
       <Presets players={3} {...(linkTo && { linkTo })} />
+      <h4>Design your own</h4>
       <p>
-        Want your own? Build a custom ruleset: start from a preset, switch any setting, and play it.
-        The builder shows what you have changed from the preset you started with.
+        Build a custom ruleset: start from a preset, switch any setting, and play it. The builder
+        shows what you have changed from the preset you started with.
       </p>
       <p className="how-actions">
         <button type="button" className="again play" onClick={onHome}>
