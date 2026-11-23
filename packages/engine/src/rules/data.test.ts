@@ -58,6 +58,7 @@ describe('loadRules', () => {
     expect(data.library.archived.map((r) => `${r.id}@${r.version}`).sort()).toEqual([
       'draft-3p@0.2.0',
       'draft-3p@0.3.0',
+      'draft-3p@0.4.0',
       'easy-3p@0.1.0',
       'standard-3p@0.1.0',
       'standard-3p@0.2.0',

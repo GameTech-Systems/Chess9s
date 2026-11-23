@@ -51,10 +51,22 @@ const resolve = (id: string, overrides: Record<string, unknown> = {}) => {
 };
 
 describe('the 3-player rulesets', () => {
-  it('draft-3p 0.4.0 (Good Practice) plays every parameter at its default', () => {
+  it('draft-3p 0.5.0 (Good Practice) is Standard (3-player) with a King that moves up to 2 squares', () => {
     const rs = ruleset('draft-3p');
-    expect([rs.version, rs.status, rs.players]).toEqual(['0.4.0', 'experimental', 3]);
-    expect(rs.overrides).toEqual({});
+    expect([rs.version, rs.status, rs.players]).toEqual(['0.5.0', 'experimental', 3]);
+    expect(rs.overrides).toEqual({ ...ruleset('heavy-h3-3p').overrides, 'king.range': 2 });
+    const standard = resolve('heavy-h3-3p');
+    const practice = resolve('draft-3p');
+    const changed = Object.keys(practice).filter(
+      (k) => JSON.stringify(practice[k]) !== JSON.stringify(standard[k]),
+    );
+    expect(changed).toEqual(['king.range']);
+  });
+
+  it('keeps draft-3p 0.4.0, the old Good Practice at every default, in the archive', () => {
+    const old = read<Ruleset>('rules/rulesets/archive/draft-3p@0.4.0.json');
+    expect([old.id, old.version, old.status]).toEqual(['draft-3p', '0.4.0', 'deprecated']);
+    expect(old.overrides).toEqual({});
   });
 
   it('standard-3p 0.3.0 (Standard) sets king.range = 1 and the Coast rule of decision 0020', () => {
