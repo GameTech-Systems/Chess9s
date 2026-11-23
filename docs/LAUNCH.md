@@ -31,6 +31,7 @@ Each gate is a set of checks. The next gate opens when they all pass.
 - Checks green: unit tests, the five browser scripts, the new offline script, and a Lighthouse-style pass (no console errors, no layout overflow at 320, 375 and 430 px and in landscape, axe with no violations: already true on seven pages in S33), plus a manual pass: a whole game by keyboard alone, visible focus, dialogs that keep and return focus, 200% zoom, and reduced motion.
 
 ### Gate 2: Soft launch (owner, S29)
+- Before testers: `www` and `http://` redirect to `https://chess9s.com/` and Cloudflare Web Analytics is off (S103, audit of 23 Nov 2026).
 - Eight to fifteen outside testers play on the final build, chosen to cover: at least two 3-player groups (one in a room, one hot-seat), at least four on phones (Android and iPhone, one installing the app and playing offline), one who plays by keyboard or with a screen reader, and two who have never played a chess variant.
 - Feedback goes to the pinned Discussion. Testers without a GitHub account send it to the owner directly, and the owner files it (or use the D92 address if one is chosen).
 - Pass: no tester hits a blocker; every reported bug has an issue; fixes ship as one Claude session (S99).

@@ -536,6 +536,10 @@ D91 to D94 and I34 are settled in the ledger (21 Nov 2026; `docs/decisions/LEDGE
 README rewritten for today (play now at chess9s.com, what is built, how to run rooms locally with `wrangler dev`); a press page in `docs/launch/press.md` (one-line pitch, facts, screenshots made with Playwright from the built app, links); a Feedback link in the footer to the pinned Discussion; post drafts for each D91 channel in `docs/launch/posts.md`, in plain words (D85), for the owner to edit and post. No new art; screenshots only. Wording the owner must approve is listed in the handoff.
 Done when: the README has no "coming soon" or phase status that is out of date, the press page and drafts exist, and the screenshots are committed.
 
+### S103 — Domain and edge settings · Owner · `todo`
+From the 23 Nov 2026 audit (`docs/audits/2026-11-23/SUMMARY.md`), in the Cloudflare dashboard before testers arrive: redirect `www.chess9s.com` to `https://chess9s.com` (301, proxied `www` record), turn on Always Use HTTPS, and turn off Web Analytics for chess9s.com (it injects a beacon the CSP blocks; the privacy page says no analytics, D94).
+Done when: `www.chess9s.com` and `http://chess9s.com` answer 301 to `https://chess9s.com/`, and the home page loads with no console error. Claude can check all three with curl and Chromium.
+
 ### S29 — Outside testers (soft launch) · Owner · `doing`
 Continues on the final build: five to ten testers, including one 3-player room and one offline game on a phone, feedback through Discussions. Gate 2 in `docs/LAUNCH.md`.
 

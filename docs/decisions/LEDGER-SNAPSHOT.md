@@ -5,7 +5,7 @@ Private items are left out. **This file overrides the "Decision defaults" table 
 
 Precedence: the owner's brief in the session, then `CLAUDE.md` and the accepted records in `docs/decisions/`, then this file, then the defaults table. A later decision on the same subject replaces an earlier one; rows marked CONFLICT or Superseded say which applies.
 
-## Decisions (95)
+## Decisions (96)
 
 | Id | Decision | Choice in effect | Status | Needed by |
 | --- | --- | --- | --- | --- |
@@ -104,17 +104,20 @@ Precedence: the owner's brief in the session, then `CLAUDE.md` and the accepted 
 | D96 | Confirm the Cloudflare rate-limiting binding on the account's plan, and add a dashboard rate-limit rule and usage alerts | Confirm after the first deploy and add the rule and alerts Owner note: Free plan. Binding checked 22 Nov 2026: 429 after 60 room-info requests from one address. Dashboard rate-limit rule in place. No usage alerts on Free: weekly dashboard check instead. Workers Logs off. | decided, default | S98 |
 | D97 | Room and socket limits (10 rooms, 30 sockets, 60 room-info requests a minute per address; 20 messages a second, burst 40) | Keep the provisional values | OPEN, default applies | S99 |
 | D98 | Privacy wording: requests counted by IP address for one minute; the address never stored | Keep as written | decided, default | S97 |
+| D99 | Good Practice is Standard with a 2-square King, for 2 and 3 players | Both player counts: Standard plus a 2-square King: draft-3p 0.5.0 copies Standard (3-player) and sets king.range to 2 | decided, default | S99 |
 
-## Open issues (11)
+## Open issues (13)
 
 - I23 (med): ChessNines role already answered
 - I27 (med): Claude can't change repo settings from chat
 - I35 (low): Durable Objects and Cloudflare preview builds
 - I36 (low): Greedy Easy Start Dragon loses its Tail within about 9 plies
 - I38 (high): At depth 2 the Kinged seat that moves just before the Dragon collapses (light, under clockwise order)
-- I42 (high): README says Phase 1 built and Play coming soon
 - I46 (low): Arrow keys between board squares
 - I47 (low): A not-found page for unknown paths
 - I48 (low): Warm up the computer's worker when a computer game opens
 - I49 (low): Manifest shortcuts
 - I50 (low): Accessibility not checked in Safari, Firefox or with a screen reader
+- I51 (high): www.chess9s.com answers Cloudflare's 404
+- I52 (high): http://chess9s.com serves the page instead of redirecting to HTTPS
+- I53 (high): Cloudflare injects its Web Analytics beacon into the home page
