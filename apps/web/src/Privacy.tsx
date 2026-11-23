@@ -86,11 +86,16 @@ export function Privacy() {
       <p>
         Questions:{' '}
         {CONTACT_ADDRESS ? (
-          <a href={`mailto:${CONTACT_ADDRESS}`}>{CONTACT_ADDRESS}</a>
+          <a href={`mailto:${CONTACT_ADDRESS}`} target="_blank" rel="noopener noreferrer">
+            {CONTACT_ADDRESS}
+          </a>
         ) : (
           <>
-            ask in <a href={DISCUSSIONS_URL}>Discussions</a> (public) until a project email address
-            is published here.
+            ask in{' '}
+            <a href={DISCUSSIONS_URL} target="_blank" rel="noopener noreferrer">
+              Discussions
+            </a>{' '}
+            (public) until a project email address is published here.
           </>
         )}
       </p>

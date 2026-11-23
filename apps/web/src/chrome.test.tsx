@@ -209,6 +209,19 @@ describe('How to play page', () => {
     expect(html).not.toContain('Bot self-play found the two sides evenly matched.</p>');
   });
 
+  it('describes Good Practice as Standard with a 2-square King, and has a Design your own heading', () => {
+    const html = renderToStaticMarkup(<App path="/how-to-play" />);
+    expect(html.match(/Everything else is the same as Standard \(default\)\./g)).toHaveLength(2);
+    expect(html).toContain('<h4>Design your own</h4>');
+    expect(html).not.toContain('Want your own?');
+    expect(renderToStaticMarkup(<App path="/rules/draft-2p" />)).toContain(
+      'The Standard ruleset, but',
+    );
+    expect(renderToStaticMarkup(<App path="/rules/draft-3p" />)).toContain(
+      'The Standard 3-player ruleset, but',
+    );
+  });
+
   it('offers the three presets of each player count, and the builder, by their names', () => {
     const html = renderToStaticMarkup(<App path="/how-to-play" />);
     for (const id of [...HOME_PRESETS[2], ...HOME_PRESETS[3]]) {
