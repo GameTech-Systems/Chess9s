@@ -28,7 +28,10 @@ const set = validateBoardAndPieces(
 );
 
 function rulesFor(id: string): MoveRules {
-  const ruleset = read(`rules/rulesets/${id}.json`) as Ruleset;
+  const file = read(`rules/rulesets/${id}.json`) as Ruleset;
+  // draft-3p 0.5.0 is Standard plus a King of 2; these tests use Good Practice as it was (0.4.0,
+  // archived), with every setting at its default.
+  const ruleset = id === 'draft-3p' ? { ...file, overrides: {} } : file;
   return { ...set, values: resolveRuleset(registry, ruleset).values, players: 3 };
 }
 

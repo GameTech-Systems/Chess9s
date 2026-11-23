@@ -17,7 +17,12 @@ const set = validateBoardAndPieces(
     .map((f) => read(`rules/pieces/${f}`)),
   registry,
 );
-const ruleset = (id: string) => read(`rules/rulesets/${id}.json`) as Ruleset;
+// draft-3p 0.5.0 is Standard (3-player) plus a King of 2. This file tests parameters against Good
+// Practice as it was before (0.4.0, archived), where every setting is at its default: no overrides.
+const ruleset = (id: string): Ruleset => {
+  const r = read(`rules/rulesets/${id}.json`) as Ruleset;
+  return id === 'draft-3p' ? { ...r, overrides: {} } : r;
+};
 
 function rulesFor(id: string, overrides: Record<string, unknown> = {}): MoveRules {
   const base = ruleset(id);

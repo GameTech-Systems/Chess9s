@@ -72,7 +72,7 @@ describe('resolveRuleset defaults', () => {
   });
 
   it('resolves the 3-player draft at defaults', () => {
-    const r = resolveRuleset(registry, draft3p);
+    const r = resolveRuleset(registry, { ...draft3p, overrides: {} });
     for (const p of applicable(3)) expect(r.values[p.id]).toEqual(p.default);
     expect(r.nulls).toEqual([]);
   });
