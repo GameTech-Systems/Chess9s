@@ -4,10 +4,7 @@
     {
       "ruleset": "draft-3p",
       "seed": 3,
-      "rows": [
-        "duel-kinged-wins",
-        "tail-stone"
-      ],
+      "rows": ["duel-kinged-wins", "tail-stone"],
       "moves": [
         "i8-i7",
         "h1-i3",
@@ -191,9 +188,7 @@
     {
       "ruleset": "draft-3p",
       "seed": 2,
-      "rows": [
-        "draw-both-kings"
-      ],
+      "rows": ["draw-both-kings"],
       "moves": [
         "f8-f7",
         "e2-e4",
@@ -496,10 +491,7 @@
       "result": {
         "status": "draw",
         "reason": "fifty-move",
-        "between": [
-          "dark",
-          "light"
-        ]
+        "between": ["dark", "light"]
       },
       "events": [
         {
@@ -1021,9 +1013,7 @@
     {
       "ruleset": "draft-3p",
       "seed": 1,
-      "rows": [
-        "dragon-out"
-      ],
+      "rows": ["dragon-out"],
       "moves": [
         "i8-i7",
         "i2-i4",
@@ -1469,10 +1459,7 @@
       "result": {
         "status": "draw",
         "reason": "fifty-move",
-        "between": [
-          "dark",
-          "light"
-        ]
+        "between": ["dark", "light"]
       },
       "events": [
         {
@@ -1493,10 +1480,7 @@
     {
       "ruleset": "draft-3p",
       "seed": 1,
-      "rows": [
-        "dragon-captures-king",
-        "draw-duel"
-      ],
+      "rows": ["dragon-captures-king", "draw-duel"],
       "moves": [
         "e8-e6",
         "d2-d4",
@@ -1643,10 +1627,7 @@
       "result": {
         "status": "draw",
         "reason": "repetition",
-        "between": [
-          "dark",
-          "dragon"
-        ]
+        "between": ["dark", "dragon"]
       },
       "events": [
         {
@@ -1659,9 +1640,7 @@
     {
       "ruleset": "draft-3p",
       "seed": 2,
-      "rows": [
-        "kinged-checkmates-king"
-      ],
+      "rows": ["kinged-checkmates-king"],
       "moves": [
         "c9-d7",
         "h1-g3",
@@ -1772,9 +1751,7 @@
     {
       "ruleset": "draft-3p",
       "seed": 3,
-      "rows": [
-        "duel-dragon-wins"
-      ],
+      "rows": ["duel-dragon-wins"],
       "moves": [
         "e8-e6",
         "d2-d4",
@@ -2132,9 +2109,7 @@
     },
     {
       "ruleset": "standard-3p",
-      "rows": [
-        "kinged-checkmates-king"
-      ],
+      "rows": ["kinged-checkmates-king"],
       "seed": 1,
       "result": {
         "status": "win",
@@ -2191,10 +2166,7 @@
     },
     {
       "ruleset": "standard-3p",
-      "rows": [
-        "dragon-captures-king",
-        "duel-kinged-wins"
-      ],
+      "rows": ["dragon-captures-king", "duel-kinged-wins"],
       "seed": 2,
       "result": {
         "status": "win",
@@ -2263,9 +2235,7 @@
     },
     {
       "ruleset": "standard-3p",
-      "rows": [
-        "duel-dragon-wins"
-      ],
+      "rows": ["duel-dragon-wins"],
       "seed": 10,
       "result": {
         "status": "win",
@@ -2484,18 +2454,12 @@
     },
     {
       "ruleset": "standard-3p",
-      "rows": [
-        "tail-stone",
-        "dragon-out"
-      ],
+      "rows": ["tail-stone", "dragon-out"],
       "seed": 2,
       "result": {
         "status": "draw",
         "reason": "insufficient-material",
-        "between": [
-          "dark",
-          "light"
-        ]
+        "between": ["dark", "light"]
       },
       "events": [
         {
@@ -2975,17 +2939,12 @@
     },
     {
       "ruleset": "standard-3p",
-      "rows": [
-        "draw-both-kings"
-      ],
+      "rows": ["draw-both-kings"],
       "seed": 1,
       "result": {
         "status": "draw",
         "reason": "fifty-move",
-        "between": [
-          "dark",
-          "light"
-        ]
+        "between": ["dark", "light"]
       },
       "events": [],
       "moves": [
@@ -3379,17 +3338,12 @@
     },
     {
       "ruleset": "standard-3p",
-      "rows": [
-        "draw-duel"
-      ],
+      "rows": ["draw-duel"],
       "seed": 1,
       "result": {
         "status": "draw",
         "reason": "fifty-move",
-        "between": [
-          "light",
-          "dragon"
-        ]
+        "between": ["light", "dragon"]
       },
       "events": [
         {
@@ -3668,9 +3622,7 @@
     },
     {
       "ruleset": "easy-3p",
-      "rows": [
-        "kinged-checkmates-king"
-      ],
+      "rows": ["kinged-checkmates-king"],
       "seed": 13,
       "result": {
         "status": "win",
@@ -3754,9 +3706,7 @@
     },
     {
       "ruleset": "easy-3p",
-      "rows": [
-        "kinged-checkmates-tail"
-      ],
+      "rows": ["kinged-checkmates-tail"],
       "seed": 1,
       "result": {
         "status": "win",
@@ -3781,9 +3731,7 @@
     },
     {
       "ruleset": "easy-3p",
-      "rows": [
-        "dragon-checkmates-king"
-      ],
+      "rows": ["dragon-checkmates-king"],
       "seed": 1,
       "result": {
         "status": "win",
@@ -4067,18 +4015,12 @@
     },
     {
       "ruleset": "easy-3p",
-      "rows": [
-        "draw"
-      ],
+      "rows": ["draw"],
       "seed": 1,
       "result": {
         "status": "draw",
         "reason": "stalemate",
-        "between": [
-          "dark",
-          "light",
-          "dragon"
-        ]
+        "between": ["dark", "light", "dragon"]
       },
       "events": [],
       "moves": [
@@ -4385,9 +4327,7 @@
     },
     {
       "ruleset": "heavy-3p",
-      "rows": [
-        "dragon-out"
-      ],
+      "rows": ["dragon-out"],
       "moves": [
         "e8-e6",
         "i2-i4",
@@ -4690,10 +4630,7 @@
       "result": {
         "status": "draw",
         "reason": "repetition",
-        "between": [
-          "dark",
-          "light"
-        ]
+        "between": ["dark", "light"]
       },
       "events": [
         {
@@ -4713,9 +4650,7 @@
     },
     {
       "ruleset": "heavy-3p",
-      "rows": [
-        "kinged-checkmates-king"
-      ],
+      "rows": ["kinged-checkmates-king"],
       "moves": [
         "d8-d6",
         "h2-h3",
@@ -4742,10 +4677,7 @@
     },
     {
       "ruleset": "heavy-3p",
-      "rows": [
-        "dragon-captures-king",
-        "duel-dragon-wins"
-      ],
+      "rows": ["dragon-captures-king", "duel-dragon-wins"],
       "moves": [
         "g8-g6",
         "g2-g4",
@@ -4801,9 +4733,7 @@
     },
     {
       "ruleset": "heavy-3p",
-      "rows": [
-        "draw-duel"
-      ],
+      "rows": ["draw-duel"],
       "moves": [
         "h9-g7",
         "b2-b3",
@@ -4906,10 +4836,7 @@
       "result": {
         "status": "draw",
         "reason": "repetition",
-        "between": [
-          "dark",
-          "dragon"
-        ]
+        "between": ["dark", "dragon"]
       },
       "events": [
         {
@@ -4931,9 +4858,7 @@
     },
     {
       "ruleset": "heavy-3p",
-      "rows": [
-        "duel-kinged-wins"
-      ],
+      "rows": ["duel-kinged-wins"],
       "moves": [
         "c8-c7",
         "c1-b3",
@@ -5236,9 +5161,7 @@
     },
     {
       "ruleset": "heavy-3p",
-      "rows": [
-        "draw-both-kings"
-      ],
+      "rows": ["draw-both-kings"],
       "moves": [
         "b8-b7",
         "i2-i4",
@@ -5275,18 +5198,13 @@
       "result": {
         "status": "draw",
         "reason": "repetition",
-        "between": [
-          "dark",
-          "light"
-        ]
+        "between": ["dark", "light"]
       },
       "events": []
     },
     {
       "ruleset": "heavy-3p",
-      "rows": [
-        "tail-stone"
-      ],
+      "rows": ["tail-stone"],
       "moves": [
         "c9-d7",
         "d2-d3",
@@ -5358,9 +5276,7 @@
     },
     {
       "ruleset": "light-3p",
-      "rows": [
-        "duel-kinged-wins"
-      ],
+      "rows": ["duel-kinged-wins"],
       "moves": [
         "c8-c6",
         "e2-e4",
@@ -5503,9 +5419,7 @@
     },
     {
       "ruleset": "light-3p",
-      "rows": [
-        "dragon-out"
-      ],
+      "rows": ["dragon-out"],
       "moves": [
         "e8-e7",
         "c2-c4",
@@ -5703,9 +5617,7 @@
     },
     {
       "ruleset": "light-3p",
-      "rows": [
-        "kinged-checkmates-king"
-      ],
+      "rows": ["kinged-checkmates-king"],
       "moves": [
         "d8-d6",
         "c1-d3",
@@ -5737,10 +5649,7 @@
     },
     {
       "ruleset": "light-3p",
-      "rows": [
-        "dragon-captures-king",
-        "duel-dragon-wins"
-      ],
+      "rows": ["dragon-captures-king", "duel-dragon-wins"],
       "moves": [
         "e8-e6",
         "d2-d4",
@@ -5828,9 +5737,7 @@
     },
     {
       "ruleset": "light-3p",
-      "rows": [
-        "draw-both-kings"
-      ],
+      "rows": ["draw-both-kings"],
       "moves": [
         "d8-d7",
         "h2-h3",
@@ -6064,10 +5971,7 @@
       "result": {
         "status": "draw",
         "reason": "repetition",
-        "between": [
-          "dark",
-          "light"
-        ]
+        "between": ["dark", "light"]
       },
       "events": [
         {
@@ -6082,9 +5986,7 @@
     },
     {
       "ruleset": "light-3p",
-      "rows": [
-        "draw-duel"
-      ],
+      "rows": ["draw-duel"],
       "moves": [
         "h8-h6",
         "f2-f3",
@@ -6165,10 +6067,7 @@
       "result": {
         "status": "draw",
         "reason": "repetition",
-        "between": [
-          "dark",
-          "dragon"
-        ]
+        "between": ["dark", "dragon"]
       },
       "events": [
         {
