@@ -19,7 +19,7 @@ The 3-player game is Standard (`heavy-h3-3p`), a Candidate: the full depth-3 run
 | **Standard** (the 3-player default) | `heavy-h3-3p` | The Heavy-Handed Dragon rules ([below](#heavy-handed-and-light-handed-dragon-3-player)), with the Dragon Heads sliding at most 3 squares and the Tail up to 8 (`dragonHead.range` = 3, `tail.3p.range` = 8; [decision 0023](decisions/0023-tail-range.md)) and a King that moves one square (`king.range` = 1) |
 | **Good Practice** | `draft-3p` | Standard (`heavy-h3-3p`), except the King moves up to 2 squares (`king.range` = 2; [decision 0027](decisions/0027-good-practice-is-standard-plus-king.md)) |
 | **Easy Start** | `easy-3p` | Easy Start's piece settings and a shorter Dragon game: the first checkmate wins ([below](#easy-start-for-3-players-the-first-checkmate-wins)) |
-| **Original Dragon rules** | `standard-3p` | The first 3-player rules, kept for earlier games and no longer offered: Good Practice with a 1-square King, where the Dragon's pieces attack nothing from the Coast and Kings and Queens may capture them ([below](#original-dragon-rules-no-attacks-from-the-coast-3-player), [decision 0020](decisions/0020-three-player-coast-attacks.md)) |
+| **Original Dragon rules** | `standard-3p` | The first 3-player rules, kept for earlier games and no longer offered: every setting at its registry default except a 1-square King, where the Dragon's pieces attack nothing from the Coast and Kings and Queens may capture them ([below](#original-dragon-rules-no-attacks-from-the-coast-3-player), [decision 0020](decisions/0020-three-player-coast-attacks.md)) |
 | **Heavy-Handed Dragon** | `heavy-3p` | The Dragon Heads and the Tail slide any distance and the King moves one square. From the Coast the Dragon's pieces attack only the Coast, and the Dragon loses only once the four are captured and the Tail is checkmated ([below](#heavy-handed-and-light-handed-dragon-3-player), [decision 0021](decisions/0021-heavy-and-light-handed-dragon.md)). To test |
 | **Light-Handed Dragon** | `light-3p` | Heavy-Handed, except that the Tail only blocks and the Dragon loses once the four are captured ([below](#heavy-handed-and-light-handed-dragon-3-player)). To test |
 | **Heavy-Handed Dragon, Limited** | `heavy-limited-3p` | Heavy-Handed, except that Dragon Heads (and so a Tail that moves like one) slide at most 4 squares ([decision 0022](decisions/0022-limited-dragon.md)). To test |
@@ -139,7 +139,7 @@ Two options, for players to try: `coast.3p.exit` = a5-always (every way off the 
 
 ### Original Dragon rules: no attacks from the Coast (3-player)
 
-The Original Dragon rules (`standard-3p` 0.3.0, no longer offered on the home page) play two more Coast rules ([decision 0020](decisions/0020-three-player-coast-attacks.md)); Good Practice and Easy Start offer them as options:
+The Original Dragon rules (`standard-3p` 0.3.0, no longer offered on the home page) play two more Coast rules ([decision 0020](decisions/0020-three-player-coast-attacks.md)); the other 3-player rulesets offer them as options (Standard and Good Practice already let Kings and Queens capture on the Coast):
 
 1. **No attacks from the Coast** (`coast.3p.attackFrom` = blocked). A Coast piece standing on a Coast square, A5 included, attacks nothing: it can't capture, gives no check and guards no square, so a King may stand in its line or next to it. It still blocks lines like any piece. Off the Coast it attacks as usual, and it may capture a piece standing on the Coast by landing there.
 2. Each piece still first leaves the Coast through A5, and may come back onto any Coast square afterwards.
@@ -187,7 +187,7 @@ Only the 3 dragons (both Dragon Heads and the Dragon Tail) may ever stand on E5,
 
 ## 3-player Dragon mode (experimental)
 
-The third player is the Dragon: it moves third each round (dark, light, Dragon) and plays all 5 Coast pieces, each of which first emerges from the Coast through A5. The two players with Kings are the **Kinged players**. These are the full Dragon rules of Good Practice; Standard changes some of them, as the presets table says ([decision 0016](decisions/0016-three-player-rules-v0.3.md)).
+The third player is the Dragon: it moves third each round (dark, light, Dragon) and plays all 5 Coast pieces, each of which first emerges from the Coast through A5. The two players with Kings are the **Kinged players**. These are the full Dragon rules, every setting at its registry default; Standard and Good Practice change some of them, as the presets table says ([decision 0016](decisions/0016-three-player-rules-v0.3.md)).
 
 - **First Coast move**: the Sun or Moon one square, or the Tail off A5 to any legal square, which frees A5.
 - **Movement**: Dragon Heads and the Tail any distance in any direction; the Sun and Moon one square at a time on the Coast, then up to 2 squares in any direction. All in straight lines.
